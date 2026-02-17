@@ -29,6 +29,17 @@
         </li>
         <!-- jhipster-needle-add-element-to-menu - JHipster will add new menu items here -->
         @if (account() !== null) {
+          <li class="nav-item" routerLinkActive="active">
+            <a class="nav-link" routerLink="/menu-wizard" (click)="collapseNavbar()">
+              <span>
+                <fa-icon icon="utensils"></fa-icon>
+                <span>Crea Menu</span>
+              </span>
+            </a>
+          </li>
+        }
+
+        @if (account() !== null) {
           <li
             ngbDropdown
             class="nav-item dropdown pointer"

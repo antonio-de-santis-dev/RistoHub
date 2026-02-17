@@ -5,6 +5,9 @@ import { Authority } from 'app/config/authority.constants';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { errorRoute } from './layouts/error/error.route';
 
+import { MenuWizardComponent } from './menu-wizard/menu-wizard.component';
+import { MenuViewComponent } from './menu-view/menu-view.component';
+
 const routes: Routes = [
   {
     path: '',
@@ -36,6 +39,14 @@ const routes: Routes = [
   {
     path: '',
     loadChildren: () => import(`./entities/entity.routes`),
+  },
+  {
+    path: 'menu-wizard',
+    component: MenuWizardComponent,
+  },
+  {
+    path: 'menu-view/:id',
+    component: MenuViewComponent,
   },
   ...errorRoute,
 ];

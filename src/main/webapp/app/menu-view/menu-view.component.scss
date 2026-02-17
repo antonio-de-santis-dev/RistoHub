@@ -1,0 +1,266 @@
+// Variabili fallback (sostituite dai colori dinamici via [style.xxx])
+$radius: 12px;
+$shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+// ---- Loading / Errore ----
+.loading-screen,
+.errore-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+  font-family: 'Lato', sans-serif;
+  color: #6b7280;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #c8102e;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.btn-torna {
+  background: #c8102e;
+  color: white;
+  border-radius: 8px;
+  padding: 10px 24px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+// ---- Pagina menu ----
+.menu-page {
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+// ---- Header ----
+.menu-header {
+  position: relative;
+  padding: 20px 20px 16px;
+  border-bottom: 3px solid;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+}
+
+.btn-back-home {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  opacity: 0.8;
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-img {
+  max-width: 200px;
+  max-height: 100px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.logo-placeholder {
+  font-size: 3rem;
+}
+
+.menu-nome {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.menu-desc {
+  font-size: 0.95rem;
+  margin: 0;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+// ---- Main content ----
+.menu-main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px 16px;
+}
+
+// ---- Sezione portata ----
+.portata-section {
+  margin-bottom: 16px;
+  border-radius: $radius;
+  overflow: hidden;
+  box-shadow: $shadow;
+}
+
+.portata-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  cursor: pointer;
+  user-select: none;
+  transition: filter 0.2s;
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+}
+
+.portata-nome {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.05em;
+}
+
+.portata-arrow {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  transition: transform 0.3s ease;
+  line-height: 1;
+  &.open {
+    transform: rotate(90deg);
+  }
+}
+
+// ---- Lista prodotti ----
+.prodotti-list {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  background: white;
+
+  &.aperta {
+    max-height: 2000px;
+  }
+}
+
+.prodotti-empty {
+  padding: 16px 18px;
+  font-size: 0.88rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+// ---- Card prodotto ----
+.prodotto-card {
+  padding: 14px 18px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.15s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+  &:hover {
+    background: #fafafa;
+  }
+}
+
+.prodotto-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.prodotto-nome {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  flex: 1;
+}
+
+.prodotto-prezzo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.prodotto-desc {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 5px 0 0;
+  line-height: 1.4;
+}
+
+// ---- Empty state ----
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: #9ca3af;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-aggiungi {
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 700;
+}
+
+// ---- Note finali ----
+.menu-note {
+  margin-top: 32px;
+  font-size: 0.85rem;
+  background: #fef8ed;
+  padding: 14px 16px;
+  border-left: 5px solid;
+  border-radius: 6px;
+  color: #54402d;
+  line-height: 1.6;
+}
+
+// ---- Responsive ----
+@media (max-width: 600px) {
+  .menu-nome {
+    font-size: 1.4rem;
+  }
+  .logo-img {
+    max-width: 160px;
+  }
+
+  .portata-header {
+    padding: 12px 14px;
+  }
+  .portata-nome {
+    font-size: 0.95rem;
+  }
+
+  .prodotto-card {
+    padding: 12px 14px;
+  }
+  .prodotto-nome {
+    font-size: 0.92rem;
+  }
+  .prodotto-prezzo {
+    font-size: 0.88rem;
+  }
+}

@@ -1,0 +1,70 @@
+<!-- Stato: caricamento -->
+<div *ngIf="isLoading" class="loading-screen">
+  <div class="loading-spinner"></div>
+  <p>Caricamento menu in corso...</p>
+</div>
+
+<!-- Stato: errore -->
+<div *ngIf="!isLoading && errore" class="errore-screen">
+  <p>⚠️ Impossibile caricare il menu. Riprova più tardi.</p>
+  <a routerLink="/" class="btn-torna">← Torna alla Home</a>
+</div>
+
+<!-- Menu reale -->
+<div
+  *ngIf="!isLoading && !errore && menu"
+  class="menu-page"
+  [style.fontFamily]="fontTesto"
+  [style.backgroundColor]="coloreSecondario + '22'"
+>
+  <!-- HEADER con logo e nome ristorante -->
+  <div class="menu-header" [style.backgroundColor]="coloreSecondario" [style.borderBottomColor]="colorePrimario">
+    <a routerLink="/" class="btn-back-home" [style.color]="colorePrimario">← Home</a>
+
+    <div class="header-content">
+      <div *ngIf="logoUrl" class="logo-wrap">
+        <img [src]="logoUrl" class="logo-img" alt="Logo" />
+      </div>
+      <div *ngIf="!logoUrl" class="logo-placeholder" [style.color]="colorePrimario">🍽️</div>
+      <h1 class="menu-nome" [style.color]="colorePrimario">{{ menu.nome }}</h1>
+      <p *ngIf="menu.descrizione" class="menu-desc" [style.color]="colorePrimario">{{ menu.descrizione }}</p>
+    </div>
+  </div>
+
+  <!-- PORTATE accordion -->
+  <main class="menu-main">
+    <div *ngIf="portate.length === 0" class="empty-state">
+      <p>Nessuna portata ancora aggiunta.</p>
+      <a routerLink="/portata/new" class="btn-aggiungi" [style.backgroundColor]="colorePrimario">+ Aggiungi portate</a>
+    </div>
+
+    <section *ngFor="let portata of portate" class="portata-section">
+      <!-- Intestazione portata (cliccabile) -->
+      <div class="portata-header" [style.backgroundColor]="colorePrimario" (click)="togglePortata(portata)">
+        <h2 class="portata-nome">{{ nomePortata(portata) | uppercase }}</h2>
+        <span class="portata-arrow" [class.open]="portata.aperta">›</span>
+      </div>
+
+      <!-- Lista prodotti (accordion) -->
+      <div class="prodotti-list" [class.aperta]="portata.aperta">
+        <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="prodotti-empty">
+          <span>Nessun piatto ancora aggiunto in questa sezione.</span>
+        </div>
+
+        <div *ngFor="let prodotto of portata.prodotti" class="prodotto-card">
+          <div class="prodotto-top">
+            <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ prodotto.nome }}</h4>
+            <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</h4>
+          </div>
+          <p *ngIf="prodotto.descrizione" class="prodotto-desc">{{ prodotto.descrizione }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Note in fondo -->
+    <div class="menu-note" [style.borderLeftColor]="colorePrimario">
+      Tutti i nostri piatti sono preparati con ingredienti freschi e di qualità.<br />
+      Per informazioni su allergeni rivolgiti al personale di sala.
+    </div>
+  </main>
+</div>
