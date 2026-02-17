@@ -1,0 +1,33 @@
+{
+  "generator-jhipster": {
+    "applicationType": "monolith",
+    "authenticationType": "session",
+    "baseName": "ristoHub",
+    "buildTool": "maven",
+    "cacheProvider": "ehcache",
+    "clientFramework": "angular",
+    "clientTestFrameworks": [],
+    "clientTheme": "none",
+    "creationTimestamp": 1771329278760,
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "enableHibernateCache": true,
+    "enableTranslation": true,
+    "entities": [],
+    "feignClient": null,
+    "jhipsterVersion": "8.11.0",
+    "languages": ["it", "en", "fr", "de", "es"],
+    "microfrontend": null,
+    "microfrontends": [],
+    "nativeLanguage": "it",
+    "packageName": "main",
+    "prodDatabaseType": "postgresql",
+    "reactive": false,
+    "rememberMeKey": "10f1681abeca2b2b5356522f6bbeb17fe89382fa48c26b53d6bcb91f0cbf7ce07842b04d27b912da6e51d36c65a0b928f82e",
+    "serverPort": null,
+    "serviceDiscoveryType": null,
+    "syncUserWithIdp": null,
+    "testFrameworks": [],
+    "withAdminUi": true
+  }
+}

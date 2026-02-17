@@ -1,0 +1,45 @@
+<div>
+  @if (account) {
+    <h2 id="session-page-heading" jhiTranslate="sessions.title" [translateValues]="{ username: account.login }">
+      Sessioni attive per [<strong>{{ account.login }}</strong
+      >]
+    </h2>
+  }
+
+  @if (success) {
+    <div class="alert alert-success" jhiTranslate="sessions.messages.success"><strong>Sessione invalidata!</strong></div>
+  }
+
+  @if (error) {
+    <div class="alert alert-danger" jhiTranslate="sessions.messages.error">
+      <strong>Si è verificato un errore!</strong> Impossibile invalidare la sessione.
+    </div>
+  }
+
+  <div class="table-responsive">
+    <table class="table table-striped" aria-describedby="session-page-heading">
+      <thead>
+        <tr>
+          <th scope="col" jhiTranslate="sessions.table.ipaddress">Indirizzo IP</th>
+          <th scope="col" jhiTranslate="sessions.table.useragent">User Agent</th>
+          <th scope="col" jhiTranslate="sessions.table.date">Data</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (session of sessions; track $index) {
+          <tr>
+            <td>{{ session.ipAddress }}</td>
+            <td>{{ session.userAgent }}</td>
+            <td>{{ session.tokenDate | date: 'longDate' }}</td>
+            <td>
+              <button type="submit" class="btn btn-primary" (click)="invalidate(session.series)" jhiTranslate="sessions.table.button">
+                Invalida
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
