@@ -1,0 +1,66 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (portata(); as portataRef) {
+      <div>
+        <h2 data-cy="portataDetailsHeading"><span jhiTranslate="ristoHubApp.portata.detail.title">Portata</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="ristoHubApp.portata.id">Id</span></dt>
+          <dd>
+            <span>{{ portataRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.portata.tipo">Tipo</span></dt>
+          <dd>
+            <span [jhiTranslate]="'ristoHubApp.TipoPortata.' + (portataRef.tipo ?? 'null')">{{
+              { null: '', DEFAULT: 'DEFAULT', PERSONALIZZATA: 'PERSONALIZZATA' }[portataRef.tipo ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.portata.nomeDefault">Nome Default</span></dt>
+          <dd>
+            <span [jhiTranslate]="'ristoHubApp.NomePortataDefault.' + (portataRef.nomeDefault ?? 'null')">{{
+              {
+                null: '',
+                ANTIPASTO: 'ANTIPASTO',
+                PRIMO: 'PRIMO',
+                SECONDO: 'SECONDO',
+                CONTORNO: 'CONTORNO',
+                DOLCE: 'DOLCE',
+                BEVANDA: 'BEVANDA',
+                VINO_ROSSO: 'VINO_ROSSO',
+                VINO_BIANCO: 'VINO_BIANCO',
+                VINO_ROSATO: 'VINO_ROSATO',
+                BIRRA: 'BIRRA',
+              }[portataRef.nomeDefault ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.portata.nomePersonalizzato">Nome Personalizzato</span></dt>
+          <dd>
+            <span>{{ portataRef.nomePersonalizzato }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.portata.menu">Menu</span></dt>
+          <dd>
+            @if (portata()!.menu) {
+              <div>
+                <a [routerLink]="['/menu', portata()!.menu?.id, 'view']">{{ portataRef.menu?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Indietro</span>
+        </button>
+
+        <button type="button" [routerLink]="['/portata', portataRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Modifica</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,45 @@
+{
+  "annotations": {
+    "changelogDate": "20260217130957"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "nome",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "immagine",
+      "fieldType": "ImageBlob",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "contentType",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "tipo",
+      "fieldType": "TipoImmagine",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "LOGO,VETRINA"
+    }
+  ],
+  "name": "ImmagineMenu",
+  "relationships": [
+    {
+      "otherEntityName": "menu",
+      "otherEntityRelationshipName": "immagini",
+      "relationshipName": "menu",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

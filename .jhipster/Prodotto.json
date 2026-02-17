@@ -1,0 +1,46 @@
+{
+  "annotations": {
+    "changelogDate": "20260217130958"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "nome",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "descrizione",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "prezzo",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "Prodotto",
+  "relationships": [
+    {
+      "otherEntityName": "allergene",
+      "relationshipName": "allergeni",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityName": "portata",
+      "otherEntityRelationshipName": "prodotti",
+      "relationshipName": "portata",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

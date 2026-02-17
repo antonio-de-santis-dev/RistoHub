@@ -1,0 +1,67 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (immagineMenu(); as immagineMenuRef) {
+      <div>
+        <h2 data-cy="immagineMenuDetailsHeading"><span jhiTranslate="ristoHubApp.immagineMenu.detail.title">Immagine Menu</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="ristoHubApp.immagineMenu.id">Id</span></dt>
+          <dd>
+            <span>{{ immagineMenuRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.immagineMenu.nome">Nome</span></dt>
+          <dd>
+            <span>{{ immagineMenuRef.nome }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.immagineMenu.immagine">Immagine</span></dt>
+          <dd>
+            @if (immagineMenuRef.immagine) {
+              <div>
+                <a (click)="openFile(immagineMenuRef.immagine, immagineMenuRef.immagineContentType)">
+                  <img
+                    [src]="'data:' + immagineMenuRef.immagineContentType + ';base64,' + immagineMenuRef.immagine"
+                    style="max-width: 100%"
+                    alt="immagineMenu"
+                  />
+                </a>
+                {{ immagineMenuRef.immagineContentType }}, {{ byteSize(immagineMenuRef.immagine) }}
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.immagineMenu.contentType">Content Type</span></dt>
+          <dd>
+            <span>{{ immagineMenuRef.contentType }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.immagineMenu.tipo">Tipo</span></dt>
+          <dd>
+            <span [jhiTranslate]="'ristoHubApp.TipoImmagine.' + (immagineMenuRef.tipo ?? 'null')">{{
+              { null: '', LOGO: 'LOGO', VETRINA: 'VETRINA' }[immagineMenuRef.tipo ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.immagineMenu.menu">Menu</span></dt>
+          <dd>
+            @if (immagineMenu()!.menu) {
+              <div>
+                <a [routerLink]="['/menu', immagineMenu()!.menu?.id, 'view']">{{ immagineMenuRef.menu?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Indietro</span>
+        </button>
+
+        <button type="button" [routerLink]="['/immagine-menu', immagineMenuRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Modifica</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

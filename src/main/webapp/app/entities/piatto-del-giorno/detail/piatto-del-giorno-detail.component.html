@@ -1,0 +1,60 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (piattoDelGiorno(); as piattoDelGiornoRef) {
+      <div>
+        <h2 data-cy="piattoDelGiornoDetailsHeading">
+          <span jhiTranslate="ristoHubApp.piattoDelGiorno.detail.title">Piatto Del Giorno</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="ristoHubApp.piattoDelGiorno.id">Id</span></dt>
+          <dd>
+            <span>{{ piattoDelGiornoRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.piattoDelGiorno.data">Data</span></dt>
+          <dd>
+            <span>{{ piattoDelGiornoRef.data | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.piattoDelGiorno.attivo">Attivo</span></dt>
+          <dd>
+            <span>{{ piattoDelGiornoRef.attivo }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.piattoDelGiorno.nome">Nome</span></dt>
+          <dd>
+            <span>{{ piattoDelGiornoRef.nome }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.piattoDelGiorno.descrizione">Descrizione</span></dt>
+          <dd>
+            <span>{{ piattoDelGiornoRef.descrizione }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.piattoDelGiorno.prezzo">Prezzo</span></dt>
+          <dd>
+            <span>{{ piattoDelGiornoRef.prezzo }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.piattoDelGiorno.prodotto">Prodotto</span></dt>
+          <dd>
+            @if (piattoDelGiorno()!.prodotto) {
+              <div>
+                <a [routerLink]="['/prodotto', piattoDelGiorno()!.prodotto?.id, 'view']">{{ piattoDelGiornoRef.prodotto?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Indietro</span>
+        </button>
+
+        <button type="button" [routerLink]="['/piatto-del-giorno', piattoDelGiornoRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Modifica</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

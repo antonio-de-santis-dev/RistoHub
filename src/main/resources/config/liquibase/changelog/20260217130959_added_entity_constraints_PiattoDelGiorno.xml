@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity PiattoDelGiorno.
+    -->
+    <changeSet id="20260217130959-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="prodotto_id"
+                                 baseTableName="piatto_del_giorno"
+                                 constraintName="fk_piatto_del_giorno__prodotto_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="prodotto"
+                                 />
+    </changeSet>
+</databaseChangeLog>

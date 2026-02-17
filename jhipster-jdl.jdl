@@ -1,0 +1,116 @@
+enum TipoPortata {
+  DEFAULT,
+  PERSONALIZZATA
+}
+
+enum NomePortataDefault {
+  ANTIPASTO,
+  PRIMO,
+  SECONDO,
+  CONTORNO,
+  DOLCE,
+  BEVANDA,
+  VINO_ROSSO,
+  VINO_BIANCO,
+  VINO_ROSATO,
+  BIRRA
+}
+
+enum TipoImmagine {
+  LOGO,
+  VETRINA
+}
+
+// ===============================
+// ENTITÀ
+// ===============================
+
+entity Menu {
+  id UUID,
+  nome String required,
+  descrizione String,
+  attivo Boolean required,
+  templateStyle String,
+  colorePrimario String,
+  coloreSecondario String,
+  fontMenu String
+}
+
+entity Portata {
+  id UUID,
+  tipo TipoPortata required,
+  nomeDefault NomePortataDefault,
+  nomePersonalizzato String
+}
+
+entity ImmagineMenu {
+  id UUID,
+  nome String,
+  immagine ImageBlob required,
+  contentType String,
+  tipo TipoImmagine required
+}
+
+entity Prodotto {
+  id UUID,
+  nome String required,
+  descrizione String,
+  prezzo BigDecimal required
+}
+
+entity PiattoDelGiorno {
+  id UUID,
+  data LocalDate required,
+  attivo Boolean required,
+  nome String,
+  descrizione String,
+  prezzo BigDecimal
+}
+
+entity Allergene {
+  id UUID,
+  nome String required,
+  simbolo String
+}
+
+// ===============================
+// DTO / SERVICE / MAPPER
+// ===============================
+dto Menu, Portata, ImmagineMenu, Prodotto, PiattoDelGiorno, Allergene with mapstruct
+service Menu, Portata, ImmagineMenu, Prodotto, PiattoDelGiorno, Allergene with serviceClass
+
+// ===============================
+// RELAZIONI
+// ===============================
+relationship OneToMany {
+  Menu{portate} to Portata{menu required},
+  Menu{immagini} to ImmagineMenu{menu required},
+  Portata{prodotti} to Prodotto{portata required}
+}
+
+relationship ManyToOne {
+  Menu{ristoratore(login) required} to User with builtInEntity,
+  PiattoDelGiorno{prodotto} to Prodotto
+}
+
+relationship ManyToMany {
+  Prodotto{allergeni} to Allergene
+}
+
+// ===============================
+// COMMENTI FUTURI
+// ===============================
+/*
+Lista temporanea cliente (solo per sviluppo futuro)
+L’utente anonimo potrà selezionare prodotti da un menu
+e salvarli temporaneamente in sessionStorage/localStorage.
+
+entity ListaTemporanea {
+  sessionId String required,
+  dati JsonBlob required
+}
+
+relationship ManyToMany {
+  ListaTemporanea{prodotti} to Prodotto
+}
+*/

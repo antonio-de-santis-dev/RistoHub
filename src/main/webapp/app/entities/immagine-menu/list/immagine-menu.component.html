@@ -1,0 +1,134 @@
+<div>
+  <h2 id="page-heading" data-cy="ImmagineMenuHeading">
+    <span jhiTranslate="ristoHubApp.immagineMenu.home.title">ImmagineMenus</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="ristoHubApp.immagineMenu.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-immagine-menu"
+        [routerLink]="['/immagine-menu/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="ristoHubApp.immagineMenu.home.createLabel">Genera un nuovo Immagine Menu</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (immagineMenus().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="ristoHubApp.immagineMenu.home.notFound">No Immagine Menus found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.immagineMenu.id">Id</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nome">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.immagineMenu.nome">Nome</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="immagine">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.immagineMenu.immagine">Immagine</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="contentType">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.immagineMenu.contentType">Content Type</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="tipo">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.immagineMenu.tipo">Tipo</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="menu.id">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.immagineMenu.menu">Menu</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (immagineMenu of immagineMenus(); track trackId(immagineMenu)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/immagine-menu', immagineMenu.id, 'view']">{{ immagineMenu.id }}</a>
+              </td>
+              <td>{{ immagineMenu.nome }}</td>
+              <td>
+                @if (immagineMenu.immagine) {
+                  <a (click)="openFile(immagineMenu.immagine, immagineMenu.immagineContentType)">
+                    <img
+                      [src]="'data:' + immagineMenu.immagineContentType + ';base64,' + immagineMenu.immagine"
+                      style="max-height: 30px"
+                      alt="immagineMenu"
+                    />
+                  </a>
+                  <span>{{ immagineMenu.immagineContentType }}, {{ byteSize(immagineMenu.immagine) }}</span>
+                }
+              </td>
+              <td>{{ immagineMenu.contentType }}</td>
+              <td [jhiTranslate]="'ristoHubApp.TipoImmagine.' + (immagineMenu.tipo ?? 'null')">
+                {{ { null: '', LOGO: 'LOGO', VETRINA: 'VETRINA' }[immagineMenu.tipo ?? 'null'] }}
+              </td>
+              <td>
+                @if (immagineMenu.menu) {
+                  <div>
+                    <a [routerLink]="['/menu', immagineMenu.menu.id, 'view']">{{ immagineMenu.menu.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/immagine-menu', immagineMenu.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Visualizza</span>
+                  </a>
+
+                  <a [routerLink]="['/immagine-menu', immagineMenu.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Modifica</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(immagineMenu)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Elimina</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

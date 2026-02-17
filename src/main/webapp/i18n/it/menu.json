@@ -1,0 +1,33 @@
+{
+  "ristoHubApp": {
+    "menu": {
+      "home": {
+        "title": "Menus",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Genera un nuovo Menu",
+        "createOrEditLabel": "Genera o modifica un Menu",
+        "notFound": "No Menus found"
+      },
+      "created": "&Egrave; stato generato un nuovo Menu con identificatore {{ param }}",
+      "updated": "&Egrave; stato aggiornato Menu identificato da {{ param }}",
+      "deleted": "&Egrave; stato eliminato Menu con identificatore {{ param }}",
+      "delete": {
+        "question": "Sei sicuro di volere eliminare Menu {{ id }}?"
+      },
+      "detail": {
+        "title": "Menu"
+      },
+      "id": "Id",
+      "nome": "Nome",
+      "descrizione": "Descrizione",
+      "attivo": "Attivo",
+      "templateStyle": "Template Style",
+      "colorePrimario": "Colore Primario",
+      "coloreSecondario": "Colore Secondario",
+      "fontMenu": "Font Menu",
+      "portate": "Portate",
+      "immagini": "Immagini",
+      "ristoratore": "Ristoratore"
+    }
+  }
+}

@@ -1,0 +1,62 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (menu(); as menuRef) {
+      <div>
+        <h2 data-cy="menuDetailsHeading"><span jhiTranslate="ristoHubApp.menu.detail.title">Menu</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="ristoHubApp.menu.id">Id</span></dt>
+          <dd>
+            <span>{{ menuRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.menu.nome">Nome</span></dt>
+          <dd>
+            <span>{{ menuRef.nome }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.menu.descrizione">Descrizione</span></dt>
+          <dd>
+            <span>{{ menuRef.descrizione }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.menu.attivo">Attivo</span></dt>
+          <dd>
+            <span>{{ menuRef.attivo }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.menu.templateStyle">Template Style</span></dt>
+          <dd>
+            <span>{{ menuRef.templateStyle }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.menu.colorePrimario">Colore Primario</span></dt>
+          <dd>
+            <span>{{ menuRef.colorePrimario }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.menu.coloreSecondario">Colore Secondario</span></dt>
+          <dd>
+            <span>{{ menuRef.coloreSecondario }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.menu.fontMenu">Font Menu</span></dt>
+          <dd>
+            <span>{{ menuRef.fontMenu }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.menu.ristoratore">Ristoratore</span></dt>
+          <dd>
+            <span>{{ menuRef.ristoratore?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Indietro</span>
+        </button>
+
+        <button type="button" [routerLink]="['/menu', menuRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Modifica</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

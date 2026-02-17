@@ -1,0 +1,106 @@
+<div>
+  <h2 id="page-heading" data-cy="AllergeneHeading">
+    <span jhiTranslate="ristoHubApp.allergene.home.title">Allergenes</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="ristoHubApp.allergene.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-allergene"
+        [routerLink]="['/allergene/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="ristoHubApp.allergene.home.createLabel">Genera un nuovo Allergene</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (allergenes().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="ristoHubApp.allergene.home.notFound">No Allergenes found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.allergene.id">Id</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nome">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.allergene.nome">Nome</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="simbolo">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.allergene.simbolo">Simbolo</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="prodotto.id">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.allergene.prodotto">Prodotto</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (allergene of allergenes(); track trackId(allergene)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/allergene', allergene.id, 'view']">{{ allergene.id }}</a>
+              </td>
+              <td>{{ allergene.nome }}</td>
+              <td>{{ allergene.simbolo }}</td>
+              <td>
+                @for (prodotto of allergene.prodottos; track $index; let last = $last) {
+                  <span>
+                    <a class="form-control-static" [routerLink]="['/prodotto', prodotto.id, 'view']">{{ prodotto.id }}</a
+                    >{{ last ? '' : ', ' }}
+                  </span>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/allergene', allergene.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Visualizza</span>
+                  </a>
+
+                  <a [routerLink]="['/allergene', allergene.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Modifica</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(allergene)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Elimina</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

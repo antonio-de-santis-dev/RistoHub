@@ -1,0 +1,26 @@
+{
+  "ristoHubApp": {
+    "allergene": {
+      "home": {
+        "title": "Allergenes",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Genera un nuovo Allergene",
+        "createOrEditLabel": "Genera o modifica un Allergene",
+        "notFound": "No Allergenes found"
+      },
+      "created": "&Egrave; stato generato un nuovo Allergene con identificatore {{ param }}",
+      "updated": "&Egrave; stato aggiornato Allergene identificato da {{ param }}",
+      "deleted": "&Egrave; stato eliminato Allergene con identificatore {{ param }}",
+      "delete": {
+        "question": "Sei sicuro di volere eliminare Allergene {{ id }}?"
+      },
+      "detail": {
+        "title": "Allergene"
+      },
+      "id": "Id",
+      "nome": "Nome",
+      "simbolo": "Simbolo",
+      "prodotto": "Prodotto"
+    }
+  }
+}

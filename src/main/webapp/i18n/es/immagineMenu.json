@@ -1,0 +1,28 @@
+{
+  "ristoHubApp": {
+    "immagineMenu": {
+      "home": {
+        "title": "Immagine Menus",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Immagine Menu",
+        "createOrEditLabel": "Crear o editar Immagine Menu",
+        "notFound": "Ningún Immagine Menus encontrado"
+      },
+      "created": "Un nuevo Immagine Menu ha sido creado con el identificador {{ param }}",
+      "updated": "Un Immagine Menu ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Immagine Menu ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Immagine Menu {{ id }}?"
+      },
+      "detail": {
+        "title": "Immagine Menu"
+      },
+      "id": "Id",
+      "nome": "Nome",
+      "immagine": "Immagine",
+      "contentType": "Content Type",
+      "tipo": "Tipo",
+      "menu": "Menu"
+    }
+  }
+}

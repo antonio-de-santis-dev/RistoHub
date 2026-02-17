@@ -19,7 +19,18 @@
     <property name="timeType" value="time(6)" dbms="postgresql"/>
 
     <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260217130955_added_entity_Menu.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260217130956_added_entity_Portata.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260217130957_added_entity_ImmagineMenu.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260217130958_added_entity_Prodotto.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260217130959_added_entity_PiattoDelGiorno.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260217131000_added_entity_Allergene.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+    <include file="config/liquibase/changelog/20260217130955_added_entity_constraints_Menu.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260217130956_added_entity_constraints_Portata.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260217130957_added_entity_constraints_ImmagineMenu.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260217130958_added_entity_constraints_Prodotto.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260217130959_added_entity_constraints_PiattoDelGiorno.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

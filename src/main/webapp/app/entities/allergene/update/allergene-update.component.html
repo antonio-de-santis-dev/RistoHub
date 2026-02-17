@@ -1,0 +1,71 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-allergene-heading" data-cy="AllergeneCreateUpdateHeading" jhiTranslate="ristoHubApp.allergene.home.createOrEditLabel">
+        Genera o modifica un Allergene
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="ristoHubApp.allergene.id">Id</label>
+            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let nomeRef = editForm.get('nome')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_nome" jhiTranslate="ristoHubApp.allergene.nome">Nome</label>
+          <input type="text" class="form-control" name="nome" id="field_nome" data-cy="nome" formControlName="nome" />
+          @if (nomeRef.invalid && (nomeRef.dirty || nomeRef.touched)) {
+            <div>
+              @if (editForm.get('nome')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Questo campo è obbligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_simbolo" jhiTranslate="ristoHubApp.allergene.simbolo">Simbolo</label>
+          <input type="text" class="form-control" name="simbolo" id="field_simbolo" data-cy="simbolo" formControlName="simbolo" />
+        </div>
+
+        <div class="mb-3">
+          <label for="field_prodottos" jhiTranslate="ristoHubApp.allergene.prodotto">Prodotto</label>
+          <select
+            class="form-control"
+            id="field_prodottos"
+            data-cy="prodotto"
+            multiple
+            name="prodottos"
+            formControlName="prodottos"
+            [compareWith]="compareProdotto"
+          >
+            @for (prodottoOption of prodottosSharedCollection; track $index) {
+              <option [ngValue]="prodottoOption">{{ prodottoOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annulla</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Salva</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,131 @@
+<div>
+  <h2 id="page-heading" data-cy="PortataHeading">
+    <span jhiTranslate="ristoHubApp.portata.home.title">Portatas</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="ristoHubApp.portata.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-portata"
+        [routerLink]="['/portata/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="ristoHubApp.portata.home.createLabel">Genera un nuovo Portata</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (portatas().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="ristoHubApp.portata.home.notFound">No Portatas found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.portata.id">Id</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="tipo">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.portata.tipo">Tipo</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nomeDefault">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.portata.nomeDefault">Nome Default</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nomePersonalizzato">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.portata.nomePersonalizzato">Nome Personalizzato</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="menu.id">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.portata.menu">Menu</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (portata of portatas(); track trackId(portata)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/portata', portata.id, 'view']">{{ portata.id }}</a>
+              </td>
+              <td [jhiTranslate]="'ristoHubApp.TipoPortata.' + (portata.tipo ?? 'null')">
+                {{ { null: '', DEFAULT: 'DEFAULT', PERSONALIZZATA: 'PERSONALIZZATA' }[portata.tipo ?? 'null'] }}
+              </td>
+              <td [jhiTranslate]="'ristoHubApp.NomePortataDefault.' + (portata.nomeDefault ?? 'null')">
+                {{
+                  {
+                    null: '',
+                    ANTIPASTO: 'ANTIPASTO',
+                    PRIMO: 'PRIMO',
+                    SECONDO: 'SECONDO',
+                    CONTORNO: 'CONTORNO',
+                    DOLCE: 'DOLCE',
+                    BEVANDA: 'BEVANDA',
+                    VINO_ROSSO: 'VINO_ROSSO',
+                    VINO_BIANCO: 'VINO_BIANCO',
+                    VINO_ROSATO: 'VINO_ROSATO',
+                    BIRRA: 'BIRRA',
+                  }[portata.nomeDefault ?? 'null']
+                }}
+              </td>
+              <td>{{ portata.nomePersonalizzato }}</td>
+              <td>
+                @if (portata.menu) {
+                  <div>
+                    <a [routerLink]="['/menu', portata.menu.id, 'view']">{{ portata.menu.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/portata', portata.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Visualizza</span>
+                  </a>
+
+                  <a [routerLink]="['/portata', portata.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Modifica</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(portata)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Elimina</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

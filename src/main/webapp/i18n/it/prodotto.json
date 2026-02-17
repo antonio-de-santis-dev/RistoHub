@@ -1,0 +1,28 @@
+{
+  "ristoHubApp": {
+    "prodotto": {
+      "home": {
+        "title": "Prodottos",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Genera un nuovo Prodotto",
+        "createOrEditLabel": "Genera o modifica un Prodotto",
+        "notFound": "No Prodottos found"
+      },
+      "created": "&Egrave; stato generato un nuovo Prodotto con identificatore {{ param }}",
+      "updated": "&Egrave; stato aggiornato Prodotto identificato da {{ param }}",
+      "deleted": "&Egrave; stato eliminato Prodotto con identificatore {{ param }}",
+      "delete": {
+        "question": "Sei sicuro di volere eliminare Prodotto {{ id }}?"
+      },
+      "detail": {
+        "title": "Prodotto"
+      },
+      "id": "Id",
+      "nome": "Nome",
+      "descrizione": "Descrizione",
+      "prezzo": "Prezzo",
+      "allergeni": "Allergeni",
+      "portata": "Portata"
+    }
+  }
+}

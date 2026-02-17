@@ -1,0 +1,141 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-menu-heading" data-cy="MenuCreateUpdateHeading" jhiTranslate="ristoHubApp.menu.home.createOrEditLabel">
+        Genera o modifica un Menu
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="ristoHubApp.menu.id">Id</label>
+            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let nomeRef = editForm.get('nome')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_nome" jhiTranslate="ristoHubApp.menu.nome">Nome</label>
+          <input type="text" class="form-control" name="nome" id="field_nome" data-cy="nome" formControlName="nome" />
+          @if (nomeRef.invalid && (nomeRef.dirty || nomeRef.touched)) {
+            <div>
+              @if (editForm.get('nome')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Questo campo è obbligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_descrizione" jhiTranslate="ristoHubApp.menu.descrizione">Descrizione</label>
+          <input
+            type="text"
+            class="form-control"
+            name="descrizione"
+            id="field_descrizione"
+            data-cy="descrizione"
+            formControlName="descrizione"
+          />
+        </div>
+
+        @let attivoRef = editForm.get('attivo')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_attivo" jhiTranslate="ristoHubApp.menu.attivo">Attivo</label>
+          <input type="checkbox" class="form-check" name="attivo" id="field_attivo" data-cy="attivo" formControlName="attivo" />
+          @if (attivoRef.invalid && (attivoRef.dirty || attivoRef.touched)) {
+            <div>
+              @if (editForm.get('attivo')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Questo campo è obbligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_templateStyle" jhiTranslate="ristoHubApp.menu.templateStyle">Template Style</label>
+          <input
+            type="text"
+            class="form-control"
+            name="templateStyle"
+            id="field_templateStyle"
+            data-cy="templateStyle"
+            formControlName="templateStyle"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_colorePrimario" jhiTranslate="ristoHubApp.menu.colorePrimario">Colore Primario</label>
+          <input
+            type="text"
+            class="form-control"
+            name="colorePrimario"
+            id="field_colorePrimario"
+            data-cy="colorePrimario"
+            formControlName="colorePrimario"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_coloreSecondario" jhiTranslate="ristoHubApp.menu.coloreSecondario">Colore Secondario</label>
+          <input
+            type="text"
+            class="form-control"
+            name="coloreSecondario"
+            id="field_coloreSecondario"
+            data-cy="coloreSecondario"
+            formControlName="coloreSecondario"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_fontMenu" jhiTranslate="ristoHubApp.menu.fontMenu">Font Menu</label>
+          <input type="text" class="form-control" name="fontMenu" id="field_fontMenu" data-cy="fontMenu" formControlName="fontMenu" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_ristoratore" jhiTranslate="ristoHubApp.menu.ristoratore">Ristoratore</label>
+          <select
+            class="form-control"
+            id="field_ristoratore"
+            data-cy="ristoratore"
+            name="ristoratore"
+            formControlName="ristoratore"
+            [compareWith]="compareUser"
+          >
+            @if (!editForm.get('ristoratore')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (userOption of usersSharedCollection; track $index) {
+              <option [ngValue]="userOption">{{ userOption.login }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['ristoratore'])!.invalid && (editForm.get(['ristoratore'])!.dirty || editForm.get(['ristoratore'])!.touched)) {
+          <div>
+            @if (editForm.get(['ristoratore'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">Questo campo è obbligatorio.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annulla</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Salva</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

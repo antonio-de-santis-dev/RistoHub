@@ -1,0 +1,97 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-portata-heading" data-cy="PortataCreateUpdateHeading" jhiTranslate="ristoHubApp.portata.home.createOrEditLabel">
+        Genera o modifica un Portata
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="ristoHubApp.portata.id">Id</label>
+            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let tipoRef = editForm.get('tipo')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_tipo" jhiTranslate="ristoHubApp.portata.tipo">Tipo</label>
+          <select class="form-control" name="tipo" formControlName="tipo" id="field_tipo" data-cy="tipo">
+            <option [ngValue]="null">{{ 'ristoHubApp.TipoPortata.null' | translate }}</option>
+            @for (tipoPortata of tipoPortataValues; track $index) {
+              <option [value]="tipoPortata">{{ 'ristoHubApp.TipoPortata.' + tipoPortata | translate }}</option>
+            }
+          </select>
+          @if (tipoRef.invalid && (tipoRef.dirty || tipoRef.touched)) {
+            <div>
+              @if (editForm.get('tipo')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Questo campo è obbligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_nomeDefault" jhiTranslate="ristoHubApp.portata.nomeDefault">Nome Default</label>
+          <select class="form-control" name="nomeDefault" formControlName="nomeDefault" id="field_nomeDefault" data-cy="nomeDefault">
+            <option [ngValue]="null">{{ 'ristoHubApp.NomePortataDefault.null' | translate }}</option>
+            @for (nomePortataDefault of nomePortataDefaultValues; track $index) {
+              <option [value]="nomePortataDefault">{{ 'ristoHubApp.NomePortataDefault.' + nomePortataDefault | translate }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_nomePersonalizzato" jhiTranslate="ristoHubApp.portata.nomePersonalizzato"
+            >Nome Personalizzato</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            name="nomePersonalizzato"
+            id="field_nomePersonalizzato"
+            data-cy="nomePersonalizzato"
+            formControlName="nomePersonalizzato"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_menu" jhiTranslate="ristoHubApp.portata.menu">Menu</label>
+          <select class="form-control" id="field_menu" data-cy="menu" name="menu" formControlName="menu" [compareWith]="compareMenu">
+            @if (editForm.get(['menu'])!.value === null) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (menuOption of menusSharedCollection; track $index) {
+              <option [ngValue]="menuOption">{{ menuOption.id }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['menu'])!.invalid && (editForm.get(['menu'])!.dirty || editForm.get(['menu'])!.touched)) {
+          <div>
+            @if (editForm.get(['menu'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">Questo campo è obbligatorio.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annulla</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Salva</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

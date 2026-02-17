@@ -1,0 +1,143 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-immagine-menu-heading"
+        data-cy="ImmagineMenuCreateUpdateHeading"
+        jhiTranslate="ristoHubApp.immagineMenu.home.createOrEditLabel"
+      >
+        Genera o modifica un Immagine Menu
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="ristoHubApp.immagineMenu.id">Id</label>
+            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_nome" jhiTranslate="ristoHubApp.immagineMenu.nome">Nome</label>
+          <input type="text" class="form-control" name="nome" id="field_nome" data-cy="nome" formControlName="nome" />
+        </div>
+
+        @let immagineRef = editForm.get('immagine')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_immagine" jhiTranslate="ristoHubApp.immagineMenu.immagine">Immagine</label>
+          <div>
+            @if (immagineRef.value) {
+              <img
+                [src]="'data:' + editForm.get('immagineContentType')!.value + ';base64,' + immagineRef.value"
+                style="max-height: 100px"
+                alt="immagineMenu"
+              />
+            }
+            @if (immagineRef.value) {
+              <div class="form-text text-danger clearfix">
+                <span class="pull-start">{{ editForm.get('immagineContentType')!.value }}, {{ byteSize(immagineRef.value!) }}</span>
+                <button
+                  type="button"
+                  (click)="clearInputImage('immagine', 'immagineContentType', 'file_immagine')"
+                  class="btn btn-secondary btn-xs pull-end"
+                >
+                  <fa-icon icon="times"></fa-icon>
+                </button>
+              </div>
+            }
+            <input
+              type="file"
+              id="file_immagine"
+              data-cy="immagine"
+              (change)="setFileData($event, 'immagine', true)"
+              accept="image/*"
+              jhiTranslate="entity.action.addimage"
+            />
+          </div>
+          <input type="hidden" class="form-control" name="immagine" id="field_immagine" data-cy="immagine" formControlName="immagine" />
+          <input
+            type="hidden"
+            class="form-control"
+            name="immagineContentType"
+            id="field_immagineContentType"
+            formControlName="immagineContentType"
+          />
+          @if (immagineRef.invalid && (immagineRef.dirty || immagineRef.touched)) {
+            <div>
+              @if (editForm.get('immagine')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Questo campo è obbligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_contentType" jhiTranslate="ristoHubApp.immagineMenu.contentType">Content Type</label>
+          <input
+            type="text"
+            class="form-control"
+            name="contentType"
+            id="field_contentType"
+            data-cy="contentType"
+            formControlName="contentType"
+          />
+        </div>
+
+        @let tipoRef = editForm.get('tipo')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_tipo" jhiTranslate="ristoHubApp.immagineMenu.tipo">Tipo</label>
+          <select class="form-control" name="tipo" formControlName="tipo" id="field_tipo" data-cy="tipo">
+            <option [ngValue]="null">{{ 'ristoHubApp.TipoImmagine.null' | translate }}</option>
+            @for (tipoImmagine of tipoImmagineValues; track $index) {
+              <option [value]="tipoImmagine">{{ 'ristoHubApp.TipoImmagine.' + tipoImmagine | translate }}</option>
+            }
+          </select>
+          @if (tipoRef.invalid && (tipoRef.dirty || tipoRef.touched)) {
+            <div>
+              @if (editForm.get('tipo')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Questo campo è obbligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_menu" jhiTranslate="ristoHubApp.immagineMenu.menu">Menu</label>
+          <select class="form-control" id="field_menu" data-cy="menu" name="menu" formControlName="menu" [compareWith]="compareMenu">
+            @if (editForm.get(['menu'])!.value === null) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (menuOption of menusSharedCollection; track $index) {
+              <option [ngValue]="menuOption">{{ menuOption.id }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['menu'])!.invalid && (editForm.get(['menu'])!.dirty || editForm.get(['menu'])!.touched)) {
+          <div>
+            @if (editForm.get(['menu'])?.errors?.required) {
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">Questo campo è obbligatorio.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annulla</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Salva</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

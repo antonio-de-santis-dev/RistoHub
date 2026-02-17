@@ -1,0 +1,47 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (allergene(); as allergeneRef) {
+      <div>
+        <h2 data-cy="allergeneDetailsHeading"><span jhiTranslate="ristoHubApp.allergene.detail.title">Allergene</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="ristoHubApp.allergene.id">Id</span></dt>
+          <dd>
+            <span>{{ allergeneRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.allergene.nome">Nome</span></dt>
+          <dd>
+            <span>{{ allergeneRef.nome }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.allergene.simbolo">Simbolo</span></dt>
+          <dd>
+            <span>{{ allergeneRef.simbolo }}</span>
+          </dd>
+          <dt><span jhiTranslate="ristoHubApp.allergene.prodotto">Prodotto</span></dt>
+          <dd>
+            @for (prodotto of allergeneRef.prodottos; track $index; let last = $last) {
+              <span>
+                <a [routerLink]="['/prodotto', prodotto.id, 'view']">{{ prodotto?.id }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Indietro</span>
+        </button>
+
+        <button type="button" [routerLink]="['/allergene', allergeneRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Modifica</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

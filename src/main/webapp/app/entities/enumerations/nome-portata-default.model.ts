@@ -1,0 +1,21 @@
+export enum NomePortataDefault {
+  ANTIPASTO = 'ANTIPASTO',
+
+  PRIMO = 'PRIMO',
+
+  SECONDO = 'SECONDO',
+
+  CONTORNO = 'CONTORNO',
+
+  DOLCE = 'DOLCE',
+
+  BEVANDA = 'BEVANDA',
+
+  VINO_ROSSO = 'VINO_ROSSO',
+
+  VINO_BIANCO = 'VINO_BIANCO',
+
+  VINO_ROSATO = 'VINO_ROSATO',
+
+  BIRRA = 'BIRRA',
+}

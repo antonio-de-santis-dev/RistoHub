@@ -1,0 +1,26 @@
+{
+  "annotations": {
+    "changelogDate": "20260217131000"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "nome",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "simbolo",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Allergene",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

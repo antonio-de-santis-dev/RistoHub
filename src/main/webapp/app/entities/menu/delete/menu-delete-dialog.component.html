@@ -1,0 +1,24 @@
+@if (menu) {
+  <form name="deleteForm" (ngSubmit)="confirmDelete(menu.id!)">
+    <div class="modal-header">
+      <h4 class="modal-title" data-cy="menuDeleteDialogHeading" jhiTranslate="entity.delete.title">Conferma operazione di cancellazione</h4>
+    </div>
+
+    <div class="modal-body">
+      <jhi-alert-error />
+      <p id="jhi-delete-menu-heading" jhiTranslate="ristoHubApp.menu.delete.question" [translateValues]="{ id: menu.id }">
+        Sei sicuro di volere eliminare Menu {{ menu.id }}?
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">
+        <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annulla</span>
+      </button>
+
+      <button id="jhi-confirm-delete-menu" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
+        <fa-icon icon="times"></fa-icon>&nbsp;<span jhiTranslate="entity.action.delete">Elimina</span>
+      </button>
+    </div>
+  </form>
+}

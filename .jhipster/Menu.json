@@ -1,0 +1,71 @@
+{
+  "annotations": {
+    "changelogDate": "20260217130955"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "nome",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "descrizione",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "attivo",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "templateStyle",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "colorePrimario",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "coloreSecondario",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "fontMenu",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Menu",
+  "relationships": [
+    {
+      "otherEntityName": "portata",
+      "otherEntityRelationshipName": "menu",
+      "relationshipName": "portate",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "immagineMenu",
+      "otherEntityRelationshipName": "menu",
+      "relationshipName": "immagini",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "relationshipName": "ristoratore",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required",
+      "relationshipWithBuiltInEntity": true
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

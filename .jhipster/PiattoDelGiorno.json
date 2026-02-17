@@ -1,0 +1,46 @@
+{
+  "annotations": {
+    "changelogDate": "20260217130959"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "data",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "attivo",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "nome",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "descrizione",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "prezzo",
+      "fieldType": "BigDecimal"
+    }
+  ],
+  "name": "PiattoDelGiorno",
+  "relationships": [
+    {
+      "otherEntityName": "prodotto",
+      "relationshipName": "prodotto",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

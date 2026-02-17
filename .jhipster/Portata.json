@@ -1,0 +1,48 @@
+{
+  "annotations": {
+    "changelogDate": "20260217130956"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "tipo",
+      "fieldType": "TipoPortata",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "DEFAULT,PERSONALIZZATA"
+    },
+    {
+      "fieldName": "nomeDefault",
+      "fieldType": "NomePortataDefault",
+      "fieldValues": "ANTIPASTO,PRIMO,SECONDO,CONTORNO,DOLCE,BEVANDA,VINO_ROSSO,VINO_BIANCO,VINO_ROSATO,BIRRA"
+    },
+    {
+      "fieldName": "nomePersonalizzato",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Portata",
+  "relationships": [
+    {
+      "otherEntityName": "prodotto",
+      "otherEntityRelationshipName": "portata",
+      "relationshipName": "prodotti",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "menu",
+      "otherEntityRelationshipName": "portate",
+      "relationshipName": "menu",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

@@ -1,0 +1,117 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-piatto-del-giorno-heading"
+        data-cy="PiattoDelGiornoCreateUpdateHeading"
+        jhiTranslate="ristoHubApp.piattoDelGiorno.home.createOrEditLabel"
+      >
+        Genera o modifica un Piatto Del Giorno
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="ristoHubApp.piattoDelGiorno.id">Id</label>
+            <input type="text" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let dataRef = editForm.get('data')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_data" jhiTranslate="ristoHubApp.piattoDelGiorno.data">Data</label>
+          <div class="input-group">
+            <input
+              id="field_data"
+              data-cy="data"
+              type="text"
+              class="form-control"
+              name="data"
+              ngbDatepicker
+              #dataDp="ngbDatepicker"
+              formControlName="data"
+            />
+            <button type="button" class="btn btn-secondary" (click)="dataDp.toggle()"><fa-icon icon="calendar-alt"></fa-icon></button>
+          </div>
+          @if (dataRef.invalid && (dataRef.dirty || dataRef.touched)) {
+            <div>
+              @if (editForm.get('data')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Questo campo è obbligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let attivoRef = editForm.get('attivo')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_attivo" jhiTranslate="ristoHubApp.piattoDelGiorno.attivo">Attivo</label>
+          <input type="checkbox" class="form-check" name="attivo" id="field_attivo" data-cy="attivo" formControlName="attivo" />
+          @if (attivoRef.invalid && (attivoRef.dirty || attivoRef.touched)) {
+            <div>
+              @if (editForm.get('attivo')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Questo campo è obbligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_nome" jhiTranslate="ristoHubApp.piattoDelGiorno.nome">Nome</label>
+          <input type="text" class="form-control" name="nome" id="field_nome" data-cy="nome" formControlName="nome" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_descrizione" jhiTranslate="ristoHubApp.piattoDelGiorno.descrizione">Descrizione</label>
+          <input
+            type="text"
+            class="form-control"
+            name="descrizione"
+            id="field_descrizione"
+            data-cy="descrizione"
+            formControlName="descrizione"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_prezzo" jhiTranslate="ristoHubApp.piattoDelGiorno.prezzo">Prezzo</label>
+          <input type="number" class="form-control" name="prezzo" id="field_prezzo" data-cy="prezzo" formControlName="prezzo" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_prodotto" jhiTranslate="ristoHubApp.piattoDelGiorno.prodotto">Prodotto</label>
+          <select
+            class="form-control"
+            id="field_prodotto"
+            data-cy="prodotto"
+            name="prodotto"
+            formControlName="prodotto"
+            [compareWith]="compareProdotto"
+          >
+            <option [ngValue]="null"></option>
+            @for (prodottoOption of prodottosSharedCollection; track $index) {
+              <option [ngValue]="prodottoOption">{{ prodottoOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annulla</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Salva</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

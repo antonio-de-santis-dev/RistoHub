@@ -1,0 +1,28 @@
+{
+  "ristoHubApp": {
+    "portata": {
+      "home": {
+        "title": "Portatas",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Genera un nuovo Portata",
+        "createOrEditLabel": "Genera o modifica un Portata",
+        "notFound": "No Portatas found"
+      },
+      "created": "&Egrave; stato generato un nuovo Portata con identificatore {{ param }}",
+      "updated": "&Egrave; stato aggiornato Portata identificato da {{ param }}",
+      "deleted": "&Egrave; stato eliminato Portata con identificatore {{ param }}",
+      "delete": {
+        "question": "Sei sicuro di volere eliminare Portata {{ id }}?"
+      },
+      "detail": {
+        "title": "Portata"
+      },
+      "id": "Id",
+      "tipo": "Tipo",
+      "nomeDefault": "Nome Default",
+      "nomePersonalizzato": "Nome Personalizzato",
+      "prodotti": "Prodotti",
+      "menu": "Menu"
+    }
+  }
+}

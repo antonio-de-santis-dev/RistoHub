@@ -52,6 +52,17 @@ public class CacheConfiguration {
             createCache(cm, main.domain.User.class.getName() + ".authorities");
             createCache(cm, main.domain.PersistentToken.class.getName());
             createCache(cm, main.domain.User.class.getName() + ".persistentTokens");
+            createCache(cm, main.domain.Menu.class.getName());
+            createCache(cm, main.domain.Menu.class.getName() + ".portates");
+            createCache(cm, main.domain.Menu.class.getName() + ".immaginis");
+            createCache(cm, main.domain.Portata.class.getName());
+            createCache(cm, main.domain.Portata.class.getName() + ".prodottis");
+            createCache(cm, main.domain.ImmagineMenu.class.getName());
+            createCache(cm, main.domain.Prodotto.class.getName());
+            createCache(cm, main.domain.Prodotto.class.getName() + ".allergenis");
+            createCache(cm, main.domain.PiattoDelGiorno.class.getName());
+            createCache(cm, main.domain.Allergene.class.getName());
+            createCache(cm, main.domain.Allergene.class.getName() + ".prodottos");
             // jhipster-needle-ehcache-add-entry
         };
     }

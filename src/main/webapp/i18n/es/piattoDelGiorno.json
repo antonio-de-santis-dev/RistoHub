@@ -1,0 +1,29 @@
+{
+  "ristoHubApp": {
+    "piattoDelGiorno": {
+      "home": {
+        "title": "Piatto Del Giornos",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Piatto Del Giorno",
+        "createOrEditLabel": "Crear o editar Piatto Del Giorno",
+        "notFound": "Ningún Piatto Del Giornos encontrado"
+      },
+      "created": "Un nuevo Piatto Del Giorno ha sido creado con el identificador {{ param }}",
+      "updated": "Un Piatto Del Giorno ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Piatto Del Giorno ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Piatto Del Giorno {{ id }}?"
+      },
+      "detail": {
+        "title": "Piatto Del Giorno"
+      },
+      "id": "Id",
+      "data": "Data",
+      "attivo": "Attivo",
+      "nome": "Nome",
+      "descrizione": "Descrizione",
+      "prezzo": "Prezzo",
+      "prodotto": "Prodotto"
+    }
+  }
+}

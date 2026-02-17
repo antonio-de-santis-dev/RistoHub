@@ -1,0 +1,137 @@
+<div>
+  <h2 id="page-heading" data-cy="PiattoDelGiornoHeading">
+    <span jhiTranslate="ristoHubApp.piattoDelGiorno.home.title">PiattoDelGiornos</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="ristoHubApp.piattoDelGiorno.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-piatto-del-giorno"
+        [routerLink]="['/piatto-del-giorno/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="ristoHubApp.piattoDelGiorno.home.createLabel">Genera un nuovo Piatto Del Giorno</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (piattoDelGiornos().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="ristoHubApp.piattoDelGiorno.home.notFound">No Piatto Del Giornos found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.piattoDelGiorno.id">Id</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="data">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.piattoDelGiorno.data">Data</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="attivo">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.piattoDelGiorno.attivo">Attivo</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nome">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.piattoDelGiorno.nome">Nome</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="descrizione">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.piattoDelGiorno.descrizione">Descrizione</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="prezzo">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.piattoDelGiorno.prezzo">Prezzo</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="prodotto.id">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.piattoDelGiorno.prodotto">Prodotto</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (piattoDelGiorno of piattoDelGiornos(); track trackId(piattoDelGiorno)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/piatto-del-giorno', piattoDelGiorno.id, 'view']">{{ piattoDelGiorno.id }}</a>
+              </td>
+              <td>{{ piattoDelGiorno.data | formatMediumDate }}</td>
+              <td>{{ piattoDelGiorno.attivo }}</td>
+              <td>{{ piattoDelGiorno.nome }}</td>
+              <td>{{ piattoDelGiorno.descrizione }}</td>
+              <td>{{ piattoDelGiorno.prezzo }}</td>
+              <td>
+                @if (piattoDelGiorno.prodotto) {
+                  <div>
+                    <a [routerLink]="['/prodotto', piattoDelGiorno.prodotto.id, 'view']">{{ piattoDelGiorno.prodotto.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/piatto-del-giorno', piattoDelGiorno.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Visualizza</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/piatto-del-giorno', piattoDelGiorno.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Modifica</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(piattoDelGiorno)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Elimina</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
