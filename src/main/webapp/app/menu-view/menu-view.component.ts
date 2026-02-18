@@ -77,7 +77,7 @@ export class MenuViewComponent implements OnInit {
       }
 
       // 3. Carica il logo
-      const immagini: any[] = (await this.http.get<any[]>(`/api/immagine-menus?menuId.equals=${id}`).toPromise()) ?? [];
+      const immagini: any[] = (await this.http.get<any[]>(`/api/menus/${id}/immagini`).toPromise()) ?? [];
       const logo = immagini.find(i => i.tipo === 'LOGO');
       if (logo?.immagine) {
         const blob = this.base64ToBlob(logo.immagine, logo.immagineContentType);
@@ -85,7 +85,7 @@ export class MenuViewComponent implements OnInit {
       }
 
       // 4. Carica le portate
-      const portateRaw: any[] = (await this.http.get<any[]>(`/api/portatas?menuId.equals=${id}`).toPromise()) ?? [];
+      const portateRaw: any[] = (await this.http.get<any[]>(`/api/menus/${id}/portatas`).toPromise()) ?? [];
 
       // 5. Carica i prodotti per ogni portata
       this.portate = await Promise.all(

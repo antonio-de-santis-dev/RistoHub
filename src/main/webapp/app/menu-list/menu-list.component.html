@@ -1,0 +1,73 @@
+<div class="menu-list-container">
+  <div class="menu-list-header">
+    <h1>I miei Menu</h1>
+    <button class="btn-crea" routerLink="/menu-wizard">+ Crea nuovo menu</button>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading">Caricamento...</div>
+  } @else if (menus.length === 0) {
+    <div class="empty-state">
+      <p>Non hai ancora creato nessun menu.</p>
+      <button class="btn-crea" routerLink="/menu-wizard">Crea il tuo primo menu</button>
+    </div>
+  } @else {
+    <div class="cards-grid">
+      @for (menu of menus; track menu.id) {
+        <div class="menu-card">
+          <div class="card-color-bar" [style.background]="menu.colorePrimario ?? '#8b1a1a'"></div>
+          <div class="card-body">
+            <h2>{{ menu.nome }}</h2>
+            @if (menu.descrizione) {
+              <p class="descrizione">{{ menu.descrizione }}</p>
+            }
+            <div class="card-meta">
+              <span class="badge" [class.attivo]="menu.attivo" [class.inattivo]="!menu.attivo">
+                {{ menu.attivo ? 'Attivo' : 'Inattivo' }}
+              </span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-action btn-visualizza" (click)="visualizza(menu.id)" title="Visualizza">👁 Visualizza</button>
+            <button class="btn-action btn-modifica" (click)="modifica(menu.id)" title="Modifica">✏️ Modifica</button>
+            <button class="btn-action btn-qr" (click)="mostraQr(menu.id)" title="Genera QR Code">📱 QR Code</button>
+            <button class="btn-action btn-elimina" (click)="chiediConfermaElimina(menu)" title="Elimina">🗑 Elimina</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Modal Conferma Eliminazione -->
+@if (confermaEliminazioneVisibile) {
+  <div class="modal-overlay" (click)="annullaElimina()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Elimina menu</h3>
+      <p>
+        Sei sicuro di voler eliminare <strong>{{ menuDaEliminare?.nome }}</strong
+        >? L'operazione non è reversibile.
+      </p>
+      <div class="modal-actions">
+        <button class="btn-annulla" (click)="annullaElimina()">Annulla</button>
+        <button class="btn-conferma-elimina" (click)="confermaElimina()">Elimina</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal QR Code -->
+@if (qrVisible) {
+  <div class="modal-overlay" (click)="chiudiQr()">
+    <div class="modal modal-qr" (click)="$event.stopPropagation()">
+      <h3>QR Code del Menu</h3>
+      <p class="qr-subtitle">I tuoi clienti scansionano questo codice per vedere il menu</p>
+      <img [src]="qrImageUrl" alt="QR Code" class="qr-image" />
+      <p class="qr-link">{{ qrUrl }}</p>
+      <div class="modal-actions">
+        <a [href]="qrImageUrl" download="qr-menu.png" class="btn-download">⬇ Scarica QR</a>
+        <button class="btn-annulla" (click)="chiudiQr()">Chiudi</button>
+      </div>
+    </div>
+  </div>
+}

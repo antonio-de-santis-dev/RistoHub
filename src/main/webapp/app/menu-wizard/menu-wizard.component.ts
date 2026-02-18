@@ -144,7 +144,7 @@ export class MenuWizardComponent implements OnInit {
           stileTemplate: this.selectedTemplate,
           colorePrimario: this.colorePrimario,
           coloreSecondario: this.coloreSecondario,
-          fontTesto: this.fontSelezionato,
+          fontMenu: this.fontSelezionato,
           ristoratore: { id: currentUser.id, login: currentUser.login },
         })
         .toPromise();

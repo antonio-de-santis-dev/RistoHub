@@ -110,4 +110,8 @@ public class ImmagineMenuService {
         LOG.debug("Request to delete ImmagineMenu : {}", id);
         immagineMenuRepository.deleteById(id);
     }
+
+    public List<ImmagineMenuDTO> findByMenuId(UUID menuId) {
+        return immagineMenuRepository.findByMenuId(menuId).stream().map(immagineMenuMapper::toDto).collect(Collectors.toList());
+    }
 }

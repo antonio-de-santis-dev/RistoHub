@@ -7,6 +7,7 @@ import { errorRoute } from './layouts/error/error.route';
 
 import { MenuWizardComponent } from './menu-wizard/menu-wizard.component';
 import { MenuViewComponent } from './menu-view/menu-view.component';
+import { MenuListComponent } from './menu-list/menu-list.component';
 
 const routes: Routes = [
   {
@@ -48,6 +49,12 @@ const routes: Routes = [
     path: 'menu-view/:id',
     component: MenuViewComponent,
   },
+
+  {
+    path: 'menu-list',
+    component: MenuListComponent,
+  },
+
   ...errorRoute,
 ];
 

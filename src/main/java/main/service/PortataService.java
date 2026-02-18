@@ -110,4 +110,8 @@ public class PortataService {
         LOG.debug("Request to delete Portata : {}", id);
         portataRepository.deleteById(id);
     }
+
+    public List<PortataDTO> findByMenuId(UUID menuId) {
+        return portataRepository.findByMenuId(menuId).stream().map(portataMapper::toDto).collect(Collectors.toList());
+    }
 }

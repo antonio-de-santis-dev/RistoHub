@@ -9,8 +9,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import main.repository.MenuRepository;
+import main.service.ImmagineMenuService;
 import main.service.MenuService;
+import main.service.PortataService;
+import main.service.dto.ImmagineMenuDTO;
 import main.service.dto.MenuDTO;
+import main.service.dto.PortataDTO;
 import main.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,11 +40,22 @@ public class MenuResource {
 
     private final MenuService menuService;
 
+    private final PortataService portataService;
+
+    private final ImmagineMenuService immagineMenuService;
+
     private final MenuRepository menuRepository;
 
-    public MenuResource(MenuService menuService, MenuRepository menuRepository) {
+    public MenuResource(
+        MenuService menuService,
+        MenuRepository menuRepository,
+        PortataService portataService,
+        ImmagineMenuService immagineMenuService
+    ) {
         this.menuService = menuService;
         this.menuRepository = menuRepository;
+        this.portataService = portataService;
+        this.immagineMenuService = immagineMenuService;
     }
 
     /**
@@ -169,5 +184,17 @@ public class MenuResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @GetMapping("/{id}/portatas")
+    public List<PortataDTO> getMenuPortatas(@PathVariable("id") UUID id) {
+        LOG.debug("REST request to get Portatas for Menu : {}", id);
+        return portataService.findByMenuId(id);
+    }
+
+    @GetMapping("/{id}/immagini")
+    public List<ImmagineMenuDTO> getMenuImmagini(@PathVariable("id") UUID id) {
+        LOG.debug("REST request to get Images for Menu : {}", id);
+        return immagineMenuService.findByMenuId(id);
     }
 }
