@@ -263,4 +263,15 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   .prodotto-prezzo {
     font-size: 0.88rem;
   }
+  .btn-add-prodotto {
+    font-size: 0.78rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: inherit;
+    border-radius: 6px;
+    padding: 3px 10px;
+    text-decoration: none;
+    &:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+  }
 }

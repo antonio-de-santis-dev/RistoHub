@@ -51,6 +51,14 @@
         }
 
         @if (account() !== null) {
+          <li class="nav-item" routerLinkActive="active">
+            <a class="nav-link" routerLink="/prodotto-add" (click)="collapseNavbar()">
+              <span>🍴 Prodotti</span>
+            </a>
+          </li>
+        }
+
+        @if (account() !== null) {
           <li
             ngbDropdown
             class="nav-item dropdown pointer"

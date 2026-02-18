@@ -90,7 +90,7 @@ export class MenuViewComponent implements OnInit {
       // 5. Carica i prodotti per ogni portata
       this.portate = await Promise.all(
         portateRaw.map(async p => {
-          const prodotti: Prodotto[] = (await this.http.get<Prodotto[]>(`/api/prodottos?portataId.equals=${p.id}`).toPromise()) ?? [];
+          const prodotti: Prodotto[] = (await this.http.get<Prodotto[]>(`/api/prodottos/by-portata/${p.id}`).toPromise()) ?? [];
           return { ...p, prodotti, aperta: false };
         }),
       );

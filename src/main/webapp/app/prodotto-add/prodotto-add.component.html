@@ -1,0 +1,107 @@
+<div class="prodotto-container">
+  <div class="prodotto-header">
+    <h1 class="prodotto-title">🍽️ Gestione Prodotti</h1>
+    <p class="prodotto-subtitle">Aggiungi i piatti al tuo menu</p>
+  </div>
+
+  <div *ngIf="isLoadingInit" class="loading">⏳ Caricamento...</div>
+
+  <div *ngIf="!isLoadingInit" class="prodotto-layout">
+    <!-- COLONNA SINISTRA: Form -->
+    <div class="form-card">
+      <!-- Selezione menu e portata (solo se non preimpostata) -->
+      <div *ngIf="!portataPreimpostata" class="form-section">
+        <h2 class="form-section-title">📋 Seleziona dove aggiungere</h2>
+
+        <div class="form-group">
+          <label class="form-label">Menu *</label>
+          <select class="form-control" [(ngModel)]="menuSelezionatoId" (ngModelChange)="onMenuSelezionato()">
+            <option [ngValue]="null">-- Scegli un menu --</option>
+            <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
+          </select>
+        </div>
+
+        <div class="form-group" *ngIf="portate.length > 0">
+          <label class="form-label">Portata *</label>
+          <select class="form-control" [(ngModel)]="portataSelezionataId" (ngModelChange)="onPortataSelezionata()">
+            <option [ngValue]="null">-- Scegli una portata --</option>
+            <option *ngFor="let p of portate" [value]="p.id">{{ nomePortata(p) }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Form prodotto -->
+      <div class="form-section" *ngIf="portataSelezionataId">
+        <h2 class="form-section-title">➕ Nuovo Prodotto</h2>
+
+        <!-- Feedback -->
+        <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+        <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+
+        <div class="form-group">
+          <label class="form-label">Nome *</label>
+          <input type="text" class="form-control" [(ngModel)]="nome" placeholder="es. Spaghetti alla carbonara" maxlength="100" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Descrizione</label>
+          <textarea class="form-control" [(ngModel)]="descrizione" rows="2" placeholder="Ingredienti, note o varianti..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Prezzo (€) *</label>
+          <input type="number" class="form-control" [(ngModel)]="prezzo" placeholder="0.00" min="0" step="0.50" />
+        </div>
+
+        <div class="form-group" *ngIf="allergeniDisponibili.length > 0">
+          <label class="form-label">Allergeni</label>
+          <div class="allergeni-grid">
+            <div
+              *ngFor="let a of allergeniDisponibili"
+              class="allergene-chip"
+              [class.selected]="allergeniSelezionati.has(a.id)"
+              (click)="toggleAllergene(a.id)"
+            >
+              {{ a.nome }}
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-aggiungi" (click)="aggiungiProdotto()" [disabled]="isSaving || !formValido()">
+          <span *ngIf="!isSaving">➕ Aggiungi Prodotto</span>
+          <span *ngIf="isSaving">⏳ Salvataggio...</span>
+        </button>
+      </div>
+
+      <div *ngIf="!portataSelezionataId && !portataPreimpostata" class="empty-hint">
+        👆 Seleziona un menu e una portata per iniziare ad aggiungere prodotti
+      </div>
+    </div>
+
+    <!-- COLONNA DESTRA: Lista prodotti aggiunti -->
+    <div class="lista-card">
+      <h2 class="form-section-title">
+        📦 Prodotti in questa portata
+        <span class="count-badge">{{ prodottiAggiunti.length }}</span>
+      </h2>
+
+      <div *ngIf="prodottiAggiunti.length === 0" class="empty-lista">Nessun prodotto ancora. Aggiungine uno!</div>
+
+      <div class="prodotti-lista">
+        <div *ngFor="let p of prodottiAggiunti" class="prodotto-item">
+          <div class="prodotto-item-body">
+            <div class="prodotto-item-nome">{{ p.nome }}</div>
+            <div class="prodotto-item-desc" *ngIf="p.descrizione">{{ p.descrizione }}</div>
+            <div class="prodotto-allergeni" *ngIf="p.allergenis?.length > 0">
+              <span *ngFor="let a of p.allergenis" class="allergene-tag">{{ a.nome }}</span>
+            </div>
+          </div>
+          <div class="prodotto-item-right">
+            <span class="prodotto-item-prezzo">{{ formatPrezzo(p.prezzo) }}</span>
+            <button class="btn-elimina-prodotto" (click)="eliminaProdotto(p.id)" title="Elimina">🗑</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

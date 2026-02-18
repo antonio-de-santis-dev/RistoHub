@@ -17,6 +17,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ProdottoRepository extends ProdottoRepositoryWithBagRelationships, JpaRepository<Prodotto, UUID> {
+    List<Prodotto> findByPortataId(UUID portataId);
+
     default Optional<Prodotto> findOneWithEagerRelationships(UUID id) {
         return this.fetchBagRelationships(this.findById(id));
     }

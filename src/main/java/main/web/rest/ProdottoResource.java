@@ -170,4 +170,10 @@ public class ProdottoResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
+
+    @GetMapping("/by-portata/{portataId}")
+    public List<ProdottoDTO> getProdottosByPortata(@PathVariable("portataId") UUID portataId) {
+        LOG.debug("REST request to get Prodottos for Portata : {}", portataId);
+        return prodottoService.findByPortataId(portataId);
+    }
 }

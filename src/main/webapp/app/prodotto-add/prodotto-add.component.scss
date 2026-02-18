@@ -1,0 +1,258 @@
+$accent: #8b1a1a;
+$text: #1a1a2e;
+$muted: #6b7280;
+$border: #e5e7eb;
+$radius: 12px;
+$shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+
+.prodotto-container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.prodotto-header {
+  margin-bottom: 2rem;
+  .prodotto-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: $text;
+    margin: 0 0 4px;
+  }
+  .prodotto-subtitle {
+    color: $muted;
+    margin: 0;
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem;
+  color: $muted;
+  font-size: 1.1rem;
+}
+
+.prodotto-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-card,
+.lista-card {
+  background: white;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  padding: 1.8rem;
+}
+
+.form-section {
+  margin-bottom: 1.5rem;
+}
+
+.form-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $text;
+  margin: 0 0 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.count-badge {
+  background: $accent;
+  color: white;
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 0.78rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.88rem;
+  margin-bottom: 6px;
+  color: $text;
+}
+
+.form-control {
+  width: 100%;
+  border: 1.5px solid $border;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  font-family: inherit;
+  &:focus {
+    outline: none;
+    border-color: $accent;
+  }
+}
+
+select.form-control {
+  cursor: pointer;
+}
+
+.allergeni-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.allergene-chip {
+  border: 2px solid $border;
+  border-radius: 30px;
+  padding: 4px 14px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+  &:hover {
+    border-color: $accent;
+  }
+  &.selected {
+    background: $accent;
+    color: white;
+    border-color: $accent;
+  }
+}
+
+.btn-aggiungi {
+  width: 100%;
+  background: $accent;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+  &:hover:not(:disabled) {
+    background: darken($accent, 8%);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.alert {
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  &.alert-success {
+    background: #d4edda;
+    color: #155724;
+  }
+  &.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+  }
+}
+
+.empty-hint {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: $muted;
+  font-size: 0.95rem;
+}
+
+// Lista prodotti
+.empty-lista {
+  text-align: center;
+  padding: 2rem;
+  color: $muted;
+  font-size: 0.9rem;
+}
+
+.prodotti-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.prodotto-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 12px 14px;
+  border: 1px solid $border;
+  border-radius: 8px;
+  background: #fafafa;
+  transition: box-shadow 0.2s;
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  }
+}
+
+.prodotto-item-body {
+  flex: 1;
+}
+
+.prodotto-item-nome {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: $text;
+  margin-bottom: 2px;
+}
+
+.prodotto-item-desc {
+  font-size: 0.82rem;
+  color: $muted;
+  margin-bottom: 4px;
+}
+
+.prodotto-allergeni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.allergene-tag {
+  background: #fff3cd;
+  color: #856404;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.prodotto-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.prodotto-item-prezzo {
+  font-weight: 700;
+  font-size: 1rem;
+  color: $accent;
+  white-space: nowrap;
+}
+
+.btn-elimina-prodotto {
+  background: transparent;
+  border: 1px solid #f8d7da;
+  color: #721c24;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  &:hover {
+    background: #f8d7da;
+  }
+}

@@ -9,6 +9,7 @@ import { MenuWizardComponent } from './menu-wizard/menu-wizard.component';
 import { MenuViewComponent } from './menu-view/menu-view.component';
 import { MenuListComponent } from './menu-list/menu-list.component';
 import { MenuWizardEditComponent } from './menu-wizard-edit/menu-wizard-edit.component';
+import { ProdottoAddComponent } from './prodotto-add/prodotto-add.component';
 
 const routes: Routes = [
   {
@@ -58,6 +59,14 @@ const routes: Routes = [
   {
     path: 'menu-wizard-edit/:id',
     component: MenuWizardEditComponent,
+  },
+  {
+    path: 'prodotto-add',
+    component: ProdottoAddComponent,
+  },
+  {
+    path: 'prodotto-add/:portataId',
+    component: ProdottoAddComponent,
   },
 
   ...errorRoute,

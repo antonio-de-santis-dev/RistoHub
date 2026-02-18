@@ -121,4 +121,8 @@ public class ProdottoService {
         LOG.debug("Request to delete Prodotto : {}", id);
         prodottoRepository.deleteById(id);
     }
+
+    public List<ProdottoDTO> findByPortataId(UUID portataId) {
+        return prodottoRepository.findByPortataId(portataId).stream().map(prodottoMapper::toDto).collect(Collectors.toList());
+    }
 }

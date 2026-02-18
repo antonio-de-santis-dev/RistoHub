@@ -49,6 +49,7 @@
       <div class="prodotti-list" [class.aperta]="portata.aperta">
         <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="prodotti-empty">
           <span>Nessun piatto ancora aggiunto in questa sezione.</span>
+          <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto"> ➕ Aggiungi piatto </a>
         </div>
 
         <div *ngFor="let prodotto of portata.prodotti" class="prodotto-card">
