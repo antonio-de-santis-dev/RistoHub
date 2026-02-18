@@ -8,6 +8,7 @@ import { errorRoute } from './layouts/error/error.route';
 import { MenuWizardComponent } from './menu-wizard/menu-wizard.component';
 import { MenuViewComponent } from './menu-view/menu-view.component';
 import { MenuListComponent } from './menu-list/menu-list.component';
+import { MenuWizardEditComponent } from './menu-wizard-edit/menu-wizard-edit.component';
 
 const routes: Routes = [
   {
@@ -53,6 +54,10 @@ const routes: Routes = [
   {
     path: 'menu-list',
     component: MenuListComponent,
+  },
+  {
+    path: 'menu-wizard-edit/:id',
+    component: MenuWizardEditComponent,
   },
 
   ...errorRoute,

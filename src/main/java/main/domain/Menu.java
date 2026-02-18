@@ -49,12 +49,12 @@ public class Menu implements Serializable {
     @Column(name = "font_menu")
     private String fontMenu;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "prodottis", "menu" }, allowSetters = true)
     private Set<Portata> portates = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "menu" }, allowSetters = true)
     private Set<ImmagineMenu> immaginis = new HashSet<>();

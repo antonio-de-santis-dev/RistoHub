@@ -1,0 +1,199 @@
+<div class="wizard-container">
+  <div *ngIf="isLoadingDati" class="loading-dati">
+    <p>⏳ Caricamento dati menu...</p>
+  </div>
+
+  <div *ngIf="!isLoadingDati">
+    <div class="wizard-header">
+      <h1 class="wizard-title">✏️ Modifica il tuo Menu</h1>
+      <p class="wizard-subtitle">{{ titoloStep }}</p>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" [style.width.%]="progressoPercentuale"></div>
+      </div>
+      <div class="step-indicators">
+        <span *ngFor="let s of [1, 2, 3, 4, 5]" class="step-dot" [class.active]="currentStep === s" [class.done]="currentStep > s">{{
+          s
+        }}</span>
+      </div>
+    </div>
+
+    <div class="wizard-body">
+      <!-- STEP 1: TEMPLATE -->
+      <div *ngIf="currentStep === 1" class="step-content fade-in">
+        <p class="step-hint">Scegli la struttura visiva del tuo menu.</p>
+        <div class="template-grid">
+          <div
+            *ngFor="let t of templates"
+            class="template-card"
+            [class.selected]="selectedTemplate === t.id"
+            (click)="selectedTemplate = t.id"
+          >
+            <div class="template-preview" [ngClass]="'template-preview--' + t.id">
+              <div class="tprev-header">{{ t.icona }} Nome Ristorante</div>
+              <div class="tprev-section">
+                <div class="tprev-section-title">Antipasto</div>
+                <div class="tprev-item"><span>Bruschetta al pomodoro</span><span>€ 6,00</span></div>
+                <div class="tprev-item"><span>Tagliere misto</span><span>€ 12,00</span></div>
+              </div>
+              <div class="tprev-section">
+                <div class="tprev-section-title">Primo</div>
+                <div class="tprev-item"><span>Spaghetti all'amatriciana</span><span>€ 10,00</span></div>
+              </div>
+            </div>
+            <div class="template-info">
+              <div class="template-badge">{{ t.icona }} {{ t.nome }}</div>
+              <p class="template-desc">{{ t.descrizione }}</p>
+            </div>
+            <div class="template-check" *ngIf="selectedTemplate === t.id">✔</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: COLORI -->
+      <div *ngIf="currentStep === 2" class="step-content fade-in">
+        <p class="step-hint">Modifica i colori del tuo menu.</p>
+        <h3 class="section-label">🎨 Colori consigliati</h3>
+        <div class="colori-grid">
+          <div
+            *ngFor="let c of coloriConsigliati"
+            class="colore-card"
+            [class.selected]="colorePrimario === c.primario && coloreSecondario === c.secondario"
+            (click)="selezionaColori(c)"
+          >
+            <div class="colore-swatch">
+              <div class="swatch-primary" [style.background]="c.primario"></div>
+              <div class="swatch-secondary" [style.background]="c.secondario"></div>
+            </div>
+            <span class="colore-nome">{{ c.nome }}</span>
+          </div>
+        </div>
+
+        <h3 class="section-label">🖌️ Personalizza</h3>
+        <div class="color-pickers">
+          <div class="color-picker-group">
+            <label>Colore Primario</label>
+            <div class="picker-row">
+              <input type="color" [(ngModel)]="colorePrimario" class="color-input" />
+              <input type="text" [(ngModel)]="colorePrimario" class="hex-input" maxlength="7" />
+            </div>
+          </div>
+          <div class="color-picker-group">
+            <label>Colore Secondario</label>
+            <div class="picker-row">
+              <input type="color" [(ngModel)]="coloreSecondario" class="color-input" />
+              <input type="text" [(ngModel)]="coloreSecondario" class="hex-input" maxlength="7" />
+            </div>
+          </div>
+        </div>
+
+        <div class="anteprima-colori" [style.background]="coloreSecondario" [style.borderColor]="colorePrimario">
+          <h4 [style.color]="colorePrimario">Il tuo Menu</h4>
+          <p [style.color]="colorePrimario" style="opacity: 0.8">Antipasto · Primo · Secondo · Dolce</p>
+          <button class="btn-preview" [style.background]="colorePrimario" [style.color]="coloreSecondario">Sfoglia il menu</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: LOGO -->
+      <div *ngIf="currentStep === 3" class="step-content fade-in">
+        <p class="step-hint">Modifica il logo. Se non carichi un nuovo file, verrà mantenuto quello attuale.</p>
+
+        <div *ngIf="logoEsistenteUrl && !logoFile" class="logo-attuale">
+          <p class="logo-attuale-label">📌 Logo attuale:</p>
+          <img [src]="logoEsistenteUrl" class="logo-preview-img" alt="Logo attuale" />
+          <button class="btn-remove" (click)="rimuoviLogo()">✕ Rimuovi logo</button>
+        </div>
+
+        <div class="logo-upload-area" [class.has-logo]="logoPreview && logoFile">
+          <ng-container *ngIf="!logoFile">
+            <div class="upload-icon">🖼️</div>
+            <p>{{ logoEsistenteUrl ? 'Carica un nuovo logo per sostituire quello attuale' : 'Trascina qui il logo oppure' }}</p>
+            <label class="btn-upload">
+              Scegli file
+              <input type="file" accept="image/*" (change)="onLogoSelezionato($event)" hidden />
+            </label>
+          </ng-container>
+          <ng-container *ngIf="logoFile">
+            <img [src]="logoPreview" class="logo-preview-img" alt="Nuovo logo" />
+            <div class="logo-actions">
+              <span class="logo-filename">{{ logoFile?.name }}</span>
+              <button class="btn-remove" (click)="rimuoviLogo()">✕ Rimuovi</button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- STEP 4: FONT -->
+      <div *ngIf="currentStep === 4" class="step-content fade-in">
+        <p class="step-hint">Modifica il font del tuo menu.</p>
+        <div class="font-list">
+          <div
+            *ngFor="let f of fontsConsigliati"
+            class="font-card"
+            [class.selected]="fontSelezionato === f.nome"
+            (click)="fontSelezionato = f.nome"
+          >
+            <div class="font-preview" [style.fontFamily]="f.nome">{{ f.esempio }}</div>
+            <div class="font-meta">
+              <span class="font-name">{{ f.nome }}</span>
+              <span class="font-tag">{{ f.tag }}</span>
+            </div>
+            <div class="font-check" *ngIf="fontSelezionato === f.nome">✔</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: PORTATE + NOME -->
+      <div *ngIf="currentStep === 5" class="step-content fade-in">
+        <div class="form-group">
+          <label class="form-label">📋 Nome del Menu *</label>
+          <input type="text" class="form-control" [(ngModel)]="nomeMenu" placeholder="es. Menu Estivo 2025" maxlength="100" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">📝 Descrizione (opzionale)</label>
+          <textarea class="form-control" [(ngModel)]="descrizioneMenu" rows="2" placeholder="Una breve descrizione del menu..."></textarea>
+        </div>
+
+        <h3 class="section-label">🍽️ Portate predefinite</h3>
+        <div class="portate-grid">
+          <div
+            *ngFor="let p of portateDefault"
+            class="portata-chip"
+            [class.selected]="portateSelezionate.has(p)"
+            (click)="togglePortata(p)"
+          >
+            {{ nomeLeggibile(p) }}
+          </div>
+        </div>
+
+        <h3 class="section-label">✏️ Portate personalizzate</h3>
+        <div class="custom-portata-input">
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="nuovaPortataCustom"
+            placeholder="es. Menu degustazione..."
+            (keydown.enter)="aggiungiPortataCustom()"
+          />
+          <button class="btn-add" (click)="aggiungiPortataCustom()">+ Aggiungi</button>
+        </div>
+        <div class="portate-custom-list" *ngIf="portatePersonalizzate.length > 0">
+          <div *ngFor="let p of portatePersonalizzate" class="portata-custom-chip">
+            {{ p }}
+            <button class="chip-remove" (click)="rimuoviPortataCustom(p)">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="wizard-footer">
+      <button class="btn-back" (click)="stepPrecedente()" [disabled]="currentStep === 1">← Indietro</button>
+      <span class="step-label">Passo {{ currentStep }} di {{ totalSteps }}</span>
+      <button *ngIf="currentStep < totalSteps" class="btn-next" (click)="stepSuccessivo()" [disabled]="!validaStep()">Avanti →</button>
+      <button *ngIf="currentStep === totalSteps" class="btn-salva" (click)="salvaModifiche()" [disabled]="isLoading || !validaStep()">
+        <span *ngIf="!isLoading">💾 Salva Modifiche</span>
+        <span *ngIf="isLoading">⏳ Salvataggio in corso...</span>
+      </button>
+    </div>
+  </div>
+</div>

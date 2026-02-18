@@ -124,7 +124,6 @@
   &:hover {
     opacity: 0.85;
   }
-
   &.btn-visualizza {
     background: #cce5ff;
     color: #004085;
@@ -143,18 +142,18 @@
   }
 }
 
-// Modals
-.modal-overlay {
+// ← classi rinominate per evitare conflitto con Bootstrap
+.menu-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9999;
 }
 
-.modal {
+.menu-modal-box {
   background: white;
   border-radius: 12px;
   padding: 2rem;
@@ -171,7 +170,7 @@
     margin-bottom: 1.5rem;
   }
 
-  &.modal-qr {
+  &.menu-modal-qr {
     max-width: 340px;
   }
 }
@@ -191,7 +190,7 @@
   margin-bottom: 1rem;
 }
 
-.modal-actions {
+.menu-modal-actions {
   display: flex;
   gap: 0.8rem;
   justify-content: center;

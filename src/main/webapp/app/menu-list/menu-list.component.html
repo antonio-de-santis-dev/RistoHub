@@ -1,7 +1,6 @@
 <div class="menu-list-container">
   <div class="menu-list-header">
     <h1>I miei Menu</h1>
-    <button class="btn-crea" routerLink="/menu-wizard">+ Crea nuovo menu</button>
   </div>
 
   @if (isLoading) {
@@ -41,14 +40,14 @@
 
 <!-- Modal Conferma Eliminazione -->
 @if (confermaEliminazioneVisibile) {
-  <div class="modal-overlay" (click)="annullaElimina()">
-    <div class="modal" (click)="$event.stopPropagation()">
+  <div class="menu-modal-overlay" (click)="annullaElimina()">
+    <div class="menu-modal-box" (click)="$event.stopPropagation()">
       <h3>Elimina menu</h3>
       <p>
         Sei sicuro di voler eliminare <strong>{{ menuDaEliminare?.nome }}</strong
         >? L'operazione non è reversibile.
       </p>
-      <div class="modal-actions">
+      <div class="menu-modal-actions">
         <button class="btn-annulla" (click)="annullaElimina()">Annulla</button>
         <button class="btn-conferma-elimina" (click)="confermaElimina()">Elimina</button>
       </div>
@@ -58,13 +57,13 @@
 
 <!-- Modal QR Code -->
 @if (qrVisible) {
-  <div class="modal-overlay" (click)="chiudiQr()">
-    <div class="modal modal-qr" (click)="$event.stopPropagation()">
+  <div class="menu-modal-overlay" (click)="chiudiQr()">
+    <div class="menu-modal-box menu-modal-qr" (click)="$event.stopPropagation()">
       <h3>QR Code del Menu</h3>
       <p class="qr-subtitle">I tuoi clienti scansionano questo codice per vedere il menu</p>
       <img [src]="qrImageUrl" alt="QR Code" class="qr-image" />
       <p class="qr-link">{{ qrUrl }}</p>
-      <div class="modal-actions">
+      <div class="menu-modal-actions">
         <a [href]="qrImageUrl" download="qr-menu.png" class="btn-download">⬇ Scarica QR</a>
         <button class="btn-annulla" (click)="chiudiQr()">Chiudi</button>
       </div>

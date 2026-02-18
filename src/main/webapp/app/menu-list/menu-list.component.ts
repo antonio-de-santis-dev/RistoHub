@@ -60,9 +60,10 @@ export class MenuListComponent implements OnInit {
 
   async confermaElimina(): Promise<void> {
     if (!this.menuDaEliminare) return;
+    const idDaEliminare = this.menuDaEliminare.id; // ← salva l'id subito
     try {
-      await this.http.delete(`/api/menus/${this.menuDaEliminare.id}`).toPromise();
-      this.menus = this.menus.filter(m => m.id !== this.menuDaEliminare.id);
+      await this.http.delete(`/api/menus/${idDaEliminare}`).toPromise();
+      this.menus = this.menus.filter(m => m.id !== idDaEliminare);
     } catch (err) {
       console.error('Errore eliminazione:', err);
     } finally {

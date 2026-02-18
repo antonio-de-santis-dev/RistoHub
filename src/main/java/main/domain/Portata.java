@@ -40,7 +40,7 @@ public class Portata implements Serializable {
     @Column(name = "nome_personalizzato")
     private String nomePersonalizzato;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "portata")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "portata", cascade = CascadeType.ALL, orphanRemoval = true)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "allergenis", "portata" }, allowSetters = true)
     private Set<Prodotto> prodottis = new HashSet<>();
