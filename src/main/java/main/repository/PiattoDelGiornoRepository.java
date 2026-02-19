@@ -13,4 +13,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PiattoDelGiornoRepository extends JpaRepository<PiattoDelGiorno, UUID> {
     List<PiattoDelGiorno> findByAttivo(Boolean attivo);
+
+    List<PiattoDelGiorno> findByMenuId(UUID menuId);
+
+    void deleteByMenuId(UUID menuId);
 }

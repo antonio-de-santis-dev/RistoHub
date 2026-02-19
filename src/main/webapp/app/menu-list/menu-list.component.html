@@ -15,17 +15,21 @@
       @for (menu of menus; track menu.id) {
         <div class="menu-card">
           <div class="card-color-bar" [style.background]="menu.colorePrimario ?? '#8b1a1a'"></div>
+
           <div class="card-body">
             <h2>{{ menu.nome }}</h2>
+
             @if (menu.descrizione) {
               <p class="descrizione">{{ menu.descrizione }}</p>
             }
+
             <div class="card-meta">
               <span class="badge" [class.attivo]="menu.attivo" [class.inattivo]="!menu.attivo">
                 {{ menu.attivo ? 'Attivo' : 'Inattivo' }}
               </span>
             </div>
           </div>
+
           <div class="card-actions">
             <button class="btn-action btn-visualizza" (click)="visualizza(menu.id)" title="Visualizza">👁 Visualizza</button>
             <button class="btn-action btn-modifica" (click)="modifica(menu.id)" title="Modifica">✏️ Modifica</button>

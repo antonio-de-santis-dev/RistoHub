@@ -97,12 +97,7 @@ export class MenuViewComponent implements OnInit {
 
   // Naviga indietro: usa history se possibile, altrimenti /menus
   tornaAiMieiMenu(): void {
-    const nav = this.router.getCurrentNavigation();
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      this.router.navigate(['/menus']);
-    }
+    this.router.navigate(['/menu-list']);
   }
 
   async caricaMenu(id: string): Promise<void> {

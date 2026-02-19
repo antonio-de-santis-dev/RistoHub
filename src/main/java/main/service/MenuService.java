@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import main.domain.Menu;
 import main.repository.MenuRepository;
+import main.repository.PiattoDelGiornoRepository;
 import main.service.dto.MenuDTO;
 import main.service.dto.PiattoDelGiornoDTO;
 import main.service.mapper.MenuMapper;
@@ -28,22 +29,24 @@ public class MenuService {
     private static final Logger LOG = LoggerFactory.getLogger(MenuService.class);
 
     private final MenuRepository menuRepository;
-
     private final MenuMapper menuMapper;
-
     private final PiattoDelGiornoMapper piattoDelGiornoMapper;
+    private final PiattoDelGiornoRepository piattoDelGiornoRepository;
 
-    public MenuService(MenuRepository menuRepository, MenuMapper menuMapper, PiattoDelGiornoMapper piattoDelGiornoMapper) {
+    public MenuService(
+        MenuRepository menuRepository,
+        MenuMapper menuMapper,
+        PiattoDelGiornoMapper piattoDelGiornoMapper,
+        PiattoDelGiornoRepository piattoDelGiornoRepository
+    ) {
         this.menuRepository = menuRepository;
         this.menuMapper = menuMapper;
         this.piattoDelGiornoMapper = piattoDelGiornoMapper;
+        this.piattoDelGiornoRepository = piattoDelGiornoRepository;
     }
 
     /**
      * Save a menu.
-     *
-     * @param menuDTO the entity to save.
-     * @return the persisted entity.
      */
     public MenuDTO save(MenuDTO menuDTO) {
         LOG.debug("Request to save Menu : {}", menuDTO);
@@ -54,9 +57,6 @@ public class MenuService {
 
     /**
      * Update a menu.
-     *
-     * @param menuDTO the entity to save.
-     * @return the persisted entity.
      */
     public MenuDTO update(MenuDTO menuDTO) {
         LOG.debug("Request to update Menu : {}", menuDTO);
@@ -67,9 +67,6 @@ public class MenuService {
 
     /**
      * Partially update a menu.
-     *
-     * @param menuDTO the entity to update partially.
-     * @return the persisted entity.
      */
     public Optional<MenuDTO> partialUpdate(MenuDTO menuDTO) {
         LOG.debug("Request to partially update Menu : {}", menuDTO);
@@ -78,7 +75,6 @@ public class MenuService {
             .findById(menuDTO.getId())
             .map(existingMenu -> {
                 menuMapper.partialUpdate(existingMenu, menuDTO);
-
                 return existingMenu;
             })
             .map(menuRepository::save)
@@ -87,8 +83,6 @@ public class MenuService {
 
     /**
      * Get all the menus.
-     *
-     * @return the list of entities.
      */
     @Transactional(readOnly = true)
     public List<MenuDTO> findAll() {
@@ -98,8 +92,6 @@ public class MenuService {
 
     /**
      * Get all the menus with eager load of many-to-many relationships.
-     *
-     * @return the list of entities.
      */
     public Page<MenuDTO> findAllWithEagerRelationships(Pageable pageable) {
         return menuRepository.findAllWithEagerRelationships(pageable).map(menuMapper::toDto);
@@ -107,9 +99,6 @@ public class MenuService {
 
     /**
      * Get one menu by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
      */
     @Transactional(readOnly = true)
     public Optional<MenuDTO> findOne(UUID id) {
@@ -119,11 +108,22 @@ public class MenuService {
 
     /**
      * Delete the menu by id.
-     *
-     * @param id the id of the entity.
+     * Prima elimina tutti i piatti del giorno collegati (FK constraint),
+     * poi elimina il menu stesso.
      */
     public void delete(UUID id) {
         LOG.debug("Request to delete Menu : {}", id);
+
+        // 1. Elimina prima i piatti del giorno collegati al menu
+        //    (FK_PIATTO_DEL_GIORNO_MENU_ID blocca altrimenti la delete)
+        piattoDelGiornoRepository.deleteByMenuId(id);
+
+        // 2. Flush per assicurarsi che la delete dei piatti venga eseguita
+        //    prima della delete del menu nella stessa transazione
+        piattoDelGiornoRepository.flush();
+
+        // 3. Ora elimina il menu (le portate e i prodotti sono gestiti
+        //    dal cascade della entity o dal loro service)
         menuRepository.deleteById(id);
     }
 

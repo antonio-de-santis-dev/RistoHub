@@ -23,11 +23,12 @@ export class MenuWizardEditComponent implements OnInit {
   logoEsistenteUrl: string | null = null;
 
   // Step 1 — Template
-  selectedTemplate: number | null = null;
+  // ← FIX: id ora è stringa ('CLASSICO', 'MODERNO', 'RUSTICO') come nel wizard creazione
+  selectedTemplate: string | null = null;
   templates = [
-    { id: 1, nome: 'Classico', descrizione: 'Elegante e tradizionale, con bordi decorativi e layout centrato', icona: '🍷' },
-    { id: 2, nome: 'Moderno', descrizione: 'Minimalista e pulito, con spaziatura generosa e tipografia bold', icona: '⚡' },
-    { id: 3, nome: 'Rustico', descrizione: 'Caldo e accogliente, ispirato alla trattoria italiana', icona: '🌿' },
+    { id: 'CLASSICO', nome: 'Classico', descrizione: 'Elegante e tradizionale, con bordi decorativi e layout centrato', icona: '🍷' },
+    { id: 'MODERNO', nome: 'Moderno', descrizione: 'Minimalista e pulito, con carosello immagini e tab scorrevoli', icona: '⚡' },
+    { id: 'RUSTICO', nome: 'Rustico', descrizione: 'Caldo e accogliente, ispirato alla trattoria italiana', icona: '🌿' },
   ];
 
   // Step 2 — Colori
@@ -60,7 +61,6 @@ export class MenuWizardEditComponent implements OnInit {
   portateDefault = ['ANTIPASTO', 'PRIMO', 'SECONDO', 'CONTORNO', 'DOLCE', 'BEVANDA', 'VINO_ROSSO', 'VINO_BIANCO', 'VINO_ROSATO', 'BIRRA'];
   portateSelezionate: Set<string> = new Set();
   portatePersonalizzate: string[] = [];
-  // IDs delle portate esistenti per poterle eliminare
   portateEsistentiIds: { id: string; nomeDefault?: string; nomePersonalizzato?: string; tipo: string }[] = [];
   nuovaPortataCustom = '';
   nomeMenu = '';
@@ -73,7 +73,6 @@ export class MenuWizardEditComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Carica Google Fonts
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href =
@@ -88,16 +87,16 @@ export class MenuWizardEditComponent implements OnInit {
 
   async caricaDatiEsistenti(id: string): Promise<void> {
     try {
-      // Carica menu
       const menu: any = await this.http.get(`/api/menus/${id}`).toPromise();
       this.nomeMenu = menu.nome ?? '';
       this.descrizioneMenu = menu.descrizione ?? '';
-      this.selectedTemplate = menu.stileTemplate ?? null;
+      // ← FIX: legge templateStyle (non stileTemplate)
+      this.selectedTemplate = menu.templateStyle ?? null;
       this.colorePrimario = menu.colorePrimario ?? '#C8102E';
       this.coloreSecondario = menu.coloreSecondario ?? '#F5E6C8';
       this.fontSelezionato = menu.fontMenu ?? 'Playfair Display';
 
-      // Carica logo esistente
+      // Logo esistente
       const immagini: any[] = (await this.http.get<any[]>(`/api/menus/${id}/immagini`).toPromise()) ?? [];
       const logo = immagini.find(i => i.tipo === 'LOGO');
       if (logo) {
@@ -106,7 +105,7 @@ export class MenuWizardEditComponent implements OnInit {
         this.logoPreview = this.logoEsistenteUrl;
       }
 
-      // Carica portate esistenti
+      // Portate esistenti
       const portate: any[] = (await this.http.get<any[]>(`/api/menus/${id}/portatas`).toPromise()) ?? [];
       this.portateEsistentiIds = portate.map(p => ({
         id: p.id,
@@ -114,8 +113,6 @@ export class MenuWizardEditComponent implements OnInit {
         nomeDefault: p.nomeDefault,
         nomePersonalizzato: p.nomePersonalizzato,
       }));
-
-      // Precompila le set delle portate selezionate
       portate.forEach(p => {
         if (p.tipo === 'DEFAULT' && p.nomeDefault) {
           this.portateSelezionate.add(p.nomeDefault);
@@ -195,15 +192,17 @@ export class MenuWizardEditComponent implements OnInit {
     if (!this.validaStep() || !this.menuId) return;
     this.isLoading = true;
     try {
-      // 1. Aggiorna il menu (PUT)
       const currentUser: any = await this.http.get('/api/account').toPromise();
+
+      // 1. Aggiorna il menu (PUT)
+      // ← FIX: usa templateStyle (non stileTemplate)
       await this.http
         .put(`/api/menus/${this.menuId}`, {
           id: this.menuId,
           nome: this.nomeMenu,
           descrizione: this.descrizioneMenu,
           attivo: true,
-          stileTemplate: this.selectedTemplate,
+          templateStyle: this.selectedTemplate, // ← campo corretto
           colorePrimario: this.colorePrimario,
           coloreSecondario: this.coloreSecondario,
           fontMenu: this.fontSelezionato,
@@ -211,25 +210,24 @@ export class MenuWizardEditComponent implements OnInit {
         })
         .toPromise();
 
-      // 2. Elimina tutte le portate esistenti e ricreale
+      // 2. Elimina portate esistenti e ricreale
       for (const p of this.portateEsistentiIds) {
         await this.http.delete(`/api/portatas/${p.id}`).toPromise();
       }
-      const p1 = Array.from(this.portateSelezionate).map(p =>
-        this.http.post('/api/portatas', { tipo: 'DEFAULT', nomeDefault: p, menu: { id: this.menuId } }).toPromise(),
-      );
-      const p2 = this.portatePersonalizzate.map(n =>
-        this.http.post('/api/portatas', { tipo: 'PERSONALIZZATA', nomePersonalizzato: n, menu: { id: this.menuId } }).toPromise(),
-      );
-      await Promise.all([...p1, ...p2]);
+      await Promise.all([
+        ...Array.from(this.portateSelezionate).map(p =>
+          this.http.post('/api/portatas', { tipo: 'DEFAULT', nomeDefault: p, menu: { id: this.menuId } }).toPromise(),
+        ),
+        ...this.portatePersonalizzate.map(n =>
+          this.http.post('/api/portatas', { tipo: 'PERSONALIZZATA', nomePersonalizzato: n, menu: { id: this.menuId } }).toPromise(),
+        ),
+      ]);
 
       // 3. Gestione logo
       if (this.logoFile) {
-        // Se c'era un logo vecchio, eliminalo
         if (this.logoEsistenteId) {
           await this.http.delete(`/api/immagine-menus/${this.logoEsistenteId}`).toPromise();
         }
-        // Carica il nuovo logo
         const reader = new FileReader();
         reader.readAsDataURL(this.logoFile);
         reader.onload = async () => {
@@ -246,7 +244,6 @@ export class MenuWizardEditComponent implements OnInit {
           this.router.navigate(['/menu-view', this.menuId]);
         };
       } else if (!this.logoPreview && this.logoEsistenteId) {
-        // L'utente ha rimosso il logo senza caricarne uno nuovo
         await this.http.delete(`/api/immagine-menus/${this.logoEsistenteId}`).toPromise();
         this.router.navigate(['/menu-view', this.menuId]);
       } else {

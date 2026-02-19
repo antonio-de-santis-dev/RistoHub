@@ -22,14 +22,12 @@
 >
   <!-- HEADER FISSO -->
   <div class="menu-header" [style.backgroundColor]="coloreSecondario" [style.borderBottomColor]="colorePrimario">
-    <button class="btn-back-home" [style.color]="colorePrimario" (click)="tornaAiMieiMenu()">← I miei menu</button>
+    <button class="btn-back-home" [style.color]="colorePrimario" (click)="tornaAiMieiMenu()">← I Miei Menu</button>
     <div class="header-content">
       <div *ngIf="logoUrl" class="logo-wrap">
         <img [src]="logoUrl" class="logo-img" alt="Logo" />
       </div>
-      <div *ngIf="!logoUrl" class="logo-placeholder" [style.color]="colorePrimario">🍽️</div>
-      <h1 class="menu-nome" [style.color]="colorePrimario">{{ menu.nome }}</h1>
-      <p *ngIf="menu.descrizione" class="menu-desc" [style.color]="colorePrimario">{{ menu.descrizione }}</p>
+      <div *ngIf="!logoUrl" class="logo-placeholder" [style.color]="colorePrimario">{{ menu.nome }}</div>
     </div>
   </div>
 
@@ -99,7 +97,6 @@
   <header class="moderno-header" [style.backgroundColor]="coloreSecondario + '40'" [style.borderBottomColor]="colorePrimario + '55'">
     <button class="moderno-btn-back" [style.color]="colorePrimario" (click)="tornaAiMieiMenu()">← I miei menu</button>
     <div class="moderno-flag">🇮🇹</div>
-    <div class="moderno-header-label" [style.color]="colorePrimario + 'bb'">Benvenuti al</div>
     <div class="moderno-logo-wrap" *ngIf="logoUrl; else modernoTitleFallback">
       <img [src]="logoUrl" class="moderno-logo-img" alt="Logo ristorante" />
     </div>
@@ -230,17 +227,15 @@
 >
   <header class="rustico-header" [style.backgroundColor]="coloreSecondario + '40'" [style.borderBottomColor]="colorePrimario + '44'">
     <div class="rustico-header-left">
-      <button class="rustico-btn-back" [style.color]="colorePrimario" (click)="tornaAiMieiMenu()">← Menu</button>
+      <button class="rustico-btn-back" [style.color]="colorePrimario" (click)="tornaAiMieiMenu()">← I miei menu</button>
     </div>
     <div class="rustico-header-center">
-      <div class="rustico-header-label" [style.color]="colorePrimario">MENU</div>
       <div class="rustico-logo-wrap" *ngIf="logoUrl; else rusticoTitleFallback">
         <img [src]="logoUrl" class="rustico-logo-img" alt="Logo ristorante" />
       </div>
       <ng-template #rusticoTitleFallback>
         <h1 class="rustico-title" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{ menu.nome | uppercase }}</h1>
       </ng-template>
-      <div class="rustico-sub" [style.color]="colorePrimario + '99'">{{ menu.descrizione || 'Cucina Italiana' }}</div>
     </div>
     <div class="rustico-header-right">
       <div class="rustico-flag">🇮🇹</div>
