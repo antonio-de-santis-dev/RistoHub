@@ -1,0 +1,125 @@
+<div class="piatti-container">
+  <div class="piatti-header">
+    <div>
+      <h1 class="piatti-title">🍽️ Piatti del Giorno / Fuori Menu</h1>
+      <p class="piatti-subtitle">Gestisci i piatti speciali visibili nel menu</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-crea" (click)="apriModaleCrea()">➕ Crea Nuovo Piatto</button>
+      <button class="btn-seleziona" (click)="apriModaleSeleziona()">🔗 Seleziona da Menu</button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">⏳ Caricamento...</div>
+
+  <div *ngIf="!isLoading && piattiGiorno.length === 0" class="empty-state">
+    <p>Nessun piatto del giorno ancora aggiunto.</p>
+    <p class="empty-hint">👆 Crea un nuovo piatto oppure selezionane uno dal menu esistente</p>
+  </div>
+
+  <div *ngIf="!isLoading && piattiGiorno.length > 0" class="piatti-grid">
+    <div *ngFor="let piatto of piattiGiorno" class="piatto-card" [class.inattivo]="!piatto.attivo">
+      <div class="piatto-header-card">
+        <div class="piatto-badge" *ngIf="piatto.prodotto">🔗 Da Menu</div>
+        <div class="piatto-badge piatto-badge-nuovo" *ngIf="!piatto.prodotto">✨ Nuovo</div>
+      </div>
+
+      <div class="piatto-body">
+        <h3 class="piatto-nome">{{ nomePiatto(piatto) }}</h3>
+        <p class="piatto-desc" *ngIf="descrizionePiatto(piatto)">{{ descrizionePiatto(piatto) }}</p>
+        <div class="piatto-prezzo">{{ formatPrezzo(prezzoPiatto(piatto)) }}</div>
+      </div>
+
+      <div class="piatto-actions">
+        <button
+          class="btn-toggle"
+          [class.attivo]="piatto.attivo"
+          (click)="toggleAttivo(piatto)"
+          [title]="piatto.attivo ? 'Disattiva visibilità' : 'Attiva visibilità'"
+        >
+          <span *ngIf="piatto.attivo">👁️ Visibile</span>
+          <span *ngIf="!piatto.attivo">👁️‍🗨️ Nascosto</span>
+        </button>
+        <button class="btn-elimina-card" (click)="eliminaPiatto(piatto.id!)" title="Elimina">🗑️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CREAZIONE/SELEZIONE -->
+  <div *ngIf="modaleCreazioneAperto" class="modal-overlay" (click)="chiudiModale()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <h2 class="modal-title">
+        <span *ngIf="!modalitaSelezioneProdotto">➕ Nuovo Piatto del Giorno</span>
+        <span *ngIf="modalitaSelezioneProdotto">🔗 Seleziona Prodotto Esistente</span>
+      </h2>
+
+      <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+      <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+
+      <!-- MODALITÀ: Crea nuovo piatto -->
+      <div *ngIf="!modalitaSelezioneProdotto" class="modal-content">
+        <!-- ↓ AGGIUNTO: selezione menu per piatto manuale -->
+        <div class="form-group">
+          <label class="form-label">Menu di destinazione *</label>
+          <select class="form-control" [(ngModel)]="menuNuovoPiatto">
+            <option [ngValue]="null">-- Scegli il menu --</option>
+            <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
+          </select>
+          <small class="form-hint" *ngIf="!menuNuovoPiatto"> 👆 Scegli in quale menu apparirà questo piatto </small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Nome *</label>
+          <input type="text" class="form-control" [(ngModel)]="nome" placeholder="es. Gnocchi al ragù di cinghiale" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Descrizione</label>
+          <textarea class="form-control" [(ngModel)]="descrizione" rows="2" placeholder="Ingredienti e note..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Prezzo (€) *</label>
+          <input type="number" class="form-control" [(ngModel)]="prezzo" placeholder="0.00" min="0" step="0.50" />
+        </div>
+      </div>
+
+      <!-- MODALITÀ: Seleziona prodotto -->
+      <div *ngIf="modalitaSelezioneProdotto" class="modal-content">
+        <div class="form-group">
+          <label class="form-label">Menu *</label>
+          <select class="form-control" [(ngModel)]="menuSelezionato" (ngModelChange)="onMenuSelezionato()">
+            <option [ngValue]="null">-- Scegli un menu --</option>
+            <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
+          </select>
+        </div>
+
+        <div class="form-group" *ngIf="portate.length > 0">
+          <label class="form-label">Portata *</label>
+          <select class="form-control" [(ngModel)]="portataSelezionata" (ngModelChange)="onPortataSelezionata()">
+            <option [ngValue]="null">-- Scegli una portata --</option>
+            <option *ngFor="let p of portate" [value]="p.id">{{ nomePortata(p) }}</option>
+          </select>
+        </div>
+
+        <div class="form-group" *ngIf="prodotti.length > 0">
+          <label class="form-label">Prodotto *</label>
+          <select class="form-control" [(ngModel)]="prodottoSelezionato">
+            <option [ngValue]="null">-- Scegli un prodotto --</option>
+            <option *ngFor="let prod of prodotti" [value]="prod.id">{{ prod.nome }} - {{ formatPrezzo(prod.prezzo) }}</option>
+          </select>
+        </div>
+
+        <div *ngIf="!menuSelezionato" class="empty-hint">👆 Seleziona prima un menu per vedere le portate</div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-annulla" (click)="chiudiModale()">Annulla</button>
+        <button class="btn-salva" (click)="salvaPiatto()" [disabled]="isSaving || !formValido()">
+          <span *ngIf="!isSaving">💾 Salva</span>
+          <span *ngIf="isSaving">⏳ Salvataggio...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

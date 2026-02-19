@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import main.domain.Menu;
+import main.domain.PiattoDelGiorno;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
@@ -38,4 +39,7 @@ public interface MenuRepository extends JpaRepository<Menu, UUID> {
 
     @Query("select menu from Menu menu left join fetch menu.ristoratore where menu.id =:id")
     Optional<Menu> findOneWithToOneRelationships(@Param("id") UUID id);
+
+    @Query("SELECT p FROM PiattoDelGiorno p " + "LEFT JOIN FETCH p.prodotto " + "WHERE p.attivo = true " + "AND p.menu.id = :menuId")
+    List<PiattoDelGiorno> findPiattiDelGiornoAttiviByMenuId(@Param("menuId") UUID menuId);
 }

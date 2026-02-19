@@ -10,17 +10,17 @@
   <a routerLink="/" class="btn-torna">← Torna alla Home</a>
 </div>
 
-<!-- Menu reale -->
+<!-- ═══════════════════════════════════════════════════════
+     TEMPLATE CLASSICO
+     ═══════════════════════════════════════════════════════ -->
 <div
-  *ngIf="!isLoading && !errore && menu"
+  *ngIf="!isLoading && !errore && menu && !isModerno && !isRustico"
   class="menu-page"
   [style.fontFamily]="fontTesto"
   [style.backgroundColor]="coloreSecondario + '22'"
 >
-  <!-- HEADER con logo e nome ristorante -->
   <div class="menu-header" [style.backgroundColor]="coloreSecondario" [style.borderBottomColor]="colorePrimario">
     <a routerLink="/" class="btn-back-home" [style.color]="colorePrimario">← Home</a>
-
     <div class="header-content">
       <div *ngIf="logoUrl" class="logo-wrap">
         <img [src]="logoUrl" class="logo-img" alt="Logo" />
@@ -31,27 +31,39 @@
     </div>
   </div>
 
-  <!-- PORTATE accordion -->
   <main class="menu-main">
     <div *ngIf="portate.length === 0" class="empty-state">
       <p>Nessuna portata ancora aggiunta.</p>
       <a routerLink="/portata/new" class="btn-aggiungi" [style.backgroundColor]="colorePrimario">+ Aggiungi portate</a>
     </div>
 
+    <section *ngIf="piattiDelGiorno.length > 0" class="portata-section portata-speciale">
+      <div class="portata-header portata-header-speciale" [style.backgroundColor]="colorePrimario" (click)="togglePiattiGiorno()">
+        <h2 class="portata-nome">✨ PIATTI DEL GIORNO / FUORI MENU</h2>
+        <span class="portata-arrow" [class.open]="piattiGiornoAperti">›</span>
+      </div>
+      <div class="prodotti-list" [class.aperta]="piattiGiornoAperti">
+        <div *ngFor="let piatto of piattiDelGiorno" class="prodotto-card prodotto-speciale">
+          <div class="prodotto-top">
+            <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ piatto.prodotto?.nome ?? piatto.nome }}</h4>
+            <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}</h4>
+          </div>
+          <p *ngIf="piatto.descrizione" class="prodotto-desc">{{ piatto.descrizione }}</p>
+          <span class="badge-speciale">🌟 Speciale</span>
+        </div>
+      </div>
+    </section>
+
     <section *ngFor="let portata of portate" class="portata-section">
-      <!-- Intestazione portata (cliccabile) -->
       <div class="portata-header" [style.backgroundColor]="colorePrimario" (click)="togglePortata(portata)">
         <h2 class="portata-nome">{{ nomePortata(portata) | uppercase }}</h2>
         <span class="portata-arrow" [class.open]="portata.aperta">›</span>
       </div>
-
-      <!-- Lista prodotti (accordion) -->
       <div class="prodotti-list" [class.aperta]="portata.aperta">
         <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="prodotti-empty">
           <span>Nessun piatto ancora aggiunto in questa sezione.</span>
-          <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto"> ➕ Aggiungi piatto </a>
+          <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
         </div>
-
         <div *ngFor="let prodotto of portata.prodotti" class="prodotto-card">
           <div class="prodotto-top">
             <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ prodotto.nome }}</h4>
@@ -59,13 +71,267 @@
           </div>
           <p *ngIf="prodotto.descrizione" class="prodotto-desc">{{ prodotto.descrizione }}</p>
         </div>
+        <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
       </div>
     </section>
 
-    <!-- Note in fondo -->
     <div class="menu-note" [style.borderLeftColor]="colorePrimario">
       Tutti i nostri piatti sono preparati con ingredienti freschi e di qualità.<br />
       Per informazioni su allergeni rivolgiti al personale di sala.
     </div>
   </main>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TEMPLATE MODERNO
+     ═══════════════════════════════════════════════════════ -->
+<div *ngIf="!isLoading && !errore && menu && isModerno" class="moderno-page">
+  <header class="moderno-header">
+    <div class="moderno-flag">🇮🇹</div>
+    <div class="moderno-header-label">Benvenuti al</div>
+    <div class="moderno-logo-wrap" *ngIf="logoUrl; else modernoTitleFallback">
+      <img [src]="logoUrl" class="moderno-logo-img" alt="Logo ristorante" />
+    </div>
+    <ng-template #modernoTitleFallback>
+      <h1 class="moderno-title">{{ menu.nome | uppercase }}</h1>
+    </ng-template>
+    <div class="moderno-divider" [style.background]="colorePrimario"></div>
+  </header>
+
+  <div class="moderno-tabs-wrapper">
+    <div class="moderno-tabs">
+      <button
+        *ngIf="piattiDelGiorno.length > 0"
+        class="moderno-tab"
+        [class.active]="modernoTabAttiva === 'piatti-giorno'"
+        [style.background]="modernoTabAttiva === 'piatti-giorno' ? colorePrimario : ''"
+        [style.borderColor]="modernoTabAttiva === 'piatti-giorno' ? colorePrimario : ''"
+        [style.color]="modernoTabAttiva === 'piatti-giorno' ? '#fff' : ''"
+        (click)="modernoTabAttiva = 'piatti-giorno'; modernoPortataAttiva = null; fermaAutoplay()"
+      >
+        ✨ Piatti del Giorno
+      </button>
+      <button
+        *ngFor="let portata of portate"
+        class="moderno-tab"
+        [class.active]="modernoTabAttiva === portata.id"
+        [style.background]="modernoTabAttiva === portata.id ? colorePrimario : ''"
+        [style.borderColor]="modernoTabAttiva === portata.id ? colorePrimario : ''"
+        [style.color]="modernoTabAttiva === portata.id ? '#fff' : ''"
+        (click)="modernoApriPortata(portata)"
+      >
+        {{ nomePortata(portata) }}
+      </button>
+    </div>
+  </div>
+
+  <div class="moderno-content">
+    <div class="moderno-home" [class.hidden]="modernoTabAttiva !== null">
+      <div class="moderno-carousel">
+        <div class="moderno-carousel-track" [style.transform]="'translateX(-' + modernoCarouselIndex * 100 + '%)'">
+          <div *ngFor="let img of modernoImmagini" class="moderno-slide">
+            <img [src]="img" alt="Piatto" />
+            <div class="moderno-slide-overlay"></div>
+          </div>
+        </div>
+        <button class="moderno-carousel-btn prev" (click)="modernoGoToSlide(modernoCarouselIndex - 1)"><span>‹</span></button>
+        <button class="moderno-carousel-btn next" (click)="modernoGoToSlide(modernoCarouselIndex + 1)"><span>›</span></button>
+      </div>
+      <div class="moderno-dots">
+        <div
+          *ngFor="let img of modernoImmagini; let i = index"
+          class="moderno-dot"
+          [class.active]="i === modernoCarouselIndex"
+          [style.background]="i === modernoCarouselIndex ? colorePrimario : ''"
+          (click)="modernoGoToSlide(i)"
+        ></div>
+      </div>
+      <div class="moderno-welcome">
+        <p class="moderno-welcome-text">Seleziona una portata per scoprire i nostri piatti</p>
+      </div>
+    </div>
+
+    <div class="moderno-lista" [class.visible]="modernoTabAttiva === 'piatti-giorno'">
+      <button class="moderno-back-btn" (click)="modernoTornaHome()">‹ Torna al menu</button>
+      <div class="moderno-lista-header">
+        <span class="moderno-lista-nome">✨ Piatti del Giorno</span>
+        <span class="moderno-lista-count">{{ piattiDelGiorno.length }} piatti</span>
+      </div>
+      <div class="moderno-prodotti">
+        <div *ngFor="let piatto of piattiDelGiorno" class="moderno-prodotto-item moderno-speciale">
+          <div class="moderno-prodotto-row">
+            <span class="moderno-bullet" [style.background]="colorePrimario"></span>
+            <span class="moderno-prodotto-nome">{{ piatto.prodotto?.nome ?? piatto.nome }}</span>
+            <span class="moderno-dots-leader"></span>
+            <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">{{
+              formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
+            }}</span>
+          </div>
+          <p *ngIf="piatto.descrizione" class="moderno-prodotto-desc">{{ piatto.descrizione }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngFor="let portata of portate" class="moderno-lista" [class.visible]="modernoTabAttiva === portata.id">
+      <button class="moderno-back-btn" [style.color]="colorePrimario" (click)="modernoTornaHome()">‹ Torna al menu</button>
+      <div class="moderno-lista-header">
+        <span class="moderno-lista-nome">{{ nomePortata(portata) }}</span>
+        <span class="moderno-lista-count">{{ portata.prodotti?.length ?? 0 }} piatti</span>
+      </div>
+      <div class="moderno-prodotti">
+        <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="moderno-empty">
+          <p>Nessun piatto ancora aggiunto.</p>
+          <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
+        </div>
+        <div *ngFor="let prodotto of portata.prodotti" class="moderno-prodotto-item">
+          <div class="moderno-prodotto-row">
+            <span class="moderno-bullet" [style.background]="colorePrimario"></span>
+            <span class="moderno-prodotto-nome">{{ prodotto.nome }}</span>
+            <span class="moderno-dots-leader"></span>
+            <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
+          </div>
+          <p *ngIf="prodotto.descrizione" class="moderno-prodotto-desc">{{ prodotto.descrizione }}</p>
+        </div>
+        <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TEMPLATE RUSTICO
+     ═══════════════════════════════════════════════════════ -->
+<div *ngIf="!isLoading && !errore && menu && isRustico" class="rustico-page">
+  <!-- HEADER -->
+  <header class="rustico-header">
+    <div class="rustico-header-left">
+      <div class="rustico-flag">🇮🇹</div>
+    </div>
+    <div class="rustico-header-center">
+      <div class="rustico-header-label">MENU</div>
+      <div class="rustico-logo-wrap" *ngIf="logoUrl; else rusticoTitleFallback">
+        <img [src]="logoUrl" class="rustico-logo-img" alt="Logo ristorante" />
+      </div>
+      <ng-template #rusticoTitleFallback>
+        <h1 class="rustico-title">{{ menu.nome | uppercase }}</h1>
+      </ng-template>
+      <div class="rustico-sub">{{ menu.descrizione || 'Cucina Italiana' }}</div>
+    </div>
+    <div class="rustico-header-right">
+      <div class="rustico-flag">🇬🇧</div>
+    </div>
+  </header>
+
+  <!-- LAYOUT: sidebar + main -->
+  <div class="rustico-layout">
+    <!-- SIDEBAR: tab verticali -->
+    <aside class="rustico-sidebar">
+      <nav class="rustico-nav">
+        <!-- Piatti del giorno (se presenti) -->
+        <button
+          *ngIf="piattiDelGiorno.length > 0"
+          class="rustico-nav-btn"
+          [class.active]="rusticoTabAttiva === 'piatti-giorno'"
+          [style.borderColor]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario : ''"
+          [style.color]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario : ''"
+          [style.background]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario + '11' : ''"
+          (click)="rusticoApriTab('piatti-giorno', null)"
+        >
+          ✨ Piatti<br />del Giorno
+        </button>
+
+        <!-- Portate normali -->
+        <button
+          *ngFor="let portata of portate"
+          class="rustico-nav-btn"
+          [class.active]="rusticoTabAttiva === portata.id"
+          [style.borderColor]="rusticoTabAttiva === portata.id ? colorePrimario : ''"
+          [style.color]="rusticoTabAttiva === portata.id ? colorePrimario : ''"
+          [style.background]="rusticoTabAttiva === portata.id ? colorePrimario + '11' : ''"
+          (click)="rusticoApriTab(portata.id, portata)"
+        >
+          {{ nomePortata(portata) }}
+        </button>
+      </nav>
+    </aside>
+
+    <!-- MAIN: carosello o lista -->
+    <main class="rustico-main">
+      <!-- CAROSELLO (stato default / nessun tab selezionato) -->
+      <div class="rustico-carousel-wrap" [class.nascosto]="rusticoTabAttiva !== null">
+        <div class="rustico-carousel">
+          <div class="rustico-carousel-track" [style.transform]="'translateX(-' + rusticoCarouselIndex * 100 + '%)'">
+            <div *ngFor="let img of rusticoImmagini" class="rustico-slide">
+              <img [src]="img" alt="Piatto del ristorante" />
+              <div class="rustico-slide-overlay"></div>
+            </div>
+          </div>
+          <button class="rustico-carousel-btn prev" (click)="rusticoGoToSlide(rusticoCarouselIndex - 1)">‹</button>
+          <button class="rustico-carousel-btn next" (click)="rusticoGoToSlide(rusticoCarouselIndex + 1)">›</button>
+          <div class="rustico-dots">
+            <button
+              *ngFor="let img of rusticoImmagini; let i = index"
+              class="rustico-dot"
+              [class.active]="i === rusticoCarouselIndex"
+              [style.background]="i === rusticoCarouselIndex ? colorePrimario : ''"
+              (click)="rusticoGoToSlide(i)"
+            ></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LISTA PRODOTTI (si mostra al click su un tab) -->
+      <div class="rustico-lista-wrap" [class.visibile]="rusticoTabAttiva !== null">
+        <button class="rustico-back-btn" [style.color]="colorePrimario" (click)="rusticoTornaCarosello()">
+          <span class="rustico-back-arrow">‹</span>
+          <span class="rustico-back-label">Torna alle foto</span>
+        </button>
+
+        <!-- Piatti del giorno -->
+        <ng-container *ngIf="rusticoTabAttiva === 'piatti-giorno'">
+          <div class="rustico-lista-header">
+            <span class="rustico-lista-nome" [style.color]="colorePrimario">✨ Piatti del Giorno</span>
+            <span class="rustico-lista-count">{{ piattiDelGiorno.length }} piatti</span>
+          </div>
+          <div class="rustico-prodotti">
+            <div *ngFor="let piatto of piattiDelGiorno" class="rustico-prodotto-item rustico-speciale">
+              <div class="rustico-prodotto-row">
+                <span class="rustico-bullet" [style.background]="colorePrimario"></span>
+                <span class="rustico-prodotto-nome">{{ piatto.prodotto?.nome ?? piatto.nome }}</span>
+                <span class="rustico-leader"></span>
+                <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">
+                  {{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}
+                </span>
+              </div>
+              <p *ngIf="piatto.descrizione" class="rustico-prodotto-desc">{{ piatto.descrizione }}</p>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Portata normale -->
+        <ng-container *ngIf="rusticoPortataAttiva">
+          <div class="rustico-lista-header">
+            <span class="rustico-lista-nome" [style.color]="colorePrimario">{{ nomePortata(rusticoPortataAttiva) }}</span>
+            <span class="rustico-lista-count">{{ rusticoPortataAttiva.prodotti?.length ?? 0 }} piatti</span>
+          </div>
+          <div class="rustico-prodotti">
+            <div *ngIf="rusticoPortataAttiva.prodotti && rusticoPortataAttiva.prodotti.length === 0" class="rustico-empty">
+              <p>Nessun piatto ancora aggiunto.</p>
+              <a [routerLink]="['/prodotto-add', rusticoPortataAttiva.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
+            </div>
+            <div *ngFor="let prodotto of rusticoPortataAttiva.prodotti" class="rustico-prodotto-item">
+              <div class="rustico-prodotto-row">
+                <span class="rustico-bullet" [style.background]="colorePrimario"></span>
+                <span class="rustico-prodotto-nome">{{ prodotto.nome }}</span>
+                <span class="rustico-leader"></span>
+                <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
+              </div>
+              <p *ngIf="prodotto.descrizione" class="rustico-prodotto-desc">{{ prodotto.descrizione }}</p>
+            </div>
+            <a [routerLink]="['/prodotto-add', rusticoPortataAttiva.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
+          </div>
+        </ng-container>
+      </div>
+    </main>
+  </div>
 </div>

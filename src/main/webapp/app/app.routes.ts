@@ -10,6 +10,7 @@ import { MenuViewComponent } from './menu-view/menu-view.component';
 import { MenuListComponent } from './menu-list/menu-list.component';
 import { MenuWizardEditComponent } from './menu-wizard-edit/menu-wizard-edit.component';
 import { ProdottoAddComponent } from './prodotto-add/prodotto-add.component';
+import { PiattiGiornoGestioneComponent } from './piatti-giorno-gestione/piatti-giorno-gestione.component';
 
 const routes: Routes = [
   {
@@ -67,6 +68,10 @@ const routes: Routes = [
   {
     path: 'prodotto-add/:portataId',
     component: ProdottoAddComponent,
+  },
+  {
+    path: 'piatti-giorno',
+    component: PiattiGiornoGestioneComponent,
   },
 
   ...errorRoute,

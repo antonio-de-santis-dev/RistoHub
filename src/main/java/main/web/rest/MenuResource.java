@@ -14,6 +14,7 @@ import main.service.MenuService;
 import main.service.PortataService;
 import main.service.dto.ImmagineMenuDTO;
 import main.service.dto.MenuDTO;
+import main.service.dto.PiattoDelGiornoDTO;
 import main.service.dto.PortataDTO;
 import main.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
@@ -196,5 +197,11 @@ public class MenuResource {
     public List<ImmagineMenuDTO> getMenuImmagini(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get Images for Menu : {}", id);
         return immagineMenuService.findByMenuId(id);
+    }
+
+    @GetMapping("/{id}/piatti-del-giorno")
+    public List<PiattoDelGiornoDTO> getPiattiDelGiornoByMenu(@PathVariable("id") UUID id) {
+        LOG.debug("REST request to get active PiattiDelGiorno for Menu : {}", id);
+        return menuService.findPiattiDelGiornoAttiviByMenuId(id);
     }
 }

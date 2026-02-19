@@ -17,11 +17,12 @@ export class MenuWizardComponent implements OnInit {
   isLoading = false;
 
   // Step 1 — Template
-  selectedTemplate: number | null = null;
+  // ← FIX: id ora è stringa ('CLASSICO', 'MODERNO', 'RUSTICO') invece di numero
+  selectedTemplate: string | null = null;
   templates = [
-    { id: 1, nome: 'Classico', descrizione: 'Elegante e tradizionale, con bordi decorativi e layout centrato', icona: '🍷' },
-    { id: 2, nome: 'Moderno', descrizione: 'Minimalista e pulito, con spaziatura generosa e tipografia bold', icona: '⚡' },
-    { id: 3, nome: 'Rustico', descrizione: 'Caldo e accogliente, ispirato alla trattoria italiana', icona: '🌿' },
+    { id: 'CLASSICO', nome: 'Classico', descrizione: 'Elegante e tradizionale, con bordi decorativi e layout centrato', icona: '🍷' },
+    { id: 'MODERNO', nome: 'Moderno', descrizione: 'Minimalista e pulito, con carosello immagini e tab scorrevoli', icona: '⚡' },
+    { id: 'RUSTICO', nome: 'Rustico', descrizione: 'Caldo e accogliente, ispirato alla trattoria italiana', icona: '🌿' },
   ];
 
   // Step 2 — Colori
@@ -141,7 +142,7 @@ export class MenuWizardComponent implements OnInit {
           nome: this.nomeMenu,
           descrizione: this.descrizioneMenu,
           attivo: true,
-          stileTemplate: this.selectedTemplate,
+          templateStyle: this.selectedTemplate, // ← FIX: era 'stileTemplate', ora usa il nome corretto del campo DB
           colorePrimario: this.colorePrimario,
           coloreSecondario: this.coloreSecondario,
           fontMenu: this.fontSelezionato,

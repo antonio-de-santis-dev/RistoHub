@@ -30,6 +30,16 @@
         <!-- jhipster-needle-add-element-to-menu - JHipster will add new menu items here -->
         @if (account() !== null) {
           <li class="nav-item" routerLinkActive="active">
+            <a class="nav-link" routerLink="/piatti-giorno" (click)="collapseNavbar()">
+              <span>
+                <fa-icon icon="star"></fa-icon>
+                <span>Piatti del Giorno</span>
+              </span>
+            </a>
+          </li>
+        }
+        @if (account() !== null) {
+          <li class="nav-item" routerLinkActive="active">
             <a class="nav-link" routerLink="/menu-wizard" (click)="collapseNavbar()">
               <span>
                 <fa-icon icon="utensils"></fa-icon>

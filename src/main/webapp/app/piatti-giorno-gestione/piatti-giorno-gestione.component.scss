@@ -1,0 +1,320 @@
+$accent: #8b1a1a;
+$success: #28a745;
+$text: #1a1a2e;
+$muted: #6b7280;
+$border: #e5e7eb;
+$radius: 12px;
+$shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+
+.piatti-container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.piatti-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  .piatti-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: $text;
+    margin: 0 0 4px;
+  }
+
+  .piatti-subtitle {
+    color: $muted;
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-crea,
+.btn-seleziona {
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-crea {
+  background: $accent;
+  color: white;
+  &:hover {
+    background: darken($accent, 8%);
+  }
+}
+
+.btn-seleziona {
+  background: #007bff;
+  color: white;
+  &:hover {
+    background: darken(#007bff, 8%);
+  }
+}
+
+.loading,
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: $muted;
+  font-size: 1.1rem;
+}
+
+.empty-hint {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  opacity: 0.8;
+}
+
+// Grid piatti
+.piatti-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.piatto-card {
+  background: white;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  overflow: hidden;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+
+  &.inattivo {
+    opacity: 0.6;
+    background: #f9f9f9;
+    border-color: #ddd;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.piatto-header-card {
+  padding: 10px 14px;
+  background: #f8f9fa;
+  border-bottom: 1px solid $border;
+}
+
+.piatto-badge {
+  display: inline-block;
+  background: #007bff;
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  &.piatto-badge-nuovo {
+    background: $success;
+  }
+}
+
+.piatto-body {
+  padding: 1.2rem;
+}
+
+.piatto-nome {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: $text;
+}
+
+.piatto-desc {
+  font-size: 0.85rem;
+  color: $muted;
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+.piatto-prezzo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: $accent;
+}
+
+.piatto-actions {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f8f9fa;
+  border-top: 1px solid $border;
+}
+
+.btn-toggle {
+  flex: 1;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f8d7da;
+  color: #721c24;
+
+  &.attivo {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.btn-elimina-card {
+  background: transparent;
+  border: 1.5px solid #f8d7da;
+  color: #721c24;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f8d7da;
+  }
+}
+
+// Modal
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.modal-box {
+  background: white;
+  border-radius: $radius;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem;
+  color: $text;
+}
+
+.modal-content {
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.88rem;
+  margin-bottom: 6px;
+  color: $text;
+}
+
+.form-control {
+  width: 100%;
+  border: 1.5px solid $border;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: $accent;
+  }
+}
+
+select.form-control {
+  cursor: pointer;
+}
+
+.alert {
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+
+  &.alert-success {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  &.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.btn-annulla {
+  background: #eee;
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #ddd;
+  }
+}
+
+.btn-salva {
+  background: $accent;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) {
+    background: darken($accent, 8%);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

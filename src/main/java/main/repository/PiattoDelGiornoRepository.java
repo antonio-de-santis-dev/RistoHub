@@ -1,5 +1,6 @@
 package main.repository;
 
+import java.util.List;
 import java.util.UUID;
 import main.domain.PiattoDelGiorno;
 import org.springframework.data.jpa.repository.*;
@@ -10,4 +11,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface PiattoDelGiornoRepository extends JpaRepository<PiattoDelGiorno, UUID> {}
+public interface PiattoDelGiornoRepository extends JpaRepository<PiattoDelGiorno, UUID> {
+    List<PiattoDelGiorno> findByAttivo(Boolean attivo);
+}

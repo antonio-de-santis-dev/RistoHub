@@ -15,7 +15,6 @@ public class PiattoDelGiornoDTO implements Serializable {
 
     private UUID id;
 
-    @NotNull
     private LocalDate data;
 
     @NotNull
@@ -28,6 +27,8 @@ public class PiattoDelGiornoDTO implements Serializable {
     private BigDecimal prezzo;
 
     private ProdottoDTO prodotto;
+
+    private MenuDTO menu; // ← AGGIUNTO: riferimento al menu di appartenenza
 
     public UUID getId() {
         return id;
@@ -85,6 +86,14 @@ public class PiattoDelGiornoDTO implements Serializable {
         this.prodotto = prodotto;
     }
 
+    public MenuDTO getMenu() { // ← AGGIUNTO
+        return menu;
+    }
+
+    public void setMenu(MenuDTO menu) { // ← AGGIUNTO
+        this.menu = menu;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -117,6 +126,7 @@ public class PiattoDelGiornoDTO implements Serializable {
             ", descrizione='" + getDescrizione() + "'" +
             ", prezzo=" + getPrezzo() +
             ", prodotto=" + getProdotto() +
+            ", menu=" + getMenu() +
             "}";
     }
 }

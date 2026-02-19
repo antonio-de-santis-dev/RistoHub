@@ -1,5 +1,6 @@
 package main.service;
 
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +41,11 @@ public class PiattoDelGiornoService {
      */
     public PiattoDelGiornoDTO save(PiattoDelGiornoDTO piattoDelGiornoDTO) {
         LOG.debug("Request to save PiattoDelGiorno : {}", piattoDelGiornoDTO);
+
+        if (piattoDelGiornoDTO.getData() == null) {
+            piattoDelGiornoDTO.setData(LocalDate.now());
+        }
+
         PiattoDelGiorno piattoDelGiorno = piattoDelGiornoMapper.toEntity(piattoDelGiornoDTO);
         piattoDelGiorno = piattoDelGiornoRepository.save(piattoDelGiorno);
         return piattoDelGiornoMapper.toDto(piattoDelGiorno);

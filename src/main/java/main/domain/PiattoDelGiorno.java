@@ -47,6 +47,10 @@ public class PiattoDelGiorno implements Serializable {
     @JsonIgnoreProperties(value = { "allergenis", "portata" }, allowSetters = true)
     private Prodotto prodotto;
 
+    @ManyToOne
+    @JoinColumn(name = "menu_id")
+    private Menu menu;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public UUID getId() {
@@ -138,6 +142,14 @@ public class PiattoDelGiorno implements Serializable {
     public PiattoDelGiorno prodotto(Prodotto prodotto) {
         this.setProdotto(prodotto);
         return this;
+    }
+
+    public Menu getMenu() {
+        return menu;
+    }
+
+    public void setMenu(Menu menu) {
+        this.menu = menu;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

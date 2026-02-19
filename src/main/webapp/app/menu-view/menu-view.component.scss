@@ -1,8 +1,8 @@
-// Variabili fallback (sostituite dai colori dinamici via [style.xxx])
+// Variabili fallback
 $radius: 12px;
 $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
-// ---- Loading / Errore ----
+// ── Loading / Errore ──
 .loading-screen,
 .errore-screen {
   display: flex;
@@ -38,13 +38,15 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   font-weight: 700;
 }
 
-// ---- Pagina menu ----
+// ══════════════════════════════════════════════════
+//  TEMPLATE CLASSICO
+// ══════════════════════════════════════════════════
+
 .menu-page {
   min-height: 100vh;
   padding-bottom: 40px;
 }
 
-// ---- Header ----
 .menu-header {
   position: relative;
   padding: 20px 20px 16px;
@@ -98,14 +100,12 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   font-style: italic;
 }
 
-// ---- Main content ----
 .menu-main {
   max-width: 720px;
   margin: 0 auto;
   padding: 20px 16px;
 }
 
-// ---- Sezione portata ----
 .portata-section {
   margin-bottom: 16px;
   border-radius: $radius;
@@ -121,7 +121,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   user-select: none;
   transition: filter 0.2s;
-
   &:hover {
     filter: brightness(1.08);
   }
@@ -146,13 +145,11 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
 }
 
-// ---- Lista prodotti ----
 .prodotti-list {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.4s ease;
   background: white;
-
   &.aperta {
     max-height: 2000px;
   }
@@ -165,12 +162,10 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   font-style: italic;
 }
 
-// ---- Card prodotto ----
 .prodotto-card {
   padding: 14px 18px;
   border-bottom: 1px solid #f3f4f6;
   transition: background 0.15s;
-
   &:last-child {
     border-bottom: none;
   }
@@ -207,7 +202,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   line-height: 1.4;
 }
 
-// ---- Empty state ----
 .empty-state {
   text-align: center;
   padding: 48px 20px;
@@ -226,7 +220,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   font-weight: 700;
 }
 
-// ---- Note finali ----
 .menu-note {
   margin-top: 32px;
   font-size: 0.85rem;
@@ -238,7 +231,986 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   line-height: 1.6;
 }
 
-// ---- Responsive ----
+.portata-speciale .portata-header-speciale {
+  background: linear-gradient(135deg, #8b1a1a 0%, #d32f2f 100%);
+}
+
+.prodotto-speciale {
+  background: #fff9e6 !important;
+  border-left: 4px solid #ffd700;
+}
+
+.badge-speciale {
+  display: inline-block;
+  background: #ffd700;
+  color: #8b1a1a;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-top: 6px;
+}
+
+.btn-add-prodotto {
+  font-size: 0.78rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: inherit;
+  border-radius: 6px;
+  padding: 3px 10px;
+  text-decoration: none;
+  display: inline-block;
+  margin: 8px 18px;
+  &:hover {
+    background: rgba(255, 255, 255, 0.35);
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  TEMPLATE MODERNO — responsive desktop + mobile
+// ══════════════════════════════════════════════════
+
+.moderno-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #faf7f2;
+  font-family: 'Jost', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.moderno-header {
+  background: #faf7f2;
+  padding: 28px 20px 16px;
+  text-align: center;
+  position: relative;
+  border-bottom: 1px solid #e8dfd0;
+  flex-shrink: 0;
+}
+
+.moderno-flag {
+  position: absolute;
+  top: 28px;
+  right: 20px;
+  font-size: 22px;
+}
+
+.moderno-header-label {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: #7a6a55;
+  margin-bottom: 8px;
+}
+
+.moderno-logo-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 0 8px;
+}
+
+.moderno-logo-img {
+  max-width: 220px;
+  max-height: 90px;
+  object-fit: contain;
+}
+
+.moderno-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 900;
+  color: #2d2419;
+  line-height: 1;
+  letter-spacing: 2px;
+}
+
+.moderno-divider {
+  width: 36px;
+  height: 1px;
+  margin: 10px auto 0;
+}
+
+.moderno-tabs-wrapper {
+  background: #faf7f2;
+  padding: 12px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  border-bottom: 1px solid #e8dfd0;
+  flex-shrink: 0;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.moderno-tabs-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.moderno-tabs {
+  display: flex;
+  gap: 10px;
+  width: max-content;
+  padding: 2px 4px;
+}
+
+.moderno-tab {
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  padding: 8px 18px;
+  border-radius: 30px;
+  border: 1.5px solid #e8dfd0;
+  background: transparent;
+  color: #7a6a55;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  text-transform: uppercase;
+  scroll-snap-align: start;
+  &:hover {
+    border-color: #c8a96e;
+    color: #2d2419;
+  }
+  &.active {
+    box-shadow: 0 2px 10px rgba(26, 20, 16, 0.2);
+  }
+}
+
+.moderno-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.moderno-home {
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+.moderno-home.hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.moderno-carousel {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  overflow: hidden;
+  background: #2d2419;
+}
+
+.moderno-carousel-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+
+.moderno-slide {
+  flex: 0 0 100%;
+  height: 100%;
+  position: relative;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+}
+
+.moderno-slide-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(26, 20, 16, 0.6), transparent);
+}
+
+.moderno-carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  background: rgba(250, 247, 242, 0.88);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  font-size: 24px;
+  color: #2d2419;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  line-height: 1;
+  &:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.05);
+  }
+  &.prev {
+    left: 16px;
+  }
+  &.next {
+    right: 16px;
+  }
+}
+
+.moderno-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 0 4px;
+  background: #faf7f2;
+}
+.moderno-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e8dfd0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  &.active {
+    width: 18px;
+    border-radius: 3px;
+  }
+}
+
+.moderno-welcome {
+  padding: 16px 20px;
+  text-align: center;
+}
+.moderno-welcome-text {
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  color: #7a6a55;
+  font-style: italic;
+}
+
+.moderno-lista {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+  background: #faf7f2;
+  min-height: 100%;
+  overflow-y: auto;
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+    position: relative;
+  }
+}
+
+.moderno-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #e8dfd0;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #c8a96e;
+  width: 100%;
+}
+
+.moderno-lista-header {
+  padding: 14px 20px 8px;
+  border-bottom: 1px solid #e8dfd0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.moderno-lista-nome {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2d2419;
+  font-style: italic;
+}
+.moderno-lista-count {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  color: #7a6a55;
+  letter-spacing: 1px;
+}
+
+.moderno-prodotti {
+  padding: 4px 0 20px;
+}
+
+.moderno-prodotto-item {
+  padding: 11px 20px;
+  border-bottom: 1px solid rgba(232, 223, 208, 0.5);
+  animation: modernoFadeIn 0.3s ease both;
+  opacity: 0;
+  &.moderno-speciale {
+    background: #fff9e6;
+    border-left: 3px solid #c8a96e;
+  }
+}
+@keyframes modernoFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.moderno-prodotto-item:nth-child(1) {
+  animation-delay: 0.04s;
+}
+.moderno-prodotto-item:nth-child(2) {
+  animation-delay: 0.08s;
+}
+.moderno-prodotto-item:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.moderno-prodotto-item:nth-child(4) {
+  animation-delay: 0.16s;
+}
+.moderno-prodotto-item:nth-child(5) {
+  animation-delay: 0.2s;
+}
+.moderno-prodotto-item:nth-child(6) {
+  animation-delay: 0.24s;
+}
+.moderno-prodotto-item:nth-child(7) {
+  animation-delay: 0.28s;
+}
+.moderno-prodotto-item:nth-child(8) {
+  animation-delay: 0.32s;
+}
+
+.moderno-prodotto-row {
+  display: flex;
+  align-items: baseline;
+}
+.moderno-bullet {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-right: 10px;
+  margin-bottom: 2px;
+}
+.moderno-prodotto-nome {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #2d2419;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.moderno-dots-leader {
+  flex: 1;
+  border-bottom: 1.5px dotted rgba(122, 106, 85, 0.35);
+  margin: 0 6px 3px;
+  min-width: 16px;
+}
+.moderno-prodotto-prezzo {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.moderno-prodotto-desc {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 300;
+  color: #7a6a55;
+  margin-top: 3px;
+  line-height: 1.5;
+  font-style: italic;
+  padding-left: 15px;
+}
+
+.moderno-empty {
+  padding: 20px;
+  text-align: center;
+  color: #7a6a55;
+  font-size: 13px;
+}
+
+// ══════════════════════════════════════════════════
+//  TEMPLATE RUSTICO
+// ══════════════════════════════════════════════════
+
+.rustico-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #faf7f2;
+  font-family: 'Jost', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Header Rustico ──
+.rustico-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 10px;
+  background: #faf7f2;
+  border-bottom: 1px solid #e8dfd0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.rustico-header-left,
+.rustico-header-right {
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.rustico-header-center {
+  flex: 1;
+  text-align: center;
+}
+
+.rustico-header-label {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(18px, 4vw, 30px);
+  font-weight: 900;
+  letter-spacing: 6px;
+  color: #2d2419;
+  line-height: 1;
+}
+
+.rustico-logo-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 2px;
+}
+
+.rustico-logo-img {
+  max-height: 48px;
+  max-width: 160px;
+  object-fit: contain;
+}
+
+.rustico-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(14px, 3vw, 22px);
+  font-weight: 700;
+  color: #2d2419;
+  line-height: 1.1;
+  margin: 2px 0 0;
+  letter-spacing: 2px;
+}
+
+.rustico-sub {
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #7a6a55;
+  margin-top: 2px;
+}
+
+.rustico-flag {
+  font-size: 18px;
+  line-height: 1;
+}
+
+// ── Layout ──
+.rustico-layout {
+  display: flex;
+  flex-direction: row; // sempre row: sidebar sinistra, main destra
+  flex: 1;
+  min-height: 0;
+  height: calc(100dvh - 68px); // occhio: adatta se header cambia altezza
+  overflow: hidden;
+}
+
+// ── Sidebar ──
+.rustico-sidebar {
+  width: 120px;
+  flex-shrink: 0;
+  background: #f2ece2;
+  border-right: 1px solid #e8dfd0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.rustico-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 6px;
+}
+
+.rustico-nav-btn {
+  width: 100%;
+  padding: 9px 5px;
+  background: white;
+  border: 1.5px solid #e8dfd0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  color: #7a6a55;
+  text-align: center;
+  line-height: 1.35;
+  letter-spacing: 0.2px;
+  transition: all 0.22s ease;
+  user-select: none;
+  word-break: break-word;
+  &:hover {
+    border-color: #c8a96e;
+    color: #2d2419;
+    background: #fdf8f0;
+  }
+  &.active {
+    font-weight: 600;
+    background: rgba(200, 16, 46, 0.06);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// ── Main content ──
+.rustico-main {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+// ── Carosello ──
+.rustico-carousel-wrap {
+  position: absolute;
+  inset: 0;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+  &.nascosto {
+    opacity: 0;
+    transform: translateX(-16px);
+    pointer-events: none;
+  }
+}
+
+.rustico-carousel {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #2d2419;
+}
+
+.rustico-carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+
+.rustico-slide {
+  flex: 0 0 100%;
+  height: 100%;
+  position: relative;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+}
+
+.rustico-slide-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(26, 20, 16, 0.08) 0%, transparent 40%, rgba(26, 20, 16, 0.5) 100%);
+}
+
+.rustico-carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  background: rgba(250, 247, 242, 0.88);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  color: #2d2419;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  line-height: 1;
+  &:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.07);
+  }
+  &.prev {
+    left: 8px;
+  }
+  &.next {
+    right: 8px;
+  }
+}
+
+.rustico-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+  z-index: 10;
+}
+
+.rustico-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(250, 247, 242, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  &.active {
+    width: 18px;
+    border-radius: 3px;
+    background: white;
+  }
+}
+
+// ── Lista prodotti ──
+.rustico-lista-wrap {
+  position: absolute;
+  inset: 0;
+  background: #faf7f2;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  opacity: 0;
+  transform: translateX(14px);
+  pointer-events: none;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+  &.visibile {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: all;
+  }
+}
+
+.rustico-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  padding: 9px 14px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #e8dfd0;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+  &:hover {
+    background: rgba(200, 16, 46, 0.03);
+  }
+}
+
+.rustico-back-arrow {
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 300;
+}
+.rustico-back-label {
+  padding-top: 1px;
+}
+
+.rustico-lista-header {
+  padding: 12px 14px 8px;
+  border-bottom: 2px solid currentColor;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: #faf7f2;
+  z-index: 5;
+}
+
+.rustico-lista-nome {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(15px, 3vw, 22px);
+  font-weight: 700;
+  font-style: italic;
+}
+
+.rustico-lista-count {
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  color: #7a6a55;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.rustico-prodotti {
+  padding: 4px 0 28px;
+}
+
+.rustico-prodotto-item {
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(232, 223, 208, 0.6);
+  animation: rusticoFadeUp 0.28s ease forwards;
+  opacity: 0;
+  &.rustico-speciale {
+    background: #fff9e6;
+    border-left: 3px solid #c8a96e;
+  }
+}
+
+@keyframes rusticoFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rustico-prodotto-item:nth-child(1) {
+  animation-delay: 0.03s;
+}
+.rustico-prodotto-item:nth-child(2) {
+  animation-delay: 0.06s;
+}
+.rustico-prodotto-item:nth-child(3) {
+  animation-delay: 0.09s;
+}
+.rustico-prodotto-item:nth-child(4) {
+  animation-delay: 0.12s;
+}
+.rustico-prodotto-item:nth-child(5) {
+  animation-delay: 0.15s;
+}
+.rustico-prodotto-item:nth-child(6) {
+  animation-delay: 0.18s;
+}
+.rustico-prodotto-item:nth-child(7) {
+  animation-delay: 0.21s;
+}
+.rustico-prodotto-item:nth-child(8) {
+  animation-delay: 0.24s;
+}
+.rustico-prodotto-item:nth-child(9) {
+  animation-delay: 0.27s;
+}
+.rustico-prodotto-item:nth-child(10) {
+  animation-delay: 0.3s;
+}
+
+.rustico-prodotto-row {
+  display: flex;
+  align-items: baseline;
+}
+
+.rustico-bullet {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-right: 8px;
+  margin-bottom: 2px;
+}
+
+.rustico-prodotto-nome {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(13px, 2.2vw, 16px);
+  font-weight: 500;
+  color: #2d2419;
+  white-space: nowrap;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 55%;
+}
+
+.rustico-leader {
+  flex: 1;
+  border-bottom: 1.5px dotted rgba(122, 106, 85, 0.35);
+  margin: 0 6px 4px;
+  min-width: 8px;
+}
+
+.rustico-prodotto-prezzo {
+  font-family: 'Jost', sans-serif;
+  font-size: clamp(12px, 1.8vw, 14px);
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.rustico-prodotto-desc {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  font-weight: 300;
+  color: #7a6a55;
+  margin-top: 3px;
+  line-height: 1.5;
+  font-style: italic;
+  padding-left: 13px;
+}
+
+.rustico-empty {
+  padding: 20px 14px;
+  text-align: center;
+  color: #7a6a55;
+  font-size: 12px;
+}
+
+// ── RESPONSIVE Desktop ≥ 768px ──
+@media (min-width: 768px) {
+  .menu-main {
+    padding: 28px 24px;
+  }
+  .menu-nome {
+    font-size: 2.2rem;
+  }
+
+  .moderno-header {
+    padding: 36px 40px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .moderno-logo-img {
+    max-width: 280px;
+    max-height: 120px;
+  }
+  .moderno-title {
+    font-size: 42px;
+  }
+  .moderno-tabs-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 14px 24px;
+  }
+  .moderno-carousel {
+    height: 460px;
+  }
+  .moderno-prodotto-nome {
+    font-size: 17px;
+  }
+  .moderno-prodotto-prezzo {
+    font-size: 15px;
+  }
+  .moderno-prodotto-desc {
+    font-size: 12px;
+  }
+  .moderno-lista-nome {
+    font-size: 26px;
+  }
+  .moderno-prodotto-item {
+    padding: 14px 32px;
+  }
+  .moderno-back-btn {
+    padding: 14px 32px;
+  }
+  .moderno-lista-header {
+    padding: 18px 32px 10px;
+  }
+
+  .rustico-sidebar {
+    width: 155px;
+  }
+  .rustico-nav-btn {
+    font-size: 11px;
+    padding: 11px 8px;
+  }
+  .rustico-header {
+    padding: 14px 24px 12px;
+  }
+  .rustico-logo-img {
+    max-height: 56px;
+    max-width: 200px;
+  }
+  .rustico-back-btn {
+    padding: 11px 20px;
+    font-size: 11px;
+  }
+  .rustico-lista-header {
+    padding: 16px 20px 10px;
+  }
+  .rustico-prodotto-item {
+    padding: 11px 20px;
+  }
+  .rustico-prodotto-nome {
+    max-width: 60%;
+    font-size: 16px;
+  }
+  .rustico-prodotto-prezzo {
+    font-size: 14px;
+  }
+  .rustico-prodotto-desc {
+    font-size: 11px;
+    padding-left: 15px;
+  }
+}
+
+// ── RESPONSIVE Mobile ≤ 600px ──
 @media (max-width: 600px) {
   .menu-nome {
     font-size: 1.4rem;
@@ -246,14 +1218,12 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   .logo-img {
     max-width: 160px;
   }
-
   .portata-header {
     padding: 12px 14px;
   }
   .portata-nome {
     font-size: 0.95rem;
   }
-
   .prodotto-card {
     padding: 12px 14px;
   }
@@ -263,15 +1233,54 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   .prodotto-prezzo {
     font-size: 0.88rem;
   }
-  .btn-add-prodotto {
-    font-size: 0.78rem;
-    background: rgba(255, 255, 255, 0.2);
-    color: inherit;
+
+  .moderno-carousel {
+    height: 240px;
+  }
+  .moderno-title {
+    font-size: 26px;
+  }
+  .moderno-logo-img {
+    max-width: 180px;
+    max-height: 70px;
+  }
+  .moderno-carousel-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+  }
+
+  // Rustico mobile: sidebar si restringe
+  .rustico-sidebar {
+    width: 84px;
+  }
+  .rustico-nav-btn {
+    font-size: 9px;
+    padding: 7px 4px;
     border-radius: 6px;
-    padding: 3px 10px;
-    text-decoration: none;
-    &:hover {
-      background: rgba(255, 255, 255, 0.35);
-    }
+  }
+  .rustico-header {
+    padding: 9px 12px 8px;
+  }
+  .rustico-header-label {
+    font-size: 16px;
+    letter-spacing: 4px;
+  }
+  .rustico-flag {
+    font-size: 15px;
+  }
+  .rustico-logo-img {
+    max-height: 36px;
+  }
+  .rustico-carousel-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+  .rustico-carousel-btn.prev {
+    left: 5px;
+  }
+  .rustico-carousel-btn.next {
+    right: 5px;
   }
 }

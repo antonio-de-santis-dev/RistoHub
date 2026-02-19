@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="add_menu_to_piatto_del_giorno" author="tu">
+    <addColumn tableName="piatto_del_giorno">
+      <column name="menu_id" type="uuid">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+    <addForeignKeyConstraint
+      baseTableName="piatto_del_giorno"
+      baseColumnNames="menu_id"
+      constraintName="fk_piatto_del_giorno_menu_id"
+      referencedTableName="menu"
+      referencedColumnNames="id"/>
+  </changeSet>
+
+</databaseChangeLog>

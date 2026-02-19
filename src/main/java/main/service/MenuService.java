@@ -8,7 +8,9 @@ import java.util.stream.Collectors;
 import main.domain.Menu;
 import main.repository.MenuRepository;
 import main.service.dto.MenuDTO;
+import main.service.dto.PiattoDelGiornoDTO;
 import main.service.mapper.MenuMapper;
+import main.service.mapper.PiattoDelGiornoMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -29,9 +31,12 @@ public class MenuService {
 
     private final MenuMapper menuMapper;
 
-    public MenuService(MenuRepository menuRepository, MenuMapper menuMapper) {
+    private final PiattoDelGiornoMapper piattoDelGiornoMapper;
+
+    public MenuService(MenuRepository menuRepository, MenuMapper menuMapper, PiattoDelGiornoMapper piattoDelGiornoMapper) {
         this.menuRepository = menuRepository;
         this.menuMapper = menuMapper;
+        this.piattoDelGiornoMapper = piattoDelGiornoMapper;
     }
 
     /**
@@ -120,5 +125,15 @@ public class MenuService {
     public void delete(UUID id) {
         LOG.debug("Request to delete Menu : {}", id);
         menuRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PiattoDelGiornoDTO> findPiattiDelGiornoAttiviByMenuId(UUID menuId) {
+        LOG.debug("Request to get active PiattiDelGiorno for Menu : {}", menuId);
+        return menuRepository
+            .findPiattiDelGiornoAttiviByMenuId(menuId)
+            .stream()
+            .map(piattoDelGiornoMapper::toDto)
+            .collect(Collectors.toList());
     }
 }
