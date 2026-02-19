@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
@@ -46,6 +46,12 @@ export class MenuViewComponent implements OnInit {
   piattiDelGiorno: any[] = [];
   piattiGiornoAperti = false;
 
+  // ── Percorso "I miei menu" ──
+  // Usa il navigation history se disponibile, altrimenti fallback a /menus
+  get backRoute(): string {
+    return '/menus';
+  }
+
   // ── TEMPLATE MODERNO ──
   modernoTabAttiva: string | null = null;
   modernoPortataAttiva: Portata | null = null;
@@ -74,6 +80,7 @@ export class MenuViewComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private http: HttpClient,
     private sanitizer: DomSanitizer,
   ) {}
@@ -86,6 +93,16 @@ export class MenuViewComponent implements OnInit {
       return;
     }
     this.caricaMenu(id);
+  }
+
+  // Naviga indietro: usa history se possibile, altrimenti /menus
+  tornaAiMieiMenu(): void {
+    const nav = this.router.getCurrentNavigation();
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      this.router.navigate(['/menus']);
+    }
   }
 
   async caricaMenu(id: string): Promise<void> {
@@ -101,7 +118,7 @@ export class MenuViewComponent implements OnInit {
         document.head.appendChild(link);
       }
 
-      // Carica font Google per MODERNO e RUSTICO
+      // Font aggiuntivi per MODERNO e RUSTICO
       if (this.menu?.templateStyle === 'MODERNO' || this.menu?.templateStyle === 'RUSTICO') {
         const linkFonts = document.createElement('link');
         linkFonts.rel = 'stylesheet';
@@ -110,7 +127,7 @@ export class MenuViewComponent implements OnInit {
         document.head.appendChild(linkFonts);
       }
 
-      // Carica immagini (logo)
+      // Logo
       const immagini: any[] = (await this.http.get<any[]>(`/api/menus/${id}/immagini`).toPromise()) ?? [];
       const logo = immagini.find(i => i.tipo === 'LOGO');
       if (logo?.immagine) {
@@ -118,7 +135,7 @@ export class MenuViewComponent implements OnInit {
         this.logoUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob));
       }
 
-      // Carica portate con prodotti
+      // Portate + prodotti
       const portateRaw: any[] = (await this.http.get<any[]>(`/api/menus/${id}/portatas`).toPromise()) ?? [];
       this.portate = await Promise.all(
         portateRaw.map(async p => {
@@ -127,17 +144,13 @@ export class MenuViewComponent implements OnInit {
         }),
       );
 
-      // Carica piatti del giorno attivi per questo menu
+      // Piatti del giorno
       const piattiAttivi: any[] = (await this.http.get<any[]>(`/api/menus/${id}/piatti-del-giorno`).toPromise()) ?? [];
       this.piattiDelGiorno = piattiAttivi;
 
-      // Avvia autoplay del template corretto
-      if (this.menu?.templateStyle === 'MODERNO') {
-        this.avviaAutoplay();
-      }
-      if (this.menu?.templateStyle === 'RUSTICO') {
-        this.avviaAutoplayRustico();
-      }
+      // Avvia autoplay
+      if (this.menu?.templateStyle === 'MODERNO') this.avviaAutoplay();
+      if (this.menu?.templateStyle === 'RUSTICO') this.avviaAutoplayRustico();
     } catch (err) {
       console.error('Errore caricamento menu:', err);
       this.errore = true;
@@ -147,7 +160,7 @@ export class MenuViewComponent implements OnInit {
   }
 
   // ════════════════════════════════════════════
-  //  TEMPLATE CLASSICO
+  //  CLASSICO
   // ════════════════════════════════════════════
   togglePortata(portata: Portata): void {
     portata.aperta = !portata.aperta;
@@ -158,7 +171,7 @@ export class MenuViewComponent implements OnInit {
   }
 
   // ════════════════════════════════════════════
-  //  TEMPLATE MODERNO
+  //  MODERNO
   // ════════════════════════════════════════════
   modernoApriPortata(portata: Portata): void {
     this.modernoTabAttiva = portata.id;
@@ -191,7 +204,7 @@ export class MenuViewComponent implements OnInit {
   }
 
   // ════════════════════════════════════════════
-  //  TEMPLATE RUSTICO
+  //  RUSTICO
   // ════════════════════════════════════════════
   rusticoApriTab(tabId: string, portata: Portata | null): void {
     this.rusticoTabAttiva = tabId;

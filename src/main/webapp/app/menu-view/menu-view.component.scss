@@ -34,35 +34,41 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   color: white;
   border-radius: 8px;
   padding: 10px 24px;
-  text-decoration: none;
+  border: none;
+  cursor: pointer;
   font-weight: 700;
+  font-size: 0.9rem;
 }
 
 // ══════════════════════════════════════════════════
-//  TEMPLATE CLASSICO
+//  TEMPLATE CLASSICO — pagina unica, tutto scorre
 // ══════════════════════════════════════════════════
 
 .menu-page {
   min-height: 100vh;
-  padding-bottom: 40px;
+  padding-bottom: 48px;
 }
 
+// Header normale — scorre via con la pagina, NESSUN sticky
 .menu-header {
-  position: relative;
-  padding: 20px 20px 16px;
+  padding: 16px 20px 14px;
   border-bottom: 3px solid;
   text-align: center;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  position: relative; // solo per posizionare il bottone back
 }
 
 .btn-back-home {
   position: absolute;
-  top: 16px;
-  left: 16px;
-  font-size: 0.85rem;
+  top: 14px;
+  left: 14px;
+  font-size: 0.82rem;
   font-weight: 700;
-  text-decoration: none;
-  opacity: 0.8;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.85;
+  padding: 0;
   &:hover {
     opacity: 1;
   }
@@ -72,18 +78,18 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .logo-img {
   max-width: 200px;
-  max-height: 100px;
+  max-height: 80px;
   object-fit: contain;
   border-radius: 8px;
 }
 
 .logo-placeholder {
-  font-size: 3rem;
+  font-size: 2.5rem;
 }
 
 .menu-nome {
@@ -94,7 +100,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .menu-desc {
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   margin: 0;
   opacity: 0.8;
   font-style: italic;
@@ -174,6 +180,11 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
 }
 
+.prodotto-speciale {
+  background: rgba(0, 0, 0, 0.02);
+  border-left: 4px solid;
+}
+
 .prodotto-top {
   display: flex;
   justify-content: space-between;
@@ -231,19 +242,8 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   line-height: 1.6;
 }
 
-.portata-speciale .portata-header-speciale {
-  background: linear-gradient(135deg, #8b1a1a 0%, #d32f2f 100%);
-}
-
-.prodotto-speciale {
-  background: #fff9e6 !important;
-  border-left: 4px solid #ffd700;
-}
-
 .badge-speciale {
   display: inline-block;
-  background: #ffd700;
-  color: #8b1a1a;
   font-size: 0.72rem;
   font-weight: 700;
   padding: 3px 10px;
@@ -253,7 +253,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
 .btn-add-prodotto {
   font-size: 0.78rem;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.06);
   color: inherit;
   border-radius: 6px;
   padding: 3px 10px;
@@ -261,153 +261,146 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   display: inline-block;
   margin: 8px 18px;
   &:hover {
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(0, 0, 0, 0.12);
   }
 }
 
 // ══════════════════════════════════════════════════
-//  TEMPLATE MODERNO — responsive desktop + mobile
+//  TEMPLATE MODERNO — pagina unica, tutto scorre
 // ══════════════════════════════════════════════════
 
 .moderno-page {
-  width: 100%;
   min-height: 100vh;
-  background: #faf7f2;
   font-family: 'Jost', sans-serif;
-  display: flex;
-  flex-direction: column;
 }
 
+// Header normale — scorre via con la pagina, NESSUN sticky
 .moderno-header {
-  background: #faf7f2;
-  padding: 28px 20px 16px;
+  padding: 24px 20px 14px;
   text-align: center;
-  position: relative;
-  border-bottom: 1px solid #e8dfd0;
-  flex-shrink: 0;
+  border-bottom: 1px solid;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  position: relative; // solo per posizionare il bottone back e la bandiera
+}
+
+.moderno-btn-back {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.85;
+  letter-spacing: 0.3px;
+  padding: 0;
+  &:hover {
+    opacity: 1;
+  }
 }
 
 .moderno-flag {
   position: absolute;
-  top: 28px;
-  right: 20px;
-  font-size: 22px;
+  top: 24px;
+  right: 18px;
+  font-size: 20px;
 }
 
 .moderno-header-label {
   font-family: 'Jost', sans-serif;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 300;
   letter-spacing: 5px;
   text-transform: uppercase;
-  color: #7a6a55;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .moderno-logo-wrap {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 4px 0 8px;
+  padding: 3px 0 6px;
 }
 
 .moderno-logo-img {
-  max-width: 220px;
-  max-height: 90px;
+  max-width: 180px;
+  max-height: 70px;
   object-fit: contain;
 }
 
 .moderno-title {
   font-family: 'Playfair Display', serif;
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 900;
-  color: #2d2419;
   line-height: 1;
   letter-spacing: 2px;
 }
 
 .moderno-divider {
-  width: 36px;
+  width: 32px;
   height: 1px;
-  margin: 10px auto 0;
+  margin: 8px auto 0;
 }
 
+// Tabs normali — scorrono via con la pagina, NESSUN sticky
 .moderno-tabs-wrapper {
-  background: #faf7f2;
-  padding: 12px 16px;
+  padding: 10px 14px;
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  border-bottom: 1px solid #e8dfd0;
-  flex-shrink: 0;
+  border-bottom: 1px solid;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-}
-.moderno-tabs-wrapper::-webkit-scrollbar {
-  display: none;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .moderno-tabs {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   width: max-content;
-  padding: 2px 4px;
+  padding: 2px 2px;
 }
 
 .moderno-tab {
   font-family: 'Jost', sans-serif;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.5px;
-  padding: 8px 18px;
+  padding: 7px 16px;
   border-radius: 30px;
-  border: 1.5px solid #e8dfd0;
+  border: 1.5px solid;
   background: transparent;
-  color: #7a6a55;
   cursor: pointer;
   transition: all 0.25s ease;
   white-space: nowrap;
   text-transform: uppercase;
   scroll-snap-align: start;
-  &:hover {
-    border-color: #c8a96e;
-    color: #2d2419;
-  }
   &.active {
-    box-shadow: 0 2px 10px rgba(26, 20, 16, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   }
 }
 
 .moderno-content {
-  flex: 1;
   position: relative;
-  overflow: hidden;
-  max-width: 900px;
-  margin: 0 auto;
-  width: 100%;
+  min-height: 60vh;
 }
 
 .moderno-home {
-  transition:
-    opacity 0.4s ease,
-    transform 0.4s ease;
+  transition: opacity 0.4s ease;
   opacity: 1;
-  transform: translateY(0);
 }
 .moderno-home.hidden {
-  opacity: 0;
-  transform: translateY(-10px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  display: none;
 }
 
 .moderno-carousel {
   position: relative;
   width: 100%;
-  height: 340px;
+  height: 300px;
   overflow: hidden;
   background: #2d2419;
 }
@@ -446,8 +439,8 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   background: rgba(250, 247, 242, 0.88);
   border: none;
   border-radius: 50%;
@@ -456,7 +449,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   align-items: center;
   justify-content: center;
   z-index: 10;
-  font-size: 24px;
+  font-size: 22px;
   color: #2d2419;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
@@ -466,10 +459,10 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     transform: translateY(-50%) scale(1.05);
   }
   &.prev {
-    left: 16px;
+    left: 12px;
   }
   &.next {
-    right: 16px;
+    right: 12px;
   }
 }
 
@@ -478,7 +471,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   justify-content: center;
   gap: 6px;
   padding: 10px 0 4px;
-  background: #faf7f2;
 }
 .moderno-dot {
   width: 6px;
@@ -494,37 +486,20 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .moderno-welcome {
-  padding: 16px 20px;
+  padding: 14px 20px;
   text-align: center;
 }
 .moderno-welcome-text {
-  font-family: 'Jost', sans-serif;
   font-size: 12px;
   font-weight: 300;
   letter-spacing: 1px;
-  color: #7a6a55;
   font-style: italic;
 }
 
 .moderno-lista {
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  transition:
-    opacity 0.4s ease,
-    transform 0.4s ease;
-  background: #faf7f2;
-  min-height: 100%;
-  overflow-y: auto;
+  display: none;
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: all;
-    position: relative;
+    display: block;
   }
 }
 
@@ -532,23 +507,22 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 12px 20px;
+  padding: 11px 18px;
   background: none;
   border: none;
-  border-bottom: 1px solid #e8dfd0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   cursor: pointer;
   font-family: 'Jost', sans-serif;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: #c8a96e;
   width: 100%;
 }
 
 .moderno-lista-header {
-  padding: 14px 20px 8px;
-  border-bottom: 1px solid #e8dfd0;
+  padding: 14px 18px 8px;
+  border-bottom: 2px solid;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -557,7 +531,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   font-family: 'Playfair Display', serif;
   font-size: 20px;
   font-weight: 700;
-  color: #2d2419;
   font-style: italic;
 }
 .moderno-lista-count {
@@ -568,17 +541,16 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .moderno-prodotti {
-  padding: 4px 0 20px;
+  padding: 4px 0 48px;
 }
 
 .moderno-prodotto-item {
-  padding: 11px 20px;
-  border-bottom: 1px solid rgba(232, 223, 208, 0.5);
+  padding: 11px 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   animation: modernoFadeIn 0.3s ease both;
-  opacity: 0;
   &.moderno-speciale {
-    background: #fff9e6;
-    border-left: 3px solid #c8a96e;
+    background: rgba(0, 0, 0, 0.015);
+    border-left: 3px solid;
   }
 }
 @keyframes modernoFadeIn {
@@ -629,7 +601,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   margin-bottom: 2px;
 }
 .moderno-prodotto-nome {
-  font-family: 'Cormorant Garamond', serif;
   font-size: 15px;
   font-weight: 500;
   color: #2d2419;
@@ -659,7 +630,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   font-style: italic;
   padding-left: 15px;
 }
-
 .moderno-empty {
   padding: 20px;
   text-align: center;
@@ -668,179 +638,155 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 // ══════════════════════════════════════════════════
-//  TEMPLATE RUSTICO
+//  TEMPLATE RUSTICO — pagina unica, tutto scorre
 // ══════════════════════════════════════════════════
 
 .rustico-page {
-  width: 100%;
   min-height: 100vh;
-  background: #faf7f2;
   font-family: 'Jost', sans-serif;
-  display: flex;
-  flex-direction: column;
 }
 
-// ── Header Rustico ──
+// Header normale — scorre via con la pagina, NESSUN sticky
 .rustico-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px 10px;
-  background: #faf7f2;
-  border-bottom: 1px solid #e8dfd0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  flex-shrink: 0;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
 }
 
-.rustico-header-left,
+.rustico-header-left {
+  width: 60px;
+  flex-shrink: 0;
+}
 .rustico-header-right {
   width: 36px;
   flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
 }
-
 .rustico-header-center {
   flex: 1;
   text-align: center;
+  min-width: 0;
+}
+
+.rustico-btn-back {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.85;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  padding: 0;
+  &:hover {
+    opacity: 1;
+  }
 }
 
 .rustico-header-label {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(18px, 4vw, 30px);
+  font-size: clamp(14px, 3vw, 24px);
   font-weight: 900;
-  letter-spacing: 6px;
-  color: #2d2419;
+  letter-spacing: 5px;
   line-height: 1;
 }
 
 .rustico-logo-wrap {
   display: flex;
   justify-content: center;
-  padding: 4px 0 2px;
+  padding: 2px 0 1px;
 }
-
 .rustico-logo-img {
-  max-height: 48px;
-  max-width: 160px;
+  max-height: 40px;
+  max-width: 140px;
   object-fit: contain;
 }
 
 .rustico-title {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(14px, 3vw, 22px);
+  font-size: clamp(11px, 2.2vw, 18px);
   font-weight: 700;
-  color: #2d2419;
   line-height: 1.1;
-  margin: 2px 0 0;
+  margin: 1px 0 0;
   letter-spacing: 2px;
 }
 
 .rustico-sub {
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 300;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: #7a6a55;
-  margin-top: 2px;
+  margin-top: 1px;
 }
-
 .rustico-flag {
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1;
 }
 
-// ── Layout ──
+// Layout — sidebar e main affiancati, tutto fluisce
 .rustico-layout {
   display: flex;
-  flex-direction: row; // sempre row: sidebar sinistra, main destra
-  flex: 1;
-  min-height: 0;
-  height: calc(100dvh - 68px); // occhio: adatta se header cambia altezza
-  overflow: hidden;
+  flex-direction: row;
+  align-items: flex-start;
 }
 
-// ── Sidebar ──
+// Sidebar normale — scorre con la pagina, NESSUN sticky
 .rustico-sidebar {
-  width: 120px;
+  width: 110px;
   flex-shrink: 0;
-  background: #f2ece2;
-  border-right: 1px solid #e8dfd0;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  border-right: 1px solid;
 }
 
 .rustico-nav {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  padding: 10px 6px;
+  padding: 8px 5px;
 }
 
 .rustico-nav-btn {
   width: 100%;
-  padding: 9px 5px;
+  padding: 8px 4px;
   background: white;
-  border: 1.5px solid #e8dfd0;
-  border-radius: 8px;
+  border: 1.5px solid;
+  border-radius: 7px;
   cursor: pointer;
   font-family: 'Jost', sans-serif;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 400;
-  color: #7a6a55;
   text-align: center;
   line-height: 1.35;
   letter-spacing: 0.2px;
   transition: all 0.22s ease;
   user-select: none;
   word-break: break-word;
-  &:hover {
-    border-color: #c8a96e;
-    color: #2d2419;
-    background: #fdf8f0;
-  }
   &.active {
     font-weight: 600;
-    background: rgba(200, 16, 46, 0.06);
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
   }
 }
 
-// ── Main content ──
 .rustico-main {
   flex: 1;
   min-width: 0;
-  position: relative;
-  overflow: hidden;
 }
 
-// ── Carosello ──
+// Carosello
 .rustico-carousel-wrap {
-  position: absolute;
-  inset: 0;
-  transition:
-    opacity 0.4s ease,
-    transform 0.4s ease;
-  opacity: 1;
-  transform: translateX(0);
-  pointer-events: all;
   &.nascosto {
-    opacity: 0;
-    transform: translateX(-16px);
-    pointer-events: none;
+    display: none;
   }
 }
 
 .rustico-carousel {
   width: 100%;
-  height: 100%;
+  height: 80vw; // proporzionale alla larghezza, non alla viewport
+  max-height: 600px;
   position: relative;
   overflow: hidden;
   background: #2d2419;
@@ -876,13 +822,13 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   background: rgba(250, 247, 242, 0.88);
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 18px;
   color: #2d2419;
   display: flex;
   align-items: center;
@@ -896,16 +842,16 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     transform: translateY(-50%) scale(1.07);
   }
   &.prev {
-    left: 8px;
+    left: 7px;
   }
   &.next {
-    right: 8px;
+    right: 7px;
   }
 }
 
 .rustico-dots {
   position: absolute;
-  bottom: 12px;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -928,23 +874,12 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
 }
 
-// ── Lista prodotti ──
+// Lista prodotti — fluisce normalmente
 .rustico-lista-wrap {
-  position: absolute;
-  inset: 0;
-  background: #faf7f2;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  opacity: 0;
-  transform: translateX(14px);
-  pointer-events: none;
-  transition:
-    opacity 0.4s ease,
-    transform 0.4s ease;
+  display: none;
+  padding-bottom: 48px;
   &.visibile {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: all;
+    display: block;
   }
 }
 
@@ -953,24 +888,24 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   align-items: center;
   gap: 5px;
   width: 100%;
-  padding: 9px 14px;
+  padding: 8px 12px;
   background: none;
   border: none;
-  border-bottom: 1px solid #e8dfd0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   cursor: pointer;
   font-family: 'Jost', sans-serif;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 500;
   letter-spacing: 2px;
   text-transform: uppercase;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease;
   &:hover {
-    background: rgba(200, 16, 46, 0.03);
+    background: rgba(0, 0, 0, 0.03);
   }
 }
 
 .rustico-back-arrow {
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1;
   font-weight: 300;
 }
@@ -979,46 +914,42 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .rustico-lista-header {
-  padding: 12px 14px 8px;
-  border-bottom: 2px solid currentColor;
+  padding: 10px 12px 7px;
+  border-bottom: 2px solid;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  position: sticky;
-  top: 0;
-  background: #faf7f2;
-  z-index: 5;
 }
 
 .rustico-lista-nome {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(15px, 3vw, 22px);
+  font-size: clamp(14px, 2.5vw, 20px);
   font-weight: 700;
   font-style: italic;
 }
 
 .rustico-lista-count {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 300;
   letter-spacing: 2px;
   color: #7a6a55;
   text-transform: uppercase;
   flex-shrink: 0;
-  margin-left: 8px;
+  margin-left: 6px;
 }
 
 .rustico-prodotti {
-  padding: 4px 0 28px;
+  padding: 4px 0 4px;
 }
 
 .rustico-prodotto-item {
-  padding: 9px 14px;
-  border-bottom: 1px solid rgba(232, 223, 208, 0.6);
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   animation: rusticoFadeUp 0.28s ease forwards;
   opacity: 0;
   &.rustico-speciale {
-    background: #fff9e6;
-    border-left: 3px solid #c8a96e;
+    background: rgba(0, 0, 0, 0.015);
+    border-left: 3px solid;
   }
 }
 
@@ -1067,56 +998,49 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: baseline;
 }
-
 .rustico-bullet {
   width: 5px;
   height: 5px;
   border-radius: 50%;
   flex-shrink: 0;
-  margin-right: 8px;
+  margin-right: 7px;
   margin-bottom: 2px;
 }
-
 .rustico-prodotto-nome {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(13px, 2.2vw, 16px);
+  font-size: clamp(12px, 2vw, 15px);
   font-weight: 500;
   color: #2d2419;
   white-space: nowrap;
   flex-shrink: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 55%;
+  max-width: 52%;
 }
-
 .rustico-leader {
   flex: 1;
   border-bottom: 1.5px dotted rgba(122, 106, 85, 0.35);
-  margin: 0 6px 4px;
+  margin: 0 5px 4px;
   min-width: 8px;
 }
-
 .rustico-prodotto-prezzo {
   font-family: 'Jost', sans-serif;
-  font-size: clamp(12px, 1.8vw, 14px);
+  font-size: clamp(11px, 1.8vw, 13px);
   font-weight: 500;
   white-space: nowrap;
   flex-shrink: 0;
 }
-
 .rustico-prodotto-desc {
   font-family: 'Jost', sans-serif;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 300;
   color: #7a6a55;
   margin-top: 3px;
   line-height: 1.5;
   font-style: italic;
-  padding-left: 13px;
+  padding-left: 12px;
 }
-
 .rustico-empty {
-  padding: 20px 14px;
+  padding: 16px 12px;
   text-align: center;
   color: #7a6a55;
   font-size: 12px;
@@ -1125,31 +1049,32 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 // ── RESPONSIVE Desktop ≥ 768px ──
 @media (min-width: 768px) {
   .menu-main {
-    padding: 28px 24px;
+    padding: 28px 40px;
   }
   .menu-nome {
     font-size: 2.2rem;
   }
 
   .moderno-header {
-    padding: 36px 40px 20px;
-    max-width: 900px;
-    margin: 0 auto;
+    padding: 28px 40px 16px;
+  }
+  .moderno-btn-back {
+    top: 16px;
+    left: 24px;
+    font-size: 0.85rem;
   }
   .moderno-logo-img {
-    max-width: 280px;
-    max-height: 120px;
+    max-width: 240px;
+    max-height: 90px;
   }
   .moderno-title {
-    font-size: 42px;
+    font-size: 38px;
   }
   .moderno-tabs-wrapper {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 14px 24px;
+    padding: 12px 24px;
   }
   .moderno-carousel {
-    height: 460px;
+    height: 420px;
   }
   .moderno-prodotto-nome {
     font-size: 17px;
@@ -1157,130 +1082,141 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   .moderno-prodotto-prezzo {
     font-size: 15px;
   }
-  .moderno-prodotto-desc {
-    font-size: 12px;
-  }
-  .moderno-lista-nome {
-    font-size: 26px;
-  }
   .moderno-prodotto-item {
-    padding: 14px 32px;
+    padding: 13px 28px;
   }
   .moderno-back-btn {
-    padding: 14px 32px;
+    padding: 13px 28px;
   }
   .moderno-lista-header {
-    padding: 18px 32px 10px;
+    padding: 16px 28px 10px;
   }
 
   .rustico-sidebar {
-    width: 155px;
+    width: 145px;
   }
   .rustico-nav-btn {
-    font-size: 11px;
-    padding: 11px 8px;
+    font-size: 10.5px;
+    padding: 10px 7px;
   }
   .rustico-header {
-    padding: 14px 24px 12px;
+    padding: 12px 20px 10px;
+  }
+  .rustico-header-left {
+    width: 80px;
   }
   .rustico-logo-img {
-    max-height: 56px;
-    max-width: 200px;
+    max-height: 50px;
+    max-width: 180px;
   }
   .rustico-back-btn {
-    padding: 11px 20px;
-    font-size: 11px;
+    padding: 10px 18px;
+    font-size: 10.5px;
   }
   .rustico-lista-header {
-    padding: 16px 20px 10px;
+    padding: 14px 18px 8px;
   }
   .rustico-prodotto-item {
-    padding: 11px 20px;
+    padding: 10px 18px;
   }
   .rustico-prodotto-nome {
-    max-width: 60%;
-    font-size: 16px;
+    max-width: 58%;
+    font-size: 15px;
   }
   .rustico-prodotto-prezzo {
-    font-size: 14px;
+    font-size: 13px;
   }
   .rustico-prodotto-desc {
-    font-size: 11px;
-    padding-left: 15px;
+    font-size: 10.5px;
+    padding-left: 14px;
+  }
+  .rustico-lista-nome {
+    font-size: 22px;
   }
 }
 
 // ── RESPONSIVE Mobile ≤ 600px ──
 @media (max-width: 600px) {
   .menu-nome {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
   .logo-img {
-    max-width: 160px;
+    max-width: 150px;
+    max-height: 60px;
   }
   .portata-header {
-    padding: 12px 14px;
+    padding: 11px 13px;
   }
   .portata-nome {
-    font-size: 0.95rem;
-  }
-  .prodotto-card {
-    padding: 12px 14px;
-  }
-  .prodotto-nome {
     font-size: 0.92rem;
   }
-  .prodotto-prezzo {
-    font-size: 0.88rem;
+  .prodotto-card {
+    padding: 11px 13px;
   }
 
   .moderno-carousel {
-    height: 240px;
+    height: 210px;
   }
   .moderno-title {
-    font-size: 26px;
+    font-size: 22px;
   }
   .moderno-logo-img {
-    max-width: 180px;
-    max-height: 70px;
+    max-width: 150px;
+    max-height: 60px;
   }
   .moderno-carousel-btn {
-    width: 30px;
-    height: 30px;
-    font-size: 18px;
+    width: 28px;
+    height: 28px;
+    font-size: 17px;
+  }
+  .moderno-btn-back {
+    font-size: 0.7rem;
+    top: 8px;
+    left: 8px;
+  }
+  .moderno-header {
+    padding: 20px 14px 12px;
   }
 
-  // Rustico mobile: sidebar si restringe
   .rustico-sidebar {
-    width: 84px;
+    width: 78px;
+  }
+  .rustico-carousel {
+    height: 70vw;
   }
   .rustico-nav-btn {
-    font-size: 9px;
-    padding: 7px 4px;
+    font-size: 8.5px;
+    padding: 6px 3px;
     border-radius: 6px;
   }
   .rustico-header {
-    padding: 9px 12px 8px;
+    padding: 7px 8px 6px;
   }
   .rustico-header-label {
-    font-size: 16px;
-    letter-spacing: 4px;
+    font-size: 13px;
+    letter-spacing: 3px;
+  }
+  .rustico-header-left {
+    width: 44px;
   }
   .rustico-flag {
-    font-size: 15px;
+    font-size: 13px;
   }
   .rustico-logo-img {
-    max-height: 36px;
+    max-height: 30px;
   }
   .rustico-carousel-btn {
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
+    width: 26px;
+    height: 26px;
+    font-size: 15px;
   }
   .rustico-carousel-btn.prev {
-    left: 5px;
+    left: 4px;
   }
   .rustico-carousel-btn.next {
-    right: 5px;
+    right: 4px;
+  }
+  .rustico-btn-back {
+    font-size: 0.65rem;
   }
 }
