@@ -37,8 +37,8 @@ class AllergeneResourceIT {
     private static final String DEFAULT_NOME = "AAAAAAAAAA";
     private static final String UPDATED_NOME = "BBBBBBBBBB";
 
-    private static final String DEFAULT_SIMBOLO = "AAAAAAAAAA";
-    private static final String UPDATED_SIMBOLO = "BBBBBBBBBB";
+    private static final String DEFAULT_COLORE = "#AAAAAA";
+    private static final String UPDATED_COLORE = "#BBBBBB";
 
     private static final String ENTITY_API_URL = "/api/allergenes";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -64,22 +64,16 @@ class AllergeneResourceIT {
 
     /**
      * Create an entity for this test.
-     *
-     * This is a static method, as tests for other entities might also need it,
-     * if they test an entity which requires the current entity.
      */
     public static Allergene createEntity() {
-        return new Allergene().nome(DEFAULT_NOME).simbolo(DEFAULT_SIMBOLO);
+        return new Allergene().nome(DEFAULT_NOME).colore(DEFAULT_COLORE);
     }
 
     /**
      * Create an updated entity for this test.
-     *
-     * This is a static method, as tests for other entities might also need it,
-     * if they test an entity which requires the current entity.
      */
     public static Allergene createUpdatedEntity() {
-        return new Allergene().nome(UPDATED_NOME).simbolo(UPDATED_SIMBOLO);
+        return new Allergene().nome(UPDATED_NOME).colore(UPDATED_COLORE);
     }
 
     @BeforeEach
@@ -169,7 +163,7 @@ class AllergeneResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(allergene.getId().toString())))
             .andExpect(jsonPath("$.[*].nome").value(hasItem(DEFAULT_NOME)))
-            .andExpect(jsonPath("$.[*].simbolo").value(hasItem(DEFAULT_SIMBOLO)));
+            .andExpect(jsonPath("$.[*].colore").value(hasItem(DEFAULT_COLORE)));
     }
 
     @Test
@@ -185,7 +179,7 @@ class AllergeneResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(allergene.getId().toString()))
             .andExpect(jsonPath("$.nome").value(DEFAULT_NOME))
-            .andExpect(jsonPath("$.simbolo").value(DEFAULT_SIMBOLO));
+            .andExpect(jsonPath("$.colore").value(DEFAULT_COLORE));
     }
 
     @Test
@@ -205,9 +199,8 @@ class AllergeneResourceIT {
 
         // Update the allergene
         Allergene updatedAllergene = allergeneRepository.findById(allergene.getId()).orElseThrow();
-        // Disconnect from session so that the updates on updatedAllergene are not directly saved in db
         em.detach(updatedAllergene);
-        updatedAllergene.nome(UPDATED_NOME).simbolo(UPDATED_SIMBOLO);
+        updatedAllergene.nome(UPDATED_NOME).colore(UPDATED_COLORE);
         AllergeneDTO allergeneDTO = allergeneMapper.toDto(updatedAllergene);
 
         restAllergeneMockMvc
@@ -230,10 +223,8 @@ class AllergeneResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         allergene.setId(UUID.randomUUID());
 
-        // Create the Allergene
         AllergeneDTO allergeneDTO = allergeneMapper.toDto(allergene);
 
-        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restAllergeneMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, allergeneDTO.getId())
@@ -243,7 +234,6 @@ class AllergeneResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        // Validate the Allergene in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
@@ -253,10 +243,8 @@ class AllergeneResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         allergene.setId(UUID.randomUUID());
 
-        // Create the Allergene
         AllergeneDTO allergeneDTO = allergeneMapper.toDto(allergene);
 
-        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restAllergeneMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, UUID.randomUUID())
@@ -266,7 +254,6 @@ class AllergeneResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        // Validate the Allergene in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
@@ -276,15 +263,12 @@ class AllergeneResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         allergene.setId(UUID.randomUUID());
 
-        // Create the Allergene
         AllergeneDTO allergeneDTO = allergeneMapper.toDto(allergene);
 
-        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restAllergeneMockMvc
             .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(allergeneDTO)))
             .andExpect(status().isMethodNotAllowed());
 
-        // Validate the Allergene in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
@@ -296,7 +280,6 @@ class AllergeneResourceIT {
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
-        // Update the allergene using partial update
         Allergene partialUpdatedAllergene = new Allergene();
         partialUpdatedAllergene.setId(allergene.getId());
 
@@ -308,8 +291,6 @@ class AllergeneResourceIT {
                     .content(om.writeValueAsBytes(partialUpdatedAllergene))
             )
             .andExpect(status().isOk());
-
-        // Validate the Allergene in the database
 
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
         assertAllergeneUpdatableFieldsEquals(
@@ -326,11 +307,10 @@ class AllergeneResourceIT {
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
-        // Update the allergene using partial update
         Allergene partialUpdatedAllergene = new Allergene();
         partialUpdatedAllergene.setId(allergene.getId());
 
-        partialUpdatedAllergene.nome(UPDATED_NOME).simbolo(UPDATED_SIMBOLO);
+        partialUpdatedAllergene.nome(UPDATED_NOME).colore(UPDATED_COLORE);
 
         restAllergeneMockMvc
             .perform(
@@ -340,8 +320,6 @@ class AllergeneResourceIT {
                     .content(om.writeValueAsBytes(partialUpdatedAllergene))
             )
             .andExpect(status().isOk());
-
-        // Validate the Allergene in the database
 
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
         assertAllergeneUpdatableFieldsEquals(partialUpdatedAllergene, getPersistedAllergene(partialUpdatedAllergene));
@@ -353,10 +331,8 @@ class AllergeneResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         allergene.setId(UUID.randomUUID());
 
-        // Create the Allergene
         AllergeneDTO allergeneDTO = allergeneMapper.toDto(allergene);
 
-        // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restAllergeneMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, allergeneDTO.getId())
@@ -366,7 +342,6 @@ class AllergeneResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        // Validate the Allergene in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
@@ -376,10 +351,8 @@ class AllergeneResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         allergene.setId(UUID.randomUUID());
 
-        // Create the Allergene
         AllergeneDTO allergeneDTO = allergeneMapper.toDto(allergene);
 
-        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restAllergeneMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, UUID.randomUUID())
@@ -389,7 +362,6 @@ class AllergeneResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        // Validate the Allergene in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
@@ -399,17 +371,14 @@ class AllergeneResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         allergene.setId(UUID.randomUUID());
 
-        // Create the Allergene
         AllergeneDTO allergeneDTO = allergeneMapper.toDto(allergene);
 
-        // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restAllergeneMockMvc
             .perform(
                 patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(allergeneDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
-        // Validate the Allergene in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 

@@ -12,7 +12,6 @@
 
 <!-- ═══════════════════════════════════════════════════════
      TEMPLATE CLASSICO
-     Header STICKY, contenuto scrollabile
      ═══════════════════════════════════════════════════════ -->
 <div
   *ngIf="!isLoading && !errore && menu && !isModerno && !isRustico"
@@ -50,6 +49,18 @@
             <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}</h4>
           </div>
           <p *ngIf="piatto.descrizione" class="prodotto-desc">{{ piatto.descrizione }}</p>
+          <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis)?.length > 0">
+            <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis">
+              <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
+              <span
+                *ngIf="!getAllergeneIcona(a)"
+                class="allergene-tag-solo-nome"
+                [title]="a.nome"
+                [style.backgroundColor]="a.colore || '#888'"
+                >{{ a.nome }}</span
+              >
+            </ng-container>
+          </div>
           <span class="badge-speciale" [style.backgroundColor]="coloreSecondario" [style.color]="colorePrimario">🌟 Speciale</span>
         </div>
       </div>
@@ -71,21 +82,47 @@
             <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</h4>
           </div>
           <p *ngIf="prodotto.descrizione" class="prodotto-desc">{{ prodotto.descrizione }}</p>
+          <!-- ICONE ALLERGENI SUL PRODOTTO -->
+          <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
+            <ng-container *ngFor="let a of prodotto.allergenis">
+              <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
+              <span
+                *ngIf="!getAllergeneIcona(a)"
+                class="allergene-tag-solo-nome"
+                [title]="a.nome"
+                [style.backgroundColor]="a.colore || '#888'"
+                >{{ a.nome }}</span
+              >
+            </ng-container>
+          </div>
         </div>
         <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
       </div>
     </section>
 
+    <!-- SEZIONE ALLERGENI FOOTER CLASSICO -->
+    <div class="sezione-allergeni-footer" *ngIf="tuttiAllergeniMenu.length > 0" [style.borderTopColor]="colorePrimario + '44'">
+      <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">Allergeni presenti in questo menu</h3>
+      <div class="allergeni-footer-lista">
+        <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
+          <div class="allergene-footer-cerchio" [style.backgroundColor]="a.colore || '#888'">
+            <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [alt]="a.nome" class="allergene-footer-icona" />
+            <span *ngIf="!getAllergeneIcona(a)" class="allergene-footer-iniziale">{{ a.nome.charAt(0) }}</span>
+          </div>
+          <span class="allergene-footer-nome">{{ a.nome }}</span>
+        </div>
+      </div>
+      <p class="allergeni-footer-nota">Per ulteriori informazioni sugli allergeni rivolgiti al personale di sala.</p>
+    </div>
+
     <div class="menu-note" [style.borderLeftColor]="colorePrimario">
-      Tutti i nostri piatti sono preparati con ingredienti freschi e di qualità.<br />
-      Per informazioni su allergeni rivolgiti al personale di sala.
+      Tutti i nostri piatti sono preparati con ingredienti freschi e di qualità.
     </div>
   </main>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════
      TEMPLATE MODERNO
-     Header + tabs FISSI, contenuto scrollabile
      ═══════════════════════════════════════════════════════ -->
 <div
   *ngIf="!isLoading && !errore && menu && isModerno"
@@ -163,6 +200,7 @@
       </div>
     </div>
 
+    <!-- Lista piatti del giorno -->
     <div class="moderno-lista" [class.visible]="modernoTabAttiva === 'piatti-giorno'" [style.backgroundColor]="coloreSecondario + '18'">
       <button class="moderno-back-btn" [style.color]="colorePrimario" (click)="modernoTornaHome()">‹ Torna al menu</button>
       <div class="moderno-lista-header" [style.borderBottomColor]="colorePrimario">
@@ -180,10 +218,20 @@
             }}</span>
           </div>
           <p *ngIf="piatto.descrizione" class="moderno-prodotto-desc">{{ piatto.descrizione }}</p>
+          <!-- ICONE ALLERGENI -->
+          <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis)?.length > 0">
+            <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis">
+              <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
+              <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
+                a.nome
+              }}</span>
+            </ng-container>
+          </div>
         </div>
       </div>
     </div>
 
+    <!-- Liste portate -->
     <div
       *ngFor="let portata of portate"
       class="moderno-lista"
@@ -208,16 +256,39 @@
             <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
           </div>
           <p *ngIf="prodotto.descrizione" class="moderno-prodotto-desc">{{ prodotto.descrizione }}</p>
+          <!-- ICONE ALLERGENI -->
+          <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
+            <ng-container *ngFor="let a of prodotto.allergenis">
+              <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
+              <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
+                a.nome
+              }}</span>
+            </ng-container>
+          </div>
         </div>
         <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
       </div>
+    </div>
+
+    <!-- SEZIONE ALLERGENI FOOTER MODERNO -->
+    <div class="sezione-allergeni-footer" *ngIf="tuttiAllergeniMenu.length > 0" [style.borderTopColor]="colorePrimario + '44'">
+      <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">Allergeni presenti in questo menu</h3>
+      <div class="allergeni-footer-lista">
+        <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
+          <div class="allergene-footer-cerchio" [style.backgroundColor]="a.colore || '#888'">
+            <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [alt]="a.nome" class="allergene-footer-icona" />
+            <span *ngIf="!getAllergeneIcona(a)" class="allergene-footer-iniziale">{{ a.nome.charAt(0) }}</span>
+          </div>
+          <span class="allergene-footer-nome">{{ a.nome }}</span>
+        </div>
+      </div>
+      <p class="allergeni-footer-nota">Per ulteriori informazioni sugli allergeni rivolgiti al personale di sala.</p>
     </div>
   </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════
      TEMPLATE RUSTICO
-     Header + sidebar FISSI, solo lista prodotti scorribile
      ═══════════════════════════════════════════════════════ -->
 <div
   *ngIf="!isLoading && !errore && menu && isRustico"
@@ -299,6 +370,7 @@
           <span class="rustico-back-label">Torna alle foto</span>
         </button>
 
+        <!-- Piatti del giorno RUSTICO -->
         <ng-container *ngIf="rusticoTabAttiva === 'piatti-giorno'">
           <div class="rustico-lista-header" [style.borderBottomColor]="colorePrimario">
             <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">✨ Piatti del Giorno</span>
@@ -319,10 +391,20 @@
                 }}</span>
               </div>
               <p *ngIf="piatto.descrizione" class="rustico-prodotto-desc">{{ piatto.descrizione }}</p>
+              <!-- ICONE ALLERGENI -->
+              <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis)?.length > 0">
+                <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis">
+                  <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
+                  <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
+                    a.nome
+                  }}</span>
+                </ng-container>
+              </div>
             </div>
           </div>
         </ng-container>
 
+        <!-- Lista portata RUSTICO -->
         <ng-container *ngIf="rusticoPortataAttiva">
           <div class="rustico-lista-header" [style.borderBottomColor]="colorePrimario">
             <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{
@@ -343,10 +425,38 @@
                 <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
               </div>
               <p *ngIf="prodotto.descrizione" class="rustico-prodotto-desc">{{ prodotto.descrizione }}</p>
+              <!-- ICONE ALLERGENI -->
+              <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
+                <ng-container *ngFor="let a of prodotto.allergenis">
+                  <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
+                  <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
+                    a.nome
+                  }}</span>
+                </ng-container>
+              </div>
             </div>
             <a [routerLink]="['/prodotto-add', rusticoPortataAttiva.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
           </div>
         </ng-container>
+
+        <!-- SEZIONE ALLERGENI FOOTER RUSTICO (in fondo alla lista) -->
+        <div
+          class="sezione-allergeni-footer"
+          *ngIf="rusticoTabAttiva && tuttiAllergeniMenu.length > 0"
+          [style.borderTopColor]="colorePrimario + '44'"
+        >
+          <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">Allergeni presenti in questo menu</h3>
+          <div class="allergeni-footer-lista">
+            <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
+              <div class="allergene-footer-cerchio" [style.backgroundColor]="a.colore || '#888'">
+                <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [alt]="a.nome" class="allergene-footer-icona" />
+                <span *ngIf="!getAllergeneIcona(a)" class="allergene-footer-iniziale">{{ a.nome.charAt(0) }}</span>
+              </div>
+              <span class="allergene-footer-nome">{{ a.nome }}</span>
+            </div>
+          </div>
+          <p class="allergeni-footer-nota">Per ulteriori informazioni sugli allergeni rivolgiti al personale di sala.</p>
+        </div>
       </div>
     </main>
   </div>

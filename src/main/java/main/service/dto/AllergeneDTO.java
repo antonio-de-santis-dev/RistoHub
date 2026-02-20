@@ -1,11 +1,10 @@
 package main.service.dto;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Lob;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * A DTO for the {@link main.domain.Allergene} entity.
@@ -18,7 +17,11 @@ public class AllergeneDTO implements Serializable {
     @NotNull
     private String nome;
 
-    private String simbolo;
+    private byte[] icona;
+
+    private String iconaContentType;
+
+    private String colore;
 
     private Set<ProdottoDTO> prodottos = new HashSet<>();
 
@@ -38,12 +41,28 @@ public class AllergeneDTO implements Serializable {
         this.nome = nome;
     }
 
-    public String getSimbolo() {
-        return simbolo;
+    public byte[] getIcona() {
+        return icona;
     }
 
-    public void setSimbolo(String simbolo) {
-        this.simbolo = simbolo;
+    public void setIcona(byte[] icona) {
+        this.icona = icona;
+    }
+
+    public String getIconaContentType() {
+        return iconaContentType;
+    }
+
+    public void setIconaContentType(String iconaContentType) {
+        this.iconaContentType = iconaContentType;
+    }
+
+    public String getColore() {
+        return colore;
+    }
+
+    public void setColore(String colore) {
+        this.colore = colore;
     }
 
     public Set<ProdottoDTO> getProdottos() {
@@ -75,14 +94,26 @@ public class AllergeneDTO implements Serializable {
         return Objects.hash(this.id);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "AllergeneDTO{" +
-            "id='" + getId() + "'" +
-            ", nome='" + getNome() + "'" +
-            ", simbolo='" + getSimbolo() + "'" +
-            ", prodottos=" + getProdottos() +
-            "}";
+        return (
+            "AllergeneDTO{" +
+            "id=" +
+            id +
+            ", nome='" +
+            nome +
+            '\'' +
+            ", icona=" +
+            Arrays.toString(icona) +
+            ", iconaContentType='" +
+            iconaContentType +
+            '\'' +
+            ", colore='" +
+            colore +
+            '\'' +
+            ", prodottos=" +
+            prodottos +
+            '}'
+        );
     }
 }

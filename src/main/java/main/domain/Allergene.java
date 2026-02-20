@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -30,8 +31,15 @@ public class Allergene implements Serializable {
     @Column(name = "nome", nullable = false)
     private String nome;
 
-    @Column(name = "simbolo")
-    private String simbolo;
+    @Lob
+    @Column(name = "icona")
+    private byte[] icona;
+
+    @Column(name = "icona_content_type")
+    private String iconaContentType;
+
+    @Column(name = "colore")
+    private String colore;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "allergenis")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -66,17 +74,28 @@ public class Allergene implements Serializable {
         this.nome = nome;
     }
 
-    public String getSimbolo() {
-        return this.simbolo;
+    public byte[] getIcona() {
+        return icona;
     }
 
-    public Allergene simbolo(String simbolo) {
-        this.setSimbolo(simbolo);
-        return this;
+    public void setIcona(byte[] icona) {
+        this.icona = icona;
     }
 
-    public void setSimbolo(String simbolo) {
-        this.simbolo = simbolo;
+    public String getIconaContentType() {
+        return iconaContentType;
+    }
+
+    public void setIconaContentType(String iconaContentType) {
+        this.iconaContentType = iconaContentType;
+    }
+
+    public String getColore() {
+        return colore;
+    }
+
+    public void setColore(String colore) {
+        this.colore = colore;
     }
 
     public Set<Prodotto> getProdottos() {
@@ -110,6 +129,11 @@ public class Allergene implements Serializable {
         return this;
     }
 
+    public Allergene colore(String colore) {
+        this.setColore(colore);
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -130,12 +154,16 @@ public class Allergene implements Serializable {
     }
 
     // prettier-ignore
+
     @Override
     public String toString() {
         return "Allergene{" +
-            "id=" + getId() +
-            ", nome='" + getNome() + "'" +
-            ", simbolo='" + getSimbolo() + "'" +
-            "}";
+            "id=" + id +
+            ", nome='" + nome + '\'' +
+            ", icona=" + Arrays.toString(icona) +
+            ", iconaContentType='" + iconaContentType + '\'' +
+            ", colore='" + colore + '\'' +
+            ", prodottos=" + prodottos +
+            '}';
     }
 }

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="20260219-allergeni-default" author="you">
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000001"/>
+      <column name="nome" value="Glutine"/>
+      <column name="colore" value="#E8471E"/>
+    </insert>
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000002"/>
+      <column name="nome" value="Crostacei"/>
+      <column name="colore" value="#1E88C8"/>
+    </insert>
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000003"/>
+      <column name="nome" value="Uova"/>
+      <column name="colore" value="#F5A623"/>
+    </insert>
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000004"/>
+      <column name="nome" value="Pesce"/>
+      <column name="colore" value="#1565C0"/>
+    </insert>
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000005"/>
+      <column name="nome" value="Arachidi"/>
+      <column name="colore" value="#8B4513"/>
+    </insert>
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000006"/>
+      <column name="nome" value="Soia"/>
+      <column name="colore" value="#2E7D32"/>
+    </insert>
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000007"/>
+      <column name="nome" value="Latte"/>
+      <column name="colore" value="#00BCD4"/>
+    </insert>
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000008"/>
+      <column name="nome" value="Frutta a guscio"/>
+      <column name="colore" value="#E91E8C"/>
+    </insert>
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000009"/>
+      <column name="nome" value="Sedano"/>
+      <column name="colore" value="#43A047"/>
+    </insert>
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000010"/>
+      <column name="nome" value="Senape"/>
+      <column name="colore" value="#F5A623"/>
+    </insert>
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000011"/>
+      <column name="nome" value="Sesamo"/>
+      <column name="colore" value="#8D6E63"/>
+    </insert>
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000012"/>
+      <column name="nome" value="Anidride solforosa"/>
+      <column name="colore" value="#7B1FA2"/>
+    </insert>
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000013"/>
+      <column name="nome" value="Lupini"/>
+      <column name="colore" value="#C8A000"/>
+    </insert>
+
+    <insert tableName="allergene">
+      <column name="id" value="a1000001-0000-0000-0000-000000000014"/>
+      <column name="nome" value="Molluschi"/>
+      <column name="colore" value="#00897B"/>
+    </insert>
+
+  </changeSet>
+
+</databaseChangeLog>

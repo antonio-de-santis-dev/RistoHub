@@ -4,11 +4,20 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
+interface Allergene {
+  id: string;
+  nome: string;
+  icona?: string;
+  iconaContentType?: string;
+  colore?: string;
+}
+
 interface Prodotto {
   id: string;
   nome: string;
   descrizione?: string;
   prezzo: number;
+  allergenis?: Allergene[];
 }
 
 interface Portata {
@@ -46,8 +55,10 @@ export class MenuViewComponent implements OnInit {
   piattiDelGiorno: any[] = [];
   piattiGiornoAperti = false;
 
-  // ── Percorso "I miei menu" ──
-  // Usa il navigation history se disponibile, altrimenti fallback a /menus
+  // ── Mappa allergeni completi (con icona BLOB) caricata da /api/allergenes ──
+  // Necessaria perché /api/prodottos non include i BLOB negli oggetti annidati
+  allergeniMap: Map<string, Allergene> = new Map();
+
   get backRoute(): string {
     return '/menus';
   }
@@ -57,7 +68,6 @@ export class MenuViewComponent implements OnInit {
   modernoPortataAttiva: Portata | null = null;
   modernoCarouselIndex = 0;
   modernoAutoplayTimer: any = null;
-
   modernoImmagini: string[] = [
     'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80',
     'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=800&q=80',
@@ -70,7 +80,6 @@ export class MenuViewComponent implements OnInit {
   rusticoPortataAttiva: Portata | null = null;
   rusticoCarouselIndex = 0;
   rusticoAutoplayTimer: any = null;
-
   rusticoImmagini: string[] = [
     'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=900&q=80',
     'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=900&q=80',
@@ -95,7 +104,6 @@ export class MenuViewComponent implements OnInit {
     this.caricaMenu(id);
   }
 
-  // Naviga indietro: usa history se possibile, altrimenti /menus
   tornaAiMieiMenu(): void {
     this.router.navigate(['/menu-list']);
   }
@@ -104,7 +112,6 @@ export class MenuViewComponent implements OnInit {
     try {
       this.menu = (await this.http.get<Menu>(`/api/menus/${id}`).toPromise()) ?? null;
 
-      // Carica font personalizzato
       if (this.menu?.fontMenu) {
         const fontName = this.menu.fontMenu.replace(/ /g, '+');
         const link = document.createElement('link');
@@ -113,7 +120,6 @@ export class MenuViewComponent implements OnInit {
         document.head.appendChild(link);
       }
 
-      // Font aggiuntivi per MODERNO e RUSTICO
       if (this.menu?.templateStyle === 'MODERNO' || this.menu?.templateStyle === 'RUSTICO') {
         const linkFonts = document.createElement('link');
         linkFonts.rel = 'stylesheet';
@@ -121,6 +127,12 @@ export class MenuViewComponent implements OnInit {
           'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500&display=swap';
         document.head.appendChild(linkFonts);
       }
+
+      // ── CARICA ALLERGENI COMPLETI (con BLOB icona) ──
+      // I prodotti annidati non includono il campo icona nella risposta API,
+      // quindi carichiamo tutti gli allergeni separatamente e costruiamo una mappa
+      const tuttiAllergeni: Allergene[] = (await this.http.get<Allergene[]>('/api/allergenes').toPromise()) ?? [];
+      this.allergeniMap = new Map(tuttiAllergeni.map(a => [a.id, a]));
 
       // Logo
       const immagini: any[] = (await this.http.get<any[]>(`/api/menus/${id}/immagini`).toPromise()) ?? [];
@@ -143,7 +155,6 @@ export class MenuViewComponent implements OnInit {
       const piattiAttivi: any[] = (await this.http.get<any[]>(`/api/menus/${id}/piatti-del-giorno`).toPromise()) ?? [];
       this.piattiDelGiorno = piattiAttivi;
 
-      // Avvia autoplay
       if (this.menu?.templateStyle === 'MODERNO') this.avviaAutoplay();
       if (this.menu?.templateStyle === 'RUSTICO') this.avviaAutoplayRustico();
     } catch (err) {
@@ -229,6 +240,48 @@ export class MenuViewComponent implements OnInit {
       clearInterval(this.rusticoAutoplayTimer);
       this.rusticoAutoplayTimer = null;
     }
+  }
+
+  // ════════════════════════════════════════════
+  //  ALLERGENI
+  // ════════════════════════════════════════════
+
+  /**
+   * Restituisce il data URL dell'icona cercando prima nella mappa completa.
+   * La mappa ha i BLOB, gli allergeni annidati nei prodotti no.
+   */
+  getAllergeneIcona(a: Allergene): string {
+    const completo = this.allergeniMap.get(a.id) ?? a;
+    if (completo.icona && completo.iconaContentType) {
+      return `data:${completo.iconaContentType};base64,${completo.icona}`;
+    }
+    return '';
+  }
+
+  /** Raccoglie tutti gli allergeni unici del menu usando la mappa completa */
+  get tuttiAllergeniMenu(): Allergene[] {
+    const map = new Map<string, Allergene>();
+
+    this.portate.forEach(portata => {
+      (portata.prodotti ?? []).forEach(p => {
+        (p.allergenis ?? []).forEach(a => {
+          if (a.id) {
+            map.set(a.id, this.allergeniMap.get(a.id) ?? a);
+          }
+        });
+      });
+    });
+
+    this.piattiDelGiorno.forEach(piatto => {
+      const allergeni: Allergene[] = piatto.prodotto?.allergenis ?? piatto.allergenis ?? [];
+      allergeni.forEach(a => {
+        if (a.id) {
+          map.set(a.id, this.allergeniMap.get(a.id) ?? a);
+        }
+      });
+    });
+
+    return Array.from(map.values());
   }
 
   // ════════════════════════════════════════════

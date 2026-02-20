@@ -28,6 +28,7 @@ export class ProdottoAddComponent implements OnInit {
   // Allergeni
   allergeniDisponibili: any[] = [];
   allergeniSelezionati: Set<string> = new Set();
+  nomeAllergeneCustom = '';
 
   // Campi prodotto
   nome = '';
@@ -102,13 +103,49 @@ export class ProdottoAddComponent implements OnInit {
     }
   }
 
+  // ─── METODI ALLERGENI ───
+
   toggleAllergene(id: string): void {
     if (this.allergeniSelezionati.has(id)) {
       this.allergeniSelezionati.delete(id);
     } else {
       this.allergeniSelezionati.add(id);
     }
+    // Forza aggiornamento Set per Angular change detection
+    this.allergeniSelezionati = new Set(this.allergeniSelezionati);
   }
+
+  /** Aggiunge un allergene personalizzato alla lista locale (non viene salvato nel DB come allergene globale) */
+  aggiungiAllergeneCustom(): void {
+    const nome = this.nomeAllergeneCustom.trim();
+    if (!nome) return;
+    // Genera un ID temporaneo locale per gestire selezione
+    const idTemp = 'custom_' + Date.now();
+    const custom = {
+      id: idTemp,
+      nome,
+      icona: null,
+      iconaContentType: null,
+      colore: '#607D8B',
+      isCustom: true,
+    };
+    this.allergeniDisponibili = [...this.allergeniDisponibili, custom];
+    // Selezionalo subito automaticamente
+    this.allergeniSelezionati = new Set([...this.allergeniSelezionati, idTemp]);
+    this.nomeAllergeneCustom = '';
+  }
+
+  /** Array degli ID selezionati (per *ngFor nel template) */
+  get allergeniSelezionatiArray(): string[] {
+    return Array.from(this.allergeniSelezionati);
+  }
+
+  /** Trova un allergene per ID nella lista disponibili */
+  getAllergeneById(id: string): any {
+    return this.allergeniDisponibili.find(a => a.id === id) ?? null;
+  }
+
+  // ─── FINE METODI ALLERGENI ───
 
   nomePortata(p: any): string {
     if (p.tipo === 'PERSONALIZZATA' && p.nomePersonalizzato) return p.nomePersonalizzato;
@@ -135,7 +172,15 @@ export class ProdottoAddComponent implements OnInit {
     this.errorMessage = null;
 
     try {
-      const allergeni = Array.from(this.allergeniSelezionati).map(id => ({ id }));
+      // Prepara allergeni: solo quelli con ID reali (non custom locali senza backend)
+      const allergeni = Array.from(this.allergeniSelezionati)
+        .filter(id => !id.startsWith('custom_'))
+        .map(id => ({ id }));
+
+      // Per gli allergeni custom: se vuoi salvarli prima sul backend, aggiungi qui
+      // la chiamata POST /api/allergenes e poi usa l'ID restituito.
+      // Per ora vengono ignorati nel salvataggio (solo visivi in sessione).
+
       const prodotto: any = await this.http
         .post('/api/prodottos', {
           nome: this.nome.trim(),
@@ -145,6 +190,9 @@ export class ProdottoAddComponent implements OnInit {
           allergenis: allergeni,
         })
         .toPromise();
+
+      // Arricchisci il prodotto con i dati allergeni completi per la visualizzazione
+      prodotto.allergenis = allergeni.map(a => this.getAllergeneById(a.id)).filter(Boolean);
 
       this.prodottiAggiunti.unshift(prodotto);
       this.successMessage = `✅ "${prodotto.nome}" aggiunto con successo!`;

@@ -48,7 +48,7 @@ public class AllergeneAsserts {
         assertThat(actual)
             .as("Verify Allergene relevant properties")
             .satisfies(a -> assertThat(a.getNome()).as("check nome").isEqualTo(expected.getNome()))
-            .satisfies(a -> assertThat(a.getSimbolo()).as("check simbolo").isEqualTo(expected.getSimbolo()));
+            .satisfies(a -> assertThat(a.getColore()).as("check colore").isEqualTo(expected.getColore()));
     }
 
     /**
