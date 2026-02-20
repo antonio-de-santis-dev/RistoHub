@@ -56,7 +56,6 @@ export class MenuViewComponent implements OnInit {
   piattiGiornoAperti = false;
 
   // ── Mappa allergeni completi (con icona BLOB) caricata da /api/allergenes ──
-  // Necessaria perché /api/prodottos non include i BLOB negli oggetti annidati
   allergeniMap: Map<string, Allergene> = new Map();
 
   get backRoute(): string {
@@ -128,11 +127,16 @@ export class MenuViewComponent implements OnInit {
         document.head.appendChild(linkFonts);
       }
 
-      // ── CARICA ALLERGENI COMPLETI (con BLOB icona) ──
-      // I prodotti annidati non includono il campo icona nella risposta API,
-      // quindi carichiamo tutti gli allergeni separatamente e costruiamo una mappa
-      const tuttiAllergeni: Allergene[] = (await this.http.get<Allergene[]>('/api/allergenes').toPromise()) ?? [];
-      this.allergeniMap = new Map(tuttiAllergeni.map(a => [a.id, a]));
+      // ── CARICA ALLERGENI — NON BLOCCANTE ──
+      // Se /api/allergenes fallisce (es. relazioni orfane nel DB),
+      // il menu si carica comunque, solo senza le icone allergeni.
+      try {
+        const tuttiAllergeni: Allergene[] = (await this.http.get<Allergene[]>('/api/allergenes').toPromise()) ?? [];
+        this.allergeniMap = new Map(tuttiAllergeni.map(a => [a.id, a]));
+      } catch (errAllergeni) {
+        console.warn('⚠️ Allergeni non disponibili (500). Il menu verrà mostrato senza icone allergeni.', errAllergeni);
+        this.allergeniMap = new Map(); // mappa vuota: nessun crash, niente icone
+      }
 
       // Logo
       const immagini: any[] = (await this.http.get<any[]>(`/api/menus/${id}/immagini`).toPromise()) ?? [];
@@ -246,10 +250,6 @@ export class MenuViewComponent implements OnInit {
   //  ALLERGENI
   // ════════════════════════════════════════════
 
-  /**
-   * Restituisce il data URL dell'icona cercando prima nella mappa completa.
-   * La mappa ha i BLOB, gli allergeni annidati nei prodotti no.
-   */
   getAllergeneIcona(a: Allergene): string {
     const completo = this.allergeniMap.get(a.id) ?? a;
     if (completo.icona && completo.iconaContentType) {
@@ -258,7 +258,6 @@ export class MenuViewComponent implements OnInit {
     return '';
   }
 
-  /** Raccoglie tutti gli allergeni unici del menu usando la mappa completa */
   get tuttiAllergeniMenu(): Allergene[] {
     const map = new Map<string, Allergene>();
 
