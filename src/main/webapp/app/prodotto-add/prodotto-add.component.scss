@@ -101,30 +101,6 @@ select.form-control {
   cursor: pointer;
 }
 
-.allergeni-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.allergene-chip {
-  border: 2px solid $border;
-  border-radius: 30px;
-  padding: 4px 14px;
-  font-size: 0.82rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  user-select: none;
-  &:hover {
-    border-color: $accent;
-  }
-  &.selected {
-    background: $accent;
-    color: white;
-    border-color: $accent;
-  }
-}
-
 .btn-aggiungi {
   width: 100%;
   background: $accent;
@@ -168,7 +144,8 @@ select.form-control {
   font-size: 0.95rem;
 }
 
-// Lista prodotti
+// ── Lista prodotti (colonna destra) ──
+
 .empty-lista {
   text-align: center;
   padding: 2rem;
@@ -214,22 +191,6 @@ select.form-control {
   margin-bottom: 4px;
 }
 
-.prodotto-allergeni {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 4px;
-}
-
-.allergene-tag {
-  background: #fff3cd;
-  color: #856404;
-  border-radius: 20px;
-  padding: 2px 8px;
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
 .prodotto-item-right {
   display: flex;
   flex-direction: column;
@@ -255,197 +216,192 @@ select.form-control {
   &:hover {
     background: #f8d7da;
   }
+}
 
-  // ════════════════════════════════════════════════════════════════════
-  //  ALLERGENI — aggiungere IN FONDO a prodotto-add.component.scss
-  //  Sostituisce/integra le classi .allergene-chip e .allergeni-grid esistenti
-  // ════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+//  ALLERGENI
+// ══════════════════════════════════════════════════
 
-  // Sovrascrivi il chip esistente per includere l'icona immagine
-  .allergeni-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 10px;
+.allergeni-sezione {
+  border-top: 1px solid #f3f4f6;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+.allergeni-hint {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin: 0 0 10px;
+}
+
+.allergeni-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.allergene-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 20px;
+  border: 2px solid #ddd;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+
+  &:hover {
+    border-color: #aaa;
+    background: #f0f0f0;
   }
 
-  .allergene-chip {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px 4px 4px; // sinistra stretta per l'icona
-    border-radius: 20px;
-    border: 2px solid #ddd;
-    background: #fafafa;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    user-select: none;
+  &.selected {
+    font-weight: 600;
+  }
+}
 
-    &:hover {
-      border-color: #aaa;
-      background: #f0f0f0;
-    }
+.allergene-chip-icona {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
 
-    &.selected {
-      font-weight: 600;
-    }
+.allergene-chip-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
 
-    // Cerchietto icona
-    .allergene-chip-icona {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      flex-shrink: 0;
+.allergene-chip-iniziale {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+}
 
-      .allergene-chip-img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain; // contain: mostra tutto il disegno PNG
-        border-radius: 50%;
-        // nessun background: la PNG ha già lo sfondo colorato dentro
-      }
+.allergene-chip-nome {
+  font-size: 12px;
+  color: #333;
+  white-space: nowrap;
+}
 
-      .allergene-chip-iniziale {
-        font-size: 12px;
-        font-weight: 700;
-        color: #fff;
-        text-transform: uppercase;
-      }
-    }
+.allergene-chip-check {
+  font-size: 13px;
+  color: #fff;
+  margin-left: 2px;
+}
 
-    .allergene-chip-nome {
-      font-size: 12px;
-      color: #333;
-    }
+// Riga allergene personalizzato
+.allergene-custom-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
 
-    .allergene-chip-check {
-      font-size: 13px;
-      color: #fff;
-      margin-left: 2px;
-      background: transparent;
-    }
+.allergene-custom-input {
+  flex: 1;
+}
+
+.btn-allergene-add {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  background: #f5f5f5;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+
+  &:hover:not(:disabled) {
+    background: #e0e0e0;
   }
 
-  // Riga allergene personalizzato
-  .allergene-custom-row {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-
-    .allergene-custom-input {
-      flex: 1;
-    }
-
-    .btn-allergene-add {
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: 1.5px solid #ccc;
-      background: #f5f5f5;
-      font-weight: 600;
-      font-size: 0.88rem;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.15s;
-
-      &:hover:not(:disabled) {
-        background: #e0e0e0;
-      }
-
-      &:disabled {
-        opacity: 0.45;
-        cursor: not-allowed;
-      }
-    }
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
   }
+}
 
-  // Riepilogo chips selezionati
-  .allergeni-selezionati-riepilogo {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-    margin-top: 8px;
-    padding: 8px 10px;
-    background: #f9f9f9;
-    border-radius: 8px;
+// Riepilogo chips selezionati
+.allergeni-selezionati-riepilogo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
 
-    .riepilogo-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #666;
-    }
+.riepilogo-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #666;
+}
 
-    .riepilogo-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 600;
-      color: #fff;
+.riepilogo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+}
 
-      .riepilogo-remove {
-        cursor: pointer;
-        font-size: 15px;
-        line-height: 1;
-        opacity: 0.8;
-        margin-left: 1px;
+.riepilogo-remove {
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  opacity: 0.8;
+  margin-left: 1px;
 
-        &:hover {
-          opacity: 1;
-        }
-      }
-    }
+  &:hover {
+    opacity: 1;
   }
+}
 
-  // Iconcine allergeni nella lista prodotti (colonna destra)
-  .prodotto-item-allergeni {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 5px;
+// Iconcine allergeni nella lista prodotti (colonna destra)
+.prodotto-item-allergeni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
 
-    .allergene-lista-cerchio {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      flex-shrink: 0;
+.allergene-lista-cerchio {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
 
-      .allergene-lista-img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain; // contain: mostra tutto il PNG
-        border-radius: 50%;
-      }
+.allergene-lista-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
 
-      .allergene-lista-iniziale {
-        font-size: 10px;
-        font-weight: 700;
-        color: #fff;
-        text-transform: uppercase;
-      }
-    }
-  }
-
-  // Hint testo sotto label allergeni
-  .allergeni-hint {
-    font-size: 0.78rem;
-    color: #9ca3af;
-    margin: 0 0 10px;
-  }
-
-  .allergeni-sezione {
-    border-top: 1px solid #f3f4f6;
-    padding-top: 1rem;
-    margin-top: 0.5rem;
-  }
+.allergene-lista-iniziale {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
 }

@@ -41,7 +41,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 // ══════════════════════════════════════════════════
-//  TEMPLATE CLASSICO — pagina unica, tutto scorre
+//  TEMPLATE CLASSICO
 // ══════════════════════════════════════════════════
 
 .menu-page {
@@ -49,13 +49,12 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   padding-bottom: 48px;
 }
 
-// Header normale — scorre via con la pagina, NESSUN sticky
 .menu-header {
   padding: 16px 20px 14px;
   border-bottom: 3px solid;
   text-align: center;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
-  position: relative; // solo per posizionare il bottone back
+  position: relative;
 }
 
 .btn-back-home {
@@ -266,7 +265,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 // ══════════════════════════════════════════════════
-//  TEMPLATE MODERNO — pagina unica, tutto scorre
+//  TEMPLATE MODERNO
 // ══════════════════════════════════════════════════
 
 .moderno-page {
@@ -274,13 +273,12 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   font-family: 'Jost', sans-serif;
 }
 
-// Header normale — scorre via con la pagina, NESSUN sticky
 .moderno-header {
   padding: 24px 20px 14px;
   text-align: center;
   border-bottom: 1px solid;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  position: relative; // solo per posizionare il bottone back e la bandiera
+  position: relative;
 }
 
 .moderno-btn-back {
@@ -343,7 +341,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   margin: 8px auto 0;
 }
 
-// Tabs normali — scorrono via con la pagina, NESSUN sticky
 .moderno-tabs-wrapper {
   padding: 10px 14px;
   overflow-x: auto;
@@ -638,7 +635,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 // ══════════════════════════════════════════════════
-//  TEMPLATE RUSTICO — pagina unica, tutto scorre
+//  TEMPLATE RUSTICO
 // ══════════════════════════════════════════════════
 
 .rustico-page {
@@ -646,7 +643,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   font-family: 'Jost', sans-serif;
 }
 
-// Header normale — scorre via con la pagina, NESSUN sticky
 .rustico-header {
   display: flex;
   align-items: center;
@@ -728,14 +724,12 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   line-height: 1;
 }
 
-// Layout — sidebar e main affiancati, tutto fluisce
 .rustico-layout {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
 }
 
-// Sidebar normale — scorre con la pagina, NESSUN sticky
 .rustico-sidebar {
   width: 110px;
   flex-shrink: 0;
@@ -776,7 +770,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   min-width: 0;
 }
 
-// Carosello
 .rustico-carousel-wrap {
   &.nascosto {
     display: none;
@@ -785,7 +778,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
 .rustico-carousel {
   width: 100%;
-  height: 80vw; // proporzionale alla larghezza, non alla viewport
+  height: 80vw;
   max-height: 600px;
   position: relative;
   overflow: hidden;
@@ -874,7 +867,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
 }
 
-// Lista prodotti — fluisce normalmente
 .rustico-lista-wrap {
   display: none;
   padding-bottom: 48px;
@@ -903,7 +895,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     background: rgba(0, 0, 0, 0.03);
   }
 }
-
 .rustico-back-arrow {
   font-size: 15px;
   line-height: 1;
@@ -1219,122 +1210,144 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   .rustico-btn-back {
     font-size: 0.65rem;
   }
+}
 
-  // ════════════════════════════════════════════════════════════════════
-  //  ALLERGENI — aggiungere IN FONDO a menu-view.component.scss
-  // ════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+//  ALLERGENI — icone inline sui prodotti
+//  Pattern identico a .allergene-lista-cerchio / .allergene-lista-img
+//  di prodotto-add.component.scss che funziona correttamente
+// ══════════════════════════════════════════════════
 
-  // ── Iconcine mini sotto ogni prodotto ────────────────────────────────
-  .prodotto-allergeni {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 4px;
-    margin-top: 6px;
+.prodotto-allergeni {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+  margin-top: 5px;
+}
+
+// Identico a .allergene-lista-cerchio in prodotto-add:
+// border-radius: 50% + overflow: hidden clippano il cerchio
+.allergene-icona-mini-wrap {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+// Identico a .allergene-lista-img in prodotto-add:
+// width/height 100% + object-fit: contain + border-radius: 50%
+.allergene-icona-mini {
+  width: 5%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+}
+
+.allergene-tag-solo-nome {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  color: white;
+  vertical-align: middle;
+}
+
+// ══════════════════════════════════════════════════
+//  ALLERGENI — sezione footer in fondo al menu
+//  Pattern identico a .allergene-chip-icona / .allergene-chip-img
+//  di prodotto-add.component.scss che funziona correttamente
+// ══════════════════════════════════════════════════
+
+.sezione-allergeni-footer {
+  margin: 24px 16px 12px;
+  padding: 14px 14px 10px;
+  border-top: 1.5px solid;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.allergeni-footer-titolo {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 10px;
+}
+
+.allergeni-footer-lista {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 10px;
+  margin-bottom: 10px;
+}
+
+.allergene-footer-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+// Identico a .allergene-chip-icona in prodotto-add
+.allergene-footer-cerchio {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+// Identico a .allergene-chip-img in prodotto-add
+.allergene-footer-icona {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+}
+
+.allergene-footer-iniziale {
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.allergene-footer-nome {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.allergeni-footer-nota {
+  font-size: 9px;
+  color: #999;
+  font-style: italic;
+  margin: 6px 0 0;
+}
+
+@media (min-width: 768px) {
+  .allergeni-footer-lista {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 16px;
   }
-
-  // Icona PNG — sfondo TRASPARENTE, immagine a piena dimensione nel cerchio
-  .allergene-icona-mini {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    object-fit: contain; // contain = non taglia, mostra tutto
-    object-position: center;
-    display: block;
-    flex-shrink: 0;
-    // nessun background: le PNG hanno già il cerchio colorato disegnato dentro
+  .allergene-footer-cerchio {
+    width: 26px;
+    height: 26px;
   }
-
-  // Fallback testo quando non c'è immagine
-  .allergene-tag-solo-nome {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 20px;
-    padding: 0 7px;
-    border-radius: 10px;
-    font-size: 10px;
-    font-weight: 600;
-    color: #fff;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  // ── Footer allergeni in fondo al menu ────────────────────────────────
-  .sezione-allergeni-footer {
-    margin: 28px 16px 8px;
-    padding: 18px 16px 14px;
-    border-top: 2px solid;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.55);
-
-    .allergeni-footer-titolo {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin: 0 0 14px;
-    }
-
-    .allergeni-footer-lista {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px 14px;
-      margin-bottom: 12px;
-    }
-
-    .allergene-footer-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      width: 52px;
-    }
-
-    // Cerchio icona nel footer — sfondo trasparente, solo la PNG
-    .allergene-footer-cerchio {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      flex-shrink: 0;
-
-      .allergene-footer-icona {
-        width: 100%;
-        height: 100%;
-        object-fit: contain; // contain = mostra tutto il disegno
-        object-position: center;
-        border-radius: 50%;
-        // nessun background aggiuntivo: la PNG ha già lo sfondo colorato
-      }
-
-      // Fallback solo se NON c'è icona: iniziale bianca su cerchio colorato
-      .allergene-footer-iniziale {
-        font-size: 15px;
-        font-weight: 700;
-        color: #fff;
-        text-transform: uppercase;
-        // il backgroundColor viene da [style.backgroundColor] nel template
-      }
-    }
-
-    .allergene-footer-nome {
-      font-size: 9px;
-      text-align: center;
-      color: #666;
-      line-height: 1.2;
-      word-break: break-word;
-      max-width: 52px;
-    }
-
-    .allergeni-footer-nota {
-      font-size: 10px;
-      color: #999;
-      font-style: italic;
-      margin: 0;
-    }
+  .allergene-icona-mini-wrap {
+    width: 26px;
+    height: 26px;
   }
 }
