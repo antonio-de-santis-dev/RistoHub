@@ -194,15 +194,16 @@ export class MenuWizardEditComponent implements OnInit {
     try {
       const currentUser: any = await this.http.get('/api/account').toPromise();
 
-      // 1. Aggiorna il menu (PUT)
-      // ← FIX: usa templateStyle (non stileTemplate)
+      // 1. Aggiorna il menu con PATCH (partialUpdate) invece di PUT.
+      //    PUT costruisce entita con portatas=[] -> JPA orphanRemoval cancella tutto.
+      //    PATCH aggiorna solo i campi del DTO senza toccare portatas/prodotti.
       await this.http
-        .put(`/api/menus/${this.menuId}`, {
+        .patch(`/api/menus/${this.menuId}`, {
           id: this.menuId,
           nome: this.nomeMenu,
           descrizione: this.descrizioneMenu,
           attivo: true,
-          templateStyle: this.selectedTemplate, // ← campo corretto
+          templateStyle: this.selectedTemplate,
           colorePrimario: this.colorePrimario,
           coloreSecondario: this.coloreSecondario,
           fontMenu: this.fontSelezionato,
@@ -210,18 +211,57 @@ export class MenuWizardEditComponent implements OnInit {
         })
         .toPromise();
 
-      // 2. Elimina portate esistenti e ricreale
-      for (const p of this.portateEsistentiIds) {
-        await this.http.delete(`/api/portatas/${p.id}`).toPromise();
+      // 2. Aggiorna portate con DIFF sicuro.
+      //    REGOLA FONDAMENTALE: una portata viene eliminata SOLO se è vuota (0 prodotti).
+      //    Se ha prodotti, viene mantenuta anche se l'utente l'ha deselezionata —
+      //    questo previene la perdita di dati per cascade delete.
+
+      // Normalizza il tipo: il backend potrebbe restituire 'DEFAULT' o 'default'
+      const tipoDefault = (t: string) => t?.toUpperCase() === 'DEFAULT';
+      const tipoCustom = (t: string) => t?.toUpperCase() === 'PERSONALIZZATA';
+
+      // ── DEFAULT: portate da eliminare ──
+      const portateDefaultDaEliminare = this.portateEsistentiIds.filter(
+        p => tipoDefault(p.tipo) && p.nomeDefault && !this.portateSelezionate.has(p.nomeDefault),
+      );
+      for (const p of portateDefaultDaEliminare) {
+        // GUARD: elimina solo se la portata è vuota
+        const prodotti: any[] = (await this.http.get<any[]>(`/api/prodottos/by-portata/${p.id}`).toPromise()) ?? [];
+        if (prodotti.length === 0) {
+          await this.http.delete(`/api/portatas/${p.id}`).toPromise();
+        }
+        // Se ha prodotti: la portata viene mantenuta silenziosamente
       }
-      await Promise.all([
-        ...Array.from(this.portateSelezionate).map(p =>
-          this.http.post('/api/portatas', { tipo: 'DEFAULT', nomeDefault: p, menu: { id: this.menuId } }).toPromise(),
-        ),
-        ...this.portatePersonalizzate.map(n =>
-          this.http.post('/api/portatas', { tipo: 'PERSONALIZZATA', nomePersonalizzato: n, menu: { id: this.menuId } }).toPromise(),
-        ),
-      ]);
+
+      // ── DEFAULT: portate da creare ──
+      const nomiDefaultEsistenti = new Set(
+        this.portateEsistentiIds.filter(p => tipoDefault(p.tipo) && p.nomeDefault).map(p => p.nomeDefault!),
+      );
+      const portateDefaultDaCreare = Array.from(this.portateSelezionate).filter(nome => !nomiDefaultEsistenti.has(nome));
+      for (const nome of portateDefaultDaCreare) {
+        await this.http.post('/api/portatas', { tipo: 'DEFAULT', nomeDefault: nome, menu: { id: this.menuId } }).toPromise();
+      }
+
+      // ── PERSONALIZZATA: portate da eliminare ──
+      const portateCustomDaEliminare = this.portateEsistentiIds.filter(
+        p => tipoCustom(p.tipo) && p.nomePersonalizzato && !this.portatePersonalizzate.includes(p.nomePersonalizzato),
+      );
+      for (const p of portateCustomDaEliminare) {
+        // GUARD: elimina solo se la portata è vuota
+        const prodotti: any[] = (await this.http.get<any[]>(`/api/prodottos/by-portata/${p.id}`).toPromise()) ?? [];
+        if (prodotti.length === 0) {
+          await this.http.delete(`/api/portatas/${p.id}`).toPromise();
+        }
+      }
+
+      // ── PERSONALIZZATA: portate da creare ──
+      const nomiCustomEsistenti = new Set(
+        this.portateEsistentiIds.filter(p => tipoCustom(p.tipo) && p.nomePersonalizzato).map(p => p.nomePersonalizzato!),
+      );
+      const portateCustomDaCreare = this.portatePersonalizzate.filter(nome => !nomiCustomEsistenti.has(nome));
+      for (const nome of portateCustomDaCreare) {
+        await this.http.post('/api/portatas', { tipo: 'PERSONALIZZATA', nomePersonalizzato: nome, menu: { id: this.menuId } }).toPromise();
+      }
 
       // 3. Gestione logo
       if (this.logoFile) {

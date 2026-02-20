@@ -36,9 +36,6 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
 }
 
 .form-card,
@@ -52,7 +49,6 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 .form-section {
   margin-bottom: 1.5rem;
 }
-
 .form-section-title {
   font-size: 1rem;
   font-weight: 700;
@@ -62,7 +58,6 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   align-items: center;
   gap: 0.5rem;
 }
-
 .count-badge {
   background: $accent;
   color: white;
@@ -70,11 +65,9 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   padding: 2px 10px;
   font-size: 0.78rem;
 }
-
 .form-group {
   margin-bottom: 1rem;
 }
-
 .form-label {
   display: block;
   font-weight: 700;
@@ -96,7 +89,6 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
     border-color: $accent;
   }
 }
-
 select.form-control {
   cursor: pointer;
 }
@@ -144,8 +136,6 @@ select.form-control {
   font-size: 0.95rem;
 }
 
-// ── Lista prodotti (colonna destra) ──
-
 .empty-lista {
   text-align: center;
   padding: 2rem;
@@ -177,34 +167,29 @@ select.form-control {
 .prodotto-item-body {
   flex: 1;
 }
-
 .prodotto-item-nome {
   font-weight: 700;
   font-size: 0.95rem;
   color: $text;
   margin-bottom: 2px;
 }
-
 .prodotto-item-desc {
   font-size: 0.82rem;
   color: $muted;
   margin-bottom: 4px;
 }
-
 .prodotto-item-right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
 }
-
 .prodotto-item-prezzo {
   font-weight: 700;
   font-size: 1rem;
   color: $accent;
   white-space: nowrap;
 }
-
 .btn-elimina-prodotto {
   background: transparent;
   border: 1px solid #f8d7da;
@@ -218,22 +203,18 @@ select.form-control {
   }
 }
 
-// ══════════════════════════════════════════════════
-//  ALLERGENI
-// ══════════════════════════════════════════════════
+// ── ALLERGENI ──
 
 .allergeni-sezione {
   border-top: 1px solid #f3f4f6;
   padding-top: 1rem;
   margin-top: 0.5rem;
 }
-
 .allergeni-hint {
   font-size: 0.78rem;
   color: #9ca3af;
   margin: 0 0 10px;
 }
-
 .allergeni-grid {
   display: flex;
   flex-wrap: wrap;
@@ -252,12 +233,10 @@ select.form-control {
   cursor: pointer;
   transition: all 0.15s ease;
   user-select: none;
-
   &:hover {
     border-color: #aaa;
     background: #f0f0f0;
   }
-
   &.selected {
     font-weight: 600;
   }
@@ -273,40 +252,34 @@ select.form-control {
   overflow: hidden;
   flex-shrink: 0;
 }
-
 .allergene-chip-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   border-radius: 50%;
 }
-
 .allergene-chip-iniziale {
   font-size: 12px;
   font-weight: 700;
   color: #fff;
   text-transform: uppercase;
 }
-
 .allergene-chip-nome {
   font-size: 12px;
   color: #333;
   white-space: nowrap;
 }
-
 .allergene-chip-check {
   font-size: 13px;
   color: #fff;
   margin-left: 2px;
 }
 
-// Riga allergene personalizzato
 .allergene-custom-row {
   display: flex;
   gap: 8px;
   margin-top: 8px;
 }
-
 .allergene-custom-input {
   flex: 1;
 }
@@ -321,18 +294,15 @@ select.form-control {
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.15s;
-
   &:hover:not(:disabled) {
     background: #e0e0e0;
   }
-
   &:disabled {
     opacity: 0.45;
     cursor: not-allowed;
   }
 }
 
-// Riepilogo chips selezionati
 .allergeni-selezionati-riepilogo {
   display: flex;
   flex-wrap: wrap;
@@ -343,13 +313,11 @@ select.form-control {
   background: #f9f9f9;
   border-radius: 8px;
 }
-
 .riepilogo-label {
   font-size: 11px;
   font-weight: 700;
   color: #666;
 }
-
 .riepilogo-chip {
   display: inline-flex;
   align-items: center;
@@ -360,20 +328,17 @@ select.form-control {
   font-weight: 600;
   color: #fff;
 }
-
 .riepilogo-remove {
   cursor: pointer;
   font-size: 15px;
   line-height: 1;
   opacity: 0.8;
   margin-left: 1px;
-
   &:hover {
     opacity: 1;
   }
 }
 
-// Iconcine allergeni nella lista prodotti (colonna destra)
 .prodotto-item-allergeni {
   display: flex;
   flex-wrap: wrap;
@@ -391,17 +356,104 @@ select.form-control {
   overflow: hidden;
   flex-shrink: 0;
 }
-
 .allergene-lista-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   border-radius: 50%;
 }
-
 .allergene-lista-iniziale {
   font-size: 10px;
   font-weight: 700;
   color: #fff;
   text-transform: uppercase;
+}
+
+// ══════════════════════════════════════════════════
+//  RESPONSIVE MOBILE
+// ══════════════════════════════════════════════════
+
+@media (max-width: 768px) {
+  .prodotto-container {
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
+
+  .prodotto-header {
+    margin-bottom: 1.25rem;
+    .prodotto-title {
+      font-size: 1.4rem;
+    }
+  }
+
+  // Colonne: form sopra, lista sotto
+  .prodotto-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .form-card,
+  .lista-card {
+    padding: 1.2rem 1rem;
+  }
+
+  // I chip allergeni sono più piccoli su mobile
+  .allergene-chip {
+    padding: 4px 8px 4px 4px;
+  }
+  .allergene-chip-nome {
+    font-size: 11px;
+  }
+
+  .allergene-custom-row {
+    flex-direction: row; // mantieni row, il bottone resta a destra
+  }
+}
+
+@media (max-width: 480px) {
+  .prodotto-header .prodotto-title {
+    font-size: 1.2rem;
+  }
+
+  .form-card,
+  .lista-card {
+    padding: 1rem 0.875rem;
+  }
+
+  // Il selettore menu+portata su mobile: dropdown a tutto schermo
+  .form-control {
+    font-size: 1rem;
+  } // più facile da toccare
+
+  .btn-aggiungi {
+    padding: 14px;
+    font-size: 1.05rem;
+  } // bottone grande per il dito
+
+  // Allergeni: chip più compatte su schermi piccoli
+  .allergeni-grid {
+    gap: 6px;
+  }
+  .allergene-chip {
+    padding: 3px 7px 3px 3px;
+  }
+  .allergene-chip-icona {
+    width: 24px;
+    height: 24px;
+  }
+  .allergene-chip-nome {
+    font-size: 10px;
+  }
+
+  // Lista prodotto: layout compatto
+  .prodotto-item {
+    padding: 10px 10px;
+    gap: 0.75rem;
+  }
+  .prodotto-item-nome {
+    font-size: 0.9rem;
+  }
+  .prodotto-item-prezzo {
+    font-size: 0.95rem;
+  }
 }

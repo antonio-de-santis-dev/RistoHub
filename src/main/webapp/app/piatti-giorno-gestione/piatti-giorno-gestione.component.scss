@@ -80,7 +80,6 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   opacity: 0.8;
 }
 
-// Grid piatti
 .piatti-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -132,21 +131,18 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 .piatto-body {
   padding: 1.2rem;
 }
-
 .piatto-nome {
   font-size: 1.1rem;
   font-weight: 700;
   margin: 0 0 6px;
   color: $text;
 }
-
 .piatto-desc {
   font-size: 0.85rem;
   color: $muted;
   margin: 0 0 10px;
   line-height: 1.4;
 }
-
 .piatto-prezzo {
   font-size: 1.2rem;
   font-weight: 700;
@@ -177,7 +173,6 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
     background: #d4edda;
     color: #155724;
   }
-
   &:hover {
     opacity: 0.85;
   }
@@ -192,7 +187,6 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s;
-
   &:hover {
     background: #f8d7da;
   }
@@ -226,7 +220,6 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   margin: 0 0 1.5rem;
   color: $text;
 }
-
 .modal-content {
   margin-bottom: 1.5rem;
 }
@@ -234,7 +227,6 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 .form-group {
   margin-bottom: 1rem;
 }
-
 .form-label {
   display: block;
   font-weight: 700;
@@ -242,7 +234,6 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   margin-bottom: 6px;
   color: $text;
 }
-
 .form-control {
   width: 100%;
   border: 1.5px solid $border;
@@ -251,13 +242,11 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   font-size: 0.95rem;
   box-sizing: border-box;
   font-family: inherit;
-
   &:focus {
     outline: none;
     border-color: $accent;
   }
 }
-
 select.form-control {
   cursor: pointer;
 }
@@ -267,12 +256,10 @@ select.form-control {
   padding: 10px 14px;
   margin-bottom: 1rem;
   font-size: 0.9rem;
-
   &.alert-success {
     background: #d4edda;
     color: #155724;
   }
-
   &.alert-error {
     background: #f8d7da;
     color: #721c24;
@@ -283,6 +270,7 @@ select.form-control {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 .btn-annulla {
@@ -294,7 +282,6 @@ select.form-control {
   cursor: pointer;
   font-weight: 600;
   transition: background 0.2s;
-
   &:hover {
     background: #ddd;
   }
@@ -309,12 +296,114 @@ select.form-control {
   cursor: pointer;
   font-weight: 600;
   transition: background 0.2s;
-
   &:hover:not(:disabled) {
     background: darken($accent, 8%);
   }
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  RESPONSIVE MOBILE
+// ══════════════════════════════════════════════════
+
+@media (max-width: 768px) {
+  .piatti-container {
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
+
+  .piatti-header {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+    gap: 0.75rem;
+
+    .piatti-title {
+      font-size: 1.4rem;
+    }
+    .piatti-subtitle {
+      font-size: 0.88rem;
+    }
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: row;
+  }
+
+  .btn-crea,
+  .btn-seleziona {
+    flex: 1;
+    text-align: center;
+    padding: 0.7rem 0.8rem;
+  }
+
+  .piatti-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .piatto-body {
+    padding: 1rem;
+  }
+  .piatto-nome {
+    font-size: 1rem;
+  }
+  .piatto-prezzo {
+    font-size: 1.1rem;
+  }
+
+  .piatto-actions {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .btn-toggle {
+    padding: 10px 12px;
+    font-size: 0.82rem;
+  }
+
+  .modal-box {
+    padding: 1.5rem 1.2rem;
+    max-height: 95vh;
+  }
+
+  .modal-title {
+    font-size: 1.15rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .modal-actions {
+    flex-direction: row;
+    justify-content: stretch;
+
+    button {
+      flex: 1;
+      text-align: center;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .piatti-header .piatti-title {
+    font-size: 1.2rem;
+  }
+
+  .piatto-card:hover {
+    transform: none;
+  } // disabilita hover lift su touch
+
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .modal-box {
+    border-radius: $radius $radius 0 0; // bottom sheet su mobile
+    max-height: 92vh;
+    width: 100%;
+    max-width: 100%;
   }
 }

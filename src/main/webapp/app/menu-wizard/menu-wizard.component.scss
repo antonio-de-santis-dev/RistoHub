@@ -119,9 +119,6 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-  }
 }
 
 .template-card {
@@ -253,9 +250,6 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   margin-bottom: 24px;
-  @media (max-width: 600px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 .colore-card {
@@ -648,5 +642,150 @@ $shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  RESPONSIVE MOBILE
+// ══════════════════════════════════════════════════
+
+@media (max-width: 768px) {
+  .wizard-container {
+    margin: 16px auto;
+    padding: 0 12px;
+  }
+
+  .wizard-title {
+    font-size: 1.5rem;
+  }
+
+  .wizard-subtitle {
+    font-size: 0.92rem;
+    margin-bottom: 14px;
+  }
+
+  .step-dot {
+    width: 26px;
+    height: 26px;
+    font-size: 0.72rem;
+  }
+
+  .wizard-body {
+    padding: 20px 16px;
+    min-height: auto;
+  }
+
+  // Step 1: template in colonna singola
+  .template-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  // Step 2: colori 2 colonne
+  .colori-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .color-pickers {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .hex-input {
+    width: 100%;
+    max-width: 140px;
+  }
+
+  .anteprima-colori {
+    padding: 16px;
+    h4 {
+      font-size: 1.1rem;
+    }
+  }
+
+  // Step 3: logo upload
+  .logo-upload-area {
+    padding: 32px 16px;
+  }
+
+  // Step 4: font card più compatta
+  .font-card {
+    padding: 12px 14px;
+    gap: 12px;
+  }
+
+  .font-preview {
+    font-size: 1rem;
+  }
+
+  // Step 5: portate chip più piccole
+  .portata-chip {
+    padding: 6px 14px;
+    font-size: 0.82rem;
+  }
+
+  .custom-portata-input {
+    flex-direction: row; // rimane row ma input si espande
+  }
+
+  // Footer: bottoni più grandi per il dito
+  .wizard-footer {
+    gap: 8px;
+  }
+
+  .btn-back,
+  .btn-next,
+  .btn-genera {
+    padding: 12px 18px;
+    font-size: 0.92rem;
+  }
+
+  .step-label {
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .wizard-title {
+    font-size: 1.25rem;
+  }
+
+  .wizard-body {
+    padding: 16px 12px;
+  }
+
+  // Template preview più piccola
+  .template-preview {
+    padding: 10px;
+    font-size: 0.72rem;
+  }
+
+  // Colori: 2 colonne
+  .colori-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  // Footer: impila il label sotto i bottoni
+  .wizard-footer {
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    .step-label {
+      width: 100%;
+      text-align: center;
+      order: -1;
+      margin-bottom: 8px;
+    }
+  }
+
+  .btn-back {
+    flex: 1;
+    text-align: center;
+  }
+  .btn-next,
+  .btn-genera {
+    flex: 1;
+    text-align: center;
   }
 }
