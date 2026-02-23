@@ -67,7 +67,13 @@
         <div class="field-group">
           <div class="field-label-row">
             <label class="field-label" for="password">Password</label>
-            <a class="link-forgot" routerLink="/account/reset/request" data-cy="forgetYourPasswordSelector"> Password dimenticata? </a>
+            <!--
+              ✅ FIX: usa (click) invece di routerLink
+              Così il modal si apre SOPRA il login, senza navigare via
+            -->
+            <button type="button" class="link-forgot" (click)="apriRecuperoPassword()" data-cy="forgetYourPasswordSelector">
+              Password dimenticata?
+            </button>
           </div>
           <div class="field-input-wrap">
             <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -111,3 +117,102 @@
     </div>
   </div>
 </div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     MODAL RECUPERO PASSWORD (inline — rimane sulla pagina login)
+══════════════════════════════════════════════════════════════ -->
+@if (mostraModalRecupero()) {
+  <div class="modal-overlay" (click)="chiudiSuOverlay($event)">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <!-- Pulsante chiudi -->
+      <button class="btn-close-modal" type="button" (click)="chiudiRecuperoPassword()" aria-label="Chiudi">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+
+      <!-- Icona lucchetto -->
+      <div class="modal-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+      </div>
+
+      @if (!recuperoSuccess()) {
+        <!-- Stato: inserimento email -->
+        <h2 class="modal-title" id="modal-title">Password dimenticata?</h2>
+        <p class="modal-subtitle">
+          Inserisci l'email del tuo account.<br />
+          Ti invieremo un link per reimpostare la password.
+        </p>
+
+        <form class="modal-form" (ngSubmit)="requestReset()" [formGroup]="resetRequestForm">
+          <div class="field-group">
+            <label class="field-label" for="reset-email">Email</label>
+            <div class="field-input-wrap">
+              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+              <input
+                type="email"
+                class="field-input"
+                id="reset-email"
+                name="reset-email"
+                placeholder="la-tua@email.com"
+                formControlName="email"
+                data-cy="emailResetPassword"
+                autocomplete="email"
+              />
+            </div>
+
+            @let emailRef = resetRequestForm.get('email')!;
+            @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {
+              <span class="field-error">
+                @if (emailRef.errors?.['required']) {
+                  L'email è obbligatoria.
+                }
+                @if (emailRef.errors?.['email']) {
+                  Formato email non valido.
+                }
+                @if (emailRef.errors?.['minlength']) {
+                  Almeno 5 caratteri.
+                }
+                @if (emailRef.errors?.['maxlength']) {
+                  Massimo 254 caratteri.
+                }
+              </span>
+            }
+          </div>
+
+          <button type="submit" class="btn-invia" [disabled]="resetRequestForm.invalid" data-cy="submit">
+            Invia link di reset
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </form>
+
+        <button class="btn-annulla" type="button" (click)="chiudiRecuperoPassword()">Annulla</button>
+      } @else {
+        <!-- Stato: email inviata con successo -->
+        <div class="success-state">
+          <div class="success-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          </div>
+          <h2 class="modal-title">Email inviata!</h2>
+          <p class="modal-subtitle">
+            Controlla la tua casella di posta.<br />
+            Riceverai un link per reimpostare la password.
+          </p>
+          <button class="btn-invia" type="button" (click)="chiudiRecuperoPassword()">Torna al login</button>
+        </div>
+      }
+    </div>
+  </div>
+}

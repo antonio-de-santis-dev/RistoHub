@@ -237,11 +237,18 @@ router-outlet[name='navbar'] ~ * {
   }
 }
 
+/* ── FIX: link-forgot ora è un <button> stilizzato come link ────── */
 .link-forgot {
   font-size: 0.78rem;
   color: #6b7280;
   text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: 'Nunito Sans', sans-serif;
   transition: color 0.15s ease;
+
   &:hover {
     color: #111;
   }
@@ -380,4 +387,189 @@ router-outlet[name='navbar'] ~ * {
     max-width: 80px;
     max-height: 80px;
   }
+}
+
+/* ================================================================
+   MODAL RECUPERO PASSWORD — Overlay sopra il login
+   ================================================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+  animation: overlay-in 0.2s ease both;
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.8rem 2.4rem 2.2rem;
+  width: min(420px, 92vw);
+  text-align: center;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.3),
+    0 4px 16px rgba(0, 0, 0, 0.15);
+  animation: modal-card-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  font-family: 'Nunito Sans', sans-serif;
+}
+
+@keyframes modal-card-in {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.btn-close-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: #e5e7eb;
+    color: #111;
+  }
+}
+
+.modal-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.4rem;
+  color: #374151;
+}
+
+.modal-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 0.5rem;
+}
+
+.modal-subtitle {
+  font-size: 0.88rem;
+  color: #6b7280;
+  line-height: 1.55;
+  margin: 0 0 1.6rem;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+  margin-bottom: 0.8rem;
+}
+
+.field-error {
+  font-size: 0.78rem;
+  color: #dc2626;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.btn-invia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.82rem 1rem;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: #222;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+  }
+}
+
+.btn-annulla {
+  width: 100%;
+  margin-top: 0.6rem;
+  padding: 0.6rem;
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: #111;
+  }
+}
+
+.success-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.success-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #f0fdf4;
+  border: 2px solid #bbf7d0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #16a34a;
+  margin-bottom: 0.4rem;
 }
