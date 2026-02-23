@@ -5,6 +5,7 @@ import { Authority } from 'app/config/authority.constants';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { errorRoute } from './layouts/error/error.route';
 
+import { LandingComponent } from './landing/landing.component';
 import { MenuWizardComponent } from './menu-wizard/menu-wizard.component';
 import { MenuViewComponent } from './menu-view/menu-view.component';
 import { MenuListComponent } from './menu-list/menu-list.component';
@@ -13,16 +14,28 @@ import { ProdottoAddComponent } from './prodotto-add/prodotto-add.component';
 import { PiattiGiornoGestioneComponent } from './piatti-giorno-gestione/piatti-giorno-gestione.component';
 
 const routes: Routes = [
+  // ── LANDING: prima pagina visibile senza login ──────────────────
   {
     path: '',
-    loadComponent: () => import('./home/home.component'),
-    title: 'home.title',
+    component: LandingComponent,
+    pathMatch: 'full',
   },
+
+  // ── NAVBAR (outlet secondario, invariato) ────────────────────────
   {
     path: '',
     loadComponent: () => import('./layouts/navbar/navbar.component'),
     outlet: 'navbar',
   },
+
+  // ── HOME (dopo login) ────────────────────────────────────────────
+  {
+    path: 'home',
+    loadComponent: () => import('./home/home.component'),
+    title: 'home.title',
+  },
+
+  // ── ADMIN ────────────────────────────────────────────────────────
   {
     path: 'admin',
     data: {
@@ -31,6 +44,8 @@ const routes: Routes = [
     canActivate: [UserRouteAccessService],
     loadChildren: () => import('./admin/admin.routes'),
   },
+
+  // ── ACCOUNT / LOGIN ──────────────────────────────────────────────
   {
     path: 'account',
     loadChildren: () => import('./account/account.route'),
@@ -40,10 +55,14 @@ const routes: Routes = [
     loadComponent: () => import('./login/login.component'),
     title: 'login.title',
   },
+
+  // ── ENTITÀ JHIPSTER ──────────────────────────────────────────────
   {
     path: '',
     loadChildren: () => import(`./entities/entity.routes`),
   },
+
+  // ── MENU ─────────────────────────────────────────────────────────
   {
     path: 'menu-wizard',
     component: MenuWizardComponent,
@@ -52,7 +71,6 @@ const routes: Routes = [
     path: 'menu-view/:id',
     component: MenuViewComponent,
   },
-
   {
     path: 'menu-list',
     component: MenuListComponent,
@@ -61,6 +79,8 @@ const routes: Routes = [
     path: 'menu-wizard-edit/:id',
     component: MenuWizardEditComponent,
   },
+
+  // ── PRODOTTI ─────────────────────────────────────────────────────
   {
     path: 'prodotto-add',
     component: ProdottoAddComponent,
@@ -69,6 +89,8 @@ const routes: Routes = [
     path: 'prodotto-add/:portataId',
     component: ProdottoAddComponent,
   },
+
+  // ── PIATTI DEL GIORNO ────────────────────────────────────────────
   {
     path: 'piatti-giorno',
     component: PiattiGiornoGestioneComponent,

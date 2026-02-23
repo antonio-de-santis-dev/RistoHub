@@ -1,0 +1,234 @@
+/* ================================================================
+   LANDING PAGE v2 — RistoHub
+   Design: sfondo lavagna scura a tutta pagina + card bianca centrale
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600&display=swap');
+
+/* ── PAGINA FULL SCREEN ────────────────────────────────────────── */
+.landing-page {
+  /*
+    ═══════════════════════════════════════════════════════════════
+     COME AGGIUNGERE L'IMMAGINE DI SFONDO:
+     1. Metti il file immagine (es. sfondo.jpg) in:
+            src/main/webapp/content/images/sfondo.jpg
+     2. Cambia la riga qui sotto con:
+            background-image: url('/content/images/sfondo.jpg');
+
+     L'immagine si adatta automaticamente a tutta la pagina
+     grazie a:  background-size: cover
+    ═══════════════════════════════════════════════════════════════
+  */
+  background-image: url('/content/images/unnamed.jpg');
+  background-size: cover; /* ← adatta tutta la pagina */
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* ← sfondo fisso su scroll */
+
+  /* Colore fallback mentre l'immagine carica */
+  background-color: #1c1c1c;
+
+  /* Occupa tutta la viewport, ignora navbar */
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Reset top per non lasciare spazio alla navbar */
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  overflow-y: auto;
+}
+
+/* ── CARD BIANCA CENTRALE ──────────────────────────────────────── */
+.landing-card {
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 3rem 2.5rem 2.8rem;
+  width: min(360px, 88vw);
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45),
+    0 4px 16px rgba(0, 0, 0, 0.25);
+
+  /* Animazione ingresso */
+  animation: card-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── AREA LOGO ─────────────────────────────────────────────────── */
+.logo-area {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-img {
+  /*
+    ═══════════════════════════════════════════════════════════════
+     COME AGGIUNGERE IL LOGO:
+     1. Metti il file logo (es. logo.png) in:
+            src/main/webapp/assets/images/logo.png
+     2. Il src nell'HTML è già impostato su quel percorso.
+        Cambia solo il nome file se necessario.
+
+     Formati consigliati: .png (con sfondo trasparente) o .svg
+    ═══════════════════════════════════════════════════════════════
+  */
+  max-width: 180px;
+  max-height: 150px;
+  width: 100%;
+  object-fit: contain;
+  animation: logo-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+}
+
+@keyframes logo-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Fallback testo se logo non disponibile */
+.logo-fallback {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 3rem;
+}
+.logo-fallback-nome {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #111;
+}
+
+/* ── TITOLO PRINCIPALE ─────────────────────────────────────────── */
+.headline {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(1.7rem, 5vw, 2rem);
+  font-weight: 900;
+  color: #111111;
+  line-height: 1.25;
+  margin: 0 0 2.2rem;
+  letter-spacing: -0.01em;
+  text-align: center;
+
+  animation: fade-up 0.6s ease 0.3s both;
+}
+
+/* ── PULSANTE GET STARTED ──────────────────────────────────────── */
+.btn-start {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+
+  background: #111111;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px; /* ← pill shape */
+  padding: 0.9rem 2rem;
+  cursor: pointer;
+
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+
+  min-width: 200px;
+
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+
+  animation: fade-up 0.6s ease 0.45s both;
+}
+
+.btn-start:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  background: #222222;
+}
+
+.btn-start:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Icona freccia nel pulsante */
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: #111111;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+
+.btn-start:hover .btn-icon {
+  transform: translateX(3px);
+}
+
+/* ── ANIMAZIONE COMUNE ──────────────────────────────────────────── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── RESPONSIVO ─────────────────────────────────────────────────── */
+@media (max-width: 400px) {
+  .landing-card {
+    padding: 2.4rem 1.8rem 2.2rem;
+    border-radius: 20px;
+  }
+
+  .headline {
+    font-size: 1.55rem;
+  }
+
+  .btn-start {
+    min-width: 180px;
+    font-size: 0.95rem;
+  }
+}

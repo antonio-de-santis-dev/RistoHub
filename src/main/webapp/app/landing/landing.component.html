@@ -1,0 +1,46 @@
+<!-- PAGINA LANDING FULL SCREEN -->
+<div class="landing-page">
+  <!-- CARD CENTRALE BIANCA -->
+  <div class="landing-card">
+    <!-- Logo -->
+    <div class="logo-area">
+      <img
+        src="content/images/LogoNero.png"
+        alt="RistoHub"
+        class="logo-img"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+      />
+      <!-- Fallback se logo non trovato -->
+      <div class="logo-fallback" style="display: none">
+        <span>🍽️</span>
+        <span class="logo-fallback-nome">RistoHub</span>
+      </div>
+    </div>
+
+    <!-- Testo principale -->
+    <h1 class="headline">
+      Scegli il tuo<br />
+      mood, noi ci<br />
+      mettiamo il gusto
+    </h1>
+
+    <!-- Pulsante: controlla auth al click -->
+    <button class="btn-start" (click)="entra()">
+      <span>Get started</span>
+      <span class="btn-icon">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </span>
+    </button>
+  </div>
+</div>
