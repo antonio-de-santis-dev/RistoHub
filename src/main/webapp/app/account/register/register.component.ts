@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, OnDestroy, inject, signal, viewChild } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -13,8 +13,9 @@ import { RegisterService } from './register.service';
   selector: 'jhi-register',
   imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent],
   templateUrl: './register.component.html',
+  styleUrls: ['./register.component.scss'],
 })
-export default class RegisterComponent implements AfterViewInit {
+export default class RegisterComponent implements AfterViewInit, OnInit, OnDestroy {
   login = viewChild.required<ElementRef>('login');
 
   doNotMatch = signal(false);
@@ -23,6 +24,10 @@ export default class RegisterComponent implements AfterViewInit {
   errorUserExists = signal(false);
   success = signal(false);
 
+  private styleTag: HTMLStyleElement | null = null;
+  private readonly translateService = inject(TranslateService);
+  private readonly registerService = inject(RegisterService);
+
   registerForm = new FormGroup({
     login: new FormControl('', {
       nonNullable: true,
@@ -30,7 +35,7 @@ export default class RegisterComponent implements AfterViewInit {
         Validators.required,
         Validators.minLength(1),
         Validators.maxLength(50),
-        Validators.pattern('^[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$|^[_.@A-Za-z0-9-]+$'),
+        Validators.pattern('^[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$|^[_.@A-Za-z0-9-]*$'),
       ],
     }),
     email: new FormControl('', {
@@ -47,11 +52,25 @@ export default class RegisterComponent implements AfterViewInit {
     }),
   });
 
-  private readonly translateService = inject(TranslateService);
-  private readonly registerService = inject(RegisterService);
+  ngOnInit(): void {
+    // Nasconde navbar e footer sulla pagina di registrazione
+    this.styleTag = document.createElement('style');
+    this.styleTag.textContent = `
+      jhi-navbar, nav.navbar, jhi-footer, footer,
+      router-outlet[name="navbar"] ~ * { display: none !important; }
+    `;
+    document.head.appendChild(this.styleTag);
+  }
 
   ngAfterViewInit(): void {
     this.login().nativeElement.focus();
+  }
+
+  ngOnDestroy(): void {
+    if (this.styleTag) {
+      this.styleTag.remove();
+      this.styleTag = null;
+    }
   }
 
   register(): void {
@@ -63,12 +82,13 @@ export default class RegisterComponent implements AfterViewInit {
     const { password, confirmPassword } = this.registerForm.getRawValue();
     if (password !== confirmPassword) {
       this.doNotMatch.set(true);
-    } else {
-      const { login, email } = this.registerForm.getRawValue();
-      this.registerService
-        .save({ login, email, password, langKey: this.translateService.currentLang })
-        .subscribe({ next: () => this.success.set(true), error: response => this.processError(response) });
+      return;
     }
+
+    const { login, email } = this.registerForm.getRawValue();
+    this.registerService
+      .save({ login, email, password, langKey: this.translateService.currentLang })
+      .subscribe({ next: () => this.success.set(true), error: response => this.processError(response) });
   }
 
   private processError(response: HttpErrorResponse): void {

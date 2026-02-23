@@ -1,222 +1,245 @@
-<div>
-  <div class="d-flex justify-content-center">
-    <div class="col-md-8">
-      <h1 data-cy="registerTitle" jhiTranslate="register.title">Registrazione</h1>
-
-      @if (success()) {
-        <div class="alert alert-success" jhiTranslate="register.messages.success">
-          <strong>La registrazione account è stata salvata!</strong> Controlla la tua email per confermare.
-        </div>
-      }
-
-      @if (error()) {
-        <div class="alert alert-danger" jhiTranslate="register.messages.error.fail">
-          <strong>La registrazione dell&apos;account è fallita!</strong> Riprova più tardi.
-        </div>
-      }
-
-      @if (errorUserExists()) {
-        <div class="alert alert-danger" jhiTranslate="register.messages.error.userexists">
-          <strong>Il nome utente scelto è già registrato!</strong> Si prega di scegliere un altro nome utente.
-        </div>
-      }
-
-      @if (errorEmailExists()) {
-        <div class="alert alert-danger" jhiTranslate="register.messages.error.emailexists">
-          <strong>L&apos;indirizzo email è già in uso</strong> Si prega di sceglierne un altro.
-        </div>
-      }
-
-      @if (doNotMatch()) {
-        <div class="alert alert-danger" jhiTranslate="global.messages.error.dontmatch">
-          La password e la sua conferma non corrispondono!
-        </div>
-      }
+<div class="split-page">
+  <!-- ══════════════════════════════════════════
+       SINISTRA — Sfondo + card con solo logo
+  ══════════════════════════════════════════ -->
+  <div class="split-right">
+    <div class="right-card">
+      <img
+        src="content/images/LogoNero.png"
+        alt="RistoHub"
+        class="right-logo"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+      />
+      <div class="right-logo-fallback" style="display: none">🍽️</div>
     </div>
   </div>
 
-  <div class="d-flex justify-content-center">
-    <div class="col-md-8">
-      @if (!success()) {
-        <form name="form" (ngSubmit)="register()" [formGroup]="registerForm">
-          <div class="mb-3">
-            <label class="form-label" for="login" jhiTranslate="global.form.username.label">Utente</label>
-            <input
-              type="text"
-              class="form-control"
-              id="login"
-              name="login"
-              placeholder="{{ 'global.form.username.placeholder' | translate }}"
-              formControlName="login"
-              data-cy="username"
-            />
+  <!-- ══════════════════════════════════════════
+       DESTRA — Form di registrazione
+  ══════════════════════════════════════════ -->
+  <div class="split-left">
+    <div class="form-wrapper">
+      <!-- Logo piccolo -->
+      <div class="form-logo">
+        <img src="content/images/LogoNero.png.jpg" alt="RistoHub" onerror="this.style.display='none'" />
+      </div>
 
+      <h1 class="form-title">Crea il tuo account</h1>
+      <p class="form-subtitle">Unisciti a RistoHub e gestisci il tuo menu digitale</p>
+
+      <!-- Messaggio successo -->
+      @if (success()) {
+        <div class="alert-success">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
+          <span jhiTranslate="register.messages.success"> Registrazione salvata! Controlla la tua email per confermare. </span>
+        </div>
+      }
+
+      <!-- Errori -->
+      @if (error()) {
+        <div class="alert-error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span jhiTranslate="register.messages.error.fail">Registrazione fallita! Riprova più tardi.</span>
+        </div>
+      }
+      @if (errorUserExists()) {
+        <div class="alert-error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span jhiTranslate="register.messages.error.userexists">Nome utente già registrato!</span>
+        </div>
+      }
+      @if (errorEmailExists()) {
+        <div class="alert-error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span jhiTranslate="register.messages.error.emailexists">Email già in uso!</span>
+        </div>
+      }
+      @if (doNotMatch()) {
+        <div class="alert-error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span jhiTranslate="global.messages.error.dontmatch">Le password non corrispondono!</span>
+        </div>
+      }
+
+      <!-- Form -->
+      @if (!success()) {
+        <form class="register-form" (ngSubmit)="register()" [formGroup]="registerForm">
+          <!-- Username -->
+          <div class="field-group">
+            <label class="field-label" for="login">Username</label>
+            <div class="field-input-wrap">
+              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <input
+                #login
+                type="text"
+                class="field-input"
+                id="login"
+                name="login"
+                placeholder="Il tuo nome utente"
+                formControlName="login"
+                data-cy="username"
+              />
+            </div>
             @let loginRef = registerForm.get('login')!;
             @if (loginRef.invalid && (loginRef.dirty || loginRef.touched)) {
-              <div>
-                @if (loginRef?.errors?.required) {
-                  <small class="form-text text-danger" jhiTranslate="register.messages.validate.login.required"
-                    >Il nome utente è obbligatorio.</small
-                  >
+              <span class="field-error">
+                @if (loginRef.errors?.['required']) {
+                  Il nome utente è obbligatorio.
                 }
-
-                @if (loginRef?.errors?.minlength) {
-                  <small class="form-text text-danger" jhiTranslate="register.messages.validate.login.minlength"
-                    >Il nome utente deve essere di almeno 1 carattere</small
-                  >
+                @if (loginRef.errors?.['minlength']) {
+                  Almeno 1 carattere.
                 }
-
-                @if (loginRef?.errors?.maxlength) {
-                  <small class="form-text text-danger" jhiTranslate="register.messages.validate.login.maxlength"
-                    >Il nome utente non può contenere più di 50 caratteri</small
-                  >
+                @if (loginRef.errors?.['maxlength']) {
+                  Massimo 50 caratteri.
                 }
-
-                @if (loginRef?.errors?.pattern) {
-                  <small class="form-text text-danger" jhiTranslate="register.messages.validate.login.pattern"
-                    >Your username is invalid.</small
-                  >
+                @if (loginRef.errors?.['pattern']) {
+                  Nome utente non valido.
                 }
-              </div>
+              </span>
             }
           </div>
 
-          <div class="mb-3">
-            <label class="form-label" for="email" jhiTranslate="global.form.email.label">Email</label>
-            <input
-              type="email"
-              class="form-control"
-              id="email"
-              name="email"
-              placeholder="{{ 'global.form.email.placeholder' | translate }}"
-              formControlName="email"
-              data-cy="email"
-            />
-
+          <!-- Email -->
+          <div class="field-group">
+            <label class="field-label" for="email">Email</label>
+            <div class="field-input-wrap">
+              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+              <input
+                type="email"
+                class="field-input"
+                id="email"
+                name="email"
+                placeholder="La tua email"
+                formControlName="email"
+                data-cy="email"
+              />
+            </div>
             @let emailRef = registerForm.get('email')!;
             @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {
-              <div>
-                @if (emailRef?.errors?.required) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.required"
-                    >L&apos;indirizzo email è obbligatorio.</small
-                  >
+              <span class="field-error">
+                @if (emailRef.errors?.['required']) {
+                  L'email è obbligatoria.
                 }
-
-                @if (emailRef?.errors?.invalid) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.invalid"
-                    >L&apos;indirizzo email non è valido.</small
-                  >
+                @if (emailRef.errors?.['invalid'] || emailRef.errors?.['email']) {
+                  Email non valida.
                 }
-
-                @if (emailRef?.errors?.minlength) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.minlength"
-                    >L&apos;indirizzo email deve essere di almeno 5 caratteri</small
-                  >
+                @if (emailRef.errors?.['minlength']) {
+                  Almeno 5 caratteri.
                 }
-
-                @if (emailRef?.errors?.maxlength) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.maxlength"
-                    >L&apos;indirizzo email non può contenere più di 50 caratteri</small
-                  >
+                @if (emailRef.errors?.['maxlength']) {
+                  Massimo 50 caratteri.
                 }
-              </div>
+              </span>
             }
           </div>
 
-          <div class="mb-3">
-            <label class="form-label" for="password" jhiTranslate="global.form.newpassword.label">Nuova password</label>
-            <input
-              type="password"
-              class="form-control"
-              id="password"
-              name="password"
-              placeholder="{{ 'global.form.newpassword.placeholder' | translate }}"
-              formControlName="password"
-              data-cy="firstPassword"
-            />
-
+          <!-- Nuova Password -->
+          <div class="field-group">
+            <label class="field-label" for="password">Password</label>
+            <div class="field-input-wrap">
+              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              <input
+                type="password"
+                class="field-input"
+                id="password"
+                name="password"
+                placeholder="Crea una password"
+                formControlName="password"
+                data-cy="firstPassword"
+              />
+            </div>
             @let passwordRef = registerForm.get('password')!;
             @if (passwordRef.invalid && (passwordRef.dirty || passwordRef.touched)) {
-              <div>
-                @if (passwordRef?.errors?.required) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.newpassword.required"
-                    >La password è obbligatoria.</small
-                  >
+              <span class="field-error">
+                @if (passwordRef.errors?.['required']) {
+                  La password è obbligatoria.
                 }
-
-                @if (passwordRef?.errors?.minlength) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.newpassword.minlength"
-                    >La password deve essere di almeno 4 caratteri</small
-                  >
+                @if (passwordRef.errors?.['minlength']) {
+                  Almeno 4 caratteri.
                 }
-
-                @if (passwordRef?.errors?.maxlength) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.newpassword.maxlength"
-                    >La password non può contenere più di 50 caratteri</small
-                  >
+                @if (passwordRef.errors?.['maxlength']) {
+                  Massimo 50 caratteri.
                 }
-              </div>
-            }
-
-            <jhi-password-strength-bar [passwordToCheck]="passwordRef.value" />
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label" for="confirmPassword" jhiTranslate="global.form.confirmpassword.label">Conferma nuova password</label>
-            <input
-              type="password"
-              class="form-control"
-              id="confirmPassword"
-              name="confirmPassword"
-              placeholder="{{ 'global.form.confirmpassword.placeholder' | translate }}"
-              formControlName="confirmPassword"
-              data-cy="secondPassword"
-            />
-
-            @let confirmPasswordRef = registerForm.get('confirmPassword')!;
-            @if (confirmPasswordRef.invalid && (confirmPasswordRef.dirty || confirmPasswordRef.touched)) {
-              <div>
-                @if (confirmPasswordRef?.errors?.required) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.confirmpassword.required"
-                    >La password di conferma è obbligatoria.</small
-                  >
-                }
-
-                @if (confirmPasswordRef?.errors?.minlength) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.confirmpassword.minlength"
-                    >La tua password deve essere di almeno 4 caratteri</small
-                  >
-                }
-
-                @if (confirmPasswordRef?.errors?.maxlength) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.confirmpassword.maxlength"
-                    >La tua password non può contenere più di 50 caratteri</small
-                  >
-                }
-              </div>
+              </span>
             }
           </div>
 
-          <button
-            type="submit"
-            [disabled]="registerForm.invalid"
-            class="btn btn-primary"
-            data-cy="submit"
-            jhiTranslate="register.form.button"
-          >
-            Crea Account
+          <!-- Conferma Password -->
+          <div class="field-group">
+            <label class="field-label" for="confirmPassword">Conferma Password</label>
+            <div class="field-input-wrap">
+              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              <input
+                type="password"
+                class="field-input"
+                id="confirmPassword"
+                name="confirmPassword"
+                placeholder="Ripeti la password"
+                formControlName="confirmPassword"
+                data-cy="secondPassword"
+              />
+            </div>
+            @let confirmRef = registerForm.get('confirmPassword')!;
+            @if (confirmRef.invalid && (confirmRef.dirty || confirmRef.touched)) {
+              <span class="field-error">
+                @if (confirmRef.errors?.['required']) {
+                  La conferma password è obbligatoria.
+                }
+                @if (confirmRef.errors?.['minlength']) {
+                  Almeno 4 caratteri.
+                }
+                @if (confirmRef.errors?.['maxlength']) {
+                  Massimo 50 caratteri.
+                }
+              </span>
+            }
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-register" [disabled]="registerForm.invalid" data-cy="submit">
+            Crea account
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
           </button>
         </form>
       }
 
-      <div class="mt-3 alert alert-warning">
-        <span jhiTranslate="global.messages.info.authenticated.prefix">Se vuoi </span>
-        <a class="alert-link" routerLink="/login" jhiTranslate="global.messages.info.authenticated.link">accedere</a
-        ><span jhiTranslate="global.messages.info.authenticated.suffix"
-          >, puoi provare gli account di default: <br />
-          - Amministratore (user = &quot;admin&quot; e la password = &quot;admin&quot;) <br />
-          - utente (user = &quot;user&quot; e la password = &quot;user&quot;)</span
-        >
+      <!-- Link login -->
+      <div class="login-row">
+        <span>Hai già un account?</span>
+        <a class="link-login" routerLink="/login">Accedi</a>
       </div>
     </div>
   </div>
