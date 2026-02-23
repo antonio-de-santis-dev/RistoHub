@@ -1,157 +1,176 @@
-<div>
-  <div class="d-flex justify-content-center">
-    <div class="col-md-8">
-      @if (settingsForm.value.login) {
-        <h2 jhiTranslate="settings.title" [translateValues]="{ username: settingsForm.value.login }">
-          Impostazioni per l&apos;utente [<strong>{{ settingsForm.value.login }}</strong
-          >]
-        </h2>
-      }
+<div class="ac-page">
+  <div class="ac-inner">
+    <div class="ac-hero">
+      <div class="ac-avatar">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      </div>
+      <div class="ac-hero-info">
+        <h1>
+          {{ settingsForm.value.firstName || settingsForm.value.login }}
+          @if (settingsForm.value.lastName) {
+            {{ settingsForm.value.lastName }}
+          }
+        </h1>
+        <p class="ac-username">&#64;{{ settingsForm.value.login }}</p>
+        <p class="ac-email">{{ settingsForm.value.email }}</p>
+      </div>
+    </div>
+
+    <div class="ac-actions-grid">
+      <a routerLink="/account/password" class="ac-action-card">
+        <div class="ac-action-icon ac-action-icon-pwd">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        </div>
+        <div class="ac-action-text">
+          <strong>Cambia Password</strong>
+          <span>Aggiorna le tue credenziali</span>
+        </div>
+        <svg class="ac-action-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </a>
+
+      <a routerLink="/account/settings" fragment="form" class="ac-action-card">
+        <div class="ac-action-icon ac-action-icon-set">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+            />
+          </svg>
+        </div>
+        <div class="ac-action-text">
+          <strong>Modifica Profilo</strong>
+          <span>Nome, cognome, email, lingua</span>
+        </div>
+        <svg class="ac-action-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+
+    <div class="ac-card" id="form">
+      <h2 class="ac-card-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+        </svg>
+        Modifica Profilo
+      </h2>
 
       @if (success()) {
-        <div class="alert alert-success" jhiTranslate="settings.messages.success"><strong>Impostazioni salvate!</strong></div>
+        <div class="ac-alert ac-alert-success">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
+          Impostazioni salvate con successo!
+        </div>
       }
 
       <jhi-alert-error />
 
       @if (settingsForm.value.login) {
-        <form name="form" (ngSubmit)="save()" [formGroup]="settingsForm" novalidate>
-          <div class="mb-3">
-            <label class="form-label" for="firstName" jhiTranslate="settings.form.firstname">Nome</label>
-            <input
-              type="text"
-              class="form-control"
-              id="firstName"
-              name="firstName"
-              placeholder="{{ 'settings.form.firstname.placeholder' | translate }}"
-              formControlName="firstName"
-              data-cy="firstname"
-            />
-
-            @let firstNameRef = settingsForm.get('firstName')!;
-            @if (firstNameRef.invalid && (firstNameRef.dirty || firstNameRef.touched)) {
-              <div>
-                @if (firstNameRef?.errors?.required) {
-                  <small class="form-text text-danger" jhiTranslate="settings.messages.validate.firstname.required"
-                    >Il nome è obbligatorio.</small
-                  >
-                }
-
-                @if (firstNameRef?.errors?.minlength) {
-                  <small class="form-text text-danger" jhiTranslate="settings.messages.validate.firstname.minlength"
-                    >Il nome deve essere di almeno 1 carattere</small
-                  >
-                }
-
-                @if (firstNameRef?.errors?.maxlength) {
-                  <small class="form-text text-danger" jhiTranslate="settings.messages.validate.firstname.maxlength"
-                    >Il nome non può contenere più di 50 caratteri</small
-                  >
-                }
-              </div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label" for="lastName" jhiTranslate="settings.form.lastname">Cognome</label>
-            <input
-              type="text"
-              class="form-control"
-              id="lastName"
-              name="lastName"
-              placeholder="{{ 'settings.form.lastname.placeholder' | translate }}"
-              formControlName="lastName"
-              data-cy="lastname"
-            />
-
-            @let lastNameRef = settingsForm.get('lastName')!;
-            @if (lastNameRef.invalid && (lastNameRef.dirty || lastNameRef.touched)) {
-              <div>
-                @if (lastNameRef?.errors?.required) {
-                  <small class="form-text text-danger" jhiTranslate="settings.messages.validate.lastname.required"
-                    >Il cognome è obbligatorio.</small
-                  >
-                }
-
-                @if (lastNameRef?.errors?.minlength) {
-                  <small class="form-text text-danger" jhiTranslate="settings.messages.validate.lastname.minlength"
-                    >Il cognome deve essere di almeno 1 carattere</small
-                  >
-                }
-
-                @if (lastNameRef?.errors?.maxlength) {
-                  <small class="form-text text-danger" jhiTranslate="settings.messages.validate.lastname.maxlength"
-                    >Il cognome non può contenere più di 50 caratteri</small
-                  >
-                }
-              </div>
-            }
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label" for="email" jhiTranslate="global.form.email.label">Email</label>
-            <input
-              type="email"
-              class="form-control"
-              id="email"
-              name="email"
-              placeholder="{{ 'global.form.email.placeholder' | translate }}"
-              formControlName="email"
-              data-cy="email"
-            />
-
-            @let emailRef = settingsForm.get('email')!;
-            @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {
-              <div>
-                @if (emailRef?.errors?.required) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.required"
-                    >L&apos;indirizzo email è obbligatorio.</small
-                  >
-                }
-
-                @if (emailRef?.errors?.email) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.invalid"
-                    >L&apos;indirizzo email non è valido.</small
-                  >
-                }
-
-                @if (emailRef?.errors?.minlength) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.minlength"
-                    >L&apos;indirizzo email deve essere di almeno 5 caratteri</small
-                  >
-                }
-
-                @if (emailRef?.errors?.maxlength) {
-                  <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.maxlength"
-                    >L&apos;indirizzo email non può contenere più di 50 caratteri</small
-                  >
-                }
-              </div>
-            }
-          </div>
-
-          @if (languages && languages.length > 0) {
-            <div class="mb-3">
-              <label for="langKey" jhiTranslate="settings.form.language">Lingua</label>
-              <select class="form-control" id="langKey" name="langKey" formControlName="langKey" data-cy="langKey">
-                @for (language of languages; track $index) {
-                  <option [value]="language">{{ language | findLanguageFromKey }}</option>
-                }
-              </select>
+        <form (ngSubmit)="save()" [formGroup]="settingsForm" novalidate class="ac-form">
+          <div class="ac-form-row">
+            <div class="ac-field">
+              <label class="ac-label" for="firstName">Nome</label>
+              <input
+                type="text"
+                class="ac-input"
+                id="firstName"
+                formControlName="firstName"
+                placeholder="Il tuo nome"
+                data-cy="firstname"
+              />
+              @let fn = settingsForm.get('firstName')!;
+              @if (fn.invalid && (fn.dirty || fn.touched)) {
+                <span class="ac-error">
+                  @if (fn.errors?.['required']) {
+                    Il nome è obbligatorio.
+                  }
+                  @if (fn.errors?.['minlength']) {
+                    Almeno 1 carattere.
+                  }
+                  @if (fn.errors?.['maxlength']) {
+                    Massimo 50 caratteri.
+                  }
+                </span>
+              }
             </div>
-          }
+            <div class="ac-field">
+              <label class="ac-label" for="lastName">Cognome</label>
+              <input
+                type="text"
+                class="ac-input"
+                id="lastName"
+                formControlName="lastName"
+                placeholder="Il tuo cognome"
+                data-cy="lastname"
+              />
+              @let ln = settingsForm.get('lastName')!;
+              @if (ln.invalid && (ln.dirty || ln.touched)) {
+                <span class="ac-error">
+                  @if (ln.errors?.['required']) {
+                    Il cognome è obbligatorio.
+                  }
+                  @if (ln.errors?.['maxlength']) {
+                    Massimo 50 caratteri.
+                  }
+                </span>
+              }
+            </div>
+          </div>
 
-          <button
-            type="submit"
-            [disabled]="settingsForm.invalid"
-            class="btn btn-primary"
-            data-cy="submit"
-            jhiTranslate="settings.form.button"
-          >
-            Salva
+          <div class="ac-field">
+            <label class="ac-label" for="email">Email</label>
+            <input type="email" class="ac-input" id="email" formControlName="email" placeholder="la-tua@email.com" data-cy="email" />
+            @let em = settingsForm.get('email')!;
+            @if (em.invalid && (em.dirty || em.touched)) {
+              <span class="ac-error">
+                @if (em.errors?.['required']) {
+                  L'email è obbligatoria.
+                }
+                @if (em.errors?.['email']) {
+                  Email non valida.
+                }
+                @if (em.errors?.['minlength']) {
+                  Almeno 5 caratteri.
+                }
+                @if (em.errors?.['maxlength']) {
+                  Massimo 254 caratteri.
+                }
+              </span>
+            }
+          </div>
+
+          <div class="ac-field">
+            <label class="ac-label" for="langKey">Lingua</label>
+            <select class="ac-input" id="langKey" formControlName="langKey" data-cy="langKey">
+              @for (lang of languages; track lang) {
+                <option [value]="lang">{{ lang }}</option>
+              }
+            </select>
+          </div>
+
+          <button type="submit" class="ac-btn-save" [disabled]="settingsForm.invalid" data-cy="submit">
+            Salva Modifiche
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
           </button>
         </form>
       }
     </div>
   </div>
+
+  <footer class="ac-footer">
+    <p>© 2025 <strong>RistoHub</strong> — Il tuo menu digitale professionale</p>
+  </footer>
 </div>

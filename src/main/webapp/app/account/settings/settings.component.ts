@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 
 import SharedModule from 'app/shared/shared.module';
@@ -11,8 +12,9 @@ const initialAccount: Account = {} as Account;
 
 @Component({
   selector: 'jhi-settings',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule],
+  imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterModule],
   templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.scss'],
 })
 export default class SettingsComponent implements OnInit {
   success = signal(false);
@@ -32,7 +34,6 @@ export default class SettingsComponent implements OnInit {
       validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.email],
     }),
     langKey: new FormControl(initialAccount.langKey, { nonNullable: true }),
-
     activated: new FormControl(initialAccount.activated, { nonNullable: true }),
     authorities: new FormControl(initialAccount.authorities, { nonNullable: true }),
     imageUrl: new FormControl(initialAccount.imageUrl, { nonNullable: true }),
@@ -44,21 +45,16 @@ export default class SettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.accountService.identity().subscribe(account => {
-      if (account) {
-        this.settingsForm.patchValue(account);
-      }
+      if (account) this.settingsForm.patchValue(account);
     });
   }
 
   save(): void {
     this.success.set(false);
-
     const account = this.settingsForm.getRawValue();
     this.accountService.save(account).subscribe(() => {
       this.success.set(true);
-
       this.accountService.authenticate(account);
-
       if (account.langKey !== this.translateService.currentLang) {
         this.translateService.use(account.langKey);
       }

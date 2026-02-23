@@ -3,70 +3,64 @@
 // ══════════════════════════════════════════════════════
 
 $accent: #c8102e;
-$dark: #0f0f0f;
-$text: #1a1a2e;
-$muted: #6b7280;
-$border: #e5e7eb;
+$accent-soft: #ffb3be;
 
 :host {
   display: block;
-  background-image: url('/content/images/unnamed.jpg');
+  margin: -1.5% -1.5% -1.5% -1.5%;
 }
 
-// ── HERO ──
-.rh-hero {
+.rh-home {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   position: relative;
-  overflow: hidden;
+
+  background-image: url('/content/images/unnamed.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 
   &::before {
     content: '';
-    position: absolute;
+    position: fixed;
     inset: 0;
-    background-image:
-      radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
-      radial-gradient(circle at 85% 80%, rgba(200, 16, 46, 0.08) 0%, transparent 50%);
-  }
-
-  // Subtle pattern overlay
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(255, 255, 255, 0.015) 50px, rgba(255, 255, 255, 0.015) 51px),
-      repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(255, 255, 255, 0.01) 50px, rgba(255, 255, 255, 0.01) 51px);
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 0;
     pointer-events: none;
   }
 }
 
-.rh-hero-bg {
-  position: absolute;
-  inset: 0;
-  // Decorazioni cibo stile chalk - CSS art
-  pointer-events: none;
-}
-
-.rh-hero-card {
+.rh-hero,
+.rh-dashboard,
+.rh-home-footer {
   position: relative;
   z-index: 1;
-  background: white;
-  border-radius: 20px;
-  padding: 3rem 2.5rem 2.5rem;
+}
+
+// ══ HERO ══════════════════════════════════════════════
+
+.rh-hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5vh 2rem 3vh;
+  min-height: 30vh;
+}
+
+.rh-hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  max-width: 340px;
-  width: 90%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  animation: heroIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: heroIn 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 @keyframes heroIn {
   from {
     opacity: 0;
-    transform: translateY(30px) scale(0.95);
+    transform: translateY(28px) scale(0.93);
   }
   to {
     opacity: 1;
@@ -75,170 +69,161 @@ $border: #e5e7eb;
 }
 
 .rh-hero-logo {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1.2rem;
-
-  svg {
-    width: 80px;
-    height: 80px;
-  }
-}
-
-.rh-hero-brand {
-  font-family: 'Playfair Display', 'Georgia', serif;
-  font-size: 2rem;
-  font-weight: 700;
-  color: $text;
-  margin: 0 0 10px;
+  width: clamp(110px, 16vw, 220px);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 40px rgba(255, 255, 255, 0.2));
 }
 
 .rh-hero-tagline {
-  font-family: 'Lato', sans-serif;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: $text;
-  line-height: 1.4;
-  margin: 0 0 1.8rem;
+  margin: 0.75rem 0 0;
+  font-family: 'Lato', 'Helvetica Neue', sans-serif;
+  font-size: clamp(0.72rem, 1.3vw, 0.92rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.88);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.8);
 }
 
-.rh-hero-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: $text;
-  color: white;
-  border-radius: 30px;
-  padding: 14px 32px;
-  text-decoration: none;
-  font-family: 'Lato', sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
-  transition: all 0.2s;
-  box-shadow: 0 4px 16px rgba(26, 26, 46, 0.3);
+// ══ DASHBOARD ═════════════════════════════════════════
 
-  &:hover {
-    background: $accent;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 22px rgba($accent, 0.4);
-    color: white;
-  }
-}
-
-// ── DASHBOARD ──
 .rh-dashboard {
-  max-width: 1140px;
-  margin: 2rem auto;
-  padding: 0 1.5rem 3rem;
+  flex: 1;
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 2rem;
 }
 
 .rh-dashboard-greeting {
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.25rem;
 
   h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.6rem;
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-size: 1.5rem;
     font-weight: 700;
-    color: $text;
+    color: #ffffff;
     margin: 0 0 4px;
+    line-height: 1.2;
+    text-shadow:
+      0 2px 20px rgba(0, 0, 0, 0.95),
+      0 1px 4px rgba(0, 0, 0, 1);
   }
 
   p {
-    color: $muted;
+    color: rgba(255, 255, 255, 0.9);
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
   }
 }
 
 .rh-user-name {
-  color: $accent;
+  color: $accent-soft;
 }
 
-// ── Cards grid ──
 .rh-dash-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: 1.25rem;
 }
 
 .rh-dash-card {
-  background: white;
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
-  border: 1px solid $border;
-  min-height: 280px;
+  border: 1px solid rgba(255, 255, 255, 0.17);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  min-height: 240px;
   display: flex;
   flex-direction: column;
 }
 
 .rh-card-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
-  padding: 1.25rem 1.25rem 1rem;
-  border-bottom: 1px solid $border;
-  background: #fafafa;
+  padding: 1rem 1.25rem 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.rh-card-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+}
+
+.rh-card-header-text {
+  flex: 1;
+  min-width: 0;
 
   h3 {
     font-size: 1rem;
     font-weight: 700;
-    color: $text;
+    color: #ffffff;
     margin: 0 0 2px;
-    flex: 1;
+    line-height: 1.2;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
   }
 
   p {
-    font-size: 0.8rem;
-    color: $muted;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.65);
     margin: 0;
   }
-}
-
-.rh-card-icon {
-  font-size: 1.5rem;
-  flex-shrink: 0;
-  line-height: 1;
-  margin-top: 2px;
 }
 
 .rh-card-link {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.8rem;
+  gap: 5px;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: $accent;
+  color: $accent-soft;
   text-decoration: none;
+  white-space: nowrap;
   flex-shrink: 0;
-  margin-top: 2px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 179, 190, 0.35);
+  transition: all 0.18s;
 
   &:hover {
-    text-decoration: underline;
+    background: rgba(255, 179, 190, 0.14);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.35);
   }
 }
 
-// ── Loading ──
 .rh-card-loading {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  color: $muted;
-  font-size: 0.88rem;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.92rem;
   padding: 2rem;
 }
 
 .rh-mini-spinner {
   width: 20px;
   height: 20px;
-  border: 2.5px solid $border;
-  border-top-color: $accent;
+  border: 2.5px solid rgba(255, 255, 255, 0.15);
+  border-top-color: rgba(255, 255, 255, 0.85);
   border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+  animation: spin 0.75s linear infinite;
+  flex-shrink: 0;
 }
 
 @keyframes spin {
@@ -247,7 +232,6 @@ $border: #e5e7eb;
   }
 }
 
-// ── Empty state ──
 .rh-card-empty {
   flex: 1;
   display: flex;
@@ -258,270 +242,263 @@ $border: #e5e7eb;
   padding: 2rem;
   text-align: center;
 
-  .rh-empty-icon {
-    font-size: 2rem;
-    display: block;
-  }
-
   p {
-    font-size: 0.88rem;
-    color: $muted;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.92rem;
     margin: 0;
   }
 }
 
+.rh-empty-icon {
+  font-size: 2rem;
+  opacity: 0.55;
+}
+
 .rh-empty-cta {
-  font-size: 0.82rem;
-  color: $accent;
+  color: $accent-soft;
+  font-size: 0.88rem;
   font-weight: 700;
   text-decoration: none;
-  margin-top: 4px;
-
+  margin-top: 2px;
   &:hover {
+    color: #fff;
     text-decoration: underline;
   }
 }
 
-// ── Piatti list ──
+// ── Piatti ────────────────────────────────────────────
+
 .rh-piatti-list {
   flex: 1;
-  padding: 0.75rem 0;
-  overflow: hidden;
+  padding: 0.3rem 0;
 }
 
 .rh-piatto-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.65rem 1.25rem;
-  border-bottom: 1px solid #f9fafb;
   gap: 12px;
-
+  padding: 0.65rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  transition: background 0.15s;
   &:last-child {
     border-bottom: none;
+  }
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
   }
 }
 
 .rh-piatto-info {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
 .rh-piatto-nome {
-  display: block;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: $text;
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
 }
 
 .rh-piatto-menu {
-  display: block;
-  font-size: 0.72rem;
-  color: $muted;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .rh-piatto-prezzo {
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: $accent;
-  flex-shrink: 0;
+  color: $accent-soft;
   white-space: nowrap;
-}
-
-// ── Menu list ──
-.rh-menus-list {
-  flex: 1;
-  overflow: hidden;
-}
-
-.rh-menu-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid #f9fafb;
-  cursor: pointer;
-  transition: background 0.15s;
-
-  &:last-child {
-    border-bottom: none;
-  }
-  &:hover {
-    background: #fafafa;
-  }
-}
-
-.rh-menu-color-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.rh-menu-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.rh-menu-nome {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: $text;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.rh-menu-desc {
-  display: block;
-  font-size: 0.72rem;
-  color: $muted;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.rh-menu-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.rh-btn-qr-mini {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #15803d;
-  border-radius: 6px;
-  padding: 4px 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: background 0.15s;
-
-  &:hover {
-    background: #dcfce7;
-  }
-}
-
-.rh-arrow-icon {
-  color: $muted;
 }
 
 .rh-more-items {
-  padding: 0.5rem 1.25rem;
+  padding: 0.5rem 1.25rem 0.4rem;
   text-align: center;
-  border-top: 1px solid #f3f4f6;
-
   a {
-    font-size: 0.8rem;
-    color: $accent;
-    text-decoration: none;
+    font-size: 0.82rem;
+    color: $accent-soft;
     font-weight: 600;
+    text-decoration: none;
     &:hover {
+      color: #fff;
       text-decoration: underline;
     }
   }
 }
 
-// ── Quick actions ──
-.rh-quick-actions {
-  margin-top: 1.5rem;
+// ── Menu list ─────────────────────────────────────────
+
+.rh-menus-list {
+  flex: 1;
+  padding: 0.3rem 0;
 }
 
-.rh-quick-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: $muted;
-  margin: 0 0 1rem;
-}
-
-.rh-quick-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+.rh-menu-row {
+  display: flex;
+  align-items: center;
   gap: 12px;
+  padding: 0.65rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  cursor: pointer;
+  transition: background 0.15s;
+  &:last-child {
+    border-bottom: none;
+  }
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
 }
 
-.rh-quick-btn {
+// Indicatore stato (linea verticale) al posto dei cerchi colore
+.rh-menu-stato {
+  width: 3px;
+  height: 32px;
+  border-radius: 3px;
+  flex-shrink: 0;
+
+  &.rh-menu-attivo {
+    background: #4ade80;
+    box-shadow: 0 0 6px rgba(74, 222, 128, 0.5);
+  }
+
+  &.rh-menu-inattivo {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.rh-menu-info {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rh-menu-nome {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+
+.rh-menu-desc {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.58);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rh-qr-btn {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 1.2rem 0.5rem;
-  background: white;
-  border: 1.5px solid $border;
-  border-radius: 12px;
-  text-decoration: none;
-  color: $text;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-align: center;
-  transition: all 0.2s;
-
-  svg {
-    color: $accent;
-  }
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+  opacity: 1;
+  transition: all 0.18s;
 
   &:hover {
+    background: $accent;
     border-color: $accent;
-    background: #fff5f5;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 14px rgba($accent, 0.15);
-    color: $text;
+    color: #ffffff;
+    transform: scale(1.08);
+    box-shadow: 0 2px 12px rgba($accent, 0.55);
+  }
+  &:active {
+    transform: scale(0.95);
   }
 }
 
-// ── QR Modal ──
+// ══ FOOTER ════════════════════════════════════════════
+
+.rh-home-footer {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  padding: 1rem 2rem;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+
+  p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.42);
+    letter-spacing: 0.03em;
+    strong {
+      color: rgba(255, 255, 255, 0.65);
+      font-weight: 700;
+    }
+  }
+}
+
+// ══ QR MODAL ══════════════════════════════════════════
+
 .rh-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
   padding: 1rem;
-  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
 }
 
-.rh-modal-box {
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  max-width: 360px;
-  width: 90%;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.rh-modal {
+  background: rgba(18, 12, 10, 0.94);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 22px;
+  padding: 2rem 1.75rem 1.75rem;
+  max-width: 340px;
+  width: 100%;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-  animation: modalIn 0.2s ease;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65);
+  animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   h3 {
     font-size: 1.2rem;
     font-weight: 700;
-    margin: 0 0 8px;
-    color: $text;
-  }
-
-  p {
-    font-size: 0.85rem;
-    color: $muted;
-    margin-bottom: 1.2rem;
+    color: #ffffff;
+    margin: 0 0 1.25rem;
   }
 }
 
 @keyframes modalIn {
   from {
     opacity: 0;
-    transform: scale(0.95) translateY(10px);
+    transform: scale(0.88) translateY(20px);
   }
   to {
     opacity: 1;
@@ -531,29 +508,30 @@ $border: #e5e7eb;
 
 .rh-modal-icon {
   font-size: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   display: block;
 }
 
 .rh-qr-wrap {
   display: flex;
   justify-content: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.875rem;
 }
 
 .rh-qr-img {
-  width: 190px;
-  height: 190px;
-  border: 2px solid $border;
+  width: 200px;
+  height: 200px;
+  border: 2px solid rgba(255, 255, 255, 0.14);
   border-radius: 12px;
 }
 
 .rh-qr-link {
-  font-size: 0.7rem;
-  color: #9ca3af;
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.38);
   word-break: break-all;
   padding: 0 0.5rem;
-  margin-bottom: 1.5rem !important;
+  margin-bottom: 1.25rem;
+  display: block;
 }
 
 .rh-modal-actions {
@@ -567,90 +545,73 @@ $border: #e5e7eb;
   align-items: center;
   gap: 6px;
   background: #16a34a;
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
+  color: #fff;
+  padding: 0.7rem 1.3rem;
+  border-radius: 10px;
   text-decoration: none;
-  font-weight: 600;
-  font-size: 0.88rem;
+  font-weight: 700;
+  font-size: 0.9rem;
   transition: background 0.2s;
   &:hover {
     background: #15803d;
-    color: white;
+    color: #fff;
   }
 }
 
 .rh-btn-close {
-  background: #f3f4f6;
-  color: $text;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 0.7rem 1.3rem;
+  border-radius: 10px;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 0.88rem;
+  font-weight: 700;
+  font-size: 0.9rem;
   font-family: inherit;
   transition: background 0.2s;
   &:hover {
-    background: #e5e7eb;
+    background: rgba(255, 255, 255, 0.18);
   }
 }
 
-// ══════════════════════════════════════════════════════
-//  RESPONSIVE
-// ══════════════════════════════════════════════════════
+// ══ RESPONSIVE ════════════════════════════════════════
 
 @media (max-width: 768px) {
+  :host {
+    margin: -0.75rem -0.75rem -0.75rem -0.75rem;
+  }
   .rh-hero {
-    min-height: 100dvh;
-    padding: 0;
+    min-height: 26vh;
+    padding: 3vh 1.5rem 2.5vh;
   }
-
-  .rh-hero-card {
-    border-radius: 14px;
-    padding: 2rem 1.5rem;
+  .rh-hero-logo {
+    width: clamp(100px, 42vw, 180px);
   }
-
   .rh-dashboard {
-    padding: 0 1rem 2rem;
-    margin-top: 1.5rem;
+    padding: 1.25rem 1rem 1.5rem;
   }
-
   .rh-dash-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-
-  .rh-quick-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .rh-dashboard-greeting h2 {
+    font-size: 1.3rem;
   }
 }
 
 @media (max-width: 480px) {
-  .rh-hero-card {
-    padding: 1.75rem 1.25rem;
+  .rh-hero-logo {
+    width: clamp(90px, 50vw, 160px);
   }
-
-  .rh-hero-brand {
-    font-size: 1.75rem;
+  .rh-card-header {
+    padding: 0.9rem 1rem 0.8rem;
   }
-
-  .rh-dashboard-greeting h2 {
-    font-size: 1.35rem;
+  .rh-piatto-row,
+  .rh-menu-row {
+    padding: 0.6rem 1rem;
   }
-
-  .rh-dash-grid {
-    gap: 0.875rem;
-  }
-
-  .rh-quick-btn {
-    padding: 1rem 0.4rem;
-    font-size: 0.75rem;
-    gap: 6px;
-
-    svg {
-      width: 18px;
-      height: 18px;
-    }
+  .rh-qr-btn {
+    width: 28px;
+    height: 28px;
   }
 }

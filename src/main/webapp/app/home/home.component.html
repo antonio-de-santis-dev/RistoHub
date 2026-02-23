@@ -1,197 +1,165 @@
 <div class="rh-home">
-  <div class="sfondo">
-    <!-- DASHBOARD (solo utenti loggati) -->
-    @if (account() !== null) {
-      <div class="rh-dashboard">
-        <div class="rh-dashboard-greeting">
-          <h2>
-            Ciao, <span class="rh-user-name">{{ account()?.login }}</span> 👋
-          </h2>
-          <p>Ecco il riepilogo della tua situazione oggi</p>
-        </div>
-
-        <div class="rh-dash-grid">
-          <!-- CARD 1: Piatti del Giorno attivi -->
-          <div class="rh-dash-card rh-card-piatti">
-            <div class="rh-card-header">
-              <div class="rh-card-icon">✨</div>
-              <div>
-                <h3>Piatti del Giorno</h3>
-                <p>Piatti speciali attivi oggi</p>
-              </div>
-              <a routerLink="/piatti-giorno" class="rh-card-link">
-                Gestisci
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </a>
-            </div>
-
-            @if (isLoadingPiatti) {
-              <div class="rh-card-loading">
-                <div class="rh-mini-spinner"></div>
-                <span>Caricamento...</span>
-              </div>
-            } @else if (piattiAttivi.length === 0) {
-              <div class="rh-card-empty">
-                <span class="rh-empty-icon">🍽️</span>
-                <p>Nessun piatto del giorno attivo</p>
-                <a routerLink="/piatti-giorno" class="rh-empty-cta">Aggiungi un piatto →</a>
-              </div>
-            } @else {
-              <div class="rh-piatti-list">
-                @for (piatto of piattiAttivi.slice(0, 5); track piatto.id) {
-                  <div class="rh-piatto-row">
-                    <div class="rh-piatto-info">
-                      <span class="rh-piatto-nome">{{ piatto.prodotto?.nome ?? piatto.nome }}</span>
-                      @if (piatto.menu?.nome) {
-                        <span class="rh-piatto-menu">{{ piatto.menu.nome }}</span>
-                      }
-                    </div>
-                    <span class="rh-piatto-prezzo">{{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}</span>
-                  </div>
-                }
-                @if (piattiAttivi.length > 5) {
-                  <div class="rh-more-items">
-                    <a routerLink="/piatti-giorno">+ altri {{ piattiAttivi.length - 5 }} piatti →</a>
-                  </div>
-                }
-              </div>
-            }
-          </div>
-
-          <!-- CARD 2: Menu attivi -->
-          <div class="rh-dash-card rh-card-menus">
-            <div class="rh-card-header">
-              <div class="rh-card-icon">🍷</div>
-              <div>
-                <h3>I miei Menu</h3>
-                <p>Menu attualmente attivi</p>
-              </div>
-              <a routerLink="/menu-list" class="rh-card-link">
-                Gestisci
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </a>
-            </div>
-
-            @if (isLoadingMenus) {
-              <div class="rh-card-loading">
-                <div class="rh-mini-spinner"></div>
-                <span>Caricamento...</span>
-              </div>
-            } @else if (menuAttivi.length === 0) {
-              <div class="rh-card-empty">
-                <span class="rh-empty-icon">📋</span>
-                <p>Nessun menu attivo</p>
-                <a routerLink="/menu-wizard" class="rh-empty-cta">Crea il tuo primo menu →</a>
-              </div>
-            } @else {
-              <div class="rh-menus-list">
-                @for (menu of menuAttivi; track menu.id) {
-                  <div class="rh-menu-row" (click)="apriMenu(menu.id)">
-                    <div class="rh-menu-color-dot" [style.background]="menu.colorePrimario ?? '#c8102e'"></div>
-                    <div class="rh-menu-info">
-                      <span class="rh-menu-nome">{{ menu.nome }}</span>
-                      @if (menu.descrizione) {
-                        <span class="rh-menu-desc">{{ menu.descrizione }}</span>
-                      }
-                    </div>
-                    <div class="rh-menu-actions">
-                      <button class="rh-btn-qr-mini" (click)="$event.stopPropagation(); apriQr(menu.id)" title="QR Code">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <rect x="3" y="3" width="5" height="5" />
-                          <rect x="16" y="3" width="5" height="5" />
-                          <rect x="3" y="16" width="5" height="5" />
-                          <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
-                          <path d="M21 21v.01" />
-                          <path d="M12 7v3a2 2 0 0 1-2 2H7" />
-                        </svg>
-                      </button>
-                      <svg
-                        class="rh-arrow-icon"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <polyline points="9 18 15 12 9 6" />
-                      </svg>
-                    </div>
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        </div>
-
-        <!-- Azioni rapide -->
-        <div class="rh-quick-actions">
-          <h3 class="rh-quick-title">Azioni Rapide</h3>
-          <div class="rh-quick-grid">
-            <a routerLink="/menu-wizard" class="rh-quick-btn">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="16" />
-                <line x1="8" y1="12" x2="16" y2="12" />
-              </svg>
-              <span>Crea Menu</span>
-            </a>
-            <a routerLink="/piatti-giorno" class="rh-quick-btn">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-              </svg>
-              <span>Piatti del Giorno</span>
-            </a>
-            <a routerLink="/prodotto-add" class="rh-quick-btn">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 2l3 7H3m11-7 3 7h-3M6 9c0 5 3 10 6 13 3-3 6-8 6-13" />
-              </svg>
-              <span>Aggiungi Prodotto</span>
-            </a>
-            <a routerLink="/menu-list" class="rh-quick-btn">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="7" height="7" />
-                <rect x="14" y="3" width="7" height="7" />
-                <rect x="3" y="14" width="7" height="7" />
-                <rect x="14" y="14" width="7" height="7" />
-              </svg>
-              <span>I Miei Menu</span>
-            </a>
-          </div>
-        </div>
-      </div>
-    }
-
-    <!-- QR Modal -->
-    @if (qrVisible) {
-      <div class="rh-modal-overlay" (click)="chiudiQr()">
-        <div class="rh-modal-box" (click)="$event.stopPropagation()">
-          <div class="rh-modal-icon">📱</div>
-          <h3>QR Code del Menu</h3>
-          <p>I clienti scansionano questo codice per visualizzare il menu</p>
-          <div class="rh-qr-wrap">
-            <img [src]="qrImageUrl" alt="QR Code" class="rh-qr-img" />
-          </div>
-          <p class="rh-qr-link">{{ qrUrl }}</p>
-          <div class="rh-modal-actions">
-            <a [href]="qrImageUrl" download="qr-menu.png" class="rh-btn-download">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              Scarica QR
-            </a>
-            <button class="rh-btn-close" (click)="chiudiQr()">Chiudi</button>
-          </div>
-        </div>
-      </div>
-    }
+  <!-- HERO -->
+  <div class="rh-hero">
+    <div class="rh-hero-content">
+      <img src="content/images/LogoBianco.png" alt="RistoHub" class="rh-hero-logo" />
+      <p class="rh-hero-tagline">Il tuo menu digitale professionale</p>
+    </div>
   </div>
+
+  <!-- DASHBOARD -->
+  @if (account() !== null) {
+    <div class="rh-dashboard">
+      <div class="rh-dashboard-greeting">
+        <h2>
+          Ciao, <span class="rh-user-name">{{ account()?.login }}</span> 👋
+        </h2>
+        <p>Ecco il riepilogo della tua situazione oggi</p>
+      </div>
+
+      <div class="rh-dash-grid">
+        <!-- CARD 1: Piatti del Giorno -->
+        <div class="rh-dash-card">
+          <div class="rh-card-header">
+            <span class="rh-card-icon">✨</span>
+            <div class="rh-card-header-text">
+              <h3>Piatti del Giorno</h3>
+              <p>Piatti speciali attivi oggi</p>
+            </div>
+            <a routerLink="/piatti-giorno" class="rh-card-link">
+              Gestisci
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
+
+          @if (isLoadingPiatti) {
+            <div class="rh-card-loading">
+              <div class="rh-mini-spinner"></div>
+              <span>Caricamento...</span>
+            </div>
+          } @else if (piattiAttivi.length === 0) {
+            <div class="rh-card-empty">
+              <span class="rh-empty-icon">🍽️</span>
+              <p>Nessun piatto del giorno attivo</p>
+              <a routerLink="/piatti-giorno" class="rh-empty-cta">Aggiungi un piatto →</a>
+            </div>
+          } @else {
+            <div class="rh-piatti-list">
+              @for (piatto of piattiAttivi.slice(0, 6); track piatto.id) {
+                <div class="rh-piatto-row">
+                  <div class="rh-piatto-info">
+                    <span class="rh-piatto-nome">{{ piatto.nome ?? piatto.prodotto?.nome ?? '—' }}</span>
+                    @if (piatto.menu?.nome) {
+                      <span class="rh-piatto-menu">{{ piatto.menu.nome }}</span>
+                    }
+                  </div>
+                  <span class="rh-piatto-prezzo">{{ formatPrezzo(piatto.prezzo ?? piatto.prodotto?.prezzo) }}</span>
+                </div>
+              }
+              @if (piattiAttivi.length > 6) {
+                <div class="rh-more-items">
+                  <a routerLink="/piatti-giorno">+ altri {{ piattiAttivi.length - 6 }} piatti →</a>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- CARD 2: I miei Menu — icona cambiata, rimossi cerchi colore -->
+        <div class="rh-dash-card">
+          <div class="rh-card-header">
+            <!-- Nuova icona: libro/menu aperto -->
+            <span class="rh-card-icon">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+            </span>
+            <div class="rh-card-header-text">
+              <h3>I miei Menu</h3>
+              <p>Menu attualmente attivi</p>
+            </div>
+            <a routerLink="/menu-list" class="rh-card-link">
+              Gestisci
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
+
+          @if (isLoadingMenus) {
+            <div class="rh-card-loading">
+              <div class="rh-mini-spinner"></div>
+              <span>Caricamento...</span>
+            </div>
+          } @else if (menuAttivi.length === 0) {
+            <div class="rh-card-empty">
+              <span class="rh-empty-icon">📋</span>
+              <p>Nessun menu attivo</p>
+              <a routerLink="/menu-wizard" class="rh-empty-cta">Crea il tuo primo menu →</a>
+            </div>
+          } @else {
+            <div class="rh-menus-list">
+              @for (menu of menuAttivi; track menu.id) {
+                <div class="rh-menu-row" (click)="apriMenu(menu.id)">
+                  <!-- RIMOSSO il cerchio colore, sostituito con indicatore stato -->
+                  <div class="rh-menu-stato" [class.rh-menu-attivo]="menu.attivo" [class.rh-menu-inattivo]="!menu.attivo"></div>
+                  <div class="rh-menu-info">
+                    <span class="rh-menu-nome">{{ menu.nome }}</span>
+                    @if (menu.descrizione) {
+                      <span class="rh-menu-desc">{{ menu.descrizione }}</span>
+                    }
+                  </div>
+                  <button class="rh-qr-btn" (click)="$event.stopPropagation(); apriQr(menu.id)" title="QR Code">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="7" height="7" />
+                      <rect x="14" y="3" width="7" height="7" />
+                      <rect x="3" y="14" width="7" height="7" />
+                      <rect x="14" y="14" width="3" height="3" />
+                    </svg>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- FOOTER INTERNO -->
+  <footer class="rh-home-footer">
+    <p>© 2025 <strong>RistoHub</strong> — Il tuo menu digitale professionale</p>
+  </footer>
+
+  <!-- QR MODAL -->
+  @if (qrVisible && qrMenuId) {
+    <div class="rh-modal-overlay" (click)="chiudiQr()">
+      <div class="rh-modal" (click)="$event.stopPropagation()">
+        <span class="rh-modal-icon">📱</span>
+        <h3>QR Code Menu</h3>
+        <div class="rh-qr-wrap">
+          <img [src]="qrImageUrl" alt="QR Code" class="rh-qr-img" />
+        </div>
+        <p class="rh-qr-link">{{ qrUrl }}</p>
+        <div class="rh-modal-actions">
+          <a [href]="qrImageUrl" download="qr-menu.png" class="rh-btn-download">⬇ Scarica PNG</a>
+          <button (click)="chiudiQr()" class="rh-btn-close">Chiudi</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

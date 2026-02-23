@@ -1,112 +1,202 @@
-$accent: #8b1a1a;
-$text: #1a1a2e;
-$muted: #6b7280;
-$border: #e5e7eb;
-$radius: 12px;
-$shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+// ══════════════════════════════════════════════════════
+//  RistoHub — Prodotto Add  (dark glassmorphism)
+// ══════════════════════════════════════════════════════
 
-.prodotto-container {
+$accent: #c8102e;
+$accent-soft: #ffb3be;
+$text-white: #ffffff;
+$muted-white: rgba(255, 255, 255, 0.62);
+$border-glass: rgba(255, 255, 255, 0.15);
+$radius: 16px;
+
+:host {
+  display: block;
+}
+
+.pa-page {
+  min-height: 100vh;
+  position: relative;
+  background-image: url('/content/images/unnamed.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.62);
+    z-index: 0;
+    pointer-events: none;
+  }
+}
+
+.pa-inner {
+  position: relative;
+  z-index: 1;
   max-width: 1100px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 3rem;
 }
 
-.prodotto-header {
+// ── Header ────────────────────────────────────────────
+.pa-header {
   margin-bottom: 2rem;
-  .prodotto-title {
-    font-size: 1.8rem;
+
+  h1 {
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-size: 1.75rem;
     font-weight: 700;
-    color: $text;
+    color: $text-white;
     margin: 0 0 4px;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8);
   }
-  .prodotto-subtitle {
-    color: $muted;
+
+  p {
+    color: $muted-white;
     margin: 0;
+    font-size: 0.9rem;
   }
 }
 
-.loading {
-  text-align: center;
+// ── Loading ───────────────────────────────────────────
+.pa-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   padding: 4rem;
-  color: $muted;
-  font-size: 1.1rem;
+  color: $muted-white;
+  font-size: 0.95rem;
 }
 
-.prodotto-layout {
+.pa-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid rgba(255, 255, 255, 0.15);
+  border-top-color: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ── Layout 2 colonne ──────────────────────────────────
+.pa-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
 }
 
-.form-card,
-.lista-card {
-  background: white;
+// ── Card glass ────────────────────────────────────────
+.pa-card {
+  background: rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: $radius;
-  box-shadow: $shadow;
-  padding: 1.8rem;
+  overflow: hidden;
+  border: 1px solid $border-glass;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  padding: 1.75rem;
 }
 
-.form-section {
+// ── Form ──────────────────────────────────────────────
+.pa-section {
   margin-bottom: 1.5rem;
 }
-.form-section-title {
+
+.pa-section-title {
   font-size: 1rem;
   font-weight: 700;
-  color: $text;
+  color: $text-white;
   margin: 0 0 1.2rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
 }
-.count-badge {
+
+.pa-count-badge {
   background: $accent;
-  color: white;
+  color: #fff;
   border-radius: 20px;
   padding: 2px 10px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
 }
-.form-group {
+
+.pa-form-group {
   margin-bottom: 1rem;
 }
-.form-label {
+
+.pa-form-label {
   display: block;
   font-weight: 700;
   font-size: 0.88rem;
   margin-bottom: 6px;
-  color: $text;
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.form-control {
+.pa-form-control {
   width: 100%;
-  border: 1.5px solid $border;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 9px;
   padding: 10px 14px;
   font-size: 0.95rem;
   box-sizing: border-box;
   font-family: inherit;
+  color: $text-white;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+  }
   &:focus {
     outline: none;
-    border-color: $accent;
+    border-color: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  option {
+    background: #1a1a2e;
+    color: #fff;
   }
 }
-select.form-control {
+
+select.pa-form-control {
   cursor: pointer;
 }
+textarea.pa-form-control {
+  resize: vertical;
+  min-height: 72px;
+}
 
-.btn-aggiungi {
+.pa-btn-aggiungi {
   width: 100%;
   background: $accent;
-  color: white;
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 12px;
+  border-radius: 9px;
+  padding: 13px;
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
   margin-top: 0.5rem;
-  transition: background 0.2s;
+  font-family: inherit;
+  transition:
+    background 0.2s,
+    transform 0.18s;
+
   &:hover:not(:disabled) {
-    background: darken($accent, 8%);
+    background: darken(#c8102e, 8%);
+    transform: translateY(-1px);
   }
   &:disabled {
     opacity: 0.5;
@@ -114,241 +204,63 @@ select.form-control {
   }
 }
 
-.alert {
-  border-radius: 8px;
+.pa-alert {
+  border-radius: 9px;
   padding: 10px 14px;
   margin-bottom: 1rem;
   font-size: 0.9rem;
-  &.alert-success {
-    background: #d4edda;
-    color: #155724;
+  font-weight: 500;
+
+  &.pa-alert-success {
+    background: rgba(74, 222, 128, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.25);
   }
-  &.alert-error {
-    background: #f8d7da;
-    color: #721c24;
-  }
-}
-
-.empty-hint {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: $muted;
-  font-size: 0.95rem;
-}
-
-.empty-lista {
-  text-align: center;
-  padding: 2rem;
-  color: $muted;
-  font-size: 0.9rem;
-}
-
-.prodotti-lista {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.prodotto-item {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 12px 14px;
-  border: 1px solid $border;
-  border-radius: 8px;
-  background: #fafafa;
-  transition: box-shadow 0.2s;
-  &:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  &.pa-alert-error {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.25);
   }
 }
 
-.prodotto-item-body {
-  flex: 1;
-}
-.prodotto-item-nome {
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: $text;
-  margin-bottom: 2px;
-}
-.prodotto-item-desc {
-  font-size: 0.82rem;
-  color: $muted;
-  margin-bottom: 4px;
-}
-.prodotto-item-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-}
-.prodotto-item-prezzo {
-  font-weight: 700;
-  font-size: 1rem;
-  color: $accent;
-  white-space: nowrap;
-}
-.btn-elimina-prodotto {
-  background: transparent;
-  border: 1px solid #f8d7da;
-  color: #721c24;
-  border-radius: 6px;
-  padding: 2px 8px;
+// Allergeni
+.pa-allergeni-hint {
   font-size: 0.8rem;
-  cursor: pointer;
-  &:hover {
-    background: #f8d7da;
-  }
+  color: $muted-white;
+  margin-bottom: 8px;
 }
 
-// ── ALLERGENI ──
-
-.allergeni-sezione {
-  border-top: 1px solid #f3f4f6;
-  padding-top: 1rem;
-  margin-top: 0.5rem;
-}
-.allergeni-hint {
-  font-size: 0.78rem;
-  color: #9ca3af;
-  margin: 0 0 10px;
-}
-.allergeni-grid {
+.pa-allergeni-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 7px;
+  margin-bottom: 0.75rem;
 }
 
-.allergene-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px 4px 4px;
-  border-radius: 20px;
-  border: 2px solid #ddd;
-  background: #fafafa;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  user-select: none;
-  &:hover {
-    border-color: #aaa;
-    background: #f0f0f0;
-  }
-  &.selected {
-    font-weight: 600;
-  }
-}
-
-.allergene-chip-icona {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.allergene-chip-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 50%;
-}
-.allergene-chip-iniziale {
-  font-size: 12px;
-  font-weight: 700;
-  color: #fff;
-  text-transform: uppercase;
-}
-.allergene-chip-nome {
-  font-size: 12px;
-  color: #333;
-  white-space: nowrap;
-}
-.allergene-chip-check {
-  font-size: 13px;
-  color: #fff;
-  margin-left: 2px;
-}
-
-.allergene-custom-row {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-}
-.allergene-custom-input {
-  flex: 1;
-}
-
-.btn-allergene-add {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1.5px solid #ccc;
-  background: #f5f5f5;
-  font-weight: 600;
-  font-size: 0.88rem;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s;
-  &:hover:not(:disabled) {
-    background: #e0e0e0;
-  }
-  &:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
-}
-
-.allergeni-selezionati-riepilogo {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  padding: 8px 10px;
-  background: #f9f9f9;
-  border-radius: 8px;
-}
-.riepilogo-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: #666;
-}
-.riepilogo-chip {
+.pa-allergene-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #fff;
-}
-.riepilogo-remove {
+  gap: 6px;
+  padding: 5px 10px 5px 5px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
-  font-size: 15px;
-  line-height: 1;
-  opacity: 0.8;
-  margin-left: 1px;
-  &:hover {
-    opacity: 1;
+  background: rgba(255, 255, 255, 0.06);
+  transition: all 0.18s;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.82rem;
+  font-weight: 600;
+
+  &.selected {
+    border-color: $accent-soft;
+    background: rgba(200, 16, 46, 0.2);
+    color: $accent-soft;
   }
 }
 
-.prodotto-item-allergeni {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 5px;
-}
-
-.allergene-lista-cerchio {
-  width: 24px;
-  height: 24px;
+.pa-allergene-icona {
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -356,104 +268,210 @@ select.form-control {
   overflow: hidden;
   flex-shrink: 0;
 }
-.allergene-lista-img {
+
+.pa-allergene-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   border-radius: 50%;
 }
-.allergene-lista-iniziale {
+.pa-allergene-iniziale {
   font-size: 10px;
   font-weight: 700;
   color: #fff;
   text-transform: uppercase;
 }
 
-// ══════════════════════════════════════════════════
-//  RESPONSIVE MOBILE
-// ══════════════════════════════════════════════════
+.pa-custom-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.pa-btn-custom {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+  &:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+}
+
+// ── Lista prodotti ────────────────────────────────────
+.pa-lista-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+
+  h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text-white;
+    margin: 0;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.pa-lista-empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: $muted-white;
+  font-size: 0.9rem;
+}
+
+.pa-prodotto-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.85rem 1rem;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  margin-bottom: 8px;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.09);
+  }
+}
+
+.pa-prodotto-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pa-prodotto-nome {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: $text-white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+.pa-prodotto-desc {
+  display: block;
+  font-size: 0.78rem;
+  color: $muted-white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pa-prodotto-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pa-prodotto-prezzo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: $accent-soft;
+  white-space: nowrap;
+}
+
+// Allergeni nella lista
+.pa-prodotto-allergeni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.pa-lista-cerchio {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.pa-lista-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+.pa-lista-iniziale {
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.pa-btn-elimina {
+  background: transparent;
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  color: #f87171;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  &:hover {
+    background: rgba(248, 113, 113, 0.15);
+  }
+}
+
+// ══ RESPONSIVE ════════════════════════════════════════
 
 @media (max-width: 768px) {
-  .prodotto-container {
-    margin: 1rem auto;
-    padding: 0 1rem;
+  .pa-inner {
+    padding: 1.5rem 1rem 2rem;
   }
-
-  .prodotto-header {
+  .pa-header h1 {
+    font-size: 1.45rem;
+  }
+  .pa-header {
     margin-bottom: 1.25rem;
-    .prodotto-title {
-      font-size: 1.4rem;
-    }
   }
-
-  // Colonne: form sopra, lista sotto
-  .prodotto-layout {
+  .pa-layout {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 1.25rem;
   }
-
-  .form-card,
-  .lista-card {
-    padding: 1.2rem 1rem;
+  .pa-card {
+    padding: 1.25rem 1rem;
   }
-
-  // I chip allergeni sono più piccoli su mobile
-  .allergene-chip {
+  .pa-allergene-chip {
     padding: 4px 8px 4px 4px;
-  }
-  .allergene-chip-nome {
-    font-size: 11px;
-  }
-
-  .allergene-custom-row {
-    flex-direction: row; // mantieni row, il bottone resta a destra
   }
 }
 
 @media (max-width: 480px) {
-  .prodotto-header .prodotto-title {
+  .pa-header h1 {
     font-size: 1.2rem;
   }
-
-  .form-card,
-  .lista-card {
+  .pa-card {
     padding: 1rem 0.875rem;
   }
-
-  // Il selettore menu+portata su mobile: dropdown a tutto schermo
-  .form-control {
+  .pa-form-control {
     font-size: 1rem;
-  } // più facile da toccare
-
-  .btn-aggiungi {
+  }
+  .pa-btn-aggiungi {
     padding: 14px;
     font-size: 1.05rem;
-  } // bottone grande per il dito
-
-  // Allergeni: chip più compatte su schermi piccoli
-  .allergeni-grid {
-    gap: 6px;
   }
-  .allergene-chip {
-    padding: 3px 7px 3px 3px;
-  }
-  .allergene-chip-icona {
-    width: 24px;
-    height: 24px;
-  }
-  .allergene-chip-nome {
-    font-size: 10px;
-  }
-
-  // Lista prodotto: layout compatto
-  .prodotto-item {
-    padding: 10px 10px;
+  .pa-prodotto-item {
+    padding: 0.75rem;
     gap: 0.75rem;
-  }
-  .prodotto-item-nome {
-    font-size: 0.9rem;
-  }
-  .prodotto-item-prezzo {
-    font-size: 0.95rem;
   }
 }

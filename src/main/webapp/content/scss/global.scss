@@ -234,3 +234,24 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   }
 }
 /* jhipster-needle-scss-add-main JHipster will add new css style */
+
+/* ==========================================================================
+   HOME PAGE — rimuovi padding/bordi del .jh-card wrapper
+   In questo modo jhi-home può estendersi a tutto schermo
+========================================================================== */
+
+/* Quando il card wrapper contiene jhi-home, azzera tutto */
+.card.jh-card:has(jhi-home) {
+  padding: 0 !important;
+  margin-top: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Fallback per browser che non supportano :has() */
+jhi-home {
+  display: block;
+  /* Il margin negativo nel :host del componente si occupa del resto */
+}

@@ -1,160 +1,146 @@
-<div class="prodotto-container">
-  <div class="prodotto-header">
-    <h1 class="prodotto-title">🍽️ Gestione Prodotti</h1>
-    <p class="prodotto-subtitle">Aggiungi i piatti al tuo menu</p>
-  </div>
-
-  <div *ngIf="isLoadingInit" class="loading">⏳ Caricamento...</div>
-
-  <div *ngIf="!isLoadingInit" class="prodotto-layout">
-    <!-- COLONNA SINISTRA: Form -->
-    <div class="form-card">
-      <!-- Selezione menu e portata -->
-      <div *ngIf="!portataPreimpostata" class="form-section">
-        <h2 class="form-section-title">📋 Seleziona dove aggiungere</h2>
-
-        <div class="form-group">
-          <label class="form-label">Menu *</label>
-          <select class="form-control" [(ngModel)]="menuSelezionatoId" (ngModelChange)="onMenuSelezionato()">
-            <option [ngValue]="null">-- Scegli un menu --</option>
-            <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
-          </select>
-        </div>
-
-        <div class="form-group" *ngIf="portate.length > 0">
-          <label class="form-label">Portata *</label>
-          <select class="form-control" [(ngModel)]="portataSelezionataId" (ngModelChange)="onPortataSelezionata()">
-            <option [ngValue]="null">-- Scegli una portata --</option>
-            <option *ngFor="let p of portate" [value]="p.id">{{ nomePortata(p) }}</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Form prodotto -->
-      <div class="form-section" *ngIf="portataSelezionataId">
-        <h2 class="form-section-title">➕ Nuovo Prodotto</h2>
-
-        <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
-        <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
-
-        <div class="form-group">
-          <label class="form-label">Nome *</label>
-          <input type="text" class="form-control" [(ngModel)]="nome" placeholder="es. Spaghetti alla carbonara" maxlength="100" />
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Descrizione</label>
-          <textarea class="form-control" [(ngModel)]="descrizione" rows="2" placeholder="Ingredienti, note o varianti..."></textarea>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Prezzo (€) *</label>
-          <input type="number" class="form-control" [(ngModel)]="prezzo" placeholder="0.00" min="0" step="0.50" />
-        </div>
-
-        <!-- ─── SEZIONE ALLERGENI ─── -->
-        <div class="form-group allergeni-sezione" *ngIf="allergeniDisponibili.length > 0">
-          <label class="form-label">Allergeni</label>
-          <p class="allergeni-hint">Clicca per selezionare/deselezionare gli allergeni presenti nel prodotto</p>
-
-          <div class="allergeni-grid">
-            <div
-              *ngFor="let a of allergeniDisponibili"
-              class="allergene-chip"
-              [class.selected]="allergeniSelezionati.has(a.id)"
-              [style.borderColor]="allergeniSelezionati.has(a.id) ? a.colore || '#555' : '#ddd'"
-              [style.backgroundColor]="allergeniSelezionati.has(a.id) ? (a.colore || '#555') + '22' : '#fafafa'"
-              (click)="toggleAllergene(a.id)"
-              [title]="a.nome"
-            >
-              <!-- Icona immagine se disponibile -->
-              <div class="allergene-chip-icona" [style.backgroundColor]="a.colore || '#888'">
-                <img
-                  *ngIf="a.icona && a.iconaContentType"
-                  [src]="'data:' + a.iconaContentType + ';base64,' + a.icona"
-                  [alt]="a.nome"
-                  class="allergene-chip-img"
-                />
-                <!-- Fallback: iniziale del nome con colore -->
-                <span *ngIf="!a.icona" class="allergene-chip-iniziale">{{ a.nome.charAt(0) }}</span>
-              </div>
-              <span class="allergene-chip-nome">{{ a.nome }}</span>
-              <span class="allergene-chip-check" *ngIf="allergeniSelezionati.has(a.id)">✓</span>
-            </div>
-          </div>
-
-          <!-- Allergene personalizzato -->
-          <div class="allergene-custom-row">
-            <input
-              type="text"
-              class="form-control allergene-custom-input"
-              [(ngModel)]="nomeAllergeneCustom"
-              placeholder="Aggiungi allergene personalizzato..."
-              (keyup.enter)="aggiungiAllergeneCustom()"
-            />
-            <button class="btn-allergene-add" (click)="aggiungiAllergeneCustom()" [disabled]="!nomeAllergeneCustom.trim()">
-              + Aggiungi
-            </button>
-          </div>
-
-          <!-- Riepilogo selezionati -->
-          <div class="allergeni-selezionati-riepilogo" *ngIf="allergeniSelezionati.size > 0">
-            <span class="riepilogo-label">Selezionati:</span>
-            <span
-              *ngFor="let id of allergeniSelezionatiArray"
-              class="riepilogo-chip"
-              [style.backgroundColor]="getAllergeneById(id)?.colore || '#555'"
-            >
-              {{ getAllergeneById(id)?.nome }}
-              <span class="riepilogo-remove" (click)="toggleAllergene(id)">×</span>
-            </span>
-          </div>
-        </div>
-        <!-- ─── FINE SEZIONE ALLERGENI ─── -->
-
-        <button class="btn-aggiungi" (click)="aggiungiProdotto()" [disabled]="isSaving || !formValido()">
-          <span *ngIf="!isSaving">➕ Aggiungi Prodotto</span>
-          <span *ngIf="isSaving">⏳ Salvataggio...</span>
-        </button>
-      </div>
-
-      <div *ngIf="!portataSelezionataId && !portataPreimpostata" class="empty-hint">
-        👆 Seleziona un menu e una portata per iniziare ad aggiungere prodotti
-      </div>
+<div class="pa-page">
+  <div class="pa-inner">
+    <!-- Header -->
+    <div class="pa-header">
+      <h1>🍽️ Gestione Prodotti</h1>
+      <p>Aggiungi i piatti al tuo menu</p>
     </div>
 
-    <!-- COLONNA DESTRA: Lista prodotti -->
-    <div class="lista-card">
-      <h2 class="form-section-title">
-        📦 Prodotti in questa portata
-        <span class="count-badge">{{ prodottiAggiunti.length }}</span>
-      </h2>
+    <div *ngIf="isLoadingInit" class="pa-loading">
+      <div class="pa-spinner"></div>
+      <span>Caricamento...</span>
+    </div>
 
-      <div *ngIf="prodottiAggiunti.length === 0" class="empty-lista">Nessun prodotto ancora. Aggiungine uno!</div>
+    <div *ngIf="!isLoadingInit" class="pa-layout">
+      <!-- COLONNA SINISTRA: Form -->
+      <div class="pa-card">
+        <!-- Selezione menu e portata -->
+        <div *ngIf="!portataPreimpostata" class="pa-section">
+          <h2 class="pa-section-title">📋 Seleziona dove aggiungere</h2>
 
-      <div class="prodotti-lista">
-        <div *ngFor="let p of prodottiAggiunti" class="prodotto-item">
-          <div class="prodotto-item-body">
-            <div class="prodotto-item-nome">{{ p.nome }}</div>
-            <div class="prodotto-item-desc" *ngIf="p.descrizione">{{ p.descrizione }}</div>
-            <!-- Icone allergeni nella lista prodotti -->
-            <div class="prodotto-item-allergeni" *ngIf="p.allergenis?.length > 0">
-              <ng-container *ngFor="let a of p.allergenis">
-                <div class="allergene-lista-cerchio" [style.backgroundColor]="a.colore || '#888'" [title]="a.nome">
+          <div class="pa-form-group">
+            <label class="pa-form-label">Menu *</label>
+            <select class="pa-form-control" [(ngModel)]="menuSelezionatoId" (ngModelChange)="onMenuSelezionato()">
+              <option [ngValue]="null">-- Scegli un menu --</option>
+              <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
+            </select>
+          </div>
+
+          <div class="pa-form-group" *ngIf="portate.length > 0">
+            <label class="pa-form-label">Portata *</label>
+            <select class="pa-form-control" [(ngModel)]="portataSelezionataId" (ngModelChange)="onPortataSelezionata()">
+              <option [ngValue]="null">-- Scegli una portata --</option>
+              <option *ngFor="let p of portate" [value]="p.id">{{ nomePortata(p) }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Form prodotto -->
+        <div class="pa-section" *ngIf="portataSelezionataId">
+          <h2 class="pa-section-title">➕ Nuovo Prodotto</h2>
+
+          <div *ngIf="successMessage" class="pa-alert pa-alert-success">{{ successMessage }}</div>
+          <div *ngIf="errorMessage" class="pa-alert pa-alert-error">{{ errorMessage }}</div>
+
+          <div class="pa-form-group">
+            <label class="pa-form-label">Nome *</label>
+            <input type="text" class="pa-form-control" [(ngModel)]="nome" placeholder="es. Spaghetti alla carbonara" maxlength="100" />
+          </div>
+
+          <div class="pa-form-group">
+            <label class="pa-form-label">Descrizione</label>
+            <textarea class="pa-form-control" [(ngModel)]="descrizione" rows="2" placeholder="Ingredienti, note o varianti..."></textarea>
+          </div>
+
+          <div class="pa-form-group">
+            <label class="pa-form-label">Prezzo (€) *</label>
+            <input type="number" class="pa-form-control" [(ngModel)]="prezzo" placeholder="0.00" min="0" step="0.50" />
+          </div>
+
+          <!-- Allergeni -->
+          <div class="pa-form-group" *ngIf="allergeniDisponibili.length > 0">
+            <label class="pa-form-label">Allergeni</label>
+            <p class="pa-allergeni-hint">Clicca per selezionare/deselezionare gli allergeni</p>
+            <div class="pa-allergeni-grid">
+              <div
+                *ngFor="let a of allergeniDisponibili"
+                class="pa-allergene-chip"
+                [class.selected]="allergeniSelezionati.has(a.id)"
+                [style.borderColor]="allergeniSelezionati.has(a.id) ? a.colore || '#c8102e' : ''"
+                (click)="toggleAllergene(a.id)"
+              >
+                <div class="pa-allergene-icona" [style.backgroundColor]="a.colore || '#888'">
                   <img
                     *ngIf="a.icona && a.iconaContentType"
                     [src]="'data:' + a.iconaContentType + ';base64,' + a.icona"
                     [alt]="a.nome"
-                    class="allergene-lista-img"
+                    class="pa-allergene-img"
                   />
-                  <span *ngIf="!a.icona" class="allergene-lista-iniziale">{{ a.nome.charAt(0) }}</span>
+                  <span *ngIf="!a.icona" class="pa-allergene-iniziale">{{ a.nome.charAt(0) }}</span>
+                </div>
+                {{ a.nome }}
+              </div>
+            </div>
+            <div class="pa-custom-row">
+              <input
+                type="text"
+                class="pa-form-control"
+                [(ngModel)]="nomeAllergeneCustom"
+                placeholder="Allergene personalizzato..."
+                style="flex: 1"
+              />
+              <button class="pa-btn-custom" (click)="aggiungiAllergeneCustom()" type="button">+ Aggiungi</button>
+            </div>
+          </div>
+
+          <button class="pa-btn-aggiungi" (click)="aggiungiProdotto()" [disabled]="!formValido() || isSaving">
+            {{ isSaving ? 'Salvataggio...' : '+ Aggiungi Prodotto' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- COLONNA DESTRA: Lista prodotti aggiunti -->
+      <div class="pa-card">
+        <div class="pa-lista-header">
+          <h2>
+            Prodotti aggiunti <span class="pa-count-badge">{{ prodottiAggiunti.length }}</span>
+          </h2>
+        </div>
+
+        <div *ngIf="prodottiAggiunti.length === 0" class="pa-lista-empty">Nessun prodotto aggiunto ancora</div>
+
+        <div *ngFor="let p of prodottiAggiunti" class="pa-prodotto-item">
+          <div class="pa-prodotto-info">
+            <span class="pa-prodotto-nome">{{ p.nome }}</span>
+            <span class="pa-prodotto-desc" *ngIf="p.descrizione">{{ p.descrizione }}</span>
+          </div>
+          <div class="pa-prodotto-meta">
+            <span class="pa-prodotto-prezzo">{{ formatPrezzo(p.prezzo) }}</span>
+
+            <!-- Allergeni mini -->
+            <div class="pa-prodotto-allergeni" *ngIf="p.allergenis && p.allergenis.length > 0">
+              <ng-container *ngFor="let a of p.allergenis">
+                <div class="pa-lista-cerchio" [style.backgroundColor]="a.colore || '#888'" [title]="a.nome">
+                  <img
+                    *ngIf="a.icona && a.iconaContentType"
+                    [src]="'data:' + a.iconaContentType + ';base64,' + a.icona"
+                    [alt]="a.nome"
+                    class="pa-lista-img"
+                  />
+                  <span *ngIf="!a.icona || a.isCustom" class="pa-lista-iniziale">
+                    <img *ngIf="a.isCustom" src="/content/images/allergene-custom.png" [alt]="a.nome" class="pa-lista-img" />
+                    <span *ngIf="!a.isCustom && !a.icona">{{ a.nome.charAt(0) }}</span>
+                  </span>
                 </div>
               </ng-container>
             </div>
-          </div>
-          <div class="prodotto-item-right">
-            <span class="prodotto-item-prezzo">{{ formatPrezzo(p.prezzo) }}</span>
-            <button class="btn-elimina-prodotto" (click)="eliminaProdotto(p.id)" title="Elimina">🗑</button>
+
+            <button class="pa-btn-elimina" (click)="eliminaProdotto(p.id)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>

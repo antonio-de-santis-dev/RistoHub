@@ -1,303 +1,484 @@
-$accent: #8b1a1a;
-$success: #28a745;
-$text: #1a1a2e;
-$muted: #6b7280;
-$border: #e5e7eb;
-$radius: 12px;
-$shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+// ══════════════════════════════════════════════════════
+//  RistoHub — Piatti del Giorno
+//  Fix: niente spazi, card solide, footer
+// ══════════════════════════════════════════════════════
 
-.piatti-container {
-  max-width: 1100px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
+$accent: #c8102e;
+$accent-soft: #ffb3be;
+$text-white: #ffffff;
+$muted-white: rgba(255, 255, 255, 0.65);
+$radius: 16px;
+
+// ── Host: annulla TUTTI i margini/padding del layout JHipster
+:host {
+  display: block;
+  margin: -1.5rem -15px 0; // rimuove gap laterali e top
 }
 
-.piatti-header {
+.pg-page {
+  min-height: 100vh;
+  position: relative;
+
+  background-image: url('/content/images/unnamed.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-color: #1a0a05;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 0;
+    pointer-events: none;
+  }
+}
+
+.pg-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 5.5rem 1.5rem 0; // top alto per navbar, 0 bottom (footer lo gestisce)
+}
+
+// ── Header ────────────────────────────────────────────
+.pg-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
+  margin-bottom: 2rem;
 
-  .piatti-title {
-    font-size: 1.8rem;
+  h1 {
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-size: 1.75rem;
     font-weight: 700;
-    color: $text;
+    color: $text-white;
     margin: 0 0 4px;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8);
   }
-
-  .piatti-subtitle {
-    color: $muted;
+  p {
+    color: $muted-white;
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 }
 
-.header-actions {
+.pg-header-left {
+  display: flex;
+  flex-direction: column;
+}
+.pg-header-actions {
   display: flex;
   gap: 10px;
 }
 
 .btn-crea,
 .btn-seleziona {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1.2rem;
-  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.65rem 1.2rem;
   font-size: 0.9rem;
+  font-weight: 700;
+  font-family: inherit;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .btn-crea {
   background: $accent;
-  color: white;
+  color: #fff;
   &:hover {
-    background: darken($accent, 8%);
+    background: #a50d25;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba($accent, 0.45);
   }
 }
 
 .btn-seleziona {
-  background: #007bff;
-  color: white;
+  background: rgba(59, 130, 246, 0.25);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.3);
   &:hover {
-    background: darken(#007bff, 8%);
+    background: rgba(59, 130, 246, 0.35);
+    transform: translateY(-1px);
   }
 }
 
-.loading,
-.empty-state {
+// ── Loading / Empty ───────────────────────────────────
+.pg-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 4rem;
+  color: $muted-white;
+  font-size: 0.95rem;
+}
+
+.pg-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid rgba(255, 255, 255, 0.15);
+  border-top-color: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pg-empty {
   text-align: center;
   padding: 4rem 2rem;
-  color: $muted;
-  font-size: 1.1rem;
+  color: $muted-white;
+  .pg-empty-icon {
+    font-size: 3rem;
+    opacity: 0.5;
+    margin-bottom: 1rem;
+    display: block;
+  }
+  h3 {
+    color: $text-white;
+    font-size: 1.2rem;
+    margin: 0 0 8px;
+  }
+  p {
+    font-size: 0.9rem;
+    margin: 0;
+  }
 }
 
-.empty-hint {
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-  opacity: 0.8;
-}
-
-.piatti-grid {
+// ── Grid piatti ───────────────────────────────────────
+.pg-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
 }
 
-.piatto-card {
-  background: white;
+// ── Card piatto — BIANCA SOLIDA ───────────────────────
+.pg-card {
+  background: #ffffff;
   border-radius: $radius;
-  box-shadow: $shadow;
   overflow: hidden;
-  transition: all 0.3s;
-  border: 2px solid transparent;
-
-  &.inattivo {
-    opacity: 0.6;
-    background: #f9f9f9;
-    border-color: #ddd;
-  }
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform 0.22s,
+    box-shadow 0.22s;
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+  }
+  &.pg-card-inattivo {
+    opacity: 0.65;
   }
 }
 
-.piatto-header-card {
-  padding: 10px 14px;
-  background: #f8f9fa;
-  border-bottom: 1px solid $border;
+.pg-card-bar {
+  height: 4px;
+  flex-shrink: 0;
+  transition: background 0.3s;
 }
 
-.piatto-badge {
+.pg-card-badge-row {
+  padding: 10px 14px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pg-badge {
   display: inline-block;
-  background: #007bff;
-  color: white;
   font-size: 0.72rem;
   font-weight: 700;
   padding: 3px 10px;
   border-radius: 20px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-
-  &.piatto-badge-nuovo {
-    background: $success;
+  &.pg-badge-menu {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+  &.pg-badge-custom {
+    background: #dcfce7;
+    color: #15803d;
   }
 }
 
-.piatto-body {
-  padding: 1.2rem;
+.pg-menu-nome {
+  font-size: 0.75rem;
+  color: #6b7280;
 }
-.piatto-nome {
-  font-size: 1.1rem;
+.pg-card-body {
+  padding: 0.9rem 1.2rem 1rem;
+  flex: 1;
+}
+
+.pg-nome {
+  font-size: 1.05rem;
   font-weight: 700;
-  margin: 0 0 6px;
-  color: $text;
+  color: #111;
+  margin: 0 0 5px;
 }
-.piatto-desc {
-  font-size: 0.85rem;
-  color: $muted;
+.pg-desc {
+  font-size: 0.84rem;
+  color: #6b7280;
   margin: 0 0 10px;
   line-height: 1.4;
 }
-.piatto-prezzo {
-  font-size: 1.2rem;
+.pg-prezzo {
+  font-size: 1.1rem;
   font-weight: 700;
   color: $accent;
 }
 
-.piatto-actions {
+.pg-allergeni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.pg-all-cerchio {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.pg-all-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+.pg-all-iniziale {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.pg-card-actions {
   display: flex;
   gap: 8px;
   padding: 10px 14px;
-  background: #f8f9fa;
-  border-top: 1px solid $border;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
 }
 
-.btn-toggle {
+.pg-btn-toggle {
   flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: #f8d7da;
-  color: #721c24;
-
-  &.attivo {
-    background: #d4edda;
-    color: #155724;
-  }
-  &:hover {
-    opacity: 0.85;
-  }
-}
-
-.btn-elimina-card {
-  background: transparent;
-  border: 1.5px solid #f8d7da;
-  color: #721c24;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 8px 12px;
-  font-size: 0.9rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
   transition: all 0.2s;
+  &.pg-visibile {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+  }
+  &.pg-nascosto {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+  }
   &:hover {
-    background: #f8d7da;
+    opacity: 0.8;
   }
 }
 
-// Modal
-.modal-overlay {
+.pg-btn-delete {
+  background: transparent;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    background: #fee2e2;
+  }
+}
+
+// ── Footer ────────────────────────────────────────────
+.pg-footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  margin-top: 3rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  p {
+    color: $muted-white;
+    font-size: 0.82rem;
+    margin: 0;
+    strong {
+      color: rgba(255, 255, 255, 0.85);
+    }
+  }
+}
+
+// ══ MODAL ════════════════════════════════════════════
+.pg-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
   padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.modal-box {
-  background: white;
-  border-radius: $radius;
-  padding: 2rem;
-  max-width: 500px;
+.pg-modal-box {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2rem 1.75rem;
+  max-width: 520px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+  animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
-.modal-title {
-  font-size: 1.3rem;
+.pg-modal-title {
+  font-size: 1.25rem;
   font-weight: 700;
+  color: #111;
   margin: 0 0 1.5rem;
-  color: $text;
+  text-align: center;
 }
-.modal-content {
-  margin-bottom: 1.5rem;
-}
-
-.form-group {
+.pg-form-group {
   margin-bottom: 1rem;
 }
-.form-label {
+.pg-form-label {
   display: block;
   font-weight: 700;
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   margin-bottom: 6px;
-  color: $text;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
-.form-control {
+
+.pg-form-control {
   width: 100%;
-  border: 1.5px solid $border;
-  border-radius: 8px;
+  background: #fafafa;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 9px;
   padding: 10px 14px;
   font-size: 0.95rem;
   box-sizing: border-box;
   font-family: inherit;
+  color: #111;
+  transition: border-color 0.2s;
+  &::placeholder {
+    color: #c4c4c4;
+  }
   &:focus {
     outline: none;
-    border-color: $accent;
+    border-color: #111;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+  }
+  option {
+    background: #fff;
+    color: #111;
   }
 }
-select.form-control {
-  cursor: pointer;
-}
-
-.alert {
-  border-radius: 8px;
-  padding: 10px 14px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-  &.alert-success {
-    background: #d4edda;
-    color: #155724;
-  }
-  &.alert-error {
-    background: #f8d7da;
-    color: #721c24;
-  }
+textarea.pg-form-control {
+  resize: vertical;
+  min-height: 72px;
 }
 
-.modal-actions {
+.pg-modal-actions {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+  margin-top: 1.5rem;
   flex-wrap: wrap;
 }
 
-.btn-annulla {
-  background: #eee;
-  color: #333;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
+.pg-btn-cancel {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  padding: 0.65rem 1.4rem;
+  border-radius: 9px;
   cursor: pointer;
   font-weight: 600;
+  font-family: inherit;
+  font-size: 0.9rem;
   transition: background 0.2s;
   &:hover {
-    background: #ddd;
+    background: #e5e7eb;
   }
 }
 
-.btn-salva {
+.pg-btn-save {
   background: $accent;
-  color: white;
+  color: #fff;
   border: none;
-  padding: 10px 24px;
-  border-radius: 8px;
+  padding: 0.65rem 1.4rem;
+  border-radius: 9px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: inherit;
+  font-size: 0.9rem;
   transition: background 0.2s;
-  &:hover:not(:disabled) {
-    background: darken($accent, 8%);
+  &:hover {
+    background: #a50d25;
   }
   &:disabled {
     opacity: 0.5;
@@ -305,103 +486,169 @@ select.form-control {
   }
 }
 
-// ══════════════════════════════════════════════════
-//  RESPONSIVE MOBILE
-// ══════════════════════════════════════════════════
-
-@media (max-width: 768px) {
-  .piatti-container {
-    margin: 1rem auto;
-    padding: 0 1rem;
+.pg-alert {
+  border-radius: 9px;
+  padding: 10px 14px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  &.pg-alert-success {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
   }
+  &.pg-alert-error {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+  }
+}
 
-  .piatti-header {
+.pg-allergeni-hint {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+.pg-allergeni-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 0.75rem;
+}
+
+.pg-allergene-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 5px;
+  border-radius: 20px;
+  border: 1.5px solid #e5e7eb;
+  cursor: pointer;
+  background: #fff;
+  transition: all 0.18s;
+  color: #374151;
+  font-size: 0.82rem;
+  font-weight: 600;
+  &.selected {
+    border-color: $accent;
+    background: #fff0f2;
+    color: $accent;
+  }
+}
+
+.pg-allergene-icona {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.pg-allergene-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+.pg-allergene-iniziale {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.pg-custom-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.pg-btn-custom {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+  &:hover {
+    background: #e5e7eb;
+  }
+}
+
+.pg-prodotto-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover {
+    background: #f0f0f0;
+  }
+}
+.pg-prodotto-nome {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #111;
+}
+.pg-prodotto-prezzo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: $accent;
+  white-space: nowrap;
+}
+
+// ══ RESPONSIVE ════════════════════════════════════════
+@media (max-width: 768px) {
+  :host {
+    margin: -1rem -15px 0;
+  }
+  .pg-inner {
+    padding: 4.5rem 1rem 0;
+  }
+  .pg-header {
     flex-direction: column;
     align-items: flex-start;
-    margin-bottom: 1.25rem;
-    gap: 0.75rem;
-
-    .piatti-title {
-      font-size: 1.4rem;
-    }
-    .piatti-subtitle {
-      font-size: 0.88rem;
-    }
   }
-
-  .header-actions {
+  .pg-header-actions {
     width: 100%;
-    flex-direction: row;
   }
-
   .btn-crea,
   .btn-seleziona {
     flex: 1;
-    text-align: center;
-    padding: 0.7rem 0.8rem;
+    justify-content: center;
   }
-
-  .piatti-grid {
+  .pg-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-
-  .piatto-body {
-    padding: 1rem;
-  }
-  .piatto-nome {
-    font-size: 1rem;
-  }
-  .piatto-prezzo {
-    font-size: 1.1rem;
-  }
-
-  .piatto-actions {
-    padding: 8px 10px;
-    gap: 6px;
-  }
-
-  .btn-toggle {
-    padding: 10px 12px;
-    font-size: 0.82rem;
-  }
-
-  .modal-box {
-    padding: 1.5rem 1.2rem;
-    max-height: 95vh;
-  }
-
-  .modal-title {
-    font-size: 1.15rem;
-    margin-bottom: 1.2rem;
-  }
-
-  .modal-actions {
-    flex-direction: row;
-    justify-content: stretch;
-
-    button {
-      flex: 1;
-      text-align: center;
-    }
+  .pg-modal-box {
+    padding: 1.5rem 1.25rem;
   }
 }
 
 @media (max-width: 480px) {
-  .piatti-header .piatti-title {
-    font-size: 1.2rem;
-  }
-
-  .piatto-card:hover {
+  .pg-card:hover {
     transform: none;
-  } // disabilita hover lift su touch
-
-  .modal-overlay {
+  }
+  .pg-modal-overlay {
     padding: 0;
     align-items: flex-end;
   }
-  .modal-box {
-    border-radius: $radius $radius 0 0; // bottom sheet su mobile
+  .pg-modal-box {
+    border-radius: 16px 16px 0 0;
     max-height: 92vh;
     width: 100%;
     max-width: 100%;

@@ -1,130 +1,128 @@
-<div class="menu-list-container">
-  <div class="menu-list-header">
-    <div class="header-left">
-      <h1>I miei Menu</h1>
-      <p class="header-sub">{{ menus.length }} menu creati</p>
+<div class="ml-page">
+  <div class="ml-inner">
+    <!-- Header -->
+    <div class="ml-header">
+      <div class="ml-header-left">
+        <h1>I miei Menu</h1>
+        <p>{{ menus.length }} menu creati</p>
+      </div>
+      <button class="btn-crea" routerLink="/menu-wizard">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Crea Menu
+      </button>
     </div>
-    <button class="btn-crea" routerLink="/menu-wizard">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-      Crea Menu
-    </button>
-  </div>
 
-  @if (isLoading) {
-    <div class="loading">
-      <div class="loading-spinner"></div>
-      <span>Caricamento menu...</span>
-    </div>
-  } @else if (menus.length === 0) {
-    <div class="empty-state">
-      <div class="empty-icon">🍽️</div>
-      <h3>Nessun menu ancora creato</h3>
-      <p>Crea il tuo primo menu digitale e condividilo con i clienti tramite QR Code.</p>
-      <button class="btn-crea" routerLink="/menu-wizard">Crea il tuo primo menu</button>
-    </div>
-  } @else {
-    <div class="cards-grid">
-      @for (menu of menus; track menu.id) {
-        <div class="menu-card" [class.menu-inattivo]="!menu.attivo">
-          <div class="card-color-bar" [style.background]="menu.colorePrimario ?? '#8b1a1a'"></div>
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="ml-loading">
+        <div class="ml-spinner"></div>
+        <span>Caricamento menu...</span>
+      </div>
+    }
 
-          <div class="card-body">
-            <div class="card-top-row">
-              <h2>{{ menu.nome }}</h2>
-              <!-- TOGGLE ATTIVO/INATTIVO CLICCABILE -->
-              <button
-                class="btn-toggle-attivo"
-                [class.is-attivo]="menu.attivo"
-                [class.is-inattivo]="!menu.attivo"
-                [disabled]="toggling === menu.id"
-                (click)="toggleAttivo(menu)"
-                [title]="
-                  menu.attivo
-                    ? 'Clicca per disattivare (clienti non potranno vedere il menu)'
-                    : 'Clicca per attivare (clienti potranno vedere il menu)'
-                "
-              >
-                <span class="toggle-dot"></span>
-                <span class="toggle-label">
-                  @if (toggling === menu.id) {
-                    ⏳
-                  } @else {
-                    {{ menu.attivo ? 'Attivo' : 'Inattivo' }}
-                  }
-                </span>
+    <!-- Empty -->
+    @else if (menus.length === 0) {
+      <div class="ml-empty">
+        <span class="ml-empty-icon">🍽️</span>
+        <h3>Nessun menu ancora creato</h3>
+        <p>Crea il tuo primo menu digitale e condividilo con i clienti tramite QR Code.</p>
+        <button class="btn-crea" routerLink="/menu-wizard">Crea il tuo primo menu</button>
+      </div>
+    }
+
+    <!-- Grid -->
+    @else {
+      <div class="ml-grid">
+        @for (menu of menus; track menu.id) {
+          <div class="ml-card" [class.ml-card-inattivo]="!menu.attivo">
+            <div class="ml-card-bar" [style.background]="menu.colorePrimario ?? '#c8102e'"></div>
+
+            <div class="ml-card-body">
+              <div class="ml-card-top">
+                <h2>{{ menu.nome }}</h2>
+                <button
+                  class="btn-toggle-attivo"
+                  [class.is-attivo]="menu.attivo"
+                  [class.is-inattivo]="!menu.attivo"
+                  [disabled]="toggling === menu.id"
+                  (click)="toggleAttivo(menu)"
+                  [title]="menu.attivo ? 'Clicca per disattivare' : 'Clicca per attivare'"
+                >
+                  <span class="toggle-dot"></span>
+                  <span>
+                    @if (toggling === menu.id) {
+                      ⏳
+                    } @else {
+                      {{ menu.attivo ? 'Attivo' : 'Inattivo' }}
+                    }
+                  </span>
+                </button>
+              </div>
+
+              @if (menu.descrizione) {
+                <p class="ml-card-desc">{{ menu.descrizione }}</p>
+              }
+
+              <div class="ml-card-meta">
+                <span class="ml-template-badge">{{ templateLabel(menu.templateStyle) }}</span>
+                @if (!menu.attivo) {
+                  <span class="ml-inattivo-hint">🔒 Non visibile</span>
+                }
+              </div>
+            </div>
+
+            <div class="ml-card-actions">
+              <button class="ml-btn ml-btn-view" (click)="visualizza(menu.id)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                Visualizza
+              </button>
+              <button class="ml-btn ml-btn-edit" (click)="modifica(menu.id)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                Modifica
+              </button>
+              <button class="ml-btn ml-btn-qr" (click)="mostraQr(menu.id)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="5" height="5" />
+                  <rect x="16" y="3" width="5" height="5" />
+                  <rect x="3" y="16" width="5" height="5" />
+                  <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
+                  <path d="M21 21v.01" />
+                </svg>
+                QR Code
+              </button>
+              <button class="ml-btn ml-btn-delete" (click)="chiediConfermaElimina(menu)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                </svg>
+                Elimina
               </button>
             </div>
-
-            @if (menu.descrizione) {
-              <p class="descrizione">{{ menu.descrizione }}</p>
-            }
-
-            <div class="card-meta">
-              <span class="template-badge">{{ templateLabel(menu.templateStyle) }}</span>
-              @if (!menu.attivo) {
-                <span class="inattivo-hint">🔒 Non visibile ai clienti</span>
-              }
-            </div>
           </div>
-
-          <div class="card-actions">
-            <button class="btn-action btn-visualizza" (click)="visualizza(menu.id)" title="Visualizza">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-              Visualizza
-            </button>
-            <button class="btn-action btn-modifica" (click)="modifica(menu.id)" title="Modifica">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
-              Modifica
-            </button>
-            <button class="btn-action btn-qr" (click)="mostraQr(menu.id)" title="QR Code">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="5" height="5" />
-                <rect x="16" y="3" width="5" height="5" />
-                <rect x="3" y="16" width="5" height="5" />
-                <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
-                <path d="M21 21v.01" />
-                <path d="M12 7v3a2 2 0 0 1-2 2H7" />
-                <path d="M3 12h.01" />
-                <path d="M12 3h.01" />
-                <path d="M12 16v.01" />
-                <path d="M16 12h1" />
-                <path d="M21 12v.01" />
-                <path d="M12 21v-1" />
-              </svg>
-              QR Code
-            </button>
-            <button class="btn-action btn-elimina" (click)="chiediConfermaElimina(menu)" title="Elimina">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6" />
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-              </svg>
-              Elimina
-            </button>
-          </div>
-        </div>
-      }
-    </div>
-  }
+        }
+      </div>
+    }
+  </div>
 </div>
 
 <!-- Modal Conferma Eliminazione -->
 @if (confermaEliminazioneVisibile) {
   <div class="rh-modal-overlay" (click)="annullaElimina()">
     <div class="rh-modal-box" (click)="$event.stopPropagation()">
-      <div class="rh-modal-icon rh-modal-icon-danger">🗑️</div>
+      <div class="rh-modal-icon">🗑️</div>
       <h3>Elimina menu</h3>
       <p>
-        Sei sicuro di voler eliminare <strong>{{ menuDaEliminare?.nome }}</strong
-        >? L'operazione non è reversibile.
+        Sei sicuro di voler eliminare <strong style="color: #fff">{{ menuDaEliminare?.nome }}</strong
+        >?<br />L'operazione non è reversibile.
       </p>
       <div class="rh-modal-actions">
         <button class="btn-annulla" (click)="annullaElimina()">Annulla</button>
@@ -134,7 +132,7 @@
   </div>
 }
 
-<!-- Modal QR Code -->
+<!-- Modal QR -->
 @if (qrVisible) {
   <div class="rh-modal-overlay" (click)="chiudiQr()">
     <div class="rh-modal-box rh-modal-qr" (click)="$event.stopPropagation()">
@@ -146,21 +144,14 @@
       </div>
       <p class="qr-link">{{ qrUrl }}</p>
       <div class="rh-modal-actions">
-        <a [href]="qrImageUrl" download="qr-menu.png" class="btn-download">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-          Scarica QR
-        </a>
+        <a [href]="qrImageUrl" download="qr-menu.png" class="btn-download">⬇ Scarica QR</a>
         <button class="btn-annulla" (click)="chiudiQr()">Chiudi</button>
       </div>
     </div>
   </div>
 }
 
-<!-- Toast feedback toggle -->
+<!-- Toast -->
 @if (toastMsg) {
   <div class="rh-toast" [class.rh-toast-success]="toastType === 'success'" [class.rh-toast-error]="toastType === 'error'">
     {{ toastMsg }}

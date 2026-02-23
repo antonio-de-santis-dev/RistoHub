@@ -35,7 +35,6 @@ export default class HomeComponent implements OnInit {
     if (this.account() !== null) {
       this.caricaDashboard();
     } else {
-      // Osserva il login
       this.accountService.identity().subscribe(acc => {
         if (acc) this.caricaDashboard();
       });
@@ -50,9 +49,21 @@ export default class HomeComponent implements OnInit {
     this.isLoadingPiatti = true;
     try {
       const currentUser: any = await this.http.get('/api/account').toPromise();
+      const login = currentUser?.login;
+
+      // Prima ottieni i menu del ristoratore loggato
+      const tuttiMenu: any[] = (await this.http.get<any[]>('/api/menus').toPromise()) ?? [];
+      const meiMenuIds = new Set(tuttiMenu.filter(m => m.ristoratore?.login === login).map(m => m.id));
+
+      // Poi ottieni tutti i piatti del giorno
       const tutti: any[] = (await this.http.get<any[]>('/api/piatto-del-giornos').toPromise()) ?? [];
-      // Filtra solo quelli attivi e del ristoratore loggato
-      this.piattiAttivi = tutti.filter(p => p.attivo && (p.menu?.ristoratore?.login === currentUser.login || !p.menu));
+
+      // Filtra: attivi E (non hanno menu collegato OPPURE il menu è del ristoratore)
+      this.piattiAttivi = tutti.filter(p => {
+        if (!p.attivo) return false;
+        if (!p.menu?.id) return true; // piatto senza menu: includi
+        return meiMenuIds.has(p.menu.id);
+      });
     } catch (err) {
       console.error('Errore piatti del giorno:', err);
     } finally {
