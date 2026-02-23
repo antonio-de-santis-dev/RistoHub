@@ -1,0 +1,389 @@
+// ══════════════════════════════════════════════════════
+//  RistoHub — Login Page
+// ══════════════════════════════════════════════════════
+
+$accent: #c8102e;
+$accent-light: #e8192e;
+$dark: #0f0f0f;
+$surface: #ffffff;
+$border: #e5e7eb;
+$text: #1a1a2e;
+$muted: #6b7280;
+
+:host {
+  display: block;
+}
+
+.rh-login-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+// ── Left branding panel ──
+.rh-login-left {
+  flex: 0 0 42%;
+  background: linear-gradient(145deg, #0f0f0f 0%, #1a0a0e 40%, #2a0812 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+
+  // Decorative food pattern overlay
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 80%, rgba($accent, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba($accent, 0.08) 0%, transparent 50%);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 40px,
+      rgba(255, 255, 255, 0.015) 40px,
+      rgba(255, 255, 255, 0.015) 41px
+    );
+  }
+}
+
+.rh-login-left-inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 340px;
+}
+
+.rh-login-logo {
+  svg {
+    width: 88px;
+    height: 88px;
+    margin-bottom: 1.25rem;
+  }
+}
+
+.rh-login-brand {
+  font-family: 'Playfair Display', 'Georgia', serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.5rem;
+}
+
+.rh-login-tagline {
+  font-family: 'Lato', sans-serif;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.6;
+  margin: 0 0 2.5rem;
+  font-style: italic;
+}
+
+.rh-login-features {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 2.5rem;
+  text-align: left;
+}
+
+.rh-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.92rem;
+
+  .rh-feature-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+}
+
+.rh-login-flag {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.05em;
+  margin-top: 1rem;
+}
+
+// ── Right form panel ──
+.rh-login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  background: #fafafa;
+}
+
+.rh-login-form-wrap {
+  width: 100%;
+  max-width: 420px;
+}
+
+.rh-login-header {
+  margin-bottom: 2rem;
+}
+
+.rh-login-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: $text;
+  margin: 0 0 6px;
+}
+
+.rh-login-subtitle {
+  font-size: 0.95rem;
+  color: $muted;
+  margin: 0;
+}
+
+.rh-login-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 1.5rem;
+  font-size: 0.88rem;
+  color: #b91c1c;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.rh-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.rh-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rh-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: $text;
+  letter-spacing: 0.01em;
+}
+
+.rh-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.rh-input-icon {
+  position: absolute;
+  left: 14px;
+  color: $muted;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.rh-input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border: 1.5px solid $border;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: 'Lato', sans-serif;
+  background: white;
+  color: $text;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: #c0c4cc;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $accent;
+    box-shadow: 0 0 0 3px rgba($accent, 0.1);
+  }
+}
+
+.rh-form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rh-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: $muted;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rh-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: $accent;
+  cursor: pointer;
+}
+
+.rh-forgot {
+  font-size: 0.85rem;
+  color: $accent;
+  text-decoration: none;
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.rh-btn-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 24px;
+  background: $accent;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'Lato', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 14px rgba($accent, 0.35);
+
+  &:hover {
+    background: $accent-light;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba($accent, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.rh-login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 1.5rem 0;
+  color: $muted;
+  font-size: 0.82rem;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: $border;
+  }
+}
+
+.rh-register-prompt {
+  text-align: center;
+  font-size: 0.9rem;
+  color: $muted;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rh-register-link {
+  color: $accent;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// ── Responsive ──
+@media (max-width: 768px) {
+  .rh-login-wrapper {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .rh-login-left {
+    flex: 0 0 auto;
+    padding: 2.5rem 1.5rem;
+
+    .rh-login-features {
+      display: none; // nasconde features su mobile per compattezza
+    }
+  }
+
+  .rh-login-logo svg {
+    width: 64px;
+    height: 64px;
+  }
+
+  .rh-login-brand {
+    font-size: 2rem;
+  }
+
+  .rh-login-tagline {
+    font-size: 0.95rem;
+    margin-bottom: 0;
+  }
+
+  .rh-login-flag {
+    display: none;
+  }
+
+  .rh-login-right {
+    padding: 2rem 1.25rem 3rem;
+    background: white;
+    flex: 1;
+  }
+
+  .rh-login-title {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .rh-login-left {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .rh-login-right {
+    padding: 1.5rem 1rem 2.5rem;
+  }
+
+  .rh-form-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

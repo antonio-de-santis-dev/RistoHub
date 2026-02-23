@@ -1,83 +1,236 @@
-<div class="row">
-  <div class="col-md-3">
-    <span class="hipster img-fluid rounded"></span>
-  </div>
-
-  <div class="col-md-9">
-    <h1 class="display-4"><span jhiTranslate="home.title">Benvenuto, Java Hipster!</span> (Risto Hub)</h1>
-
-    <p class="lead" jhiTranslate="home.subtitle">Questa è la tua home page</p>
-
-    <div>
-      @if (account() !== null) {
-        <div class="alert alert-success">
-          @if (account(); as accountRef) {
-            <span id="home-logged-message" jhiTranslate="home.logged.message" [translateValues]="{ username: accountRef.login }"
-              >Autenticato come &quot;{{ accountRef.login }}&quot;.</span
-            >
-          }
-        </div>
+<div class="rh-home">
+  <!-- HERO SECTION -->
+  <div class="rh-hero">
+    <div class="rh-hero-bg">
+      <!-- Food chalk pattern via CSS -->
+    </div>
+    <div class="rh-hero-card">
+      <!-- Logo SVG inline -->
+      <div class="rh-hero-logo">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="40" cy="40" r="38" stroke="#1a1a2e" stroke-width="2" />
+          <path d="M24 36 Q24 24 40 24 Q56 24 56 36 L56 42 L24 42 Z" fill="#1a1a2e" opacity="0.9" />
+          <rect x="24" y="42" width="32" height="5" rx="2" fill="#1a1a2e" opacity="0.9" />
+          <line x1="33" y1="50" x2="33" y2="62" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" />
+          <line x1="30" y1="50" x2="30" y2="56" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" />
+          <line x1="36" y1="50" x2="36" y2="56" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" />
+          <path d="M47 50 L47 62" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" />
+          <path d="M47 50 Q51 52 51 56 L47 56" stroke="#1a1a2e" stroke-width="2" fill="none" stroke-linecap="round" />
+        </svg>
+      </div>
+      <h1 class="rh-hero-brand">RistoHub</h1>
+      <p class="rh-hero-tagline">Scegli il tuo mood,<br />noi ci mettiamo il gusto</p>
+      @if (account() === null) {
+        <a class="rh-hero-cta" routerLink="/account/register">
+          Get started
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </a>
       } @else {
-        <div class="alert alert-warning">
-          <span jhiTranslate="global.messages.info.authenticated.prefix">Se vuoi </span>
-          <a class="alert-link" (click)="login()" jhiTranslate="global.messages.info.authenticated.link">accedere</a
-          ><span jhiTranslate="global.messages.info.authenticated.suffix"
-            >, puoi provare gli account di default: <br />
-            - Amministratore (user = &quot;admin&quot; e la password = &quot;admin&quot;) <br />
-            - utente (user = &quot;user&quot; e la password = &quot;user&quot;)</span
-          >
-        </div>
-
-        <div class="alert alert-warning">
-          <span jhiTranslate="global.messages.info.register.noaccount">Non hai ancora un account?</span>&nbsp;
-          <a class="alert-link" routerLink="/account/register" jhiTranslate="global.messages.info.register.link">Crea un account</a>
-        </div>
+        <a class="rh-hero-cta" routerLink="/menu-wizard">
+          Crea un Menu
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </a>
       }
     </div>
-
-    <p jhiTranslate="home.question">In caso di domande su JHipster:</p>
-
-    <ul>
-      <li>
-        <a href="https://www.jhipster.tech/" target="_blank" rel="noopener noreferrer" jhiTranslate="home.link.homepage"
-          >Homepage JHipster</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://stackoverflow.com/tags/jhipster/info"
-          target="_blank"
-          rel="noopener noreferrer"
-          jhiTranslate="home.link.stackoverflow"
-          >JHipster su Stack Overflow</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/jhipster/generator-jhipster/issues?state=open"
-          target="_blank"
-          rel="noopener noreferrer"
-          jhiTranslate="home.link.bugtracker"
-          >JHipster tracciamento errori</a
-        >
-      </li>
-      <li>
-        <a href="https://gitter.im/jhipster/generator-jhipster" target="_blank" rel="noopener noreferrer" jhiTranslate="home.link.chat"
-          >Chat room pubblica di JHipster</a
-        >
-      </li>
-      <li>
-        <a href="https://twitter.com/jhipster" target="_blank" rel="noopener noreferrer" jhiTranslate="home.link.follow"
-          >segui &#64;jhipster su Twitter</a
-        >
-      </li>
-    </ul>
-
-    <p>
-      <span jhiTranslate="home.like">Se ti piace JHipster, non dimenticarti di darci una stella su</span>
-      <a href="https://github.com/jhipster/generator-jhipster" target="_blank" rel="noopener noreferrer" jhiTranslate="home.github"
-        >GitHub</a
-      >!
-    </p>
   </div>
+
+  <!-- DASHBOARD (solo utenti loggati) -->
+  @if (account() !== null) {
+    <div class="rh-dashboard">
+      <div class="rh-dashboard-greeting">
+        <h2>
+          Ciao, <span class="rh-user-name">{{ account()?.login }}</span> 👋
+        </h2>
+        <p>Ecco il riepilogo della tua situazione oggi</p>
+      </div>
+
+      <div class="rh-dash-grid">
+        <!-- CARD 1: Piatti del Giorno attivi -->
+        <div class="rh-dash-card rh-card-piatti">
+          <div class="rh-card-header">
+            <div class="rh-card-icon">✨</div>
+            <div>
+              <h3>Piatti del Giorno</h3>
+              <p>Piatti speciali attivi oggi</p>
+            </div>
+            <a routerLink="/piatti-giorno" class="rh-card-link">
+              Gestisci
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
+
+          @if (isLoadingPiatti) {
+            <div class="rh-card-loading">
+              <div class="rh-mini-spinner"></div>
+              <span>Caricamento...</span>
+            </div>
+          } @else if (piattiAttivi.length === 0) {
+            <div class="rh-card-empty">
+              <span class="rh-empty-icon">🍽️</span>
+              <p>Nessun piatto del giorno attivo</p>
+              <a routerLink="/piatti-giorno" class="rh-empty-cta">Aggiungi un piatto →</a>
+            </div>
+          } @else {
+            <div class="rh-piatti-list">
+              @for (piatto of piattiAttivi.slice(0, 5); track piatto.id) {
+                <div class="rh-piatto-row">
+                  <div class="rh-piatto-info">
+                    <span class="rh-piatto-nome">{{ piatto.prodotto?.nome ?? piatto.nome }}</span>
+                    @if (piatto.menu?.nome) {
+                      <span class="rh-piatto-menu">{{ piatto.menu.nome }}</span>
+                    }
+                  </div>
+                  <span class="rh-piatto-prezzo">{{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}</span>
+                </div>
+              }
+              @if (piattiAttivi.length > 5) {
+                <div class="rh-more-items">
+                  <a routerLink="/piatti-giorno">+ altri {{ piattiAttivi.length - 5 }} piatti →</a>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- CARD 2: Menu attivi -->
+        <div class="rh-dash-card rh-card-menus">
+          <div class="rh-card-header">
+            <div class="rh-card-icon">🍷</div>
+            <div>
+              <h3>I miei Menu</h3>
+              <p>Menu attualmente attivi</p>
+            </div>
+            <a routerLink="/menu-list" class="rh-card-link">
+              Gestisci
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
+
+          @if (isLoadingMenus) {
+            <div class="rh-card-loading">
+              <div class="rh-mini-spinner"></div>
+              <span>Caricamento...</span>
+            </div>
+          } @else if (menuAttivi.length === 0) {
+            <div class="rh-card-empty">
+              <span class="rh-empty-icon">📋</span>
+              <p>Nessun menu attivo</p>
+              <a routerLink="/menu-wizard" class="rh-empty-cta">Crea il tuo primo menu →</a>
+            </div>
+          } @else {
+            <div class="rh-menus-list">
+              @for (menu of menuAttivi; track menu.id) {
+                <div class="rh-menu-row" (click)="apriMenu(menu.id)">
+                  <div class="rh-menu-color-dot" [style.background]="menu.colorePrimario ?? '#c8102e'"></div>
+                  <div class="rh-menu-info">
+                    <span class="rh-menu-nome">{{ menu.nome }}</span>
+                    @if (menu.descrizione) {
+                      <span class="rh-menu-desc">{{ menu.descrizione }}</span>
+                    }
+                  </div>
+                  <div class="rh-menu-actions">
+                    <button class="rh-btn-qr-mini" (click)="$event.stopPropagation(); apriQr(menu.id)" title="QR Code">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="5" height="5" />
+                        <rect x="16" y="3" width="5" height="5" />
+                        <rect x="3" y="16" width="5" height="5" />
+                        <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
+                        <path d="M21 21v.01" />
+                        <path d="M12 7v3a2 2 0 0 1-2 2H7" />
+                      </svg>
+                    </button>
+                    <svg
+                      class="rh-arrow-icon"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Azioni rapide -->
+      <div class="rh-quick-actions">
+        <h3 class="rh-quick-title">Azioni Rapide</h3>
+        <div class="rh-quick-grid">
+          <a routerLink="/menu-wizard" class="rh-quick-btn">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="16" />
+              <line x1="8" y1="12" x2="16" y2="12" />
+            </svg>
+            <span>Crea Menu</span>
+          </a>
+          <a routerLink="/piatti-giorno" class="rh-quick-btn">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+            <span>Piatti del Giorno</span>
+          </a>
+          <a routerLink="/prodotto-add" class="rh-quick-btn">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 2l3 7H3m11-7 3 7h-3M6 9c0 5 3 10 6 13 3-3 6-8 6-13" />
+            </svg>
+            <span>Aggiungi Prodotto</span>
+          </a>
+          <a routerLink="/menu-list" class="rh-quick-btn">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+            </svg>
+            <span>I Miei Menu</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- QR Modal -->
+  @if (qrVisible) {
+    <div class="rh-modal-overlay" (click)="chiudiQr()">
+      <div class="rh-modal-box" (click)="$event.stopPropagation()">
+        <div class="rh-modal-icon">📱</div>
+        <h3>QR Code del Menu</h3>
+        <p>I clienti scansionano questo codice per visualizzare il menu</p>
+        <div class="rh-qr-wrap">
+          <img [src]="qrImageUrl" alt="QR Code" class="rh-qr-img" />
+        </div>
+        <p class="rh-qr-link">{{ qrUrl }}</p>
+        <div class="rh-modal-actions">
+          <a [href]="qrImageUrl" download="qr-menu.png" class="rh-btn-download">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Scarica QR
+          </a>
+          <button class="rh-btn-close" (click)="chiudiQr()">Chiudi</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

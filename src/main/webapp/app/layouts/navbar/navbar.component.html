@@ -1,338 +1,356 @@
-<nav data-cy="navbar" class="navbar navbar-dark navbar-expand-md bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand logo" routerLink="/" (click)="collapseNavbar()">
-      <span class="logo-img"></span>
-      <span class="navbar-title" jhiTranslate="global.title">RistoHub</span>
-      <span class="navbar-version">{{ version }}</span>
+<nav data-cy="navbar" class="rh-navbar">
+  <div class="rh-navbar-inner">
+    <!-- BRAND / LOGO -->
+    <a class="rh-brand" routerLink="/" (click)="collapseNavbar()">
+      <!-- Inline SVG logo RistoHub — nessuna immagine esterna -->
+      <svg class="rh-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="22" cy="22" r="21" stroke="white" stroke-width="1.5" />
+        <!-- Chef hat -->
+        <path d="M14 20 Q14 14 22 14 Q30 14 30 20 L30 24 L14 24 Z" fill="white" opacity="0.9" />
+        <rect x="14" y="24" width="16" height="3" rx="1" fill="white" opacity="0.9" />
+        <!-- Fork -->
+        <line x1="18.5" y1="28" x2="18.5" y2="34" stroke="white" stroke-width="1.4" stroke-linecap="round" />
+        <line x1="17" y1="28" x2="17" y2="31" stroke="white" stroke-width="1" stroke-linecap="round" />
+        <line x1="20" y1="28" x2="20" y2="31" stroke="white" stroke-width="1" stroke-linecap="round" />
+        <!-- Knife -->
+        <path d="M25.5 28 L25.5 34" stroke="white" stroke-width="1.4" stroke-linecap="round" />
+        <path d="M25.5 28 Q27 29 27 31 L25.5 31" stroke="white" stroke-width="1" fill="none" stroke-linecap="round" />
+      </svg>
+      <span class="rh-brand-name">RistoHub</span>
+      <span class="rh-brand-flag">🇮🇹</span>
     </a>
-    <a
-      class="navbar-toggler d-lg-none"
-      href="javascript:void(0);"
-      data-toggle="collapse"
-      data-target="#navbarResponsive"
-      aria-controls="navbarResponsive"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-      (click)="toggleNavbar()"
-    >
-      <fa-icon icon="bars"></fa-icon>
-    </a>
-    <div class="navbar-collapse collapse" id="navbarResponsive" [ngbCollapse]="isNavbarCollapsed()">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-          <a class="nav-link" routerLink="/" (click)="collapseNavbar()">
-            <span>
-              <fa-icon icon="home"></fa-icon>
-              <span jhiTranslate="global.menu.home">Home</span>
-            </span>
+
+    <!-- HAMBURGER (mobile) -->
+    <button class="rh-toggler" type="button" (click)="toggleNavbar()" [attr.aria-expanded]="!isNavbarCollapsed()" aria-label="Apri menu">
+      <span class="rh-toggler-bar"></span>
+      <span class="rh-toggler-bar"></span>
+      <span class="rh-toggler-bar"></span>
+    </button>
+
+    <!-- NAV LINKS -->
+    <div class="rh-collapse" [class.open]="!isNavbarCollapsed()">
+      <ul class="rh-nav-list">
+        <!-- Home -->
+        <li class="rh-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <a class="rh-nav-link" routerLink="/" (click)="collapseNavbar()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            Home
           </a>
         </li>
-        <!-- jhipster-needle-add-element-to-menu - JHipster will add new menu items here -->
-        @if (account() !== null) {
-          <li class="nav-item" routerLinkActive="active">
-            <a class="nav-link" routerLink="/piatti-giorno" (click)="collapseNavbar()">
-              <span>
-                <fa-icon icon="star"></fa-icon>
-                <span>Piatti del Giorno</span>
-              </span>
-            </a>
-          </li>
-        }
-        @if (account() !== null) {
-          <li class="nav-item" routerLinkActive="active">
-            <a class="nav-link" routerLink="/menu-wizard" (click)="collapseNavbar()">
-              <span>
-                <fa-icon icon="utensils"></fa-icon>
-                <span>Crea Menu</span>
-              </span>
-            </a>
-          </li>
-        }
 
+        <!-- Menu items per utente loggato -->
         @if (account() !== null) {
-          <li class="nav-item" routerLinkActive="active">
-            <a class="nav-link" routerLink="/menu-list" (click)="collapseNavbar()">
-              <span>
-                <fa-icon icon="list"></fa-icon>
-                <span>I miei Menu</span>
-              </span>
+          <li class="rh-nav-item" routerLinkActive="active">
+            <a class="rh-nav-link" routerLink="/menu-list" (click)="collapseNavbar()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+              </svg>
+              I miei Menu
             </a>
           </li>
-        }
 
-        @if (account() !== null) {
-          <li class="nav-item" routerLinkActive="active">
-            <a class="nav-link" routerLink="/prodotto-add" (click)="collapseNavbar()">
-              <span>🍴 Prodotti</span>
+          <li class="rh-nav-item" routerLinkActive="active">
+            <a class="rh-nav-link" routerLink="/menu-wizard" (click)="collapseNavbar()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="16" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+              </svg>
+              Crea Menu
             </a>
           </li>
-        }
 
-        @if (account() !== null) {
+          <li class="rh-nav-item" routerLinkActive="active">
+            <a class="rh-nav-link" routerLink="/piatti-giorno" (click)="collapseNavbar()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+              Piatti del Giorno
+            </a>
+          </li>
+
+          <li class="rh-nav-item" routerLinkActive="active">
+            <a class="rh-nav-link" routerLink="/prodotto-add" (click)="collapseNavbar()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 2l3 7H3m11-7 3 7h-3M6 9c0 5 3 10 6 13 3-3 6-8 6-13" />
+              </svg>
+              Prodotti
+            </a>
+          </li>
+
+          <!-- DROPDOWN: Entità (solo admin/avanzato) -->
           <li
             ngbDropdown
-            class="nav-item dropdown pointer"
+            class="rh-nav-item rh-dropdown"
             display="dynamic"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: true }"
           >
-            <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu" data-cy="entity">
-              <span>
-                <fa-icon icon="th-list"></fa-icon>
-                <span jhiTranslate="global.menu.entities.main">Entità</span>
-              </span>
+            <a class="rh-nav-link rh-dropdown-toggle" ngbDropdownToggle href="javascript:void(0);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6" />
+                <line x1="8" y1="12" x2="21" y2="12" />
+                <line x1="8" y1="18" x2="21" y2="18" />
+                <line x1="3" y1="6" x2="3.01" y2="6" />
+                <line x1="3" y1="12" x2="3.01" y2="12" />
+                <line x1="3" y1="18" x2="3.01" y2="18" />
+              </svg>
+              Gestione
+              <svg class="rh-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
             </a>
-            <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="entity-menu">
+            <ul class="rh-dropdown-menu" ngbDropdownMenu>
               <li>
                 <a
-                  class="dropdown-item"
+                  class="rh-dropdown-item"
                   routerLink="/menu"
                   routerLinkActive="active"
                   [routerLinkActiveOptions]="{ exact: true }"
                   (click)="collapseNavbar()"
+                  >Menu</a
                 >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.menu">Menu</span>
-                </a>
               </li>
               <li>
                 <a
-                  class="dropdown-item"
+                  class="rh-dropdown-item"
                   routerLink="/portata"
                   routerLinkActive="active"
                   [routerLinkActiveOptions]="{ exact: true }"
                   (click)="collapseNavbar()"
+                  >Portate</a
                 >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.portata">Portata</span>
-                </a>
               </li>
               <li>
                 <a
-                  class="dropdown-item"
-                  routerLink="/immagine-menu"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.immagineMenu">Immagine Menu</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  class="dropdown-item"
+                  class="rh-dropdown-item"
                   routerLink="/prodotto"
                   routerLinkActive="active"
                   [routerLinkActiveOptions]="{ exact: true }"
                   (click)="collapseNavbar()"
+                  >Prodotti</a
                 >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.prodotto">Prodotto</span>
-                </a>
               </li>
               <li>
                 <a
-                  class="dropdown-item"
-                  routerLink="/piatto-del-giorno"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.piattoDelGiorno">Piatto Del Giorno</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  class="dropdown-item"
+                  class="rh-dropdown-item"
                   routerLink="/allergene"
                   routerLinkActive="active"
                   [routerLinkActiveOptions]="{ exact: true }"
                   (click)="collapseNavbar()"
+                  >Allergeni</a
                 >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.allergene">Allergene</span>
-                </a>
               </li>
-              <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
+              <li>
+                <a
+                  class="rh-dropdown-item"
+                  routerLink="/piatto-del-giorno"
+                  routerLinkActive="active"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  (click)="collapseNavbar()"
+                  >Piatti del Giorno</a
+                >
+              </li>
             </ul>
           </li>
         }
+
+        <!-- ADMIN -->
         <li
           *jhiHasAnyAuthority="'ROLE_ADMIN'"
           ngbDropdown
-          class="nav-item dropdown pointer"
+          class="rh-nav-item rh-dropdown"
           display="dynamic"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="admin-menu" data-cy="adminMenu">
-            <span>
-              <fa-icon icon="users-cog"></fa-icon>
-              <span jhiTranslate="global.menu.admin.main">Amministratore</span>
-            </span>
+          <a class="rh-nav-link rh-dropdown-toggle rh-admin-link" ngbDropdownToggle href="javascript:void(0);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            Admin
+            <svg class="rh-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
           </a>
-          <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="admin-menu">
+          <ul class="rh-dropdown-menu" ngbDropdownMenu>
             <li>
               <a
-                class="dropdown-item"
+                class="rh-dropdown-item"
                 routerLink="/authority"
                 routerLinkActive="active"
                 [routerLinkActiveOptions]="{ exact: true }"
                 (click)="collapseNavbar()"
+                >Authority</a
               >
-                <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.entities.adminAuthority">Authority</span>
-              </a>
-            </li>
-            <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->
-            <li>
-              <a class="dropdown-item" routerLink="/admin/user-management" routerLinkActive="active" (click)="collapseNavbar()">
-                <fa-icon icon="users" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.admin.userManagement">Gestione utenti</span>
-              </a>
             </li>
             <li>
-              <a class="dropdown-item" routerLink="/admin/metrics" routerLinkActive="active" (click)="collapseNavbar()">
-                <fa-icon icon="tachometer-alt" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.admin.metrics">Metriche</span>
-              </a>
+              <a class="rh-dropdown-item" routerLink="/admin/user-management" routerLinkActive="active" (click)="collapseNavbar()"
+                >Gestione Utenti</a
+              >
             </li>
             <li>
-              <a class="dropdown-item" routerLink="/admin/health" routerLinkActive="active" (click)="collapseNavbar()">
-                <fa-icon icon="heart" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.admin.health">Integrità</span>
-              </a>
+              <a class="rh-dropdown-item" routerLink="/admin/metrics" routerLinkActive="active" (click)="collapseNavbar()">Metriche</a>
             </li>
             <li>
-              <a class="dropdown-item" routerLink="/admin/configuration" routerLinkActive="active" (click)="collapseNavbar()">
-                <fa-icon icon="cogs" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.admin.configuration">Configurazione</span>
-              </a>
+              <a class="rh-dropdown-item" routerLink="/admin/health" routerLinkActive="active" (click)="collapseNavbar()">Integrità</a>
             </li>
             <li>
-              <a class="dropdown-item" routerLink="/admin/logs" routerLinkActive="active" (click)="collapseNavbar()">
-                <fa-icon icon="tasks" [fixedWidth]="true"></fa-icon>
-                <span jhiTranslate="global.menu.admin.logs">Log</span>
-              </a>
+              <a class="rh-dropdown-item" routerLink="/admin/configuration" routerLinkActive="active" (click)="collapseNavbar()"
+                >Configurazione</a
+              >
             </li>
+            <li><a class="rh-dropdown-item" routerLink="/admin/logs" routerLinkActive="active" (click)="collapseNavbar()">Log</a></li>
             @if (openAPIEnabled) {
               <li>
-                <a class="dropdown-item" routerLink="/admin/docs" routerLinkActive="active" (click)="collapseNavbar()">
-                  <fa-icon icon="book" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.admin.apidocs">API</span>
-                </a>
+                <a class="rh-dropdown-item" routerLink="/admin/docs" routerLinkActive="active" (click)="collapseNavbar()">API Docs</a>
               </li>
             }
             @if (!inProduction) {
-              <li>
-                <a class="dropdown-item" href="./h2-console/" target="_tab" (click)="collapseNavbar()">
-                  <fa-icon icon="database" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.admin.database">Database</span>
-                </a>
-              </li>
+              <li><a class="rh-dropdown-item" href="./h2-console/" target="_tab" (click)="collapseNavbar()">Database H2</a></li>
             }
           </ul>
         </li>
+
+        <!-- LINGUA -->
         @if (languages && languages.length > 1) {
-          <li ngbDropdown class="nav-item dropdown pointer" display="dynamic">
-            <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="languagesnavBarDropdown">
-              <span>
-                <fa-icon icon="flag"></fa-icon>
-                <span jhiTranslate="global.menu.language">Lingua</span>
-              </span>
+          <li ngbDropdown class="rh-nav-item rh-dropdown" display="dynamic">
+            <a class="rh-nav-link rh-dropdown-toggle" ngbDropdownToggle href="javascript:void(0);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+              <svg class="rh-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
             </a>
-            <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="languagesnavBarDropdown">
+            <ul class="rh-dropdown-menu" ngbDropdownMenu>
               @for (language of languages; track $index) {
                 <li>
                   <a
-                    class="dropdown-item"
+                    class="rh-dropdown-item"
                     [jhiActiveMenu]="language"
                     href="javascript:void(0);"
                     (click)="changeLanguage(language); collapseNavbar()"
-                    >{{ language | findLanguageFromKey }}</a
                   >
+                    {{ language | findLanguageFromKey }}
+                  </a>
                 </li>
               }
             </ul>
           </li>
         }
+
+        <!-- ACCOUNT -->
         <li
           ngbDropdown
-          class="nav-item dropdown pointer"
+          class="rh-nav-item rh-dropdown rh-account"
           display="dynamic"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
           @let accountRef = account();
-          <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="account-menu" data-cy="accountMenu">
+          <a class="rh-nav-link rh-account-toggle" ngbDropdownToggle href="javascript:void(0);" id="account-menu" data-cy="accountMenu">
             @if (!accountRef?.imageUrl) {
-              <span>
-                <fa-icon icon="user"></fa-icon>
-                <span jhiTranslate="global.menu.account.main">Utente</span>
-              </span>
+              <div class="rh-avatar">
+                {{ accountRef?.login?.charAt(0)?.toUpperCase() ?? '?' }}
+              </div>
             } @else {
-              <span>
-                <img [src]="accountRef!.imageUrl" class="profile-image rounded-circle" alt="Avatar" />
-              </span>
+              <img [src]="accountRef!.imageUrl" class="rh-avatar rh-avatar-img" alt="Avatar" />
             }
-          </a>
-          <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="account-menu">
             @if (accountRef !== null) {
+              <span class="rh-account-name">{{ accountRef.login }}</span>
+            } @else {
+              <span class="rh-account-name">Accedi</span>
+            }
+            <svg class="rh-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </a>
+          <ul class="rh-dropdown-menu rh-dropdown-menu-right" ngbDropdownMenu>
+            @if (accountRef !== null) {
+              <li class="rh-dropdown-user-info">
+                <span class="rh-dropdown-username">{{ accountRef.login }}</span>
+                <span class="rh-dropdown-email">{{ accountRef.email }}</span>
+              </li>
+              <li class="rh-dropdown-divider"></li>
               <li>
                 <a
-                  class="dropdown-item"
+                  class="rh-dropdown-item"
                   routerLink="/account/settings"
                   routerLinkActive="active"
                   (click)="collapseNavbar()"
                   data-cy="settings"
                 >
-                  <fa-icon icon="wrench" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.account.settings">Impostazioni</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+                  </svg>
+                  Impostazioni
                 </a>
               </li>
               <li>
                 <a
-                  class="dropdown-item"
+                  class="rh-dropdown-item"
                   routerLink="/account/password"
                   routerLinkActive="active"
                   (click)="collapseNavbar()"
                   data-cy="passwordItem"
                 >
-                  <fa-icon icon="lock" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.account.password">Password</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  Password
                 </a>
               </li>
+              <li class="rh-dropdown-divider"></li>
               <li>
-                <a class="dropdown-item" routerLink="/account/sessions" routerLinkActive="active" (click)="collapseNavbar()">
-                  <fa-icon icon="cloud" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.account.sessions">Sessioni</span>
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" (click)="logout()" id="logout" data-cy="logout">
-                  <fa-icon icon="sign-out-alt" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.account.logout">Esci</span>
+                <a class="rh-dropdown-item rh-logout" (click)="logout()" id="logout" data-cy="logout">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                  Esci
                 </a>
               </li>
             } @else {
               <li>
-                <a class="dropdown-item" (click)="login()" id="login" data-cy="login">
-                  <fa-icon icon="sign-in-alt" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.account.login">Accesso</span>
+                <a class="rh-dropdown-item" (click)="login()" id="login" data-cy="login">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                    <polyline points="10 17 15 12 10 7" />
+                    <line x1="15" y1="12" x2="3" y2="12" />
+                  </svg>
+                  Accedi
                 </a>
               </li>
               <li>
                 <a
-                  class="dropdown-item"
+                  class="rh-dropdown-item rh-register"
                   routerLink="/account/register"
                   routerLinkActive="active"
                   (click)="collapseNavbar()"
                   data-cy="register"
                 >
-                  <fa-icon icon="user-plus" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.account.register">Registrazione</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="8.5" cy="7" r="4" />
+                    <line x1="20" y1="8" x2="20" y2="14" />
+                    <line x1="23" y1="11" x2="17" y2="11" />
+                  </svg>
+                  Registrati
                 </a>
               </li>
             }

@@ -1,33 +1,69 @@
 <div class="piatti-container">
   <div class="piatti-header">
-    <div>
-      <h1 class="piatti-title">🍽️ Piatti del Giorno / Fuori Menu</h1>
+    <div class="piatti-header-left">
+      <h1 class="piatti-title">✨ Piatti del Giorno</h1>
       <p class="piatti-subtitle">Gestisci i piatti speciali visibili nel menu</p>
     </div>
     <div class="header-actions">
-      <button class="btn-crea" (click)="apriModaleCrea()">➕ Crea Nuovo Piatto</button>
-      <button class="btn-seleziona" (click)="apriModaleSeleziona()">🔗 Seleziona da Menu</button>
+      <button class="btn-crea" (click)="apriModaleCrea()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Crea Nuovo
+      </button>
+      <button class="btn-seleziona" (click)="apriModaleSeleziona()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+        </svg>
+        Da Menu
+      </button>
     </div>
   </div>
 
-  <div *ngIf="isLoading" class="loading">⏳ Caricamento...</div>
+  <div *ngIf="isLoading" class="loading">
+    <div class="loading-spinner"></div>
+    <span>Caricamento piatti...</span>
+  </div>
 
   <div *ngIf="!isLoading && piattiGiorno.length === 0" class="empty-state">
-    <p>Nessun piatto del giorno ancora aggiunto.</p>
-    <p class="empty-hint">👆 Crea un nuovo piatto oppure selezionane uno dal menu esistente</p>
+    <div class="empty-icon">🍽️</div>
+    <h3>Nessun piatto del giorno</h3>
+    <p>Crea un nuovo piatto speciale o selezionane uno dal menu esistente</p>
   </div>
 
   <div *ngIf="!isLoading && piattiGiorno.length > 0" class="piatti-grid">
     <div *ngFor="let piatto of piattiGiorno" class="piatto-card" [class.inattivo]="!piatto.attivo">
+      <div class="piatto-top-bar" [style.background]="piatto.attivo ? '#22c55e' : '#d1d5db'"></div>
       <div class="piatto-header-card">
         <div class="piatto-badge" *ngIf="piatto.prodotto">🔗 Da Menu</div>
-        <div class="piatto-badge piatto-badge-nuovo" *ngIf="!piatto.prodotto">✨ Nuovo</div>
+        <div class="piatto-badge piatto-badge-nuovo" *ngIf="!piatto.prodotto">✨ Personalizzato</div>
+        <div class="piatto-menu-nome" *ngIf="piatto.menu?.nome">{{ piatto.menu?.nome }}</div>
       </div>
 
       <div class="piatto-body">
         <h3 class="piatto-nome">{{ nomePiatto(piatto) }}</h3>
         <p class="piatto-desc" *ngIf="descrizionePiatto(piatto)">{{ descrizionePiatto(piatto) }}</p>
         <div class="piatto-prezzo">{{ formatPrezzo(prezzoPiatto(piatto)) }}</div>
+
+        <!-- Icone allergeni sul piatto -->
+        <div class="piatto-allergeni" *ngIf="getAllergeniPiatto(piatto).length > 0">
+          <ng-container *ngFor="let a of getAllergeniPiatto(piatto)">
+            <div class="all-mini-cerchio" [style.backgroundColor]="a.colore || '#888'" [title]="a.nome">
+              <img
+                *ngIf="a.icona && a.iconaContentType"
+                [src]="'data:' + a.iconaContentType + ';base64,' + a.icona"
+                [alt]="a.nome"
+                class="all-mini-img"
+              />
+              <span *ngIf="!a.icona || a.isCustom" class="all-mini-iniziale">
+                <img *ngIf="a.isCustom" src="/content/images/allergene-custom.png" [alt]="a.nome" class="all-mini-img" />
+                <span *ngIf="!a.isCustom && !a.icona">{{ a.nome.charAt(0) }}</span>
+              </span>
+            </div>
+          </ng-container>
+        </div>
       </div>
 
       <div class="piatto-actions">
@@ -35,12 +71,22 @@
           class="btn-toggle"
           [class.attivo]="piatto.attivo"
           (click)="toggleAttivo(piatto)"
-          [title]="piatto.attivo ? 'Disattiva visibilità' : 'Attiva visibilità'"
+          [title]="piatto.attivo ? 'Disattiva' : 'Attiva'"
         >
-          <span *ngIf="piatto.attivo">👁️ Visibile</span>
-          <span *ngIf="!piatto.attivo">👁️‍🗨️ Nascosto</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          {{ piatto.attivo ? 'Visibile' : 'Nascosto' }}
         </button>
-        <button class="btn-elimina-card" (click)="eliminaPiatto(piatto.id!)" title="Elimina">🗑️</button>
+        <button class="btn-elimina-card" (click)="eliminaPiatto(piatto.id!)" title="Elimina">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+            <path d="M10 11v6" />
+            <path d="M14 11v6" />
+          </svg>
+        </button>
       </div>
     </div>
   </div>
@@ -48,40 +94,97 @@
   <!-- MODAL CREAZIONE/SELEZIONE -->
   <div *ngIf="modaleCreazioneAperto" class="modal-overlay" (click)="chiudiModale()">
     <div class="modal-box" (click)="$event.stopPropagation()">
-      <h2 class="modal-title">
-        <span *ngIf="!modalitaSelezioneProdotto">➕ Nuovo Piatto del Giorno</span>
-        <span *ngIf="modalitaSelezioneProdotto">🔗 Seleziona Prodotto Esistente</span>
-      </h2>
+      <div class="modal-title-row">
+        <h2 class="modal-title">
+          <span *ngIf="!modalitaSelezioneProdotto">✨ Nuovo Piatto del Giorno</span>
+          <span *ngIf="modalitaSelezioneProdotto">🔗 Seleziona da Menu</span>
+        </h2>
+        <button class="modal-close" (click)="chiudiModale()">✕</button>
+      </div>
 
       <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
       <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
 
       <!-- MODALITÀ: Crea nuovo piatto -->
       <div *ngIf="!modalitaSelezioneProdotto" class="modal-content">
-        <!-- ↓ AGGIUNTO: selezione menu per piatto manuale -->
         <div class="form-group">
           <label class="form-label">Menu di destinazione *</label>
           <select class="form-control" [(ngModel)]="menuNuovoPiatto">
             <option [ngValue]="null">-- Scegli il menu --</option>
             <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
           </select>
-          <small class="form-hint" *ngIf="!menuNuovoPiatto"> 👆 Scegli in quale menu apparirà questo piatto </small>
         </div>
-
         <div class="form-group">
           <label class="form-label">Nome *</label>
           <input type="text" class="form-control" [(ngModel)]="nome" placeholder="es. Gnocchi al ragù di cinghiale" />
         </div>
-
         <div class="form-group">
           <label class="form-label">Descrizione</label>
           <textarea class="form-control" [(ngModel)]="descrizione" rows="2" placeholder="Ingredienti e note..."></textarea>
         </div>
-
         <div class="form-group">
           <label class="form-label">Prezzo (€) *</label>
           <input type="number" class="form-control" [(ngModel)]="prezzo" placeholder="0.00" min="0" step="0.50" />
         </div>
+
+        <!-- ─── SEZIONE ALLERGENI (identica a prodotto-add) ─── -->
+        <div class="form-group allergeni-sezione" *ngIf="allergeniDisponibili.length > 0">
+          <label class="form-label">Allergeni</label>
+          <p class="allergeni-hint">Clicca per selezionare gli allergeni presenti nel piatto</p>
+          <div class="allergeni-grid">
+            <div
+              *ngFor="let a of allergeniDisponibili"
+              class="allergene-chip"
+              [class.selected]="allergeniSelezionati.has(a.id)"
+              [style.borderColor]="allergeniSelezionati.has(a.id) ? a.colore || '#555' : '#ddd'"
+              [style.backgroundColor]="allergeniSelezionati.has(a.id) ? (a.colore || '#555') + '22' : '#fafafa'"
+              (click)="toggleAllergene(a.id)"
+              [title]="a.nome"
+            >
+              <div class="allergene-chip-icona" [style.backgroundColor]="a.colore || '#888'">
+                <img
+                  *ngIf="a.icona && a.iconaContentType && !a.isCustom"
+                  [src]="'data:' + a.iconaContentType + ';base64,' + a.icona"
+                  [alt]="a.nome"
+                  class="allergene-chip-img"
+                />
+                <!-- Icona personalizzato: immagine caricata dall'utente -->
+                <img *ngIf="a.isCustom" src="/content/images/allergene-custom.png" [alt]="a.nome" class="allergene-chip-img" />
+                <span *ngIf="!a.icona && !a.isCustom" class="allergene-chip-iniziale">{{ a.nome.charAt(0) }}</span>
+              </div>
+              <span class="allergene-chip-nome">{{ a.nome }}</span>
+              <span class="allergene-chip-check" *ngIf="allergeniSelezionati.has(a.id)">✓</span>
+            </div>
+          </div>
+
+          <!-- Allergene personalizzato -->
+          <div class="allergene-custom-row">
+            <input
+              type="text"
+              class="form-control allergene-custom-input"
+              [(ngModel)]="nomeAllergeneCustom"
+              placeholder="Aggiungi allergene personalizzato..."
+              (keyup.enter)="aggiungiAllergeneCustom()"
+            />
+            <button class="btn-allergene-add" (click)="aggiungiAllergeneCustom()" [disabled]="!nomeAllergeneCustom.trim()">
+              + Aggiungi
+            </button>
+          </div>
+
+          <!-- Riepilogo selezionati -->
+          <div class="allergeni-selezionati-riepilogo" *ngIf="allergeniSelezionati.size > 0">
+            <span class="riepilogo-label">Selezionati:</span>
+            <span
+              *ngFor="let id of allergeniSelezionatiArray"
+              class="riepilogo-chip"
+              [style.backgroundColor]="getAllergeneById(id)?.colore || '#555'"
+            >
+              {{ getAllergeneById(id)?.nome }}
+              <span class="riepilogo-remove" (click)="toggleAllergene(id)">×</span>
+            </span>
+          </div>
+        </div>
+        <!-- ─── FINE SEZIONE ALLERGENI ─── -->
       </div>
 
       <!-- MODALITÀ: Seleziona prodotto -->
@@ -93,7 +196,6 @@
             <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
           </select>
         </div>
-
         <div class="form-group" *ngIf="portate.length > 0">
           <label class="form-label">Portata *</label>
           <select class="form-control" [(ngModel)]="portataSelezionata" (ngModelChange)="onPortataSelezionata()">
@@ -101,7 +203,6 @@
             <option *ngFor="let p of portate" [value]="p.id">{{ nomePortata(p) }}</option>
           </select>
         </div>
-
         <div class="form-group" *ngIf="prodotti.length > 0">
           <label class="form-label">Prodotto *</label>
           <select class="form-control" [(ngModel)]="prodottoSelezionato">
@@ -109,8 +210,7 @@
             <option *ngFor="let prod of prodotti" [value]="prod.id">{{ prod.nome }} - {{ formatPrezzo(prod.prezzo) }}</option>
           </select>
         </div>
-
-        <div *ngIf="!menuSelezionato" class="empty-hint">👆 Seleziona prima un menu per vedere le portate</div>
+        <div *ngIf="!menuSelezionato" class="empty-hint">👆 Seleziona prima un menu</div>
       </div>
 
       <div class="modal-actions">
