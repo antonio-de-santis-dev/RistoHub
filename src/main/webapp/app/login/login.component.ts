@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, inject, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, OnDestroy, inject, signal, viewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
@@ -10,10 +10,10 @@ import { AccountService } from 'app/core/auth/account.service';
   selector: 'jhi-login',
   imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss'],
 })
-export default class LoginComponent implements OnInit, AfterViewInit {
+export default class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   username = viewChild.required<ElementRef>('username');
-
   authenticationError = signal(false);
 
   loginForm = new FormGroup({
@@ -25,9 +25,18 @@ export default class LoginComponent implements OnInit, AfterViewInit {
   private readonly accountService = inject(AccountService);
   private readonly loginService = inject(LoginService);
   private readonly router = inject(Router);
+  private styleTag: HTMLStyleElement | null = null;
 
   ngOnInit(): void {
-    // Se già autenticato va a /home (non a '' che è la Landing)
+    // Nasconde la navbar sulla pagina di login
+    this.styleTag = document.createElement('style');
+    this.styleTag.textContent = `
+      jhi-navbar, nav.navbar,
+      router-outlet[name="navbar"] ~ * { display: none !important; }
+    `;
+    document.head.appendChild(this.styleTag);
+
+    // Se già autenticato → home
     this.accountService.identity().subscribe(() => {
       if (this.accountService.isAuthenticated()) {
         this.router.navigate(['/home']);
@@ -37,6 +46,13 @@ export default class LoginComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.username().nativeElement.focus();
+  }
+
+  ngOnDestroy(): void {
+    if (this.styleTag) {
+      this.styleTag.remove();
+      this.styleTag = null;
+    }
   }
 
   login(): void {

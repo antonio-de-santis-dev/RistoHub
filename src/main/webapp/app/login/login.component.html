@@ -1,74 +1,58 @@
-<div class="rh-login-wrapper">
-  <!-- LEFT PANEL: Branding -->
-  <div class="rh-login-left">
-    <div class="rh-login-left-inner">
-      <!-- SVG Logo -->
-      <div class="rh-login-logo">
-        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="40" cy="40" r="38" stroke="white" stroke-width="2" />
-          <path d="M24 36 Q24 24 40 24 Q56 24 56 36 L56 42 L24 42 Z" fill="white" opacity="0.95" />
-          <rect x="24" y="42" width="32" height="5" rx="2" fill="white" opacity="0.95" />
-          <line x1="33" y1="50" x2="33" y2="62" stroke="white" stroke-width="2.5" stroke-linecap="round" />
-          <line x1="30" y1="50" x2="30" y2="56" stroke="white" stroke-width="2" stroke-linecap="round" />
-          <line x1="36" y1="50" x2="36" y2="56" stroke="white" stroke-width="2" stroke-linecap="round" />
-          <path d="M47 50 L47 62" stroke="white" stroke-width="2.5" stroke-linecap="round" />
-          <path d="M47 50 Q51 52 51 56 L47 56" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" />
-        </svg>
-      </div>
-
-      <h1 class="rh-login-brand">RistoHub</h1>
-      <p class="rh-login-tagline">Scegli il tuo mood,<br />noi ci mettiamo il gusto</p>
-
-      <div class="rh-login-features">
-        <div class="rh-feature-item">
-          <span class="rh-feature-icon">🍽️</span>
-          <span>Gestisci i tuoi menu digitali</span>
-        </div>
-        <div class="rh-feature-item">
-          <span class="rh-feature-icon">📱</span>
-          <span>QR Code per i clienti</span>
-        </div>
-        <div class="rh-feature-item">
-          <span class="rh-feature-icon">⚡</span>
-          <span>Aggiornamenti in tempo reale</span>
-        </div>
-      </div>
-
-      <div class="rh-login-flag">🇮🇹 Made in Italy</div>
+<div class="split-page">
+  <!-- ══════════════════════════════════════════
+       SINISTRA — Sfondo + card con solo logo
+  ══════════════════════════════════════════ -->
+  <div class="split-right">
+    <div class="right-card">
+      <img
+        src="content/images/LogoNero.png"
+        alt="RistoHub"
+        class="right-logo"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+      />
+      <div class="right-logo-fallback" style="display: none">🍽️</div>
     </div>
   </div>
 
-  <!-- RIGHT PANEL: Form -->
-  <div class="rh-login-right">
-    <div class="rh-login-form-wrap">
-      <div class="rh-login-header">
-        <h2 class="rh-login-title">Bentornato</h2>
-        <p class="rh-login-subtitle">Accedi al tuo account RistoHub</p>
+  <!-- ══════════════════════════════════════════
+       DESTRA — Form di accesso
+  ══════════════════════════════════════════ -->
+  <div class="split-left">
+    <div class="form-wrapper">
+      <!-- Logo piccolo in cima -->
+      <div class="form-logo">
+        <img src="content/images/LogoNero.png.jpg" alt="RistoHub" onerror="this.style.display='none'" />
       </div>
 
+      <h1 class="form-title">Bentornato</h1>
+      <p class="form-subtitle">Accedi al tuo spazio RistoHub</p>
+
+      <!-- Errore credenziali -->
       @if (authenticationError()) {
-        <div class="rh-login-error" data-cy="loginError">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="alert-error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
-          <span>Credenziali non valide. Controlla e riprova.</span>
+          <span jhiTranslate="login.messages.error.authentication"> Credenziali non valide. Controlla e riprova. </span>
         </div>
       }
 
-      <form class="rh-form" (ngSubmit)="login()" [formGroup]="loginForm" autocomplete="on">
-        <div class="rh-form-group">
-          <label class="rh-label" for="username" jhiTranslate="global.form.username.label">Utente</label>
-          <div class="rh-input-wrap">
-            <svg class="rh-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <!-- Form -->
+      <form class="login-form" (ngSubmit)="login()" [formGroup]="loginForm" autocomplete="on">
+        <!-- Username -->
+        <div class="field-group">
+          <label class="field-label" for="username">Username</label>
+          <div class="field-input-wrap">
+            <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
             <input
               #username
               type="text"
-              class="rh-input"
+              class="field-input"
               id="username"
               name="username"
               placeholder="Il tuo nome utente"
@@ -79,16 +63,20 @@
           </div>
         </div>
 
-        <div class="rh-form-group">
-          <label class="rh-label" for="password" jhiTranslate="login.form.password">Password</label>
-          <div class="rh-input-wrap">
-            <svg class="rh-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <!-- Password -->
+        <div class="field-group">
+          <div class="field-label-row">
+            <label class="field-label" for="password">Password</label>
+            <a class="link-forgot" routerLink="/account/reset/request" data-cy="forgetYourPasswordSelector"> Password dimenticata? </a>
+          </div>
+          <div class="field-input-wrap">
+            <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
             <input
               type="password"
-              class="rh-input"
+              class="field-input"
               id="password"
               name="password"
               placeholder="La tua password"
@@ -99,37 +87,26 @@
           </div>
         </div>
 
-        <div class="rh-form-row">
-          <label class="rh-checkbox-label">
-            <input type="checkbox" class="rh-checkbox" formControlName="rememberMe" />
-            <span jhiTranslate="login.form.rememberme">Ricordami</span>
-          </label>
-          <a
-            class="rh-forgot"
-            routerLink="/account/reset/request"
-            data-cy="forgetYourPasswordSelector"
-            jhiTranslate="login.password.forgot"
-          >
-            Password dimenticata?
-          </a>
-        </div>
+        <!-- Ricordami -->
+        <label class="checkbox-label">
+          <input type="checkbox" class="checkbox-input" formControlName="rememberMe" />
+          <span class="checkbox-custom"></span>
+          <span>Ricordami</span>
+        </label>
 
-        <button type="submit" class="rh-btn-login" data-cy="submit">
-          <span jhiTranslate="login.form.button">Accedi</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
+        <!-- Submit -->
+        <button type="submit" class="btn-login" data-cy="submit">
+          Accedi
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </button>
       </form>
 
-      <div class="rh-login-divider">
-        <span>oppure</span>
-      </div>
-
-      <div class="rh-register-prompt">
-        <span jhiTranslate="global.messages.info.register.noaccount">Non hai ancora un account?</span>
-        <a class="rh-register-link" routerLink="/account/register" jhiTranslate="global.messages.info.register.link">Crea un account →</a>
+      <!-- Link registrazione -->
+      <div class="register-row">
+        <span>Non hai un account?</span>
+        <a class="link-register" routerLink="/account/register">Registrati</a>
       </div>
     </div>
   </div>

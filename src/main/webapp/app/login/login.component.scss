@@ -1,389 +1,383 @@
-// ══════════════════════════════════════════════════════
-//  RistoHub — Login Page
-// ══════════════════════════════════════════════════════
+/* ================================================================
+   LOGIN PAGE — Split Screen full viewport, no footer, no gaps
+   ================================================================ */
 
-$accent: #c8102e;
-$accent-light: #e8192e;
-$dark: #0f0f0f;
-$surface: #ffffff;
-$border: #e5e7eb;
-$text: #1a1a2e;
-$muted: #6b7280;
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Nunito+Sans:wght@300;400;600&display=swap');
 
+/* ── RESET HOST — occupa tutta la viewport senza spazi ─────────── */
 :host {
   display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  overflow: hidden;
 }
 
-.rh-login-wrapper {
+/* Nasconde footer e navbar globalmente quando si è sul login */
+jhi-footer,
+footer,
+jhi-navbar,
+nav.navbar,
+router-outlet[name='navbar'] ~ * {
+  display: none !important;
+}
+
+/* ── LAYOUT SPLIT ──────────────────────────────────────────────── */
+.split-page {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  font-family: 'Nunito Sans', sans-serif;
+  overflow: hidden;
 }
 
-// ── Left branding panel ──
-.rh-login-left {
-  flex: 0 0 42%;
-  background: linear-gradient(145deg, #0f0f0f 0%, #1a0a0e 40%, #2a0812 100%);
+/* ══════════════════════════════════════════════════════════════════
+   SINISTRA — Sfondo + card logo
+══════════════════════════════════════════════════════════════════ */
+.split-right {
+  width: 50%;
+  height: 100%;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3rem 2.5rem;
-  position: relative;
-  overflow: hidden;
+  flex-shrink: 0;
 
-  // Decorative food pattern overlay
+  background-image: url('/content/images/unnamed.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #1c1c1c;
+
   &::before {
     content: '';
     position: absolute;
     inset: 0;
-    background-image:
-      radial-gradient(circle at 20% 80%, rgba($accent, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba($accent, 0.08) 0%, transparent 50%);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 40px,
-      rgba(255, 255, 255, 0.015) 40px,
-      rgba(255, 255, 255, 0.015) 41px
-    );
+    background: rgba(10, 4, 2, 0.55);
+    z-index: 1;
   }
 }
 
-.rh-login-left-inner {
+.right-card {
   position: relative;
-  z-index: 1;
-  text-align: center;
-  max-width: 340px;
-}
-
-.rh-login-logo {
-  svg {
-    width: 88px;
-    height: 88px;
-    margin-bottom: 1.25rem;
-  }
-}
-
-.rh-login-brand {
-  font-family: 'Playfair Display', 'Georgia', serif;
-  font-size: 2.8rem;
-  font-weight: 700;
-  color: white;
-  letter-spacing: 0.02em;
-  margin: 0 0 0.5rem;
-}
-
-.rh-login-tagline {
-  font-family: 'Lato', sans-serif;
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.65);
-  line-height: 1.6;
-  margin: 0 0 2.5rem;
-  font-style: italic;
-}
-
-.rh-login-features {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-bottom: 2.5rem;
-  text-align: left;
-}
-
-.rh-feature-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 0.92rem;
-
-  .rh-feature-icon {
-    font-size: 1.1rem;
-    flex-shrink: 0;
-  }
-}
-
-.rh-login-flag {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.35);
-  letter-spacing: 0.05em;
-  margin-top: 1rem;
-}
-
-// ── Right form panel ──
-.rh-login-right {
-  flex: 1;
+  z-index: 2;
+  background: #fff;
+  border-radius: 24px;
+  padding: 2.5rem;
+  width: 300px;
+  height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1.5rem;
-  background: #fafafa;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 4px 16px rgba(0, 0, 0, 0.2);
+  animation: card-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
 }
 
-.rh-login-form-wrap {
-  width: 100%;
-  max-width: 420px;
-}
-
-.rh-login-header {
-  margin-bottom: 2rem;
-}
-
-.rh-login-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 2rem;
-  font-weight: 700;
-  color: $text;
-  margin: 0 0 6px;
-}
-
-.rh-login-subtitle {
-  font-size: 0.95rem;
-  color: $muted;
-  margin: 0;
-}
-
-.rh-login-error {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 10px;
-  padding: 12px 16px;
-  margin-bottom: 1.5rem;
-  font-size: 0.88rem;
-  color: #b91c1c;
-
-  svg {
-    flex-shrink: 0;
+@keyframes card-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
-.rh-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
+.right-logo {
+  max-width: 250px;
+  max-height: 250px;
+  object-fit: contain;
 }
 
-.rh-form-group {
+.right-logo-fallback {
+  font-size: 3.5rem;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  justify-content: center;
 }
 
-.rh-label {
+/* ══════════════════════════════════════════════════════════════════
+   DESTRA — Form bianco
+══════════════════════════════════════════════════════════════════ */
+.split-left {
+  width: 50%;
+  height: 100%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow-y: auto;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  animation: slide-in-right 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.form-logo {
+  margin-bottom: 2rem;
+  img {
+    height: 56px;
+    object-fit: contain;
+  }
+}
+
+.form-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 900;
+  color: #111111;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.02em;
+}
+
+.form-subtitle {
+  font-size: 0.9rem;
+  color: #888;
+  margin: 0 0 1.8rem;
+  font-weight: 300;
+}
+
+.alert-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #dc2626;
   font-size: 0.85rem;
-  font-weight: 700;
-  color: $text;
-  letter-spacing: 0.01em;
+  margin-bottom: 1.2rem;
 }
 
-.rh-input-wrap {
-  position: relative;
+.login-form {
   display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-label-row {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
-.rh-input-icon {
-  position: absolute;
-  left: 14px;
-  color: $muted;
-  pointer-events: none;
-  flex-shrink: 0;
+.field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
-.rh-input {
+.field-input-wrap {
+  position: relative;
+}
+
+.field-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.field-input {
   width: 100%;
-  padding: 12px 14px 12px 42px;
-  border: 1.5px solid $border;
+  padding: 0.75rem 0.9rem 0.75rem 2.6rem;
+  border: 1.5px solid #e5e7eb;
   border-radius: 10px;
-  font-size: 0.95rem;
-  font-family: 'Lato', sans-serif;
-  background: white;
-  color: $text;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 0.9rem;
+  color: #111;
+  background: #fafafa;
+  outline: none;
   transition:
-    border-color 0.18s,
-    box-shadow 0.18s;
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
   box-sizing: border-box;
 
   &::placeholder {
-    color: #c0c4cc;
+    color: #c4c4c4;
   }
 
   &:focus {
-    outline: none;
-    border-color: $accent;
-    box-shadow: 0 0 0 3px rgba($accent, 0.1);
+    border-color: #111111;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.07);
   }
 }
 
-.rh-form-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
+.link-forgot {
+  font-size: 0.78rem;
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.15s ease;
+  &:hover {
+    color: #111;
+  }
 }
 
-.rh-checkbox-label {
+.checkbox-label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.88rem;
-  color: $muted;
+  gap: 0.55rem;
+  font-size: 0.85rem;
+  color: #4b5563;
   cursor: pointer;
   user-select: none;
 }
 
-.rh-checkbox {
-  width: 16px;
-  height: 16px;
-  accent-color: $accent;
-  cursor: pointer;
+.checkbox-input {
+  display: none;
 }
 
-.rh-forgot {
-  font-size: 0.85rem;
-  color: $accent;
-  text-decoration: none;
-  font-weight: 600;
+.checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  background: #fff;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  position: relative;
 
-  &:hover {
-    text-decoration: underline;
+  .checkbox-input:checked + & {
+    background: #111;
+    border-color: #111;
+    &::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 1px;
+      width: 6px;
+      height: 10px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+    }
   }
 }
 
-.rh-btn-login {
+.btn-login {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 0.6rem;
   width: 100%;
-  padding: 13px 24px;
-  background: $accent;
-  color: white;
+  padding: 0.9rem;
+  background: #111111;
+  color: #fff;
   border: none;
   border-radius: 10px;
-  font-size: 1rem;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
   font-weight: 700;
-  font-family: 'Lato', sans-serif;
   cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 0.5rem;
-  box-shadow: 0 4px 14px rgba($accent, 0.35);
+  margin-top: 0.4rem;
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 
   &:hover {
-    background: $accent-light;
+    background: #222;
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba($accent, 0.4);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.24);
   }
 
   &:active {
-    transform: translateY(0);
+    transform: scale(0.98);
   }
 }
 
-.rh-login-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 1.5rem 0;
-  color: $muted;
-  font-size: 0.82rem;
-
-  &::before,
-  &::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: $border;
-  }
-}
-
-.rh-register-prompt {
+.register-row {
+  margin-top: 1.6rem;
   text-align: center;
-  font-size: 0.9rem;
-  color: $muted;
+  font-size: 0.85rem;
+  color: #6b7280;
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
-.rh-register-link {
-  color: $accent;
+.link-register {
   font-weight: 700;
+  color: #111;
   text-decoration: none;
-
+  border-bottom: 1.5px solid #111;
+  padding-bottom: 1px;
+  transition: opacity 0.15s ease;
   &:hover {
-    text-decoration: underline;
+    opacity: 0.6;
   }
 }
 
-// ── Responsive ──
+/* ── RESPONSIVO ─────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .rh-login-wrapper {
+  :host {
+    position: static;
+    overflow-y: auto;
+  }
+
+  .split-page {
     flex-direction: column;
+    height: auto;
     min-height: 100vh;
   }
 
-  .rh-login-left {
-    flex: 0 0 auto;
-    padding: 2.5rem 1.5rem;
-
-    .rh-login-features {
-      display: none; // nasconde features su mobile per compattezza
-    }
+  .split-right {
+    width: 100%;
+    height: 220px;
+    flex-shrink: 0;
   }
 
-  .rh-login-logo svg {
-    width: 64px;
-    height: 64px;
+  .split-left {
+    width: 100%;
+    height: auto;
+    padding: 2rem 1.5rem;
   }
 
-  .rh-login-brand {
-    font-size: 2rem;
+  .right-card {
+    width: 120px;
+    height: 120px;
+    padding: 1.5rem;
+    border-radius: 16px;
   }
 
-  .rh-login-tagline {
-    font-size: 0.95rem;
-    margin-bottom: 0;
-  }
-
-  .rh-login-flag {
-    display: none;
-  }
-
-  .rh-login-right {
-    padding: 2rem 1.25rem 3rem;
-    background: white;
-    flex: 1;
-  }
-
-  .rh-login-title {
-    font-size: 1.6rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .rh-login-left {
-    padding: 1.75rem 1.25rem;
-  }
-
-  .rh-login-right {
-    padding: 1.5rem 1rem 2.5rem;
-  }
-
-  .rh-form-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+  .right-logo {
+    max-width: 80px;
+    max-height: 80px;
   }
 }

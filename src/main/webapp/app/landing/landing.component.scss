@@ -7,18 +7,6 @@
 
 /* ── PAGINA FULL SCREEN ────────────────────────────────────────── */
 .landing-page {
-  /*
-    ═══════════════════════════════════════════════════════════════
-     COME AGGIUNGERE L'IMMAGINE DI SFONDO:
-     1. Metti il file immagine (es. sfondo.jpg) in:
-            src/main/webapp/content/images/sfondo.jpg
-     2. Cambia la riga qui sotto con:
-            background-image: url('/content/images/sfondo.jpg');
-
-     L'immagine si adatta automaticamente a tutta la pagina
-     grazie a:  background-size: cover
-    ═══════════════════════════════════════════════════════════════
-  */
   background-image: url('/content/images/unnamed.jpg');
   background-size: cover; /* ← adatta tutta la pagina */
   background-position: center center;
