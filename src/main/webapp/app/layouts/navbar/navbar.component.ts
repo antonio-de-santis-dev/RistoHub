@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, HostListener } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -22,7 +22,14 @@ import NavbarItem from './navbar-item.model';
 })
 export default class NavbarComponent implements OnInit {
   inProduction?: boolean;
+  // isNavbarCollapsed kept for compatibility — not used in drawer mode
   isNavbarCollapsed = signal(true);
+  // Stato del drawer laterale
+  isSidebarOpen = signal(false);
+  // Sotto-menu espansi nel drawer
+  adminExpanded = signal(false);
+  gestioneExpanded = signal(false);
+
   languages = LANGUAGES;
   openAPIEnabled?: boolean;
   version = '';
@@ -50,13 +57,40 @@ export default class NavbarComponent implements OnInit {
     });
   }
 
+  // Chiude sidebar se si preme ESC
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeSidebar();
+  }
+
   changeLanguage(languageKey: string): void {
     this.stateStorageService.storeLocale(languageKey);
     this.translateService.use(languageKey);
   }
 
+  // Compatibilità con codice esistente
   collapseNavbar(): void {
-    this.isNavbarCollapsed.set(true);
+    this.closeSidebar();
+  }
+
+  openSidebar(): void {
+    this.isSidebarOpen.set(true);
+  }
+
+  closeSidebar(): void {
+    this.isSidebarOpen.set(false);
+  }
+
+  toggleSidebar(): void {
+    this.isSidebarOpen.update(v => !v);
+  }
+
+  toggleGestione(): void {
+    this.gestioneExpanded.update(v => !v);
+  }
+
+  toggleAdmin(): void {
+    this.adminExpanded.update(v => !v);
   }
 
   login(): void {
@@ -64,12 +98,13 @@ export default class NavbarComponent implements OnInit {
   }
 
   logout(): void {
-    this.collapseNavbar();
+    this.closeSidebar();
     this.loginService.logout();
     this.router.navigate(['']);
   }
 
+  // Tenuto per compatibilità (non usato nel drawer)
   toggleNavbar(): void {
-    this.isNavbarCollapsed.update(isNavbarCollapsed => !isNavbarCollapsed);
+    this.toggleSidebar();
   }
 }

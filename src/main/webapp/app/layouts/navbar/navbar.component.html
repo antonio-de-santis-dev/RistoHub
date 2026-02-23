@@ -1,350 +1,416 @@
-<nav data-cy="navbar" class="rh-navbar">
-  <div class="rh-navbar-inner">
-    <!-- BRAND / LOGO -->
-    <a class="rh-brand" routerLink="/" (click)="collapseNavbar()">
-      <!-- Inline SVG logo RistoHub — nessuna immagine esterna -->
-      <img src="content\images\LogoBianco.png" width="10%" />
-      <span class="rh-brand-name">RistoHub</span>
-      <span class="rh-brand-flag">🇮🇹</span>
+@let accountRef = account();
+
+<!-- ═══════════════════════════════════════════════════════════════
+     BARRA SUPERIORE — trasparente, solo hamburger
+═══════════════════════════════════════════════════════════════ -->
+<nav data-cy="navbar" class="rh-topbar">
+  <button class="rh-hamburger" type="button" (click)="toggleSidebar()" [attr.aria-expanded]="isSidebarOpen()" aria-label="Apri menu">
+    @if (!isSidebarOpen()) {
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    } @else {
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    }
+  </button>
+</nav>
+
+<!-- BACKDROP -->
+@if (isSidebarOpen()) {
+  <div class="rh-backdrop" (click)="closeSidebar()"></div>
+}
+
+<!-- ═══════════════════════════════════════════════════════════════
+     DRAWER LATERALE SINISTRO
+═══════════════════════════════════════════════════════════════ -->
+<aside class="rh-drawer" [class.open]="isSidebarOpen()" aria-label="Menu navigazione">
+  <!-- ── Header drawer con logo grande ── -->
+  <div class="rh-drawer-header">
+    <div class="rh-drawer-logo">
+      <img src="content/images/LogoBianco.png" alt="RistoHub" class="rh-drawer-logo-img" />
+      <span class="rh-drawer-flag">🇮🇹</span>
+    </div>
+    <button class="rh-drawer-close" type="button" (click)="closeSidebar()" aria-label="Chiudi menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- ── Info utente ── -->
+  @if (accountRef !== null) {
+    <div class="rh-drawer-user">
+      <div class="rh-drawer-avatar">
+        @if (!accountRef.imageUrl) {
+          <span>{{ accountRef.login ? accountRef.login.charAt(0).toUpperCase() : '?' }}</span>
+        } @else {
+          <img [src]="accountRef.imageUrl" alt="Avatar" />
+        }
+      </div>
+      <div class="rh-drawer-user-info">
+        <span class="rh-drawer-username">{{ accountRef.login }}</span>
+        <span class="rh-drawer-email">{{ accountRef.email }}</span>
+      </div>
+    </div>
+    <div class="rh-drawer-divider"></div>
+  }
+
+  <!-- ── Navigazione principale ── -->
+  <nav class="rh-drawer-nav">
+    <!-- Home -->
+    <a
+      class="rh-drawer-link"
+      routerLink="/home"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeSidebar()"
+    >
+      <!-- Casa -->
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" />
+        <path d="M9 21V12h6v9" />
+      </svg>
+      <span>Home</span>
     </a>
 
-    <!-- HAMBURGER (mobile) -->
-    <button class="rh-toggler" type="button" (click)="toggleNavbar()" [attr.aria-expanded]="!isNavbarCollapsed()" aria-label="Apri menu">
-      <span class="rh-toggler-bar"></span>
-      <span class="rh-toggler-bar"></span>
-      <span class="rh-toggler-bar"></span>
-    </button>
+    @if (accountRef !== null) {
+      <!-- I miei Menu — libro aperto -->
+      <a class="rh-drawer-link" routerLink="/menu-list" routerLinkActive="active" (click)="closeSidebar()">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+        </svg>
+        <span>I miei Menu</span>
+      </a>
 
-    <!-- NAV LINKS -->
-    <div class="rh-collapse" [class.open]="!isNavbarCollapsed()">
-      <ul class="rh-nav-list">
-        <!-- Home -->
-        <li class="rh-nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-          <a class="rh-nav-link" routerLink="/" (click)="collapseNavbar()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              <polyline points="9 22 9 12 15 12 15 22" />
+      <!-- Crea Menu — bacchetta magica -->
+      <a class="rh-drawer-link" routerLink="/menu-wizard" routerLinkActive="active" (click)="closeSidebar()">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M15 4V2" />
+          <path d="M15 16v-2" />
+          <path d="M8 9h2" />
+          <path d="M20 9h2" />
+          <path d="M17.8 11.8 19 13" />
+          <path d="M15 9h.01" />
+          <path d="M17.8 6.2 19 5" />
+          <path d="M3 21l9-9" />
+          <path d="M12.2 6.2 11 5" />
+        </svg>
+        <span>Crea Menu</span>
+      </a>
+
+      <!-- Piatti del Giorno — posate -->
+      <a class="rh-drawer-link" routerLink="/piatti-giorno" routerLinkActive="active" (click)="closeSidebar()">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+          <path d="M7 2v20" />
+          <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" />
+        </svg>
+        <span>Piatti del Giorno</span>
+      </a>
+
+      <!-- Prodotti — etichetta/tag -->
+      <a class="rh-drawer-link" routerLink="/prodotto-add" routerLinkActive="active" (click)="closeSidebar()">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+          <line x1="7" y1="7" x2="7.01" y2="7" />
+        </svg>
+        <span>Prodotti</span>
+      </a>
+
+      <!-- GESTIONE — solo ADMIN — ingranaggi -->
+      <div *jhiHasAnyAuthority="'ROLE_ADMIN'" class="rh-drawer-section">
+        <button class="rh-drawer-section-toggle" type="button" (click)="toggleGestione()">
+          <div class="rh-drawer-section-left">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
             </svg>
-            Home
-          </a>
-        </li>
-
-        <!-- Menu items per utente loggato -->
-        @if (account() !== null) {
-          <li class="rh-nav-item" routerLinkActive="active">
-            <a class="rh-nav-link" routerLink="/menu-list" (click)="collapseNavbar()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="7" height="7" />
-                <rect x="14" y="3" width="7" height="7" />
-                <rect x="3" y="14" width="7" height="7" />
-                <rect x="14" y="14" width="7" height="7" />
-              </svg>
-              I miei Menu
-            </a>
-          </li>
-
-          <li class="rh-nav-item" routerLinkActive="active">
-            <a class="rh-nav-link" routerLink="/menu-wizard" (click)="collapseNavbar()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="16" />
-                <line x1="8" y1="12" x2="16" y2="12" />
-              </svg>
-              Crea Menu
-            </a>
-          </li>
-
-          <li class="rh-nav-item" routerLinkActive="active">
-            <a class="rh-nav-link" routerLink="/piatti-giorno" (click)="collapseNavbar()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-              </svg>
-              Piatti del Giorno
-            </a>
-          </li>
-
-          <li class="rh-nav-item" routerLinkActive="active">
-            <a class="rh-nav-link" routerLink="/prodotto-add" (click)="collapseNavbar()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 2l3 7H3m11-7 3 7h-3M6 9c0 5 3 10 6 13 3-3 6-8 6-13" />
-              </svg>
-              Prodotti
-            </a>
-          </li>
-
-          <!-- DROPDOWN: Entità (solo admin/avanzato) -->
-          <li
-            ngbDropdown
-            class="rh-nav-item rh-dropdown"
-            display="dynamic"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }"
+            <span>Gestione</span>
+          </div>
+          <svg
+            class="rh-chevron"
+            [class.rotated]="gestioneExpanded()"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
           >
-            <a class="rh-nav-link rh-dropdown-toggle" ngbDropdownToggle href="javascript:void(0);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="8" y1="6" x2="21" y2="6" />
-                <line x1="8" y1="12" x2="21" y2="12" />
-                <line x1="8" y1="18" x2="21" y2="18" />
-                <line x1="3" y1="6" x2="3.01" y2="6" />
-                <line x1="3" y1="12" x2="3.01" y2="12" />
-                <line x1="3" y1="18" x2="3.01" y2="18" />
-              </svg>
-              Gestione
-              <svg class="rh-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </a>
-            <ul class="rh-dropdown-menu" ngbDropdownMenu>
-              <li>
-                <a
-                  class="rh-dropdown-item"
-                  routerLink="/menu"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                  >Menu</a
-                >
-              </li>
-              <li>
-                <a
-                  class="rh-dropdown-item"
-                  routerLink="/portata"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                  >Portate</a
-                >
-              </li>
-              <li>
-                <a
-                  class="rh-dropdown-item"
-                  routerLink="/prodotto"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                  >Prodotti</a
-                >
-              </li>
-              <li>
-                <a
-                  class="rh-dropdown-item"
-                  routerLink="/allergene"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                  >Allergeni</a
-                >
-              </li>
-              <li>
-                <a
-                  class="rh-dropdown-item"
-                  routerLink="/piatto-del-giorno"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                  >Piatti del Giorno</a
-                >
-              </li>
-            </ul>
-          </li>
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+        @if (gestioneExpanded()) {
+          <div class="rh-drawer-submenu">
+            <a
+              class="rh-drawer-sublink"
+              routerLink="/menu"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              (click)="closeSidebar()"
+              >Menu</a
+            >
+            <a
+              class="rh-drawer-sublink"
+              routerLink="/portata"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              (click)="closeSidebar()"
+              >Portate</a
+            >
+            <a
+              class="rh-drawer-sublink"
+              routerLink="/prodotto"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              (click)="closeSidebar()"
+              >Prodotti</a
+            >
+            <a
+              class="rh-drawer-sublink"
+              routerLink="/allergene"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              (click)="closeSidebar()"
+              >Allergeni</a
+            >
+            <a
+              class="rh-drawer-sublink"
+              routerLink="/piatto-del-giorno"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              (click)="closeSidebar()"
+              >Piatti del Giorno</a
+            >
+          </div>
         }
+      </div>
 
-        <!-- ADMIN -->
-        <li
-          *jhiHasAnyAuthority="'ROLE_ADMIN'"
-          ngbDropdown
-          class="rh-nav-item rh-dropdown"
-          display="dynamic"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <a class="rh-nav-link rh-dropdown-toggle rh-admin-link" ngbDropdownToggle href="javascript:void(0);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      <!-- ADMIN — solo ADMIN — scudo -->
+      <div *jhiHasAnyAuthority="'ROLE_ADMIN'" class="rh-drawer-section rh-drawer-section-admin">
+        <button class="rh-drawer-section-toggle rh-admin-toggle" type="button" (click)="toggleAdmin()">
+          <div class="rh-drawer-section-left">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
-            Admin
-            <svg class="rh-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </a>
-          <ul class="rh-dropdown-menu" ngbDropdownMenu>
-            <li>
-              <a
-                class="rh-dropdown-item"
-                routerLink="/authority"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                (click)="collapseNavbar()"
-                >Authority</a
-              >
-            </li>
-            <li>
-              <a class="rh-dropdown-item" routerLink="/admin/user-management" routerLinkActive="active" (click)="collapseNavbar()"
-                >Gestione Utenti</a
-              >
-            </li>
-            <li>
-              <a class="rh-dropdown-item" routerLink="/admin/metrics" routerLinkActive="active" (click)="collapseNavbar()">Metriche</a>
-            </li>
-            <li>
-              <a class="rh-dropdown-item" routerLink="/admin/health" routerLinkActive="active" (click)="collapseNavbar()">Integrità</a>
-            </li>
-            <li>
-              <a class="rh-dropdown-item" routerLink="/admin/configuration" routerLinkActive="active" (click)="collapseNavbar()"
-                >Configurazione</a
-              >
-            </li>
-            <li><a class="rh-dropdown-item" routerLink="/admin/logs" routerLinkActive="active" (click)="collapseNavbar()">Log</a></li>
+            <span>Admin</span>
+          </div>
+          <svg
+            class="rh-chevron"
+            [class.rotated]="adminExpanded()"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+        @if (adminExpanded()) {
+          <div class="rh-drawer-submenu">
+            <a
+              class="rh-drawer-sublink"
+              routerLink="/authority"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              (click)="closeSidebar()"
+              >Authority</a
+            >
+            <a class="rh-drawer-sublink" routerLink="/admin/user-management" routerLinkActive="active" (click)="closeSidebar()"
+              >Gestione Utenti</a
+            >
+            <a class="rh-drawer-sublink" routerLink="/admin/metrics" routerLinkActive="active" (click)="closeSidebar()">Metriche</a>
+            <a class="rh-drawer-sublink" routerLink="/admin/health" routerLinkActive="active" (click)="closeSidebar()">Integrità</a>
+            <a class="rh-drawer-sublink" routerLink="/admin/configuration" routerLinkActive="active" (click)="closeSidebar()"
+              >Configurazione</a
+            >
+            <a class="rh-drawer-sublink" routerLink="/admin/logs" routerLinkActive="active" (click)="closeSidebar()">Log</a>
             @if (openAPIEnabled) {
-              <li>
-                <a class="rh-dropdown-item" routerLink="/admin/docs" routerLinkActive="active" (click)="collapseNavbar()">API Docs</a>
-              </li>
+              <a class="rh-drawer-sublink" routerLink="/admin/docs" routerLinkActive="active" (click)="closeSidebar()">API Docs</a>
             }
-            @if (!inProduction) {
-              <li><a class="rh-dropdown-item" href="./h2-console/" target="_tab" (click)="collapseNavbar()">Database H2</a></li>
-            }
-          </ul>
-        </li>
-
-        <!-- LINGUA -->
-        @if (languages && languages.length > 1) {
-          <li ngbDropdown class="rh-nav-item rh-dropdown" display="dynamic">
-            <a class="rh-nav-link rh-dropdown-toggle" ngbDropdownToggle href="javascript:void(0);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-              </svg>
-              <svg class="rh-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </a>
-            <ul class="rh-dropdown-menu" ngbDropdownMenu>
-              @for (language of languages; track $index) {
-                <li>
-                  <a
-                    class="rh-dropdown-item"
-                    [jhiActiveMenu]="language"
-                    href="javascript:void(0);"
-                    (click)="changeLanguage(language); collapseNavbar()"
-                  >
-                    {{ language | findLanguageFromKey }}
-                  </a>
-                </li>
-              }
-            </ul>
-          </li>
+          </div>
         }
+      </div>
+    }
+  </nav>
 
-        <!-- ACCOUNT -->
-        <li
-          ngbDropdown
-          class="rh-nav-item rh-dropdown rh-account"
-          display="dynamic"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
+  <div class="rh-drawer-divider rh-drawer-divider-bottom"></div>
+
+  <!-- ── Sezione account in fondo ── -->
+  <div class="rh-drawer-account">
+    @if (accountRef !== null) {
+      <!-- Impostazioni — sliders -->
+      <a
+        class="rh-drawer-link rh-drawer-link-sm"
+        routerLink="/account/settings"
+        routerLinkActive="active"
+        (click)="closeSidebar()"
+        data-cy="settings"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
         >
-          @let accountRef = account();
-          <a class="rh-nav-link rh-account-toggle" ngbDropdownToggle href="javascript:void(0);" id="account-menu" data-cy="accountMenu">
-            @if (!accountRef?.imageUrl) {
-              <div class="rh-avatar">
-                {{ accountRef?.login?.charAt(0)?.toUpperCase() ?? '?' }}
-              </div>
-            } @else {
-              <img [src]="accountRef!.imageUrl" class="rh-avatar rh-avatar-img" alt="Avatar" />
-            }
-            @if (accountRef !== null) {
-              <span class="rh-account-name">{{ accountRef.login }}</span>
-            } @else {
-              <span class="rh-account-name">Accedi</span>
-            }
-            <svg class="rh-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </a>
-          <ul class="rh-dropdown-menu rh-dropdown-menu-right" ngbDropdownMenu>
-            @if (accountRef !== null) {
-              <li class="rh-dropdown-user-info">
-                <span class="rh-dropdown-username">{{ accountRef.login }}</span>
-                <span class="rh-dropdown-email">{{ accountRef.email }}</span>
-              </li>
-              <li class="rh-dropdown-divider"></li>
-              <li>
-                <a
-                  class="rh-dropdown-item"
-                  routerLink="/account/settings"
-                  routerLinkActive="active"
-                  (click)="collapseNavbar()"
-                  data-cy="settings"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3" />
-                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
-                  </svg>
-                  Impostazioni
-                </a>
-              </li>
-              <li>
-                <a
-                  class="rh-dropdown-item"
-                  routerLink="/account/password"
-                  routerLinkActive="active"
-                  (click)="collapseNavbar()"
-                  data-cy="passwordItem"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
-                  Password
-                </a>
-              </li>
-              <li class="rh-dropdown-divider"></li>
-              <li>
-                <a class="rh-dropdown-item rh-logout" (click)="logout()" id="logout" data-cy="logout">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                    <polyline points="16 17 21 12 16 7" />
-                    <line x1="21" y1="12" x2="9" y2="12" />
-                  </svg>
-                  Esci
-                </a>
-              </li>
-            } @else {
-              <li>
-                <a class="rh-dropdown-item" (click)="login()" id="login" data-cy="login">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                    <polyline points="10 17 15 12 10 7" />
-                    <line x1="15" y1="12" x2="3" y2="12" />
-                  </svg>
-                  Accedi
-                </a>
-              </li>
-              <li>
-                <a
-                  class="rh-dropdown-item rh-register"
-                  routerLink="/account/register"
-                  routerLinkActive="active"
-                  (click)="collapseNavbar()"
-                  data-cy="register"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="8.5" cy="7" r="4" />
-                    <line x1="20" y1="8" x2="20" y2="14" />
-                    <line x1="23" y1="11" x2="17" y2="11" />
-                  </svg>
-                  Registrati
-                </a>
-              </li>
-            }
-          </ul>
-        </li>
-      </ul>
-    </div>
+          <line x1="4" y1="6" x2="20" y2="6" />
+          <line x1="4" y1="12" x2="20" y2="12" />
+          <line x1="4" y1="18" x2="20" y2="18" />
+          <circle cx="8" cy="6" r="2" fill="currentColor" stroke="none" />
+          <circle cx="16" cy="12" r="2" fill="currentColor" stroke="none" />
+          <circle cx="10" cy="18" r="2" fill="currentColor" stroke="none" />
+        </svg>
+        <span>Impostazioni</span>
+      </a>
+
+      <!-- Password — lucchetto -->
+      <a
+        class="rh-drawer-link rh-drawer-link-sm"
+        routerLink="/account/password"
+        routerLinkActive="active"
+        (click)="closeSidebar()"
+        data-cy="passwordItem"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+        <span>Password</span>
+      </a>
+
+      <!-- Esci — freccia uscita -->
+      <button class="rh-drawer-link rh-drawer-link-sm rh-drawer-logout" type="button" (click)="logout()" id="logout" data-cy="logout">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+        <span>Esci</span>
+      </button>
+    } @else {
+      <!-- Accedi -->
+      <button class="rh-drawer-link rh-drawer-link-sm" type="button" (click)="login()">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+          <polyline points="10 17 15 12 10 7" />
+          <line x1="15" y1="12" x2="3" y2="12" />
+        </svg>
+        <span>Accedi</span>
+      </button>
+    }
   </div>
-</nav>
+</aside>
