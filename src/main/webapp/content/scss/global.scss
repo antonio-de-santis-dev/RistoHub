@@ -223,6 +223,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   -o-transform: rotate(-45deg);
   -webkit-transform: rotate(-45deg);
   transform: rotate(-45deg);
+  display: none !important;
 }
 
 /* navbar.component.scss */
@@ -241,7 +242,14 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 ========================================================================== */
 
 /* Quando il card wrapper contiene jhi-home, azzera tutto */
-.card.jh-card:has(jhi-home) {
+.card.jh-card:has(jhi-home),
+.card.jh-card:has(jhi-menu-list),
+.card.jh-card:has(jhi-menu-wizard),
+.card.jh-card:has(jhi-menu-wizard-edit),
+.card.jh-card:has(jhi-piatti-giorno-gestione),
+.card.jh-card:has(jhi-prodotto-add),
+.card.jh-card:has(jhi-settings),
+.card.jh-card:has(jhi-password) {
   padding: 0 !important;
   margin-top: 0 !important;
   border: none !important;

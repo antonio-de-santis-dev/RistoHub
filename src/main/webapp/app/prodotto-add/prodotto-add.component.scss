@@ -11,12 +11,13 @@ $radius: 16px;
 
 :host {
   display: block;
+  margin: -1.5rem -15px 0;
 }
 
 .pa-page {
   min-height: 100vh;
   position: relative;
-  background-image: url('/content/images/unnamed.jpg');
+  background-image: url('/content/images/sfondo.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

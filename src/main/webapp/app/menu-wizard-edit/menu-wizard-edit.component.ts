@@ -263,11 +263,21 @@ export class MenuWizardEditComponent implements OnInit {
         await this.http.post('/api/portatas', { tipo: 'PERSONALIZZATA', nomePersonalizzato: nome, menu: { id: this.menuId } }).toPromise();
       }
 
-      // 3. Gestione logo
+      // 3. Gestione logo — elimina TUTTI i loghi esistenti prima di salvarne uno nuovo
+      //    (fix: evita loghi duplicati da salvataggi precedenti falliti)
       if (this.logoFile) {
-        if (this.logoEsistenteId) {
-          await this.http.delete(`/api/immagine-menus/${this.logoEsistenteId}`).toPromise();
+        // Ricarica la lista aggiornata e cancella TUTTI i loghi del menu
+        const immaginiAttuali: any[] = (await this.http.get<any[]>(`/api/menus/${this.menuId}/immagini`).toPromise()) ?? [];
+        const tuttiILoghi = immaginiAttuali.filter(i => i.tipo === 'LOGO');
+        for (const logo of tuttiILoghi) {
+          try {
+            await this.http.delete(`/api/immagine-menus/${logo.id}`).toPromise();
+          } catch (e) {
+            console.warn('Impossibile eliminare logo', logo.id, e);
+          }
         }
+
+        // Carica il nuovo logo
         const reader = new FileReader();
         reader.readAsDataURL(this.logoFile);
         reader.onload = async () => {
@@ -284,7 +294,16 @@ export class MenuWizardEditComponent implements OnInit {
           this.router.navigate(['/menu-view', this.menuId]);
         };
       } else if (!this.logoPreview && this.logoEsistenteId) {
-        await this.http.delete(`/api/immagine-menus/${this.logoEsistenteId}`).toPromise();
+        // Caso "rimuovi logo senza sostituirlo" — elimina tutti i loghi
+        const immaginiAttuali: any[] = (await this.http.get<any[]>(`/api/menus/${this.menuId}/immagini`).toPromise()) ?? [];
+        const tuttiILoghi = immaginiAttuali.filter(i => i.tipo === 'LOGO');
+        for (const logo of tuttiILoghi) {
+          try {
+            await this.http.delete(`/api/immagine-menus/${logo.id}`).toPromise();
+          } catch (e) {
+            console.warn('Impossibile eliminare logo', logo.id, e);
+          }
+        }
         this.router.navigate(['/menu-view', this.menuId]);
       } else {
         this.router.navigate(['/menu-view', this.menuId]);
