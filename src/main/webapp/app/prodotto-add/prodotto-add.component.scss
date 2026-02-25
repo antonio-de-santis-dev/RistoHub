@@ -4,6 +4,8 @@
 
 $accent: #c8102e;
 $accent-soft: #ffb3be;
+$indigo: #6366f1;
+$indigo-hover: #4f46e5;
 $text-white: #ffffff;
 $muted-white: rgba(255, 255, 255, 0.62);
 $border-glass: rgba(255, 255, 255, 0.15);
@@ -40,6 +42,7 @@ $radius: 16px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem 3rem;
 }
+
 .pa-back-link {
   display: inline-flex;
   align-items: center;
@@ -59,7 +62,6 @@ $radius: 16px;
 // ── Header ────────────────────────────────────────────
 .pa-header {
   margin-bottom: 2rem;
-
   h1 {
     font-family: 'Playfair Display', 'Georgia', serif;
     font-size: 1.75rem;
@@ -68,7 +70,6 @@ $radius: 16px;
     margin: 0 0 4px;
     text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8);
   }
-
   p {
     color: $muted-white;
     margin: 0;
@@ -96,6 +97,23 @@ $radius: 16px;
   animation: spin 0.75s linear infinite;
 }
 
+.pa-mini-spinner {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+
+.pa-saving-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -119,6 +137,63 @@ $radius: 16px;
   border: 1px solid $border-glass;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   padding: 1.75rem;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+
+// Card sinistra in modalità modifica — bordo indigo
+.pa-card-edit-mode {
+  border-color: rgba(99, 102, 241, 0.55);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(99, 102, 241, 0.2);
+}
+
+// ── Banner modalità modifica ──────────────────────────
+.pa-edit-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 1.25rem;
+  font-size: 0.84rem;
+  color: #a5b4fc;
+  font-weight: 500;
+
+  strong {
+    color: #c7d2fe;
+    font-weight: 700;
+  }
+}
+
+.pa-edit-banner-icon {
+  color: #818cf8;
+  flex-shrink: 0;
+  display: flex;
+}
+
+.pa-edit-banner-cancel {
+  margin-left: auto;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #a5b4fc;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  &:hover {
+    background: rgba(99, 102, 241, 0.3);
+    color: #fff;
+  }
 }
 
 // ── Form ──────────────────────────────────────────────
@@ -135,6 +210,13 @@ $radius: 16px;
   align-items: center;
   gap: 8px;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+
+.pa-section-title-edit {
+  color: #a5b4fc;
+  svg {
+    color: #818cf8;
+  }
 }
 
 .pa-count-badge {
@@ -179,7 +261,6 @@ $radius: 16px;
     border-color: rgba(255, 255, 255, 0.45);
     background: rgba(255, 255, 255, 0.12);
   }
-
   option {
     background: #1a1a2e;
     color: #fff;
@@ -192,6 +273,12 @@ select.pa-form-control {
 textarea.pa-form-control {
   resize: vertical;
   min-height: 72px;
+}
+
+// In edit mode i focus sono indigo
+.pa-card-edit-mode .pa-form-control:focus {
+  border-color: rgba(99, 102, 241, 0.7);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 .pa-btn-aggiungi {
@@ -209,7 +296,6 @@ textarea.pa-form-control {
   transition:
     background 0.2s,
     transform 0.18s;
-
   &:hover:not(:disabled) {
     background: darken(#c8102e, 8%);
     transform: translateY(-1px);
@@ -220,13 +306,78 @@ textarea.pa-form-control {
   }
 }
 
+// ── Azioni modifica ───────────────────────────────────
+.pa-edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 0.75rem;
+}
+
+.pa-btn-annulla {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9px;
+  padding: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.13);
+    color: #fff;
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.pa-btn-salva-edit {
+  flex: 2;
+  background: $indigo;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  transition: all 0.2s;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  &:hover:not(:disabled) {
+    background: $indigo-hover;
+    box-shadow: 0 6px 22px rgba(99, 102, 241, 0.55);
+    transform: translateY(-1px);
+  }
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
 .pa-alert {
   border-radius: 9px;
   padding: 10px 14px;
   margin-bottom: 1rem;
   font-size: 0.9rem;
   font-weight: 500;
-
   &.pa-alert-success {
     background: rgba(74, 222, 128, 0.15);
     color: #4ade80;
@@ -239,7 +390,7 @@ textarea.pa-form-control {
   }
 }
 
-// Allergeni
+// ── Allergeni ─────────────────────────────────────────
 .pa-allergeni-hint {
   font-size: 0.8rem;
   color: $muted-white;
@@ -266,12 +417,18 @@ textarea.pa-form-control {
   color: rgba(255, 255, 255, 0.75);
   font-size: 0.82rem;
   font-weight: 600;
-
   &.selected {
     border-color: $accent-soft;
     background: rgba(200, 16, 46, 0.2);
     color: $accent-soft;
   }
+}
+
+// In edit mode i chip selezionati sono indigo
+.pa-card-edit-mode .pa-allergene-chip.selected {
+  border-color: rgba(99, 102, 241, 0.7);
+  background: rgba(99, 102, 241, 0.18);
+  color: #c7d2fe;
 }
 
 .pa-allergene-icona {
@@ -284,7 +441,6 @@ textarea.pa-form-control {
   overflow: hidden;
   flex-shrink: 0;
 }
-
 .pa-allergene-img {
   width: 100%;
   height: 100%;
@@ -327,7 +483,6 @@ textarea.pa-form-control {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1rem;
-
   h2 {
     font-size: 1rem;
     font-weight: 700;
@@ -353,11 +508,20 @@ textarea.pa-form-control {
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.05);
   margin-bottom: 8px;
-  transition: background 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.2s;
 
   &:hover {
     background: rgba(255, 255, 255, 0.09);
   }
+}
+
+// Item evidenziato quando è in modifica
+.pa-prodotto-in-modifica {
+  border-color: rgba(99, 102, 241, 0.55) !important;
+  background: rgba(99, 102, 241, 0.08) !important;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
 }
 
 .pa-prodotto-info {
@@ -388,7 +552,7 @@ textarea.pa-form-control {
 .pa-prodotto-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
@@ -399,7 +563,6 @@ textarea.pa-form-control {
   white-space: nowrap;
 }
 
-// Allergeni nella lista
 .pa-prodotto-allergeni {
   display: flex;
   flex-wrap: wrap;
@@ -417,7 +580,6 @@ textarea.pa-form-control {
   flex-shrink: 0;
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
-
 .pa-lista-img {
   width: 100%;
   height: 100%;
@@ -431,20 +593,319 @@ textarea.pa-form-control {
   text-transform: uppercase;
 }
 
+// ── Pulsante MODIFICA nella lista ─────────────────────
+.pa-btn-modifica {
+  background: transparent;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: #818cf8;
+  border-radius: 8px;
+  padding: 6px 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+  flex-shrink: 0;
+  &:hover {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.65);
+    color: #c7d2fe;
+    transform: translateY(-1px);
+  }
+}
+
+// Quando quel prodotto è in modifica — pulsante pieno
+.pa-btn-modifica-attivo {
+  background: rgba(99, 102, 241, 0.25) !important;
+  border-color: rgba(99, 102, 241, 0.7) !important;
+  color: #c7d2fe !important;
+}
+
+// ── Pulsante ELIMINA nella lista ──────────────────────
 .pa-btn-elimina {
   background: transparent;
   border: 1px solid rgba(248, 113, 113, 0.25);
   color: #f87171;
   border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  font-family: inherit;
+  padding: 6px 9px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.18s;
-  white-space: nowrap;
+  flex-shrink: 0;
   &:hover {
     background: rgba(248, 113, 113, 0.15);
+    transform: translateY(-1px);
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  MODAL CONFERMA ELIMINAZIONE
+// ══════════════════════════════════════════════════════
+
+.pa-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 3, 3, 0.93);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+  animation: paFadeIn 0.18s ease;
+}
+
+@keyframes paFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.pa-modal-box {
+  background: #200a0a;
+  border: 1.5px solid rgba(200, 16, 46, 0.5);
+  border-radius: 20px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow:
+    0 40px 100px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: paModalIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@keyframes paModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.pa-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 1.4rem 1.5rem 1rem;
+  background: linear-gradient(135deg, rgba(200, 16, 46, 0.22) 0%, rgba(150, 10, 30, 0.1) 100%);
+  border-bottom: 1px solid rgba(200, 16, 46, 0.45);
+}
+
+.pa-modal-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  background: rgba(200, 16, 46, 0.2);
+  border: 1.5px solid rgba(200, 16, 46, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff6b7a;
+  flex-shrink: 0;
+  animation: pulseRed 2s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(200, 16, 46, 0.25);
+}
+
+@keyframes pulseRed {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(200, 16, 46, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(200, 16, 46, 0.5);
+  }
+}
+
+.pa-modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 3px;
+}
+
+.pa-modal-subtitle {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.pa-modal-close {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.55);
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  &:hover:not(:disabled) {
+    background: rgba(200, 16, 46, 0.2);
+    border-color: rgba(200, 16, 46, 0.5);
+    color: #fff;
+  }
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.pa-modal-body {
+  padding: 1.3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+// Preview prodotto nel modal
+.pa-modal-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 15px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 11px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #c8102e, #ff4466);
+    border-radius: 3px 0 0 3px;
+  }
+}
+
+.pa-modal-preview-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pa-modal-preview-nome {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pa-modal-preview-prezzo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ff8a8a;
+}
+
+.pa-modal-preview-desc {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.42);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pa-modal-preview-allergeni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.pa-modal-avviso {
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.52);
+  line-height: 1.6;
+  margin: 0;
+  strong {
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+  }
+}
+
+.pa-modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 0.9rem 1.5rem 1.4rem;
+  border-top: 1px solid rgba(200, 16, 46, 0.2);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.pa-modal-btn-cancel {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 0.6rem 1.3rem;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: inherit;
+  font-size: 0.87rem;
+  transition: all 0.2s;
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.13);
+    color: #fff;
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.pa-modal-btn-delete {
+  background: $accent;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: inherit;
+  font-size: 0.87rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  box-shadow: 0 4px 14px rgba(200, 16, 46, 0.4);
+  transition: all 0.2s;
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  &:hover:not(:disabled) {
+    background: darken(#c8102e, 8%);
+    box-shadow: 0 6px 20px rgba(200, 16, 46, 0.6);
+    transform: translateY(-1px);
+  }
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 }
 
@@ -489,5 +950,13 @@ textarea.pa-form-control {
   .pa-prodotto-item {
     padding: 0.75rem;
     gap: 0.75rem;
+  }
+  .pa-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .pa-modal-box {
+    border-radius: 20px 20px 0 0;
+    max-width: 100%;
   }
 }

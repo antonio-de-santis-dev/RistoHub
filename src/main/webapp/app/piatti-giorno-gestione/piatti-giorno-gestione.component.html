@@ -48,14 +48,18 @@
           <div class="pg-prezzo">{{ formatPrezzo(prezzoPiatto(piatto)) }}</div>
           <div class="pg-allergeni" *ngIf="getAllergeniPiatto(piatto).length > 0">
             <ng-container *ngFor="let a of getAllergeniPiatto(piatto)">
-              <div class="pg-all-cerchio" [style.backgroundColor]="a.colore || '#888'" [title]="a.nome">
+              <div
+                class="pg-all-cerchio"
+                [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'"
+                [title]="a.nome"
+              >
                 <img
-                  *ngIf="a.icona && a.iconaContentType"
-                  [src]="'data:' + a.iconaContentType + ';base64,' + a.icona"
+                  *ngIf="getAllergeneIcona(a)"
+                  [src]="getAllergeneIcona(a)"
                   [alt]="a.nome"
                   class="pg-all-img"
+                  style="width: 100%; height: 100%; object-fit: contain"
                 />
-                <span *ngIf="!a.icona" class="pg-all-iniziale">{{ a.nome.charAt(0) }}</span>
               </div>
             </ng-container>
           </div>
@@ -73,7 +77,13 @@
             </svg>
             {{ piatto.attivo ? 'Visibile' : 'Nascosto' }}
           </button>
-          <button class="pg-btn-delete" (click)="eliminaPiatto(piatto.id!)" title="Elimina">
+          <button class="pg-btn-edit" (click)="apriModaleModifica(piatto)" title="Modifica">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+          </button>
+          <button class="pg-btn-delete" (click)="apriModaleEliminazione(piatto)" title="Elimina">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="3 6 5 6 21 6" />
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
@@ -84,18 +94,13 @@
     </div>
   </div>
 
-  <!-- Footer -->
   <footer class="pg-footer">
     <p>© 2025 <strong>RistoHub</strong> — Il tuo menu digitale professionale</p>
   </footer>
 </div>
 
-<!-- ═══════════════════════════════════════
-     MODAL: Crea Nuovo Piatto Personalizzato
-     ═══════════════════════════════════════ -->
 <div *ngIf="modaleCreazioneAperto && !modalitaSelezioneProdotto" class="pg-modal-overlay" (click)="chiudiModale()">
   <div class="pg-modal-box" (click)="$event.stopPropagation()">
-    <!-- Header modale -->
     <div class="pg-modal-header">
       <div class="pg-modal-icon">✨</div>
       <div>
@@ -157,7 +162,6 @@
             <polyline points="14 2 14 8 20 8" />
             <line x1="16" y1="13" x2="8" y2="13" />
             <line x1="16" y1="17" x2="8" y2="17" />
-            <polyline points="10 9 9 9 8 9" />
           </svg>
           Descrizione
         </label>
@@ -180,14 +184,14 @@
             [class.selected]="allergeniSelezionati.has(a.id)"
             (click)="toggleAllergene(a.id)"
           >
-            <div class="pg-allergene-icona" [style.backgroundColor]="a.colore || '#888'">
+            <div class="pg-allergene-icona" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'">
               <img
-                *ngIf="a.icona && a.iconaContentType"
-                [src]="'data:' + a.iconaContentType + ';base64,' + a.icona"
+                *ngIf="getAllergeneIcona(a)"
+                [src]="getAllergeneIcona(a)"
                 [alt]="a.nome"
                 class="pg-allergene-img"
+                style="width: 100%; height: 100%; object-fit: contain"
               />
-              <span *ngIf="!a.icona" class="pg-allergene-iniziale">{{ a.nome.charAt(0) }}</span>
             </div>
             {{ a.nome }}
             <svg
@@ -236,12 +240,8 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     MODAL: Seleziona Da Menu Esistente
-     ═══════════════════════════════════════ -->
 <div *ngIf="modaleCreazioneAperto && modalitaSelezioneProdotto" class="pg-modal-overlay" (click)="chiudiModale()">
   <div class="pg-modal-box" (click)="$event.stopPropagation()">
-    <!-- Header modale -->
     <div class="pg-modal-header">
       <div class="pg-modal-icon pg-modal-icon-blue">🔗</div>
       <div>
@@ -257,7 +257,6 @@
     </div>
 
     <div class="pg-modal-body">
-      <!-- Step 1: Scegli menu -->
       <div class="pg-step">
         <div class="pg-step-label">
           <span class="pg-step-num">1</span>
@@ -269,7 +268,6 @@
         </select>
       </div>
 
-      <!-- Step 2: Scegli portata -->
       <div class="pg-step" *ngIf="portate.length > 0">
         <div class="pg-step-label">
           <span class="pg-step-num">2</span>
@@ -281,7 +279,6 @@
         </select>
       </div>
 
-      <!-- Step 3: Lista prodotti -->
       <div class="pg-step" *ngIf="prodotti.length > 0">
         <div class="pg-step-label">
           <span class="pg-step-num">3</span>
@@ -320,7 +317,6 @@
         </div>
       </div>
 
-      <!-- Stato vuoto portata -->
       <div *ngIf="portataSelezionata && prodotti.length === 0" class="pg-empty-prodotti">
         <span>🍽️</span>
         <p>Nessun prodotto in questa portata</p>
@@ -329,6 +325,273 @@
 
     <div class="pg-modal-footer">
       <button class="pg-btn-cancel" (click)="chiudiModale()">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="modaleModificaAperto && piattoInModifica" class="pg-modal-overlay" (click)="chiudiModaleModifica()">
+  <div class="pg-modal-box" (click)="$event.stopPropagation()">
+    <div class="pg-modal-header pg-modal-header-edit">
+      <div class="pg-modal-icon pg-modal-icon-edit">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+        </svg>
+      </div>
+      <div>
+        <h2 class="pg-modal-title">Modifica Piatto</h2>
+        <p class="pg-modal-subtitle">
+          <span *ngIf="piattoInModifica.prodotto">🔗 Piatto da menu — solo il menu è modificabile</span>
+          <span *ngIf="!piattoInModifica.prodotto">✨ Piatto personalizzato</span>
+        </p>
+      </div>
+      <button class="pg-modal-close" (click)="chiudiModaleModifica()" [disabled]="isSavingEdit">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <div *ngIf="editErrore" class="pg-alert pg-alert-error" style="margin: 1rem 1.5rem 0">{{ editErrore }}</div>
+
+    <div class="pg-modal-body">
+      <div *ngIf="piattoInModifica.prodotto" class="pg-edit-readonly-banner">
+        <div class="pg-edit-readonly-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <p>
+          I dati del piatto (nome, prezzo, allergeni) sono definiti nel menu e non modificabili qui. Puoi cambiare solo il menu di
+          appartenenza.
+        </p>
+      </div>
+
+      <div *ngIf="piattoInModifica.prodotto" class="pg-edit-preview">
+        <div class="pg-edit-preview-row">
+          <span class="pg-edit-preview-label">Nome</span>
+          <span class="pg-edit-preview-value">{{ piattoInModifica.prodotto.nome }}</span>
+        </div>
+        <div class="pg-edit-preview-row">
+          <span class="pg-edit-preview-label">Prezzo</span>
+          <span class="pg-edit-preview-value pg-edit-preview-prezzo">{{ formatPrezzo(piattoInModifica.prodotto.prezzo) }}</span>
+        </div>
+        <div class="pg-edit-preview-row" *ngIf="piattoInModifica.prodotto.descrizione">
+          <span class="pg-edit-preview-label">Descrizione</span>
+          <span class="pg-edit-preview-value pg-edit-preview-desc">{{ piattoInModifica.prodotto.descrizione }}</span>
+        </div>
+        <div class="pg-edit-preview-row" *ngIf="getAllergeniPiatto(piattoInModifica).length > 0">
+          <span class="pg-edit-preview-label">Allergeni</span>
+          <div class="pg-edit-preview-allergeni">
+            <ng-container *ngFor="let a of getAllergeniPiatto(piattoInModifica)">
+              <div
+                class="pg-all-cerchio"
+                [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'"
+                [title]="a.nome"
+              >
+                <img
+                  *ngIf="getAllergeneIcona(a)"
+                  [src]="getAllergeneIcona(a)"
+                  [alt]="a.nome"
+                  class="pg-all-img"
+                  style="width: 100%; height: 100%; object-fit: contain"
+                />
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <ng-container *ngIf="!piattoInModifica.prodotto">
+        <div class="pg-form-row">
+          <div class="pg-form-group" style="flex: 1">
+            <label class="pg-form-label">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+              Nome del piatto *
+            </label>
+            <input type="text" class="pg-form-control" [(ngModel)]="editNome" placeholder="Nome del piatto" maxlength="100" />
+          </div>
+          <div class="pg-form-group pg-form-group-prezzo">
+            <label class="pg-form-label">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+              Prezzo (€) *
+            </label>
+            <input type="number" class="pg-form-control" [(ngModel)]="editPrezzo" placeholder="0,00" min="0" step="0.50" />
+          </div>
+        </div>
+
+        <div class="pg-form-group">
+          <label class="pg-form-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            Descrizione
+          </label>
+          <textarea class="pg-form-control" [(ngModel)]="editDescrizione" rows="2" placeholder="Descrizione (opzionale)"></textarea>
+        </div>
+
+        <div class="pg-form-group" *ngIf="allergeniDisponibili.length > 0">
+          <label class="pg-form-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            Allergeni
+          </label>
+          <div class="pg-allergeni-grid">
+            <div
+              *ngFor="let a of allergeniDisponibili"
+              class="pg-allergene-chip"
+              [class.selected]="editAllergeniSelezionati.has(a.id)"
+              (click)="toggleEditAllergene(a.id)"
+            >
+              <div class="pg-allergene-icona" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'">
+                <img
+                  *ngIf="getAllergeneIcona(a)"
+                  [src]="getAllergeneIcona(a)"
+                  [alt]="a.nome"
+                  class="pg-allergene-img"
+                  style="width: 100%; height: 100%; object-fit: contain"
+                />
+              </div>
+              {{ a.nome }}
+              <svg
+                *ngIf="editAllergeniSelezionati.has(a.id)"
+                class="pg-check-icon"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+          </div>
+          <div class="pg-custom-row">
+            <input
+              type="text"
+              class="pg-form-control"
+              [(ngModel)]="editNomeAllergeneCustom"
+              placeholder="Aggiungi allergene personalizzato..."
+              style="flex: 1"
+              (keydown.enter)="aggiungiAllergeneCustomEdit()"
+            />
+            <button class="pg-btn-custom" (click)="aggiungiAllergeneCustomEdit()" type="button">+ Aggiungi</button>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="pg-form-group">
+        <label class="pg-form-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+          </svg>
+          Menu di appartenenza *
+        </label>
+        <select class="pg-form-control" [(ngModel)]="editMenuId">
+          <option [ngValue]="null">— Seleziona un menu —</option>
+          <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="pg-modal-footer">
+      <button class="pg-btn-cancel" (click)="chiudiModaleModifica()" [disabled]="isSavingEdit">Annulla</button>
+      <button class="pg-btn-save-edit" (click)="salvaModifica()" [disabled]="isSavingEdit || !editFormValido()">
+        <span *ngIf="!isSavingEdit">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          Salva modifiche
+        </span>
+        <span *ngIf="isSavingEdit" class="pg-saving-row">
+          <span class="pg-mini-spinner"></span>
+          Salvataggio...
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div
+  *ngIf="modaleEliminazioneAperto && piattoInEliminazione"
+  class="pg-modal-overlay pg-modal-overlay-danger"
+  (click)="chiudiModaleEliminazione()"
+>
+  <div class="pg-modal-box pg-modal-box-sm" (click)="$event.stopPropagation()">
+    <div class="pg-modal-header pg-modal-header-danger">
+      <div class="pg-modal-icon pg-modal-icon-danger">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+          <line x1="10" y1="11" x2="10" y2="17" />
+          <line x1="14" y1="11" x2="14" y2="17" />
+        </svg>
+      </div>
+      <div>
+        <h2 class="pg-modal-title">Elimina piatto</h2>
+        <p class="pg-modal-subtitle">Questa azione è irreversibile</p>
+      </div>
+      <button class="pg-modal-close" (click)="chiudiModaleEliminazione()" [disabled]="isDeleting">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="pg-modal-body pg-elimina-body">
+      <div class="pg-elimina-card">
+        <div class="pg-elimina-card-icon">
+          <span *ngIf="piattoInEliminazione.prodotto">🔗</span>
+          <span *ngIf="!piattoInEliminazione.prodotto">✨</span>
+        </div>
+        <div class="pg-elimina-card-info">
+          <span class="pg-elimina-nome">{{ nomePiatto(piattoInEliminazione) }}</span>
+          <span class="pg-elimina-prezzo">{{ formatPrezzo(prezzoPiatto(piattoInEliminazione)) }}</span>
+          <span class="pg-elimina-menu" *ngIf="piattoInEliminazione.menu?.nome"> 📋 {{ piattoInEliminazione.menu?.nome }} </span>
+        </div>
+        <div class="pg-elimina-stato" [class.attivo]="piattoInEliminazione.attivo" [class.inattivo]="!piattoInEliminazione.attivo">
+          <span class="pg-elimina-dot"></span>
+          {{ piattoInEliminazione.attivo ? 'Visibile' : 'Nascosto' }}
+        </div>
+      </div>
+
+      <p class="pg-elimina-avviso">
+        Stai per eliminare definitivamente
+        <strong>{{ nomePiatto(piattoInEliminazione) }}</strong>
+        dai piatti del giorno. Non sarà più visibile nel menu.
+      </p>
+    </div>
+
+    <div class="pg-modal-footer">
+      <button class="pg-btn-cancel" (click)="chiudiModaleEliminazione()" [disabled]="isDeleting">Annulla</button>
+      <button class="pg-btn-elimina-confirm" (click)="confermaEliminazione()" [disabled]="isDeleting">
+        <span *ngIf="!isDeleting">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+          </svg>
+          Sì, elimina
+        </span>
+        <span *ngIf="isDeleting" class="pg-saving-row">
+          <span class="pg-mini-spinner"></span>
+          Eliminazione...
+        </span>
+      </button>
     </div>
   </div>
 </div>

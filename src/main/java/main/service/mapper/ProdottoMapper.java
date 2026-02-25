@@ -1,6 +1,7 @@
 package main.service.mapper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -22,6 +23,10 @@ public interface ProdottoMapper extends EntityMapper<ProdottoDTO, Prodotto> {
     @Mapping(target = "portata", source = "portata", qualifiedByName = "portataId")
     ProdottoDTO toDto(Prodotto s);
 
+    // ── allergenDtoListToSet aggiunto esplicitamente per garantire
+    //    che tutti gli allergeni con ID valido vengano salvati nella
+    //    tabella di join, senza dipendere dall'auto-mapping di MapStruct.
+    @Mapping(target = "allergenis", source = "allergenis", qualifiedByName = "allergenDtoListToSet")
     @Mapping(target = "removeAllergeni", ignore = true)
     @Mapping(target = "portata", source = "portata", qualifiedByName = "portataFromDto")
     Prodotto toEntity(ProdottoDTO prodottoDTO);
@@ -36,8 +41,6 @@ public interface ProdottoMapper extends EntityMapper<ProdottoDTO, Prodotto> {
 
     /**
      * toEntity: ricostruisce la Portata dall'id nel DTO.
-     * Implementato come default per evitare che MapStruct generi
-     * un'implementazione astratta non risolvibile.
      * JPA ha bisogno solo dell'id per stabilire la relazione ManyToOne.
      */
     @Named("portataFromDto")
@@ -64,7 +67,8 @@ public interface ProdottoMapper extends EntityMapper<ProdottoDTO, Prodotto> {
     AllergeneDTO toDtoAllergeneConDettagli(Allergene allergene);
 
     /**
-     * Converte Set<Allergene> → List<AllergeneDTO> con tutti i campi.
+     * toDto: converte Set<Allergene> → List<AllergeneDTO> con tutti i campi
+     * (id, nome, icona, iconaContentType, colore) necessari per la visualizzazione.
      */
     @Named("allergeniSetToList")
     default List<AllergeneDTO> allergeniSetToList(Set<Allergene> allergenis) {
@@ -74,6 +78,31 @@ public interface ProdottoMapper extends EntityMapper<ProdottoDTO, Prodotto> {
         List<AllergeneDTO> result = new ArrayList<>();
         for (Allergene a : allergenis) {
             result.add(toDtoAllergeneConDettagli(a));
+        }
+        return result;
+    }
+
+    /**
+     * toEntity: converte List<AllergeneDTO> → Set<Allergene> per la persistenza.
+     *
+     * Vengono inclusi SOLO gli allergeni con ID non-null (già presenti nel DB).
+     * Gli allergeni "custom" senza ID devono essere creati tramite POST /api/allergenes
+     * dal frontend PRIMA di chiamare il save del prodotto.
+     *
+     * JPA gestisce la relazione ManyToMany tramite la tabella di join usando solo l'id.
+     */
+    @Named("allergenDtoListToSet")
+    default Set<Allergene> allergenDtoListToSet(List<AllergeneDTO> allergeniDtos) {
+        if (allergeniDtos == null) {
+            return new HashSet<>();
+        }
+        Set<Allergene> result = new HashSet<>();
+        for (AllergeneDTO dto : allergeniDtos) {
+            if (dto.getId() != null) {
+                Allergene a = new Allergene();
+                a.setId(dto.getId());
+                result.add(a);
+            }
         }
         return result;
     }

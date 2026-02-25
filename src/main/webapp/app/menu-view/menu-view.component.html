@@ -1,25 +1,94 @@
-<!-- Stato: caricamento -->
 <div *ngIf="isLoading" class="loading-screen">
   <div class="loading-spinner"></div>
   <p>Caricamento menu in corso...</p>
 </div>
 
-<!-- Stato: errore -->
 <div *ngIf="!isLoading && errore" class="errore-screen">
   <p>⚠️ Impossibile caricare il menu. Riprova più tardi.</p>
   <button (click)="tornaAiMieiMenu()" class="btn-torna">← I miei menu</button>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     TEMPLATE CLASSICO
-     ═══════════════════════════════════════════════════════ -->
+<div *ngIf="prodottoInModifica" class="modal-overlay" (click)="chiudiModifica()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-header" [style.backgroundColor]="colorePrimario">
+      <h3 class="modal-titolo">✏️ Modifica prodotto</h3>
+      <button class="modal-close" (click)="chiudiModifica()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field">
+        <label>Nome *</label>
+        <input [(ngModel)]="editNome" type="text" placeholder="Nome del piatto" class="modal-input" />
+      </div>
+      <div class="modal-field">
+        <label>Descrizione</label>
+        <textarea [(ngModel)]="editDescrizione" placeholder="Descrizione (opzionale)" class="modal-textarea" rows="2"></textarea>
+      </div>
+      <div class="modal-field">
+        <label>Prezzo (€) *</label>
+        <input [(ngModel)]="editPrezzo" type="number" min="0" step="0.01" placeholder="0.00" class="modal-input" />
+      </div>
+      <div class="modal-field">
+        <label>Allergeni</label>
+        <div class="modal-allergeni-grid">
+          <div
+            *ngFor="let a of allergeniDisponibili"
+            class="modal-allergene-chip"
+            [class.selezionato]="editAllergeniSelezionati.has(a.id)"
+            [style.borderColor]="editAllergeniSelezionati.has(a.id) ? colorePrimario : '#e5e7eb'"
+            [style.backgroundColor]="editAllergeniSelezionati.has(a.id) ? colorePrimario + '18' : 'white'"
+            (click)="toggleEditAllergene(a.id)"
+          >
+            <img
+              *ngIf="getAllergeneIcona(a)"
+              [src]="getAllergeneIcona(a)"
+              class="modal-allergene-icona"
+              style="width: 24px; height: 24px; object-fit: contain"
+            />
+            <span *ngIf="!getAllergeneIcona(a)" class="modal-allergene-dot" [style.backgroundColor]="a.colore || '#888'"></span>
+            <span class="modal-allergene-nome">{{ a.nome }}</span>
+            <span *ngIf="editAllergeniSelezionati.has(a.id)" class="modal-allergene-check">✓</span>
+          </div>
+        </div>
+      </div>
+      <p *ngIf="editErrore" class="modal-errore">{{ editErrore }}</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-annulla" (click)="chiudiModifica()">Annulla</button>
+      <button class="btn-modal-salva" [style.backgroundColor]="colorePrimario" (click)="salvaModifica()" [disabled]="isSavingEdit">
+        {{ isSavingEdit ? 'Salvataggio...' : '💾 Salva' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="prodottoInEliminazione" class="modal-overlay" (click)="chiudiConfermaEliminazione()">
+  <div class="modal-box modal-box-small" (click)="$event.stopPropagation()">
+    <div class="modal-header modal-header-danger">
+      <h3 class="modal-titolo">🗑️ Elimina prodotto</h3>
+      <button class="modal-close" (click)="chiudiConfermaEliminazione()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-conferma-testo">
+        Sei sicuro di voler eliminare <strong>{{ prodottoInEliminazione.nome }}</strong
+        >?<br />
+        <span class="modal-conferma-nota">Questa azione non può essere annullata.</span>
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-annulla" (click)="chiudiConfermaEliminazione()">Annulla</button>
+      <button class="btn-modal-elimina" (click)="confermanEliminazione()" [disabled]="isDeleting">
+        {{ isDeleting ? 'Eliminazione...' : '🗑️ Elimina' }}
+      </button>
+    </div>
+  </div>
+</div>
+
 <div
   *ngIf="!isLoading && !errore && menu && !isModerno && !isRustico"
   class="menu-page"
   [style.fontFamily]="fontTesto"
   [style.backgroundColor]="coloreSecondario + '22'"
 >
-  <!-- HEADER FISSO -->
   <div class="menu-header" [style.backgroundColor]="coloreSecondario" [style.borderBottomColor]="colorePrimario">
     <button class="btn-back-home" [style.color]="colorePrimario" (click)="tornaAiMieiMenu()">← I Miei Menu</button>
     <div class="header-content">
@@ -30,14 +99,12 @@
     </div>
   </div>
 
-  <!-- CONTENUTO SCROLLABILE -->
   <main class="menu-main">
     <div *ngIf="portate.length === 0" class="empty-state">
       <p>Nessuna portata ancora aggiunta.</p>
       <a routerLink="/portata/new" class="btn-aggiungi" [style.backgroundColor]="colorePrimario">+ Aggiungi portate</a>
     </div>
 
-    <!-- ── Piatti del giorno CLASSICO ── -->
     <section *ngIf="piattiDelGiorno.length > 0" class="portata-section">
       <div class="portata-header" [style.backgroundColor]="colorePrimario" (click)="togglePiattiGiorno()">
         <h2 class="portata-nome">✨ PIATTI DEL GIORNO / FUORI MENU</h2>
@@ -49,14 +116,18 @@
             <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ piatto.prodotto?.nome ?? piatto.nome }}</h4>
             <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}</h4>
           </div>
-          <!-- ✅ Descrizione: mostra sia descrizione propria che quella del prodotto collegato -->
           <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="prodotto-desc">
             {{ piatto.prodotto?.descrizione ?? piatto.descrizione }}
           </p>
-          <!-- ✅ Allergeni: mostra sia quelli del prodotto collegato che quelli diretti -->
           <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
             <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis || []">
-              <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
+              <img
+                *ngIf="getAllergeneIcona(a)"
+                [src]="getAllergeneIcona(a)"
+                [title]="a.nome"
+                class="allergene-icona-mini"
+                style="width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: middle"
+              />
               <span
                 *ngIf="!getAllergeneIcona(a)"
                 class="allergene-tag-solo-nome"
@@ -71,7 +142,6 @@
       </div>
     </section>
 
-    <!-- ── Portate CLASSICO ── -->
     <section *ngFor="let portata of portate" class="portata-section">
       <div class="portata-header" [style.backgroundColor]="colorePrimario" (click)="togglePortata(portata)">
         <h2 class="portata-nome">{{ nomePortata(portata) | uppercase }}</h2>
@@ -80,17 +150,59 @@
       <div class="prodotti-list" [class.aperta]="portata.aperta">
         <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="prodotti-empty">
           <span>Nessun piatto ancora aggiunto in questa sezione.</span>
-          <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
         </div>
         <div *ngFor="let prodotto of portata.prodotti" class="prodotto-card">
           <div class="prodotto-top">
             <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ prodotto.nome }}</h4>
-            <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</h4>
+            <div class="prodotto-azioni">
+              <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</h4>
+              <button class="btn-edit" [style.--edit-color]="colorePrimario" (click)="apriModifica(prodotto)" title="Modifica">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg
+                ><span class="btn-label">Modifica</span>
+              </button>
+              <button class="btn-delete" (click)="apriConfermaEliminazione(prodotto)" title="Elimina">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6" />
+                  <path d="M14 11v6" />
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg
+                ><span class="btn-label">Elimina</span>
+              </button>
+            </div>
           </div>
           <p *ngIf="prodotto.descrizione" class="prodotto-desc">{{ prodotto.descrizione }}</p>
           <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
             <ng-container *ngFor="let a of prodotto.allergenis">
-              <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
+              <img
+                *ngIf="getAllergeneIcona(a)"
+                [src]="getAllergeneIcona(a)"
+                [title]="a.nome"
+                class="allergene-icona-mini"
+                style="width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: middle"
+              />
               <span
                 *ngIf="!getAllergeneIcona(a)"
                 class="allergene-tag-solo-nome"
@@ -105,13 +217,18 @@
       </div>
     </section>
 
-    <!-- SEZIONE ALLERGENI FOOTER CLASSICO -->
     <div class="sezione-allergeni-footer" *ngIf="tuttiAllergeniMenu.length > 0" [style.borderTopColor]="colorePrimario + '44'">
       <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">Allergeni presenti in questo menu</h3>
       <div class="allergeni-footer-lista">
         <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
           <div class="allergene-footer-cerchio" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'">
-            <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [alt]="a.nome" class="allergene-footer-icona" />
+            <img
+              *ngIf="getAllergeneIcona(a)"
+              [src]="getAllergeneIcona(a)"
+              [alt]="a.nome"
+              class="allergene-footer-icona"
+              style="width: 100%; height: 100%; object-fit: contain"
+            />
             <span *ngIf="!getAllergeneIcona(a)" class="allergene-footer-iniziale">{{ a.nome.charAt(0) }}</span>
           </div>
           <span class="allergene-footer-nome">{{ a.nome }}</span>
@@ -119,23 +236,18 @@
       </div>
       <p class="allergeni-footer-nota">Per ulteriori informazioni sugli allergeni rivolgiti al personale di sala.</p>
     </div>
-
     <div class="menu-note" [style.borderLeftColor]="colorePrimario">
       Tutti i nostri piatti sono preparati con ingredienti freschi e di qualità.
     </div>
   </main>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     TEMPLATE MODERNO
-     ═══════════════════════════════════════════════════════ -->
 <div
   *ngIf="!isLoading && !errore && menu && isModerno"
   class="moderno-page"
   [style.fontFamily]="fontTesto"
   [style.backgroundColor]="coloreSecondario + '18'"
 >
-  <!-- HEADER FISSO -->
   <header class="moderno-header" [style.backgroundColor]="coloreSecondario + '40'" [style.borderBottomColor]="colorePrimario + '55'">
     <button class="moderno-btn-back" [style.color]="colorePrimario" (click)="tornaAiMieiMenu()">← I miei menu</button>
     <div class="moderno-flag">🇮🇹</div>
@@ -148,7 +260,6 @@
     <div class="moderno-divider" [style.background]="colorePrimario"></div>
   </header>
 
-  <!-- TABS FISSI -->
   <div class="moderno-tabs-wrapper" [style.backgroundColor]="coloreSecondario + '30'" [style.borderBottomColor]="colorePrimario + '33'">
     <div class="moderno-tabs">
       <button
@@ -176,7 +287,6 @@
     </div>
   </div>
 
-  <!-- CONTENUTO SCROLLABILE -->
   <div class="moderno-content">
     <div class="moderno-home" [class.hidden]="modernoTabAttiva !== null">
       <div class="moderno-carousel">
@@ -205,7 +315,6 @@
       </div>
     </div>
 
-    <!-- ── Lista piatti del giorno MODERNO ── -->
     <div class="moderno-lista" [class.visible]="modernoTabAttiva === 'piatti-giorno'" [style.backgroundColor]="coloreSecondario + '18'">
       <button class="moderno-back-btn" [style.color]="colorePrimario" (click)="modernoTornaHome()">‹ Torna al menu</button>
       <div class="moderno-lista-header" [style.borderBottomColor]="colorePrimario">
@@ -218,18 +327,22 @@
             <span class="moderno-bullet" [style.background]="colorePrimario"></span>
             <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto">{{ piatto.prodotto?.nome ?? piatto.nome }}</span>
             <span class="moderno-dots-leader"></span>
-            <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">
-              {{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}
-            </span>
+            <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">{{
+              formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
+            }}</span>
           </div>
-          <!-- ✅ Descrizione piatto del giorno MODERNO -->
           <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="moderno-prodotto-desc">
             {{ piatto.prodotto?.descrizione ?? piatto.descrizione }}
           </p>
-          <!-- ✅ Allergeni piatto del giorno MODERNO -->
           <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
             <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis || []">
-              <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
+              <img
+                *ngIf="getAllergeneIcona(a)"
+                [src]="getAllergeneIcona(a)"
+                [title]="a.nome"
+                class="allergene-icona-mini"
+                style="width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: middle"
+              />
               <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
                 a.nome
               }}</span>
@@ -239,7 +352,6 @@
       </div>
     </div>
 
-    <!-- ── Liste portate MODERNO ── -->
     <div
       *ngFor="let portata of portate"
       class="moderno-lista"
@@ -252,21 +364,66 @@
         <span class="moderno-lista-count">{{ portata.prodotti?.length ?? 0 }} piatti</span>
       </div>
       <div class="moderno-prodotti">
-        <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="moderno-empty">
-          <p>Nessun piatto ancora aggiunto.</p>
-          <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
-        </div>
+        <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="moderno-empty"><p>Nessun piatto ancora aggiunto.</p></div>
         <div *ngFor="let prodotto of portata.prodotti" class="moderno-prodotto-item">
           <div class="moderno-prodotto-row">
             <span class="moderno-bullet" [style.background]="colorePrimario"></span>
             <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto">{{ prodotto.nome }}</span>
             <span class="moderno-dots-leader"></span>
             <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
+            <div class="prodotto-azioni prodotto-azioni-row">
+              <button
+                class="btn-edit btn-edit-compact"
+                [style.--edit-color]="colorePrimario"
+                (click)="apriModifica(prodotto)"
+                title="Modifica"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
+              <button class="btn-delete btn-delete-compact" (click)="apriConfermaEliminazione(prodotto)" title="Elimina">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6" />
+                  <path d="M14 11v6" />
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                </svg>
+              </button>
+            </div>
           </div>
           <p *ngIf="prodotto.descrizione" class="moderno-prodotto-desc">{{ prodotto.descrizione }}</p>
           <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
             <ng-container *ngFor="let a of prodotto.allergenis">
-              <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
+              <img
+                *ngIf="getAllergeneIcona(a)"
+                [src]="getAllergeneIcona(a)"
+                [title]="a.nome"
+                class="allergene-icona-mini"
+                style="width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: middle"
+              />
               <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
                 a.nome
               }}</span>
@@ -277,13 +434,18 @@
       </div>
     </div>
 
-    <!-- SEZIONE ALLERGENI FOOTER MODERNO -->
     <div class="sezione-allergeni-footer" *ngIf="tuttiAllergeniMenu.length > 0" [style.borderTopColor]="colorePrimario + '44'">
       <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">Allergeni presenti in questo menu</h3>
       <div class="allergeni-footer-lista">
         <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
           <div class="allergene-footer-cerchio" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'">
-            <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [alt]="a.nome" class="allergene-footer-icona" />
+            <img
+              *ngIf="getAllergeneIcona(a)"
+              [src]="getAllergeneIcona(a)"
+              [alt]="a.nome"
+              class="allergene-footer-icona"
+              style="width: 100%; height: 100%; object-fit: contain"
+            />
             <span *ngIf="!getAllergeneIcona(a)" class="allergene-footer-iniziale">{{ a.nome.charAt(0) }}</span>
           </div>
           <span class="allergene-footer-nome">{{ a.nome }}</span>
@@ -294,9 +456,6 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     TEMPLATE RUSTICO
-     ═══════════════════════════════════════════════════════ -->
 <div
   *ngIf="!isLoading && !errore && menu && isRustico"
   class="rustico-page"
@@ -315,9 +474,7 @@
         <h1 class="rustico-title" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{ menu.nome | uppercase }}</h1>
       </ng-template>
     </div>
-    <div class="rustico-header-right">
-      <div class="rustico-flag">🇮🇹</div>
-    </div>
+    <div class="rustico-header-right"><div class="rustico-flag">🇮🇹</div></div>
   </header>
 
   <div class="rustico-layout">
@@ -373,11 +530,9 @@
 
       <div class="rustico-lista-wrap" [class.visibile]="rusticoTabAttiva !== null" [style.backgroundColor]="coloreSecondario + '18'">
         <button class="rustico-back-btn" [style.color]="colorePrimario" (click)="rusticoTornaCarosello()">
-          <span class="rustico-back-arrow">‹</span>
-          <span class="rustico-back-label">Torna alle foto</span>
+          <span class="rustico-back-arrow">‹</span><span class="rustico-back-label">Torna alle foto</span>
         </button>
 
-        <!-- ── Piatti del giorno RUSTICO ── -->
         <ng-container *ngIf="rusticoTabAttiva === 'piatti-giorno'">
           <div class="rustico-lista-header" [style.borderBottomColor]="colorePrimario">
             <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">✨ Piatti del Giorno</span>
@@ -393,18 +548,22 @@
                 <span class="rustico-bullet" [style.background]="colorePrimario"></span>
                 <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto">{{ piatto.prodotto?.nome ?? piatto.nome }}</span>
                 <span class="rustico-leader"></span>
-                <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">
-                  {{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}
-                </span>
+                <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{
+                  formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
+                }}</span>
               </div>
-              <!-- ✅ Descrizione piatto del giorno RUSTICO -->
               <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="rustico-prodotto-desc">
                 {{ piatto.prodotto?.descrizione ?? piatto.descrizione }}
               </p>
-              <!-- ✅ Allergeni piatto del giorno RUSTICO -->
               <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
                 <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis || []">
-                  <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
+                  <img
+                    *ngIf="getAllergeneIcona(a)"
+                    [src]="getAllergeneIcona(a)"
+                    [title]="a.nome"
+                    class="allergene-icona-mini"
+                    style="width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: middle"
+                  />
                   <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
                     a.nome
                   }}</span>
@@ -414,7 +573,6 @@
           </div>
         </ng-container>
 
-        <!-- ── Lista portata RUSTICO ── -->
         <ng-container *ngIf="rusticoPortataAttiva">
           <div class="rustico-lista-header" [style.borderBottomColor]="colorePrimario">
             <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{
@@ -425,7 +583,6 @@
           <div class="rustico-prodotti">
             <div *ngIf="rusticoPortataAttiva.prodotti && rusticoPortataAttiva.prodotti.length === 0" class="rustico-empty">
               <p>Nessun piatto ancora aggiunto.</p>
-              <a [routerLink]="['/prodotto-add', rusticoPortataAttiva.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
             </div>
             <div *ngFor="let prodotto of rusticoPortataAttiva.prodotti" class="rustico-prodotto-item">
               <div class="rustico-prodotto-row">
@@ -433,11 +590,59 @@
                 <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto">{{ prodotto.nome }}</span>
                 <span class="rustico-leader"></span>
                 <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
+                <div class="prodotto-azioni prodotto-azioni-row">
+                  <button
+                    class="btn-edit btn-edit-compact"
+                    [style.--edit-color]="colorePrimario"
+                    (click)="apriModifica(prodotto)"
+                    title="Modifica"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                  </button>
+                  <button class="btn-delete btn-delete-compact" (click)="apriConfermaEliminazione(prodotto)" title="Elimina">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                      <path d="M10 11v6" />
+                      <path d="M14 11v6" />
+                      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                    </svg>
+                  </button>
+                </div>
               </div>
               <p *ngIf="prodotto.descrizione" class="rustico-prodotto-desc">{{ prodotto.descrizione }}</p>
               <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
                 <ng-container *ngFor="let a of prodotto.allergenis">
-                  <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
+                  <img
+                    *ngIf="getAllergeneIcona(a)"
+                    [src]="getAllergeneIcona(a)"
+                    [title]="a.nome"
+                    class="allergene-icona-mini"
+                    style="width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: middle"
+                  />
                   <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
                     a.nome
                   }}</span>
@@ -448,7 +653,6 @@
           </div>
         </ng-container>
 
-        <!-- SEZIONE ALLERGENI FOOTER RUSTICO -->
         <div
           class="sezione-allergeni-footer"
           *ngIf="rusticoTabAttiva && tuttiAllergeniMenu.length > 0"
@@ -458,7 +662,13 @@
           <div class="allergeni-footer-lista">
             <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
               <div class="allergene-footer-cerchio" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'">
-                <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [alt]="a.nome" class="allergene-footer-icona" />
+                <img
+                  *ngIf="getAllergeneIcona(a)"
+                  [src]="getAllergeneIcona(a)"
+                  [alt]="a.nome"
+                  class="allergene-footer-icona"
+                  style="width: 100%; height: 100%; object-fit: contain"
+                />
                 <span *ngIf="!getAllergeneIcona(a)" class="allergene-footer-iniziale">{{ a.nome.charAt(0) }}</span>
               </div>
               <span class="allergene-footer-nome">{{ a.nome }}</span>

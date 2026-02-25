@@ -2,7 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+
+// ── COSTANTE PER L'IMMAGINE DEGLI ALLERGENI PERSONALIZZATI ──
+const ALLERGENE_MANUALE_ICONA = '/content/images/allergene-manuale.png';
 
 interface Allergene {
   id: string;
@@ -18,6 +22,7 @@ interface Prodotto {
   descrizione?: string;
   prezzo: number;
   allergenis?: Allergene[];
+  portata?: { id: string };
 }
 
 interface Portata {
@@ -42,7 +47,7 @@ interface Menu {
 @Component({
   selector: 'jhi-menu-view',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './menu-view.component.html',
   styleUrls: ['./menu-view.component.scss'],
 })
@@ -55,13 +60,23 @@ export class MenuViewComponent implements OnInit {
   piattiDelGiorno: any[] = [];
   piattiGiornoAperti = false;
 
-  // Mappa allergeni completi: chiave = String(id)
   allergeniMap: Map<string, Allergene> = new Map();
   private allergeniByNome: Map<string, Allergene> = new Map();
-
-  // Mappa prodotti già caricati da by-portata (hanno allergenis completi!)
-  // chiave = String(prodotto.id)
   private prodottiMap: Map<string, Prodotto> = new Map();
+
+  // ── Modifica prodotto ──
+  prodottoInModifica: Prodotto | null = null;
+  editNome = '';
+  editDescrizione = '';
+  editPrezzo: number | null = null;
+  editAllergeniSelezionati: Set<string> = new Set();
+  allergeniDisponibili: Allergene[] = [];
+  isSavingEdit = false;
+  editErrore: string | null = null;
+
+  // ── Conferma eliminazione ──
+  prodottoInEliminazione: Prodotto | null = null;
+  isDeleting = false;
 
   get backRoute(): string {
     return '/menus';
@@ -135,7 +150,6 @@ export class MenuViewComponent implements OnInit {
         link.href = `https://fonts.googleapis.com/css2?family=${fontName}:wght@400;700&display=swap`;
         document.head.appendChild(link);
       }
-
       if (this.menu?.templateStyle === 'MODERNO' || this.menu?.templateStyle === 'RUSTICO') {
         const linkFonts = document.createElement('link');
         linkFonts.rel = 'stylesheet';
@@ -144,16 +158,15 @@ export class MenuViewComponent implements OnInit {
         document.head.appendChild(linkFonts);
       }
 
-      // 1) Allergeni - doppia mappa (id + nome fallback)
       try {
         const tuttiAllergeni: Allergene[] = (await this.http.get<Allergene[]>('/api/allergenes').toPromise()) ?? [];
+        this.allergeniDisponibili = tuttiAllergeni;
         this.allergeniMap = new Map(tuttiAllergeni.map(a => [String(a.id), a]));
         this.allergeniByNome = new Map(tuttiAllergeni.map(a => [a.nome.toLowerCase().trim(), a]));
       } catch (e) {
         console.warn('Allergeni non disponibili.', e);
       }
 
-      // 2) Logo
       const immagini: any[] = (await this.http.get<any[]>(`/api/menus/${id}/immagini`).toPromise()) ?? [];
       const logo = immagini.find(i => i.tipo === 'LOGO');
       if (logo?.immagine) {
@@ -161,20 +174,16 @@ export class MenuViewComponent implements OnInit {
         this.logoUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob));
       }
 
-      // 3) Portate + prodotti (by-portata restituisce allergenis completi)
       const portateRaw: any[] = (await this.http.get<any[]>(`/api/menus/${id}/portatas`).toPromise()) ?? [];
       const portateCaricate = await Promise.all(
         portateRaw.map(async p => {
           const prodotti: Prodotto[] = (await this.http.get<Prodotto[]>(`/api/prodottos/by-portata/${p.id}`).toPromise()) ?? [];
-          // Costruisce mappa prodottiId -> prodotto per usarla nei piatti del giorno
           prodotti.forEach(prod => this.prodottiMap.set(String(prod.id), prod));
           return { ...p, prodotti, aperta: false };
         }),
       );
       this.portate = this.ordinaPortate(portateCaricate);
 
-      // 4) Piatti del giorno - arricchisce SENZA fare fetch aggiuntivi:
-      //    usa prodottiMap (già caricata al passo 3) per trovare il prodotto completo
       const piattiAttivi: any[] = (await this.http.get<any[]>(`/api/menus/${id}/piatti-del-giorno`).toPromise()) ?? [];
       this.piattiDelGiorno = piattiAttivi.map(p => this.arricchisciPiatto(p));
 
@@ -188,33 +197,122 @@ export class MenuViewComponent implements OnInit {
     }
   }
 
-  /**
-   * Arricchisce un piatto del giorno con i dati completi del prodotto.
-   *
-   * STRATEGIA (senza fetch aggiuntivi):
-   * 1. Se il piatto ha prodotto.id → cerca il prodotto nella prodottiMap
-   *    (caricata da by-portata che restituisce allergenis completi)
-   * 2. Per gli allergenis: cerca prima nella prodottiMap, poi arricchisce
-   *    icona/colore dalla allergeniMap
-   * 3. Se il piatto è personalizzato (no prodotto) → arricchisce allergenis diretti
-   */
+  // ══════════════════════════════════════════════════
+  //  MODIFICA PRODOTTO
+  // ══════════════════════════════════════════════════
+
+  apriModifica(prodotto: Prodotto): void {
+    this.prodottoInModifica = prodotto;
+    this.editNome = prodotto.nome;
+    this.editDescrizione = prodotto.descrizione ?? '';
+    this.editPrezzo = prodotto.prezzo;
+    this.editAllergeniSelezionati = new Set((prodotto.allergenis ?? []).map(a => String(a.id)));
+    this.editErrore = null;
+  }
+
+  chiudiModifica(): void {
+    this.prodottoInModifica = null;
+    this.editErrore = null;
+  }
+
+  toggleEditAllergene(id: string): void {
+    if (this.editAllergeniSelezionati.has(id)) {
+      this.editAllergeniSelezionati.delete(id);
+    } else {
+      this.editAllergeniSelezionati.add(id);
+    }
+    this.editAllergeniSelezionati = new Set(this.editAllergeniSelezionati);
+  }
+
+  async salvaModifica(): Promise<void> {
+    if (!this.prodottoInModifica) return;
+    if (!this.editNome.trim() || !this.editPrezzo || this.editPrezzo <= 0) {
+      this.editErrore = 'Nome e prezzo sono obbligatori.';
+      return;
+    }
+    this.isSavingEdit = true;
+    this.editErrore = null;
+    try {
+      const allergenis = Array.from(this.editAllergeniSelezionati).map(id => ({ id }));
+      const body = {
+        id: this.prodottoInModifica.id,
+        nome: this.editNome.trim(),
+        descrizione: this.editDescrizione.trim() || null,
+        prezzo: this.editPrezzo,
+        portata: this.prodottoInModifica.portata ?? { id: this.trovaProdottoPortataId(this.prodottoInModifica.id) },
+        allergenis,
+      };
+      const aggiornato: any = await this.http.put(`/api/prodottos/${this.prodottoInModifica.id}`, body).toPromise();
+
+      // Aggiorna localmente in tutte le portate
+      aggiornato.allergenis = allergenis.map(a => this.allergeniMap.get(String(a.id))).filter(Boolean);
+      this.portate = this.portate.map(portata => ({
+        ...portata,
+        prodotti: (portata.prodotti ?? []).map(p => (p.id === aggiornato.id ? { ...aggiornato } : p)),
+      }));
+      this.prodottiMap.set(String(aggiornato.id), aggiornato);
+      this.chiudiModifica();
+    } catch (err) {
+      console.error('Errore modifica prodotto:', err);
+      this.editErrore = 'Errore durante il salvataggio. Riprova.';
+    } finally {
+      this.isSavingEdit = false;
+    }
+  }
+
+  // ══════════════════════════════════════════════════
+  //  ELIMINAZIONE PRODOTTO
+  // ══════════════════════════════════════════════════
+
+  apriConfermaEliminazione(prodotto: Prodotto): void {
+    this.prodottoInEliminazione = prodotto;
+  }
+
+  chiudiConfermaEliminazione(): void {
+    this.prodottoInEliminazione = null;
+  }
+
+  async confermanEliminazione(): Promise<void> {
+    if (!this.prodottoInEliminazione) return;
+    this.isDeleting = true;
+    try {
+      await this.http.delete(`/api/prodottos/${this.prodottoInEliminazione.id}`).toPromise();
+      const idEliminato = this.prodottoInEliminazione.id;
+      this.portate = this.portate.map(portata => ({
+        ...portata,
+        prodotti: (portata.prodotti ?? []).filter(p => p.id !== idEliminato),
+      }));
+      this.prodottiMap.delete(String(idEliminato));
+      this.chiudiConfermaEliminazione();
+    } catch (err) {
+      console.error('Errore eliminazione prodotto:', err);
+    } finally {
+      this.isDeleting = false;
+    }
+  }
+
+  private trovaProdottoPortataId(prodottoId: string): string | null {
+    for (const portata of this.portate) {
+      if ((portata.prodotti ?? []).some(p => p.id === prodottoId)) {
+        return portata.id;
+      }
+    }
+    return null;
+  }
+
+  // ══════════════════════════════════════════════════
+  //  METODI ESISTENTI (invariati)
+  // ══════════════════════════════════════════════════
+
   private arricchisciPiatto(piatto: any): any {
     if (piatto.prodotto?.id) {
       const prodottoCompleto = this.prodottiMap.get(String(piatto.prodotto.id));
-
       if (prodottoCompleto) {
-        // Usa il prodotto già caricato con allergenis completi
         const allergeniArricchiti = (prodottoCompleto.allergenis ?? []).map(
           a => this.allergeniMap.get(String(a.id)) ?? this.allergeniByNome.get((a.nome ?? '').toLowerCase().trim()) ?? a,
         );
-        return {
-          ...piatto,
-          prodotto: { ...prodottoCompleto, allergenis: allergeniArricchiti },
-        };
+        return { ...piatto, prodotto: { ...prodottoCompleto, allergenis: allergeniArricchiti } };
       }
-
-      // Prodotto non in portate del menu corrente (caso raro):
-      // almeno arricchisce gli allergenis parziali già presenti
       if (piatto.prodotto.allergenis?.length) {
         const allergeniArricchiti = piatto.prodotto.allergenis.map(
           (a: any) => this.allergeniMap.get(String(a.id)) ?? this.allergeniByNome.get((a.nome ?? '').toLowerCase().trim()) ?? a,
@@ -222,8 +320,6 @@ export class MenuViewComponent implements OnInit {
         return { ...piatto, prodotto: { ...piatto.prodotto, allergenis: allergeniArricchiti } };
       }
     }
-
-    // Piatto personalizzato: arricchisce allergenis diretti
     if (piatto.allergenis?.length) {
       return {
         ...piatto,
@@ -232,7 +328,6 @@ export class MenuViewComponent implements OnInit {
         ),
       };
     }
-
     return piatto;
   }
 
@@ -303,16 +398,13 @@ export class MenuViewComponent implements OnInit {
     }
   }
 
+  // ── MODIFICA CRUCIALE QUI: RESTITUISCE L'IMMAGINE INVECE DI '' ──
   getAllergeneIcona(a: Allergene): string {
     if (!a) return '';
-    if (a.icona && a.iconaContentType) {
-      return `data:${a.iconaContentType};base64,${a.icona}`;
-    }
+    if (a.icona && a.iconaContentType) return `data:${a.iconaContentType};base64,${a.icona}`;
     const completo = this.allergeniMap.get(String(a.id ?? '')) ?? this.allergeniByNome.get((a.nome ?? '').toLowerCase().trim());
-    if (completo?.icona && completo?.iconaContentType) {
-      return `data:${completo.iconaContentType};base64,${completo.icona}`;
-    }
-    return '';
+    if (completo?.icona && completo?.iconaContentType) return `data:${completo.iconaContentType};base64,${completo.icona}`;
+    return ALLERGENE_MANUALE_ICONA;
   }
 
   get tuttiAllergeniMenu(): Allergene[] {

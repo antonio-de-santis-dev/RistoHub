@@ -15,7 +15,9 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface AllergeneMapper extends EntityMapper<AllergeneDTO, Allergene> {
-    @Mapping(target = "prodottos", source = "prodottos", qualifiedByName = "prodottoIdSet")
+    // MODIFICA: Ignoriamo i prodotti quando convertiamo Allergene in DTO.
+    // Questo previene il LazyInitializationException e velocizza le API.
+    @Mapping(target = "prodottos", ignore = true)
     AllergeneDTO toDto(Allergene s);
 
     @Mapping(target = "prodottos", ignore = true)
@@ -29,6 +31,10 @@ public interface AllergeneMapper extends EntityMapper<AllergeneDTO, Allergene> {
 
     @Named("prodottoIdSet")
     default Set<ProdottoDTO> toDtoProdottoIdSet(Set<Prodotto> prodotto) {
+        // MODIFICA: Aggiunto controllo per evitare NullPointerException
+        if (prodotto == null) {
+            return null;
+        }
         return prodotto.stream().map(this::toDtoProdottoId).collect(Collectors.toSet());
     }
 

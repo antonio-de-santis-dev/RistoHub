@@ -1037,7 +1037,509 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   font-size: 12px;
 }
 
-// ── RESPONSIVE Desktop ≥ 768px ──
+// ══════════════════════════════════════════════════
+//  ALLERGENI — icone inline sui prodotti
+// ══════════════════════════════════════════════════
+
+.prodotto-allergeni {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+  margin-top: 5px;
+}
+
+.allergene-icona-mini-wrap {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.allergene-icona-mini {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+  flex-shrink: 0;
+}
+
+.allergene-tag-solo-nome {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  color: white;
+  vertical-align: middle;
+}
+
+// ══════════════════════════════════════════════════
+//  ALLERGENI — sezione footer in fondo al menu
+// ══════════════════════════════════════════════════
+
+.sezione-allergeni-footer {
+  margin: 24px 16px 12px;
+  padding: 14px 14px 10px;
+  border-top: 1.5px solid;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.allergeni-footer-titolo {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 10px;
+}
+
+.allergeni-footer-lista {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 10px;
+  margin-bottom: 10px;
+}
+
+.allergene-footer-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.allergene-footer-cerchio {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.allergene-footer-icona {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+}
+
+.allergene-footer-iniziale {
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.allergene-footer-nome {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.allergeni-footer-nota {
+  font-size: 9px;
+  color: #999;
+  font-style: italic;
+  margin: 6px 0 0;
+}
+
+// ══════════════════════════════════════════════════
+//  PULSANTI MODIFICA / ELIMINA
+// ══════════════════════════════════════════════════
+
+.prodotto-azioni {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+// Azioni inline (Moderno + Rustico) — allineati nella riga prezzo
+.prodotto-azioni-row {
+  margin-left: 8px;
+  gap: 4px;
+}
+
+// ── Pulsante MODIFICA ──
+.btn-edit {
+  --edit-color: #8b1a1a; // fallback, sovrascritto da [style.--edit-color]
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border: 1.5px solid var(--edit-color);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--edit-color);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.15s ease;
+  line-height: 1;
+  white-space: nowrap;
+
+  svg {
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    background: var(--edit-color);
+    color: white;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+    transform: translateY(-1px);
+    svg {
+      transform: rotate(-8deg) scale(1.1);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+}
+
+// ── Pulsante ELIMINA ──
+.btn-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border: 1.5px solid #dc2626;
+  border-radius: 20px;
+  background: transparent;
+  color: #dc2626;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.15s ease;
+  line-height: 1;
+  white-space: nowrap;
+
+  svg {
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    background: #dc2626;
+    color: white;
+    box-shadow: 0 3px 10px rgba(220, 38, 38, 0.3);
+    transform: translateY(-1px);
+    svg {
+      transform: scale(1.15);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+}
+
+// ── Variante compatta (Moderno + Rustico) — solo icona, cerchio ──
+.btn-edit-compact,
+.btn-delete-compact {
+  padding: 5px;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  justify-content: center;
+
+  .btn-label {
+    display: none;
+  }
+}
+
+// ── Label testo (visibile solo in Classico ≥ 500px) ──
+.btn-label {
+  display: inline;
+
+  @media (max-width: 500px) {
+    display: none;
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  MODAL OVERLAY
+// ══════════════════════════════════════════════════
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeInOverlay 0.2s ease;
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-box {
+  background: white;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUpModal 0.25s ease;
+}
+
+.modal-box-small {
+  max-width: 360px;
+}
+
+@keyframes slideUpModal {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-radius: 14px 14px 0 0;
+}
+
+.modal-header-danger {
+  background: #dc2626 !important;
+}
+
+.modal-titolo {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+}
+
+.modal-close {
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  color: white;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
+}
+
+.modal-body {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.modal-input,
+.modal-textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  &:focus {
+    border-color: #6b7280;
+  }
+}
+
+.modal-textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.modal-allergeni-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.modal-allergene-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.15s;
+  user-select: none;
+  &:hover {
+    filter: brightness(0.97);
+  }
+}
+
+.modal-allergene-icona {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.modal-allergene-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.modal-allergene-nome {
+  font-weight: 500;
+  color: #374151;
+}
+
+.modal-allergene-check {
+  font-size: 10px;
+  font-weight: 700;
+  color: inherit;
+  margin-left: 2px;
+}
+
+.modal-errore {
+  color: #dc2626;
+  font-size: 0.82rem;
+  margin: 0;
+  padding: 8px 10px;
+  background: #fef2f2;
+  border-radius: 6px;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 12px 18px 16px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.btn-modal-annulla {
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  &:hover {
+    background: #e5e7eb;
+  }
+}
+
+.btn-modal-salva {
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: filter 0.15s;
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-modal-elimina {
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: filter 0.15s;
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.modal-conferma-testo {
+  font-size: 0.92rem;
+  color: #374151;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.modal-conferma-nota {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+// ══════════════════════════════════════════════════
+//  RESPONSIVE Desktop ≥ 768px
+// ══════════════════════════════════════════════════
+
 @media (min-width: 768px) {
   .menu-main {
     padding: 28px 40px;
@@ -1123,9 +1625,25 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   .rustico-lista-nome {
     font-size: 22px;
   }
+
+  .allergeni-footer-lista {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 16px;
+  }
+  .allergene-footer-cerchio {
+    width: 26px;
+    height: 26px;
+  }
+  .allergene-icona-mini-wrap {
+    width: 26px;
+    height: 26px;
+  }
 }
 
-// ── RESPONSIVE Mobile ≤ 600px ──
+// ══════════════════════════════════════════════════
+//  RESPONSIVE Mobile ≤ 600px
+// ══════════════════════════════════════════════════
+
 @media (max-width: 600px) {
   .menu-nome {
     font-size: 1.3rem;
@@ -1208,146 +1726,5 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
   .rustico-btn-back {
     font-size: 0.65rem;
-  }
-}
-
-// ══════════════════════════════════════════════════
-//  ALLERGENI — icone inline sui prodotti
-//  Pattern identico a .allergene-lista-cerchio / .allergene-lista-img
-//  di prodotto-add.component.scss che funziona correttamente
-// ══════════════════════════════════════════════════
-
-.prodotto-allergeni {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 3px;
-  margin-top: 5px;
-}
-
-// Identico a .allergene-lista-cerchio in prodotto-add:
-// border-radius: 50% + overflow: hidden clippano il cerchio
-.allergene-icona-mini-wrap {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-// Identico a .allergene-lista-img in prodotto-add:
-// width/height 100% + object-fit: contain + border-radius: 50%
-.allergene-icona-mini {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-  border-radius: 50%;
-  display: block;
-  flex-shrink: 0;
-}
-
-.allergene-tag-solo-nome {
-  display: inline-block;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 10px;
-  color: white;
-  vertical-align: middle;
-}
-
-// ══════════════════════════════════════════════════
-//  ALLERGENI — sezione footer in fondo al menu
-//  Pattern identico a .allergene-chip-icona / .allergene-chip-img
-//  di prodotto-add.component.scss che funziona correttamente
-// ══════════════════════════════════════════════════
-
-.sezione-allergeni-footer {
-  margin: 24px 16px 12px;
-  padding: 14px 14px 10px;
-  border-top: 1.5px solid;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.45);
-}
-
-.allergeni-footer-titolo {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0 0 10px;
-}
-
-.allergeni-footer-lista {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 6px 10px;
-  margin-bottom: 10px;
-}
-
-.allergene-footer-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-}
-
-// Identico a .allergene-chip-icona in prodotto-add
-.allergene-footer-cerchio {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-// Identico a .allergene-chip-img in prodotto-add
-.allergene-footer-icona {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 50%;
-  display: block;
-}
-
-.allergene-footer-iniziale {
-  font-size: 11px;
-  font-weight: 700;
-  color: white;
-  line-height: 1;
-}
-
-.allergene-footer-nome {
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 1.2;
-  word-break: break-word;
-}
-
-.allergeni-footer-nota {
-  font-size: 9px;
-  color: #999;
-  font-style: italic;
-  margin: 6px 0 0;
-}
-
-@media (min-width: 768px) {
-  .allergeni-footer-lista {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px 16px;
-  }
-  .allergene-footer-cerchio {
-    width: 26px;
-    height: 26px;
-  }
-  .allergene-icona-mini-wrap {
-    width: 26px;
-    height: 26px;
   }
 }
