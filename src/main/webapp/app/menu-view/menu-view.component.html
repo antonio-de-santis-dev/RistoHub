@@ -37,6 +37,7 @@
       <a routerLink="/portata/new" class="btn-aggiungi" [style.backgroundColor]="colorePrimario">+ Aggiungi portate</a>
     </div>
 
+    <!-- ── Piatti del giorno CLASSICO ── -->
     <section *ngIf="piattiDelGiorno.length > 0" class="portata-section">
       <div class="portata-header" [style.backgroundColor]="colorePrimario" (click)="togglePiattiGiorno()">
         <h2 class="portata-nome">✨ PIATTI DEL GIORNO / FUORI MENU</h2>
@@ -48,7 +49,11 @@
             <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ piatto.prodotto?.nome ?? piatto.nome }}</h4>
             <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}</h4>
           </div>
-          <p *ngIf="piatto.descrizione" class="prodotto-desc">{{ piatto.descrizione }}</p>
+          <!-- ✅ Descrizione: mostra sia descrizione propria che quella del prodotto collegato -->
+          <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="prodotto-desc">
+            {{ piatto.prodotto?.descrizione ?? piatto.descrizione }}
+          </p>
+          <!-- ✅ Allergeni: mostra sia quelli del prodotto collegato che quelli diretti -->
           <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
             <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis || []">
               <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
@@ -66,6 +71,7 @@
       </div>
     </section>
 
+    <!-- ── Portate CLASSICO ── -->
     <section *ngFor="let portata of portate" class="portata-section">
       <div class="portata-header" [style.backgroundColor]="colorePrimario" (click)="togglePortata(portata)">
         <h2 class="portata-nome">{{ nomePortata(portata) | uppercase }}</h2>
@@ -199,7 +205,7 @@
       </div>
     </div>
 
-    <!-- Lista piatti del giorno -->
+    <!-- ── Lista piatti del giorno MODERNO ── -->
     <div class="moderno-lista" [class.visible]="modernoTabAttiva === 'piatti-giorno'" [style.backgroundColor]="coloreSecondario + '18'">
       <button class="moderno-back-btn" [style.color]="colorePrimario" (click)="modernoTornaHome()">‹ Torna al menu</button>
       <div class="moderno-lista-header" [style.borderBottomColor]="colorePrimario">
@@ -212,11 +218,15 @@
             <span class="moderno-bullet" [style.background]="colorePrimario"></span>
             <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto">{{ piatto.prodotto?.nome ?? piatto.nome }}</span>
             <span class="moderno-dots-leader"></span>
-            <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">{{
-              formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
-            }}</span>
+            <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">
+              {{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}
+            </span>
           </div>
-          <p *ngIf="piatto.descrizione" class="moderno-prodotto-desc">{{ piatto.descrizione }}</p>
+          <!-- ✅ Descrizione piatto del giorno MODERNO -->
+          <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="moderno-prodotto-desc">
+            {{ piatto.prodotto?.descrizione ?? piatto.descrizione }}
+          </p>
+          <!-- ✅ Allergeni piatto del giorno MODERNO -->
           <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
             <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis || []">
               <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
@@ -229,7 +239,7 @@
       </div>
     </div>
 
-    <!-- Liste portate -->
+    <!-- ── Liste portate MODERNO ── -->
     <div
       *ngFor="let portata of portate"
       class="moderno-lista"
@@ -367,7 +377,7 @@
           <span class="rustico-back-label">Torna alle foto</span>
         </button>
 
-        <!-- Piatti del giorno RUSTICO -->
+        <!-- ── Piatti del giorno RUSTICO ── -->
         <ng-container *ngIf="rusticoTabAttiva === 'piatti-giorno'">
           <div class="rustico-lista-header" [style.borderBottomColor]="colorePrimario">
             <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">✨ Piatti del Giorno</span>
@@ -383,11 +393,15 @@
                 <span class="rustico-bullet" [style.background]="colorePrimario"></span>
                 <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto">{{ piatto.prodotto?.nome ?? piatto.nome }}</span>
                 <span class="rustico-leader"></span>
-                <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{
-                  formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
-                }}</span>
+                <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">
+                  {{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}
+                </span>
               </div>
-              <p *ngIf="piatto.descrizione" class="rustico-prodotto-desc">{{ piatto.descrizione }}</p>
+              <!-- ✅ Descrizione piatto del giorno RUSTICO -->
+              <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="rustico-prodotto-desc">
+                {{ piatto.prodotto?.descrizione ?? piatto.descrizione }}
+              </p>
+              <!-- ✅ Allergeni piatto del giorno RUSTICO -->
               <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
                 <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis || []">
                   <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="allergene-icona-mini" />
@@ -400,7 +414,7 @@
           </div>
         </ng-container>
 
-        <!-- Lista portata RUSTICO -->
+        <!-- ── Lista portata RUSTICO ── -->
         <ng-container *ngIf="rusticoPortataAttiva">
           <div class="rustico-lista-header" [style.borderBottomColor]="colorePrimario">
             <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{

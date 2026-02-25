@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +17,7 @@ export class ProdottoAddComponent implements OnInit {
   isSaving = false;
   successMessage: string | null = null;
   errorMessage: string | null = null;
+  menuIdPerBack: string | null = null;
 
   // Selezione menu/portata
   menus: any[] = [];
@@ -40,6 +41,7 @@ export class ProdottoAddComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private http: HttpClient,
   ) {}
 
@@ -50,9 +52,19 @@ export class ProdottoAddComponent implements OnInit {
       this.portataPreimpostata = true;
       this.caricaAllergeni();
       this.caricaProdottiEsistenti(portataId);
+      this.caricaMenuIdDaPortata(portataId);
       this.isLoadingInit = false;
     } else {
       this.caricaMenus();
+    }
+  }
+
+  async caricaMenuIdDaPortata(portataId: string): Promise<void> {
+    try {
+      const portata: any = await this.http.get(`/api/portatas/${portataId}`).toPromise();
+      this.menuIdPerBack = portata?.menu?.id ?? null;
+    } catch (err) {
+      console.warn('Impossibile caricare portata per back-nav:', err);
     }
   }
 
@@ -66,6 +78,14 @@ export class ProdottoAddComponent implements OnInit {
       console.error('Errore caricamento menu:', err);
     } finally {
       this.isLoadingInit = false;
+    }
+  }
+
+  tornaAlMenu(): void {
+    if (this.menuIdPerBack) {
+      this.router.navigate(['/menu-view', this.menuIdPerBack]);
+    } else {
+      this.router.navigate(['/menu-list']);
     }
   }
 

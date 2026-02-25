@@ -90,99 +90,244 @@
   </footer>
 </div>
 
-<!-- Modal: Crea Nuovo -->
+<!-- ═══════════════════════════════════════
+     MODAL: Crea Nuovo Piatto Personalizzato
+     ═══════════════════════════════════════ -->
 <div *ngIf="modaleCreazioneAperto && !modalitaSelezioneProdotto" class="pg-modal-overlay" (click)="chiudiModale()">
   <div class="pg-modal-box" (click)="$event.stopPropagation()">
-    <h2 class="pg-modal-title">✨ Nuovo Piatto del Giorno</h2>
+    <!-- Header modale -->
+    <div class="pg-modal-header">
+      <div class="pg-modal-icon">✨</div>
+      <div>
+        <h2 class="pg-modal-title">Nuovo Piatto Speciale</h2>
+        <p class="pg-modal-subtitle">Crea un piatto personalizzato per oggi</p>
+      </div>
+      <button class="pg-modal-close" (click)="chiudiModale()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
     <div *ngIf="successMessage" class="pg-alert pg-alert-success">{{ successMessage }}</div>
     <div *ngIf="errorMessage" class="pg-alert pg-alert-error">{{ errorMessage }}</div>
-    <div class="pg-form-group">
-      <label class="pg-form-label">Associa a un Menu</label>
-      <select class="pg-form-control" [(ngModel)]="menuNuovoPiatto">
-        <option [ngValue]="null">-- Nessun menu --</option>
-        <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
-      </select>
-    </div>
-    <div class="pg-form-group">
-      <label class="pg-form-label">Nome *</label>
-      <input type="text" class="pg-form-control" [(ngModel)]="nome" placeholder="es. Tagliolini al tartufo" maxlength="100" />
-    </div>
-    <div class="pg-form-group">
-      <label class="pg-form-label">Descrizione</label>
-      <textarea class="pg-form-control" [(ngModel)]="descrizione" rows="2" placeholder="Ingredienti, note..."></textarea>
-    </div>
-    <div class="pg-form-group">
-      <label class="pg-form-label">Prezzo (€) *</label>
-      <input type="number" class="pg-form-control" [(ngModel)]="prezzo" placeholder="0.00" min="0" step="0.50" />
-    </div>
-    <div class="pg-form-group" *ngIf="allergeniDisponibili.length > 0">
-      <label class="pg-form-label">Allergeni</label>
-      <p class="pg-allergeni-hint">Clicca per selezionare/deselezionare</p>
-      <div class="pg-allergeni-grid">
-        <div
-          *ngFor="let a of allergeniDisponibili"
-          class="pg-allergene-chip"
-          [class.selected]="allergeniSelezionati.has(a.id)"
-          (click)="toggleAllergene(a.id)"
-        >
-          <div class="pg-allergene-icona" [style.backgroundColor]="a.colore || '#888'">
-            <img
-              *ngIf="a.icona && a.iconaContentType"
-              [src]="'data:' + a.iconaContentType + ';base64,' + a.icona"
-              [alt]="a.nome"
-              class="pg-allergene-img"
-            />
-            <span *ngIf="!a.icona" class="pg-allergene-iniziale">{{ a.nome.charAt(0) }}</span>
-          </div>
-          {{ a.nome }}
+
+    <div class="pg-modal-body">
+      <div class="pg-form-group">
+        <label class="pg-form-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+          </svg>
+          Associa a un Menu
+        </label>
+        <select class="pg-form-control" [(ngModel)]="menuNuovoPiatto">
+          <option [ngValue]="null">— Seleziona un menu —</option>
+          <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
+        </select>
+      </div>
+
+      <div class="pg-form-row">
+        <div class="pg-form-group" style="flex: 1">
+          <label class="pg-form-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+            </svg>
+            Nome del piatto *
+          </label>
+          <input type="text" class="pg-form-control" [(ngModel)]="nome" placeholder="es. Tagliolini al tartufo" maxlength="100" />
+        </div>
+        <div class="pg-form-group pg-form-group-prezzo">
+          <label class="pg-form-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+            Prezzo (€) *
+          </label>
+          <input type="number" class="pg-form-control" [(ngModel)]="prezzo" placeholder="0,00" min="0" step="0.50" />
         </div>
       </div>
-      <div class="pg-custom-row">
-        <input
-          type="text"
-          class="pg-form-control"
-          [(ngModel)]="nomeAllergeneCustom"
-          placeholder="Allergene personalizzato..."
-          style="flex: 1"
-        />
-        <button class="pg-btn-custom" (click)="aggiungiAllergeneCustom()" type="button">+ Aggiungi</button>
+
+      <div class="pg-form-group">
+        <label class="pg-form-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+            <polyline points="10 9 9 9 8 9" />
+          </svg>
+          Descrizione
+        </label>
+        <textarea class="pg-form-control" [(ngModel)]="descrizione" rows="2" placeholder="Ingredienti freschi, note speciali..."></textarea>
+      </div>
+
+      <div class="pg-form-group" *ngIf="allergeniDisponibili.length > 0">
+        <label class="pg-form-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          Allergeni
+        </label>
+        <div class="pg-allergeni-grid">
+          <div
+            *ngFor="let a of allergeniDisponibili"
+            class="pg-allergene-chip"
+            [class.selected]="allergeniSelezionati.has(a.id)"
+            (click)="toggleAllergene(a.id)"
+          >
+            <div class="pg-allergene-icona" [style.backgroundColor]="a.colore || '#888'">
+              <img
+                *ngIf="a.icona && a.iconaContentType"
+                [src]="'data:' + a.iconaContentType + ';base64,' + a.icona"
+                [alt]="a.nome"
+                class="pg-allergene-img"
+              />
+              <span *ngIf="!a.icona" class="pg-allergene-iniziale">{{ a.nome.charAt(0) }}</span>
+            </div>
+            {{ a.nome }}
+            <svg
+              *ngIf="allergeniSelezionati.has(a.id)"
+              class="pg-check-icon"
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+        </div>
+        <div class="pg-custom-row">
+          <input
+            type="text"
+            class="pg-form-control"
+            [(ngModel)]="nomeAllergeneCustom"
+            placeholder="Aggiungi allergene personalizzato..."
+            style="flex: 1"
+            (keydown.enter)="aggiungiAllergeneCustom()"
+          />
+          <button class="pg-btn-custom" (click)="aggiungiAllergeneCustom()" type="button">+ Aggiungi</button>
+        </div>
       </div>
     </div>
-    <div class="pg-modal-actions">
+
+    <div class="pg-modal-footer">
       <button class="pg-btn-cancel" (click)="chiudiModale()">Annulla</button>
-      <button class="pg-btn-save" (click)="salvaPiatto()" [disabled]="isSaving">
-        {{ isSaving ? 'Salvataggio...' : 'Salva Piatto' }}
+      <button class="pg-btn-save" (click)="salvaPiatto()" [disabled]="isSaving || !formValido()">
+        <span *ngIf="!isSaving">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          Salva Piatto
+        </span>
+        <span *ngIf="isSaving" class="pg-saving-row">
+          <span class="pg-mini-spinner"></span>
+          Salvataggio...
+        </span>
       </button>
     </div>
   </div>
 </div>
 
-<!-- Modal: Seleziona da Menu -->
+<!-- ═══════════════════════════════════════
+     MODAL: Seleziona Da Menu Esistente
+     ═══════════════════════════════════════ -->
 <div *ngIf="modaleCreazioneAperto && modalitaSelezioneProdotto" class="pg-modal-overlay" (click)="chiudiModale()">
   <div class="pg-modal-box" (click)="$event.stopPropagation()">
-    <h2 class="pg-modal-title">🔗 Seleziona da Menu</h2>
-    <div class="pg-form-group">
-      <label class="pg-form-label">Menu</label>
-      <select class="pg-form-control" [(ngModel)]="menuSelezionato" (ngModelChange)="onMenuSelezionato()">
-        <option [ngValue]="null">-- Scegli un menu --</option>
-        <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
-      </select>
+    <!-- Header modale -->
+    <div class="pg-modal-header">
+      <div class="pg-modal-icon pg-modal-icon-blue">🔗</div>
+      <div>
+        <h2 class="pg-modal-title">Seleziona dal Menu</h2>
+        <p class="pg-modal-subtitle">Scegli un piatto già presente nel tuo menu</p>
+      </div>
+      <button class="pg-modal-close" (click)="chiudiModale()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
     </div>
-    <div class="pg-form-group" *ngIf="portate.length > 0">
-      <label class="pg-form-label">Portata</label>
-      <select class="pg-form-control" [(ngModel)]="portataSelezionata" (ngModelChange)="onPortataSelezionata()">
-        <option [ngValue]="null">-- Scegli una portata --</option>
-        <option *ngFor="let p of portate" [value]="p.id">{{ p.nomePersonalizzato ?? p.nomeDefault }}</option>
-      </select>
-    </div>
-    <div *ngIf="prodotti.length > 0">
-      <label class="pg-form-label">Prodotti disponibili</label>
-      <div class="pg-prodotto-item" *ngFor="let prod of prodotti" (click)="prodottoSelezionato = prod.id; salvaPiatto()">
-        <span class="pg-prodotto-nome">{{ prod.nome }}</span>
-        <span class="pg-prodotto-prezzo">{{ formatPrezzo(prod.prezzo) }}</span>
+
+    <div class="pg-modal-body">
+      <!-- Step 1: Scegli menu -->
+      <div class="pg-step">
+        <div class="pg-step-label">
+          <span class="pg-step-num">1</span>
+          <span>Scegli il menu</span>
+        </div>
+        <select class="pg-form-control" [(ngModel)]="menuSelezionato" (ngModelChange)="onMenuSelezionato()">
+          <option [ngValue]="null">— Seleziona un menu —</option>
+          <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
+        </select>
+      </div>
+
+      <!-- Step 2: Scegli portata -->
+      <div class="pg-step" *ngIf="portate.length > 0">
+        <div class="pg-step-label">
+          <span class="pg-step-num">2</span>
+          <span>Scegli la portata</span>
+        </div>
+        <select class="pg-form-control" [(ngModel)]="portataSelezionata" (ngModelChange)="onPortataSelezionata()">
+          <option [ngValue]="null">— Seleziona una portata —</option>
+          <option *ngFor="let p of portate" [value]="p.id">{{ nomePortata(p) }}</option>
+        </select>
+      </div>
+
+      <!-- Step 3: Lista prodotti -->
+      <div class="pg-step" *ngIf="prodotti.length > 0">
+        <div class="pg-step-label">
+          <span class="pg-step-num">3</span>
+          <span>Clicca un piatto per aggiungerlo</span>
+        </div>
+        <div class="pg-prodotti-lista">
+          <div
+            class="pg-prodotto-item"
+            *ngFor="let prod of prodotti"
+            (click)="selezionaESalvaProdotto(prod)"
+            [class.pg-prodotto-saving]="isSaving && prodottoSelezionato === prod.id"
+          >
+            <div class="pg-prodotto-info">
+              <span class="pg-prodotto-nome">{{ prod.nome }}</span>
+              <span class="pg-prodotto-desc" *ngIf="prod.descrizione">{{ prod.descrizione }}</span>
+            </div>
+            <div class="pg-prodotto-right">
+              <span class="pg-prodotto-prezzo">{{ formatPrezzo(prod.prezzo) }}</span>
+              <span class="pg-prodotto-add-icon">
+                <svg
+                  *ngIf="!(isSaving && prodottoSelezionato === prod.id)"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span *ngIf="isSaving && prodottoSelezionato === prod.id" class="pg-mini-spinner"></span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stato vuoto portata -->
+      <div *ngIf="portataSelezionata && prodotti.length === 0" class="pg-empty-prodotti">
+        <span>🍽️</span>
+        <p>Nessun prodotto in questa portata</p>
       </div>
     </div>
-    <div class="pg-modal-actions">
+
+    <div class="pg-modal-footer">
       <button class="pg-btn-cancel" (click)="chiudiModale()">Chiudi</button>
     </div>
   </div>

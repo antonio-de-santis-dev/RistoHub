@@ -10,9 +10,9 @@ interface PiattoDelGiorno {
   descrizione?: string;
   prezzo: number;
   attivo: boolean;
-  prodotto?: { id: string; nome: string; prezzo: number; allergenis?: any[] };
+  prodotto?: { id: string; nome: string; descrizione?: string; prezzo: number; allergenis?: any[] };
   allergenis?: any[];
-  menu?: { id: string; nome?: string }; // ← aggiunto nome?: string
+  menu?: { id: string; nome?: string };
 }
 
 @Component({
@@ -29,17 +29,14 @@ export class PiattiGiornoGestioneComponent implements OnInit {
   errorMessage: string | null = null;
 
   piattiGiorno: PiattoDelGiorno[] = [];
-
   modaleCreazioneAperto = false;
   modalitaSelezioneProdotto = false;
 
-  // Form fields
   nome = '';
   descrizione = '';
   prezzo: number | null = null;
   prodottoSelezionato: string | null = null;
 
-  // Navigation
   menus: any[] = [];
   portate: any[] = [];
   prodotti: any[] = [];
@@ -47,26 +44,36 @@ export class PiattiGiornoGestioneComponent implements OnInit {
   menuNuovoPiatto: string | null = null;
   portataSelezionata: string | null = null;
 
-  // Allergeni
+  private _prodottoDettaglio: any | null = null;
+  private _menuDettaglio: any | null = null;
+
   allergeniDisponibili: any[] = [];
   allergeniSelezionati: Set<string> = new Set();
   nomeAllergeneCustom = '';
 
+  // prodottiMap: String(prodotto.id) -> prodotto completo (da by-portata, ha allergenis)
+  private prodottiMap: Map<string, any> = new Map();
+
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.caricaPiattiGiorno();
-    this.caricaMenus();
-    this.caricaAllergeni();
+    this.caricaTutto();
   }
 
-  async caricaPiattiGiorno(): Promise<void> {
+  async caricaTutto(): Promise<void> {
+    // Step 1: allergeni e menu in parallelo
+    await Promise.all([this.caricaAllergeni(), this.caricaMenus()]);
+    // Step 2: costruisce mappa prodotti (richiede menus già caricati)
+    await this.costruisciProdottiMap();
+    // Step 3: carica piatti e arricchisce
+    await this.caricaPiattiGiorno();
+  }
+
+  async caricaAllergeni(): Promise<void> {
     try {
-      this.piattiGiorno = (await this.http.get<PiattoDelGiorno[]>('/api/piatto-del-giornos').toPromise()) ?? [];
+      this.allergeniDisponibili = (await this.http.get<any[]>('/api/allergenes').toPromise()) ?? [];
     } catch (err) {
-      console.error('Errore caricamento piatti del giorno:', err);
-    } finally {
-      this.isLoading = false;
+      console.error('Errore allergeni:', err);
     }
   }
 
@@ -76,59 +83,115 @@ export class PiattiGiornoGestioneComponent implements OnInit {
       const tutti: any[] = (await this.http.get<any[]>('/api/menus').toPromise()) ?? [];
       this.menus = tutti.filter(m => m.ristoratore?.login === currentUser.login);
     } catch (err) {
-      console.error('Errore caricamento menu:', err);
+      console.error('Errore menu:', err);
     }
   }
 
-  async caricaAllergeni(): Promise<void> {
+  /**
+   * Costruisce prodottiMap usando /api/prodottos/by-portata/{id}
+   * che è l'unico endpoint che restituisce allergenis popolati.
+   */
+  private async costruisciProdottiMap(): Promise<void> {
     try {
-      this.allergeniDisponibili = (await this.http.get<any[]>('/api/allergenes').toPromise()) ?? [];
+      for (const menu of this.menus) {
+        const portate: any[] = (await this.http.get<any[]>(`/api/menus/${menu.id}/portatas`).toPromise()) ?? [];
+        for (const portata of portate) {
+          const prods: any[] = (await this.http.get<any[]>(`/api/prodottos/by-portata/${portata.id}`).toPromise()) ?? [];
+          prods.forEach(p => this.prodottiMap.set(String(p.id), p));
+        }
+      }
     } catch (err) {
-      console.error('Errore caricamento allergeni:', err);
+      console.warn('Errore costruzione mappa prodotti:', err);
     }
   }
 
-  // ─── ALLERGENI ───
-
-  toggleAllergene(id: string): void {
-    if (this.allergeniSelezionati.has(id)) {
-      this.allergeniSelezionati.delete(id);
-    } else {
-      this.allergeniSelezionati.add(id);
+  async caricaPiattiGiorno(): Promise<void> {
+    try {
+      const piatti = (await this.http.get<PiattoDelGiorno[]>('/api/piatto-del-giornos').toPromise()) ?? [];
+      this.piattiGiorno = piatti.map(p => this.arricchisciPiatto(p));
+    } catch (err) {
+      console.error('Errore piatti del giorno:', err);
+    } finally {
+      this.isLoading = false;
     }
-    this.allergeniSelezionati = new Set(this.allergeniSelezionati);
   }
 
-  aggiungiAllergeneCustom(): void {
-    const nome = this.nomeAllergeneCustom.trim();
-    if (!nome) return;
-    const idTemp = 'custom_' + Date.now();
-    const custom = {
-      id: idTemp,
-      nome,
-      icona: null,
-      iconaContentType: null,
-      colore: '#607D8B',
-      isCustom: true,
+  /**
+   * Arricchisce un piatto con i dati completi di prodotto e allergeni.
+   *
+   * Caso A — piatto da menu (prodotto.id presente):
+   *   Cerca il prodotto in prodottiMap → ha allergenis completi
+   *
+   * Caso B — piatto personalizzato (prodotto null):
+   *   Il GET restituisce allergenis come [{id:"uuid"}] senza icona/colore
+   *   → cerca ogni allergene in allergeniDisponibili per ID
+   */
+  private arricchisciPiatto(piatto: PiattoDelGiorno): PiattoDelGiorno {
+    // CASO A: piatto collegato a un prodotto del menu
+    if (piatto.prodotto?.id) {
+      const prodCompleto = this.prodottiMap.get(String(piatto.prodotto.id));
+      if (prodCompleto) {
+        return {
+          ...piatto,
+          prodotto: {
+            ...prodCompleto,
+            allergenis: this.arricchisciAllergeni(prodCompleto.allergenis ?? []),
+          },
+        };
+      }
+      // prodotto non in mappa (menu diverso): arricchisce quelli già presenti
+      if (piatto.prodotto.allergenis?.length) {
+        return {
+          ...piatto,
+          prodotto: {
+            ...piatto.prodotto,
+            allergenis: this.arricchisciAllergeni(piatto.prodotto.allergenis),
+          },
+        };
+      }
+      return piatto;
+    }
+
+    // CASO B: piatto personalizzato
+    // allergenis può essere [{id:"uuid"}] oppure oggetti parziali
+    return {
+      ...piatto,
+      allergenis: this.arricchisciAllergeni(piatto.allergenis ?? []),
     };
-    this.allergeniDisponibili = [...this.allergeniDisponibili, custom];
-    this.allergeniSelezionati = new Set([...this.allergeniSelezionati, idTemp]);
-    this.nomeAllergeneCustom = '';
   }
 
-  get allergeniSelezionatiArray(): string[] {
-    return Array.from(this.allergeniSelezionati);
+  /**
+   * Dato un array di allergeni (anche solo [{id:"uuid"}]),
+   * sostituisce ogni elemento con l'oggetto completo da allergeniDisponibili.
+   * Se non trovato per ID, tenta per nome. Altrimenti lascia l'originale.
+   */
+  private arricchisciAllergeni(lista: any[]): any[] {
+    return lista.map(a => {
+      // Già completo
+      if (a.icona && a.iconaContentType) return a;
+      // Cerca per ID
+      if (a.id != null) {
+        const trovato = this.allergeniDisponibili.find(d => String(d.id) === String(a.id));
+        if (trovato) return trovato;
+      }
+      // Fallback per nome
+      if (a.nome) {
+        const trovato = this.allergeniDisponibili.find(d => d.nome.toLowerCase().trim() === a.nome.toLowerCase().trim());
+        if (trovato) return trovato;
+      }
+      return a;
+    });
   }
 
   getAllergeneById(id: string): any {
-    return this.allergeniDisponibili.find(a => a.id === id) ?? null;
+    return this.allergeniDisponibili.find(a => String(a.id) === String(id)) ?? null;
   }
 
   getAllergeniPiatto(piatto: PiattoDelGiorno): any[] {
-    return piatto.prodotto?.allergenis ?? piatto.allergenis ?? [];
+    const lista: any[] = piatto.prodotto?.allergenis ?? piatto.allergenis ?? [];
+    // Sicurezza extra: ri-arricchisce nel caso non fosse stato fatto
+    return this.arricchisciAllergeni(lista);
   }
-
-  // ─── NAVIGAZIONE MENU/PORTATE ───
 
   async onMenuSelezionato(): Promise<void> {
     if (!this.menuSelezionato) return;
@@ -136,10 +199,12 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     this.prodotti = [];
     this.portataSelezionata = null;
     this.prodottoSelezionato = null;
+    this._prodottoDettaglio = null;
+    this._menuDettaglio = this.menus.find(m => m.id === this.menuSelezionato) ?? null;
     try {
       this.portate = (await this.http.get<any[]>(`/api/menus/${this.menuSelezionato}/portatas`).toPromise()) ?? [];
     } catch (err) {
-      console.error('Errore caricamento portate:', err);
+      console.error('Errore portate:', err);
     }
   }
 
@@ -147,10 +212,13 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     if (!this.portataSelezionata) return;
     this.prodotti = [];
     this.prodottoSelezionato = null;
+    this._prodottoDettaglio = null;
     try {
-      this.prodotti = (await this.http.get<any[]>(`/api/prodottos/by-portata/${this.portataSelezionata}`).toPromise()) ?? [];
+      const prods: any[] = (await this.http.get<any[]>(`/api/prodottos/by-portata/${this.portataSelezionata}`).toPromise()) ?? [];
+      prods.forEach(p => this.prodottiMap.set(String(p.id), p));
+      this.prodotti = prods;
     } catch (err) {
-      console.error('Errore caricamento prodotti:', err);
+      console.error('Errore prodotti:', err);
     }
   }
 
@@ -159,13 +227,11 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     this.modalitaSelezioneProdotto = false;
     this.resetForm();
   }
-
   apriModaleSeleziona(): void {
     this.modaleCreazioneAperto = true;
     this.modalitaSelezioneProdotto = true;
     this.resetForm();
   }
-
   chiudiModale(): void {
     this.modaleCreazioneAperto = false;
     this.resetForm();
@@ -185,13 +251,35 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     this.nomeAllergeneCustom = '';
     this.successMessage = null;
     this.errorMessage = null;
+    this._prodottoDettaglio = null;
+    this._menuDettaglio = null;
   }
 
   formValido(): boolean {
-    if (this.modalitaSelezioneProdotto) {
-      return this.prodottoSelezionato !== null && this.menuSelezionato !== null;
-    }
+    if (this.modalitaSelezioneProdotto) return this.prodottoSelezionato !== null && this.menuSelezionato !== null;
     return this.nome.trim() !== '' && this.prezzo !== null && this.prezzo > 0 && this.menuNuovoPiatto !== null;
+  }
+
+  toggleAllergene(id: string): void {
+    if (this.allergeniSelezionati.has(id)) this.allergeniSelezionati.delete(id);
+    else this.allergeniSelezionati.add(id);
+    this.allergeniSelezionati = new Set(this.allergeniSelezionati);
+  }
+
+  aggiungiAllergeneCustom(): void {
+    const nome = this.nomeAllergeneCustom.trim();
+    if (!nome) return;
+    const idTemp = 'custom_' + Date.now();
+    const custom = { id: idTemp, nome, icona: null, iconaContentType: null, colore: '#607D8B', isCustom: true };
+    this.allergeniDisponibili = [...this.allergeniDisponibili, custom];
+    this.allergeniSelezionati = new Set([...this.allergeniSelezionati, idTemp]);
+    this.nomeAllergeneCustom = '';
+  }
+
+  selezionaESalvaProdotto(prod: any): void {
+    this._prodottoDettaglio = prod;
+    this.prodottoSelezionato = prod.id;
+    this.salvaPiatto();
   }
 
   async salvaPiatto(): Promise<void> {
@@ -206,7 +294,6 @@ export class PiattiGiornoGestioneComponent implements OnInit {
         .map(id => ({ id }));
 
       let body: any = { attivo: true };
-
       if (this.modalitaSelezioneProdotto && this.prodottoSelezionato) {
         body.prodotto = { id: this.prodottoSelezionato };
         body.menu = { id: this.menuSelezionato };
@@ -222,15 +309,39 @@ export class PiattiGiornoGestioneComponent implements OnInit {
         body.allergenis = allergeni;
       }
 
-      const piatto: any = await this.http.post('/api/piatto-del-giornos', body).toPromise();
+      const piattoRisposta: any = await this.http.post('/api/piatto-del-giornos', body).toPromise();
+      let piattoArricchito: PiattoDelGiorno;
 
-      if (!this.modalitaSelezioneProdotto) {
-        piatto.allergenis = Array.from(this.allergeniSelezionati)
-          .map(id => this.getAllergeneById(id))
-          .filter(Boolean);
+      if (this.modalitaSelezioneProdotto && this._prodottoDettaglio) {
+        // _prodottoDettaglio viene da by-portata → ha allergenis completi
+        const menuInfo = this._menuDettaglio ?? this.menus.find(m => m.id === this.menuSelezionato);
+        piattoArricchito = {
+          ...piattoRisposta,
+          attivo: true,
+          prodotto: {
+            id: this._prodottoDettaglio.id,
+            nome: this._prodottoDettaglio.nome,
+            descrizione: this._prodottoDettaglio.descrizione,
+            prezzo: this._prodottoDettaglio.prezzo,
+            allergenis: this.arricchisciAllergeni(this._prodottoDettaglio.allergenis ?? []),
+          },
+          menu: menuInfo ? { id: menuInfo.id, nome: menuInfo.nome } : piattoRisposta.menu,
+        };
+      } else {
+        // Piatto personalizzato: costruisce allergenis dagli ID selezionati
+        const menuInfo = this.menus.find(m => m.id === this.menuNuovoPiatto);
+        piattoArricchito = {
+          ...piattoRisposta,
+          attivo: true,
+          menu: menuInfo ? { id: menuInfo.id, nome: menuInfo.nome } : piattoRisposta.menu,
+          // Prende gli oggetti completi direttamente da allergeniDisponibili
+          allergenis: Array.from(this.allergeniSelezionati)
+            .map(id => this.getAllergeneById(id))
+            .filter(Boolean),
+        };
       }
 
-      this.piattiGiorno.unshift(piatto);
+      this.piattiGiorno = [piattoArricchito, ...this.piattiGiorno];
       this.chiudiModale();
     } catch (err) {
       console.error('Errore salvataggio:', err);
@@ -251,8 +362,8 @@ export class PiattiGiornoGestioneComponent implements OnInit {
         await this.http.put(`/api/piatto-del-giornos/${piatto.id}`, { ...piatto }).toPromise();
       }
     } catch (err) {
-      console.error('Errore toggle attivo:', err);
-      piatto.attivo = !nuovoStato; // rollback
+      console.error('Errore toggle:', err);
+      piatto.attivo = !nuovoStato;
     }
   }
 
@@ -269,19 +380,15 @@ export class PiattiGiornoGestioneComponent implements OnInit {
   nomePiatto(p: PiattoDelGiorno): string {
     return p.prodotto?.nome ?? p.nome;
   }
-
   descrizionePiatto(p: PiattoDelGiorno): string | undefined {
-    return p.descrizione;
+    return p.prodotto?.descrizione ?? p.descrizione;
   }
-
   prezzoPiatto(p: PiattoDelGiorno): number {
     return p.prodotto?.prezzo ?? p.prezzo;
   }
-
   formatPrezzo(p: number): string {
     return `€ ${Number(p).toFixed(2).replace('.', ',')}`;
   }
-
   nomePortata(p: any): string {
     if (p.tipo === 'PERSONALIZZATA' && p.nomePersonalizzato) return p.nomePersonalizzato;
     return (p.nomeDefault ?? '').replace(/_/g, ' ');

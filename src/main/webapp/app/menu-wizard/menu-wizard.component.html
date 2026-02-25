@@ -1,5 +1,4 @@
 <div class="wizard-container">
-  <!-- HEADER -->
   <div class="wizard-header">
     <h1 class="wizard-title">✨ Crea il tuo Menu</h1>
     <p class="wizard-subtitle">{{ titoloStep }}</p>
@@ -13,40 +12,28 @@
     </div>
   </div>
 
-  <!-- BODY -->
   <div class="wizard-body">
-    <!-- STEP 1: TEMPLATE -->
     <div *ngIf="currentStep === 1" class="step-content fade-in">
       <p class="step-hint">Scegli la struttura visiva del tuo menu. Potrai personalizzare colori e font nei passi successivi.</p>
+
       <div class="template-grid">
         <div
-          *ngFor="let t of templates"
+          *ngFor="let t of templates; let i = index"
           class="template-card"
           [class.selected]="selectedTemplate === t.id"
           (click)="selectedTemplate = t.id"
         >
-          <div class="template-preview" [ngClass]="'template-preview--' + t.id">
-            <div class="tprev-header">{{ t.icona }} Nome Ristorante</div>
-            <div class="tprev-section">
-              <div class="tprev-section-title">Antipasto</div>
-              <div class="tprev-item"><span>Bruschetta al pomodoro</span><span>€ 6,00</span></div>
-              <div class="tprev-item"><span>Tagliere misto</span><span>€ 12,00</span></div>
-            </div>
-            <div class="tprev-section">
-              <div class="tprev-section-title">Primo</div>
-              <div class="tprev-item"><span>Spaghetti all'amatriciana</span><span>€ 10,00</span></div>
-            </div>
+          <div class="template-preview">
+            <img [src]="t.immagine" [alt]="'Menu ' + (i + 1)" class="template-preview-img" />
           </div>
-          <div class="template-info">
-            <div class="template-badge">{{ t.icona }} {{ t.nome }}</div>
-            <p class="template-desc">{{ t.descrizione }}</p>
+          <div class="template-info" style="text-align: center; padding: 15px">
+            <h3 style="margin: 0; font-size: 1.2rem; color: #fff">Menu {{ i + 1 }}</h3>
           </div>
           <div class="template-check" *ngIf="selectedTemplate === t.id">✔</div>
         </div>
       </div>
     </div>
 
-    <!-- STEP 2: COLORI -->
     <div *ngIf="currentStep === 2" class="step-content fade-in">
       <p class="step-hint">Scegli 2 colori per il tuo ristorante. Usa i preset oppure seleziona il colore esatto.</p>
 
@@ -91,7 +78,6 @@
       </div>
     </div>
 
-    <!-- STEP 3: LOGO -->
     <div *ngIf="currentStep === 3" class="step-content fade-in">
       <p class="step-hint">Carica il logo del tuo ristorante (PNG, JPG, SVG). Il logo è opzionale.</p>
       <div class="logo-upload-area" [class.has-logo]="logoPreview">
@@ -113,7 +99,6 @@
       </div>
     </div>
 
-    <!-- STEP 4: FONT -->
     <div *ngIf="currentStep === 4" class="step-content fade-in">
       <p class="step-hint">Il font giusto rende il menu più leggibile e professionale.</p>
       <div class="font-list">
@@ -133,7 +118,6 @@
       </div>
     </div>
 
-    <!-- STEP 5: PORTATE + NOME -->
     <div *ngIf="currentStep === 5" class="step-content fade-in">
       <div class="form-group">
         <label class="form-label">📋 Nome del Menu *</label>
@@ -170,9 +154,6 @@
       </div>
     </div>
   </div>
-  <!-- /wizard-body -->
-
-  <!-- FOOTER -->
   <div class="wizard-footer">
     <button class="btn-back" (click)="stepPrecedente()" [disabled]="currentStep === 1">← Indietro</button>
     <span class="step-label">Passo {{ currentStep }} di {{ totalSteps }}</span>

@@ -17,12 +17,23 @@ export class MenuWizardComponent implements OnInit {
   isLoading = false;
 
   // Step 1 — Template
-  // ← FIX: id ora è stringa ('CLASSICO', 'MODERNO', 'RUSTICO') invece di numero
   selectedTemplate: string | null = null;
   templates = [
-    { id: 'CLASSICO', nome: 'Classico', descrizione: 'Elegante e tradizionale, con bordi decorativi e layout centrato', icona: '🍷' },
-    { id: 'MODERNO', nome: 'Moderno', descrizione: 'Minimalista e pulito, con carosello immagini e tab scorrevoli', icona: '⚡' },
-    { id: 'RUSTICO', nome: 'Rustico', descrizione: 'Caldo e accogliente, ispirato alla trattoria italiana', icona: '🌿' },
+    {
+      id: 'CLASSICO',
+      nome: 'Classico',
+      immagine: '/content/images/view.png',
+    },
+    {
+      id: 'MODERNO',
+      nome: 'Moderno',
+      immagine: '/content/images/view2.png', // Assicurati che l'estensione corrisponda ai file fisici, prima avevi i .jpg!
+    },
+    {
+      id: 'RUSTICO',
+      nome: 'Rustico',
+      immagine: '/content/images/view3.png',
+    },
   ];
 
   // Step 2 — Colori
@@ -52,7 +63,19 @@ export class MenuWizardComponent implements OnInit {
   ];
 
   // Step 5 — Portate
-  portateDefault = ['ANTIPASTO', 'PRIMO', 'SECONDO', 'CONTORNO', 'DOLCE', 'BEVANDA', 'VINO_ROSSO', 'VINO_BIANCO', 'VINO_ROSATO', 'BIRRA'];
+  portateDefault = [
+    'ANTIPASTO',
+    'PRIMO',
+    'SECONDO',
+    'CONTORNO',
+    'BEVANDA',
+    'BIRRA',
+    'VINO_ROSSO',
+    'VINO_ROSATO',
+    'VINO_BIANCO',
+    'DOLCE',
+    'DIGESTIVO',
+  ];
   portateSelezionate: Set<string> = new Set(['ANTIPASTO', 'PRIMO', 'SECONDO', 'DOLCE']);
   portatePersonalizzate: string[] = [];
   nuovaPortataCustom = '';
@@ -142,7 +165,7 @@ export class MenuWizardComponent implements OnInit {
           nome: this.nomeMenu,
           descrizione: this.descrizioneMenu,
           attivo: true,
-          templateStyle: this.selectedTemplate, // ← FIX: era 'stileTemplate', ora usa il nome corretto del campo DB
+          templateStyle: this.selectedTemplate,
           colorePrimario: this.colorePrimario,
           coloreSecondario: this.coloreSecondario,
           fontMenu: this.fontSelezionato,

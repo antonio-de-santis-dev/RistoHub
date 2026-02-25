@@ -3,9 +3,9 @@ package main.service.dto;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -24,10 +24,17 @@ public class ProdottoDTO implements Serializable {
     @NotNull
     private BigDecimal prezzo;
 
-    private Set<AllergeneDTO> allergenis = new HashSet<>();
-
-    @NotNull
+    /**
+     * Riferimento alla portata di appartenenza.
+     * Necessario per il salvataggio (Prodotto.portata è @NotNull nel DB).
+     * Il mapper usa solo l'id per stabilire la relazione ManyToOne.
+     */
     private PortataDTO portata;
+
+    /**
+     * Allergeni del prodotto — popolati nella risposta per visualizzare le icone.
+     */
+    private List<AllergeneDTO> allergenis = new ArrayList<>();
 
     public UUID getId() {
         return id;
@@ -61,20 +68,20 @@ public class ProdottoDTO implements Serializable {
         this.prezzo = prezzo;
     }
 
-    public Set<AllergeneDTO> getAllergenis() {
-        return allergenis;
-    }
-
-    public void setAllergenis(Set<AllergeneDTO> allergenis) {
-        this.allergenis = allergenis;
-    }
-
     public PortataDTO getPortata() {
         return portata;
     }
 
     public void setPortata(PortataDTO portata) {
         this.portata = portata;
+    }
+
+    public List<AllergeneDTO> getAllergenis() {
+        return allergenis;
+    }
+
+    public void setAllergenis(List<AllergeneDTO> allergenis) {
+        this.allergenis = allergenis;
     }
 
     @Override
@@ -85,7 +92,6 @@ public class ProdottoDTO implements Serializable {
         if (!(o instanceof ProdottoDTO)) {
             return false;
         }
-
         ProdottoDTO prodottoDTO = (ProdottoDTO) o;
         if (this.id == null) {
             return false;
@@ -106,8 +112,8 @@ public class ProdottoDTO implements Serializable {
             ", nome='" + getNome() + "'" +
             ", descrizione='" + getDescrizione() + "'" +
             ", prezzo=" + getPrezzo() +
-            ", allergenis=" + getAllergenis() +
             ", portata=" + getPortata() +
+            ", allergenis=" + getAllergenis() +
             "}";
     }
 }

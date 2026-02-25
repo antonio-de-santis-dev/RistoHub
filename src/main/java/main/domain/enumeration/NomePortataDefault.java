@@ -14,4 +14,5 @@ public enum NomePortataDefault {
     VINO_BIANCO,
     VINO_ROSATO,
     BIRRA,
+    DIGESTIVO,
 }

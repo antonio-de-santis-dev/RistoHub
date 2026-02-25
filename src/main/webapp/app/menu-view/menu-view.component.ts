@@ -55,14 +55,18 @@ export class MenuViewComponent implements OnInit {
   piattiDelGiorno: any[] = [];
   piattiGiornoAperti = false;
 
-  // ── Mappa allergeni completi (con icona BLOB) caricata da /api/allergenes ──
+  // Mappa allergeni completi: chiave = String(id)
   allergeniMap: Map<string, Allergene> = new Map();
+  private allergeniByNome: Map<string, Allergene> = new Map();
+
+  // Mappa prodotti già caricati da by-portata (hanno allergenis completi!)
+  // chiave = String(prodotto.id)
+  private prodottiMap: Map<string, Prodotto> = new Map();
 
   get backRoute(): string {
     return '/menus';
   }
 
-  // ── TEMPLATE MODERNO ──
   modernoTabAttiva: string | null = null;
   modernoPortataAttiva: Portata | null = null;
   modernoCarouselIndex = 0;
@@ -74,7 +78,6 @@ export class MenuViewComponent implements OnInit {
     'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80',
   ];
 
-  // ── TEMPLATE RUSTICO ──
   rusticoTabAttiva: string | null = null;
   rusticoPortataAttiva: Portata | null = null;
   rusticoCarouselIndex = 0;
@@ -85,6 +88,20 @@ export class MenuViewComponent implements OnInit {
     'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=80',
     'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=900&q=80',
   ];
+
+  private readonly ORDINE_PORTATE: Record<string, number> = {
+    ANTIPASTO: 0,
+    PRIMO: 1,
+    SECONDO: 2,
+    CONTORNO: 3,
+    BEVANDA: 5,
+    BIRRA: 6,
+    VINO_ROSSO: 7,
+    VINO_ROSATO: 8,
+    VINO_BIANCO: 9,
+    DOLCE: 10,
+    DIGESTIVO: 11,
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -127,18 +144,16 @@ export class MenuViewComponent implements OnInit {
         document.head.appendChild(linkFonts);
       }
 
-      // ── CARICA ALLERGENI — NON BLOCCANTE ──
-      // Se /api/allergenes fallisce (es. relazioni orfane nel DB),
-      // il menu si carica comunque, solo senza le icone allergeni.
+      // 1) Allergeni - doppia mappa (id + nome fallback)
       try {
         const tuttiAllergeni: Allergene[] = (await this.http.get<Allergene[]>('/api/allergenes').toPromise()) ?? [];
-        this.allergeniMap = new Map(tuttiAllergeni.map(a => [a.id, a]));
-      } catch (errAllergeni) {
-        console.warn('⚠️ Allergeni non disponibili (500). Il menu verrà mostrato senza icone allergeni.', errAllergeni);
-        this.allergeniMap = new Map(); // mappa vuota: nessun crash, niente icone
+        this.allergeniMap = new Map(tuttiAllergeni.map(a => [String(a.id), a]));
+        this.allergeniByNome = new Map(tuttiAllergeni.map(a => [a.nome.toLowerCase().trim(), a]));
+      } catch (e) {
+        console.warn('Allergeni non disponibili.', e);
       }
 
-      // Logo
+      // 2) Logo
       const immagini: any[] = (await this.http.get<any[]>(`/api/menus/${id}/immagini`).toPromise()) ?? [];
       const logo = immagini.find(i => i.tipo === 'LOGO');
       if (logo?.immagine) {
@@ -146,18 +161,22 @@ export class MenuViewComponent implements OnInit {
         this.logoUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob));
       }
 
-      // Portate + prodotti
+      // 3) Portate + prodotti (by-portata restituisce allergenis completi)
       const portateRaw: any[] = (await this.http.get<any[]>(`/api/menus/${id}/portatas`).toPromise()) ?? [];
-      this.portate = await Promise.all(
+      const portateCaricate = await Promise.all(
         portateRaw.map(async p => {
           const prodotti: Prodotto[] = (await this.http.get<Prodotto[]>(`/api/prodottos/by-portata/${p.id}`).toPromise()) ?? [];
+          // Costruisce mappa prodottiId -> prodotto per usarla nei piatti del giorno
+          prodotti.forEach(prod => this.prodottiMap.set(String(prod.id), prod));
           return { ...p, prodotti, aperta: false };
         }),
       );
+      this.portate = this.ordinaPortate(portateCaricate);
 
-      // Piatti del giorno
+      // 4) Piatti del giorno - arricchisce SENZA fare fetch aggiuntivi:
+      //    usa prodottiMap (già caricata al passo 3) per trovare il prodotto completo
       const piattiAttivi: any[] = (await this.http.get<any[]>(`/api/menus/${id}/piatti-del-giorno`).toPromise()) ?? [];
-      this.piattiDelGiorno = piattiAttivi;
+      this.piattiDelGiorno = piattiAttivi.map(p => this.arricchisciPiatto(p));
 
       if (this.menu?.templateStyle === 'MODERNO') this.avviaAutoplay();
       if (this.menu?.templateStyle === 'RUSTICO') this.avviaAutoplayRustico();
@@ -169,43 +188,88 @@ export class MenuViewComponent implements OnInit {
     }
   }
 
-  // ════════════════════════════════════════════
-  //  CLASSICO
-  // ════════════════════════════════════════════
+  /**
+   * Arricchisce un piatto del giorno con i dati completi del prodotto.
+   *
+   * STRATEGIA (senza fetch aggiuntivi):
+   * 1. Se il piatto ha prodotto.id → cerca il prodotto nella prodottiMap
+   *    (caricata da by-portata che restituisce allergenis completi)
+   * 2. Per gli allergenis: cerca prima nella prodottiMap, poi arricchisce
+   *    icona/colore dalla allergeniMap
+   * 3. Se il piatto è personalizzato (no prodotto) → arricchisce allergenis diretti
+   */
+  private arricchisciPiatto(piatto: any): any {
+    if (piatto.prodotto?.id) {
+      const prodottoCompleto = this.prodottiMap.get(String(piatto.prodotto.id));
+
+      if (prodottoCompleto) {
+        // Usa il prodotto già caricato con allergenis completi
+        const allergeniArricchiti = (prodottoCompleto.allergenis ?? []).map(
+          a => this.allergeniMap.get(String(a.id)) ?? this.allergeniByNome.get((a.nome ?? '').toLowerCase().trim()) ?? a,
+        );
+        return {
+          ...piatto,
+          prodotto: { ...prodottoCompleto, allergenis: allergeniArricchiti },
+        };
+      }
+
+      // Prodotto non in portate del menu corrente (caso raro):
+      // almeno arricchisce gli allergenis parziali già presenti
+      if (piatto.prodotto.allergenis?.length) {
+        const allergeniArricchiti = piatto.prodotto.allergenis.map(
+          (a: any) => this.allergeniMap.get(String(a.id)) ?? this.allergeniByNome.get((a.nome ?? '').toLowerCase().trim()) ?? a,
+        );
+        return { ...piatto, prodotto: { ...piatto.prodotto, allergenis: allergeniArricchiti } };
+      }
+    }
+
+    // Piatto personalizzato: arricchisce allergenis diretti
+    if (piatto.allergenis?.length) {
+      return {
+        ...piatto,
+        allergenis: piatto.allergenis.map(
+          (a: any) => this.allergeniMap.get(String(a.id)) ?? this.allergeniByNome.get((a.nome ?? '').toLowerCase().trim()) ?? a,
+        ),
+      };
+    }
+
+    return piatto;
+  }
+
+  private ordinaPortate(portate: Portata[]): Portata[] {
+    return [...portate].sort((a, b) => {
+      const ordA = a.tipo === 'PERSONALIZZATA' ? 4 : (this.ORDINE_PORTATE[a.nomeDefault ?? ''] ?? 99);
+      const ordB = b.tipo === 'PERSONALIZZATA' ? 4 : (this.ORDINE_PORTATE[b.nomeDefault ?? ''] ?? 99);
+      return ordA - ordB;
+    });
+  }
+
   togglePortata(portata: Portata): void {
     portata.aperta = !portata.aperta;
   }
-
   togglePiattiGiorno(): void {
     this.piattiGiornoAperti = !this.piattiGiornoAperti;
   }
 
-  // ════════════════════════════════════════════
-  //  MODERNO
-  // ════════════════════════════════════════════
   modernoApriPortata(portata: Portata): void {
     this.modernoTabAttiva = portata.id;
     this.modernoPortataAttiva = portata;
     this.fermaAutoplay();
   }
-
   modernoTornaHome(): void {
     this.modernoTabAttiva = null;
     this.modernoPortataAttiva = null;
     this.avviaAutoplay();
   }
-
   modernoGoToSlide(n: number): void {
     this.modernoCarouselIndex = (n + this.modernoImmagini.length) % this.modernoImmagini.length;
   }
-
   avviaAutoplay(): void {
     this.fermaAutoplay();
     this.modernoAutoplayTimer = setInterval(() => {
       this.modernoCarouselIndex = (this.modernoCarouselIndex + 1) % this.modernoImmagini.length;
     }, 3500);
   }
-
   fermaAutoplay(): void {
     if (this.modernoAutoplayTimer) {
       clearInterval(this.modernoAutoplayTimer);
@@ -213,32 +277,25 @@ export class MenuViewComponent implements OnInit {
     }
   }
 
-  // ════════════════════════════════════════════
-  //  RUSTICO
-  // ════════════════════════════════════════════
   rusticoApriTab(tabId: string, portata: Portata | null): void {
     this.rusticoTabAttiva = tabId;
     this.rusticoPortataAttiva = portata;
     this.fermaAutoplayRustico();
   }
-
   rusticoTornaCarosello(): void {
     this.rusticoTabAttiva = null;
     this.rusticoPortataAttiva = null;
     this.avviaAutoplayRustico();
   }
-
   rusticoGoToSlide(n: number): void {
     this.rusticoCarouselIndex = (n + this.rusticoImmagini.length) % this.rusticoImmagini.length;
   }
-
   avviaAutoplayRustico(): void {
     this.fermaAutoplayRustico();
     this.rusticoAutoplayTimer = setInterval(() => {
       this.rusticoCarouselIndex = (this.rusticoCarouselIndex + 1) % this.rusticoImmagini.length;
     }, 3500);
   }
-
   fermaAutoplayRustico(): void {
     if (this.rusticoAutoplayTimer) {
       clearInterval(this.rusticoAutoplayTimer);
@@ -246,13 +303,13 @@ export class MenuViewComponent implements OnInit {
     }
   }
 
-  // ════════════════════════════════════════════
-  //  ALLERGENI
-  // ════════════════════════════════════════════
-
   getAllergeneIcona(a: Allergene): string {
-    const completo = this.allergeniMap.get(a.id) ?? a;
-    if (completo.icona && completo.iconaContentType) {
+    if (!a) return '';
+    if (a.icona && a.iconaContentType) {
+      return `data:${a.iconaContentType};base64,${a.icona}`;
+    }
+    const completo = this.allergeniMap.get(String(a.id ?? '')) ?? this.allergeniByNome.get((a.nome ?? '').toLowerCase().trim());
+    if (completo?.icona && completo?.iconaContentType) {
       return `data:${completo.iconaContentType};base64,${completo.icona}`;
     }
     return '';
@@ -260,32 +317,24 @@ export class MenuViewComponent implements OnInit {
 
   get tuttiAllergeniMenu(): Allergene[] {
     const map = new Map<string, Allergene>();
-
     this.portate.forEach(portata => {
-      (portata.prodotti ?? []).forEach(p => {
+      (portata.prodotti ?? []).forEach((p: Prodotto) => {
         (p.allergenis ?? []).forEach(a => {
-          if (a.id) {
-            map.set(a.id, this.allergeniMap.get(a.id) ?? a);
-          }
+          const key = String(a.id ?? a.nome ?? '');
+          if (key) map.set(key, a);
         });
       });
     });
-
     this.piattiDelGiorno.forEach(piatto => {
-      const allergeni: Allergene[] = piatto.prodotto?.allergenis ?? piatto.allergenis ?? [];
-      allergeni.forEach(a => {
-        if (a.id) {
-          map.set(a.id, this.allergeniMap.get(a.id) ?? a);
-        }
+      const lista: any[] = piatto.prodotto?.allergenis ?? piatto.allergenis ?? [];
+      lista.forEach(a => {
+        const key = String(a.id ?? a.nome ?? '');
+        if (key) map.set(key, a);
       });
     });
-
     return Array.from(map.values());
   }
 
-  // ════════════════════════════════════════════
-  //  COMUNI
-  // ════════════════════════════════════════════
   nomePortata(p: Portata): string {
     if (p.tipo === 'PERSONALIZZATA' && p.nomePersonalizzato) return p.nomePersonalizzato;
     return (p.nomeDefault ?? '').replace(/_/g, ' ');
@@ -299,19 +348,15 @@ export class MenuViewComponent implements OnInit {
   get colorePrimario(): string {
     return this.menu?.colorePrimario ?? '#8b1a1a';
   }
-
   get coloreSecondario(): string {
     return this.menu?.coloreSecondario ?? '#e8c832';
   }
-
   get fontTesto(): string {
     return this.menu?.fontMenu ?? 'Playfair Display';
   }
-
   get isModerno(): boolean {
     return this.menu?.templateStyle === 'MODERNO';
   }
-
   get isRustico(): boolean {
     return this.menu?.templateStyle === 'RUSTICO';
   }

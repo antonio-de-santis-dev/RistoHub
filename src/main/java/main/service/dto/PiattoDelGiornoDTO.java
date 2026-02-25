@@ -4,6 +4,8 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -28,7 +30,13 @@ public class PiattoDelGiornoDTO implements Serializable {
 
     private ProdottoDTO prodotto;
 
-    private MenuDTO menu; // ← AGGIUNTO: riferimento al menu di appartenenza
+    private MenuDTO menu;
+
+    /**
+     * Allergeni per i piatti personalizzati (senza prodotto collegato).
+     * Per i piatti collegati a un prodotto, gli allergeni sono in prodotto.allergenis.
+     */
+    private List<AllergeneDTO> allergenis = new ArrayList<>();
 
     public UUID getId() {
         return id;
@@ -86,12 +94,20 @@ public class PiattoDelGiornoDTO implements Serializable {
         this.prodotto = prodotto;
     }
 
-    public MenuDTO getMenu() { // ← AGGIUNTO
+    public MenuDTO getMenu() {
         return menu;
     }
 
-    public void setMenu(MenuDTO menu) { // ← AGGIUNTO
+    public void setMenu(MenuDTO menu) {
         this.menu = menu;
+    }
+
+    public List<AllergeneDTO> getAllergenis() {
+        return allergenis;
+    }
+
+    public void setAllergenis(List<AllergeneDTO> allergenis) {
+        this.allergenis = allergenis;
     }
 
     @Override
@@ -102,7 +118,6 @@ public class PiattoDelGiornoDTO implements Serializable {
         if (!(o instanceof PiattoDelGiornoDTO)) {
             return false;
         }
-
         PiattoDelGiornoDTO piattoDelGiornoDTO = (PiattoDelGiornoDTO) o;
         if (this.id == null) {
             return false;
@@ -127,6 +142,7 @@ public class PiattoDelGiornoDTO implements Serializable {
             ", prezzo=" + getPrezzo() +
             ", prodotto=" + getProdotto() +
             ", menu=" + getMenu() +
+            ", allergenis=" + getAllergenis() +
             "}";
     }
 }

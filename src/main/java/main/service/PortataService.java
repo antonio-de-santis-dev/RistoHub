@@ -1,11 +1,10 @@
 package main.service;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import main.domain.Portata;
+import main.domain.enumeration.NomePortataDefault;
+import main.domain.enumeration.TipoPortata;
 import main.repository.PortataRepository;
 import main.service.dto.PortataDTO;
 import main.service.mapper.PortataMapper;
@@ -112,6 +111,21 @@ public class PortataService {
     }
 
     public List<PortataDTO> findByMenuId(UUID menuId) {
-        return portataRepository.findByMenuId(menuId).stream().map(portataMapper::toDto).collect(Collectors.toList());
+        // Ordine canonico: DEFAULT prima (nell'ordine dell'enum), poi PERSONALIZZATA
+        return portataRepository
+            .findByMenuId(menuId)
+            .stream()
+            .map(portataMapper::toDto)
+            .sorted(
+                Comparator.comparingInt((PortataDTO p) -> {
+                    if (p.getTipo() == TipoPortata.DEFAULT && p.getNomeDefault() != null) {
+                        return p.getNomeDefault().ordinal();
+                    }
+                    // Portate personalizzate vanno dopo CONTORNO (ordinal 3) e prima di BEVANDA (ordinal 4)
+                    // Usiamo un valore intermedio come 3.5 → int trick: 4 * 10 - 5
+                    return NomePortataDefault.CONTORNO.ordinal() * 10 + 5;
+                })
+            )
+            .collect(Collectors.toList());
     }
 }

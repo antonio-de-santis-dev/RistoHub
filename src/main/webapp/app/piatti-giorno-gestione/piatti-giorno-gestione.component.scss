@@ -1,24 +1,25 @@
 // ══════════════════════════════════════════════════════
 //  RistoHub — Piatti del Giorno
-//  Fix: niente spazi, card solide, footer
+//  Modali dark eleganti + card solide
 // ══════════════════════════════════════════════════════
 
 $accent: #c8102e;
-$accent-soft: #ffb3be;
+$accent-hover: #a50d25;
+$accent-soft: rgba(200, 16, 46, 0.18);
 $text-white: #ffffff;
 $muted-white: rgba(255, 255, 255, 0.65);
 $radius: 16px;
 
-// ── Host: annulla TUTTI i margini/padding del layout JHipster
+// ── Host ─────────────────────────────────────────────
 :host {
   display: block;
-  margin: -1.5rem -15px 0; // rimuove gap laterali e top
+  margin: -1.5rem -15px 0;
 }
 
+// ── Pagina ────────────────────────────────────────────
 .pg-page {
   min-height: 100vh;
   position: relative;
-
   background-image: url('/content/images/sfondo.png');
   background-size: cover;
   background-position: center;
@@ -41,7 +42,7 @@ $radius: 16px;
   z-index: 1;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 5.5rem 1.5rem 0; // top alto per navbar, 0 bottom (footer lo gestisce)
+  padding: 5.5rem 1.5rem 0;
 }
 
 // ── Header ────────────────────────────────────────────
@@ -97,7 +98,7 @@ $radius: 16px;
   background: $accent;
   color: #fff;
   &:hover {
-    background: #a50d25;
+    background: $accent-hover;
     transform: translateY(-1px);
     box-shadow: 0 4px 16px rgba($accent, 0.45);
   }
@@ -132,6 +133,18 @@ $radius: 16px;
   border-radius: 50%;
   animation: spin 0.75s linear infinite;
 }
+
+.pg-mini-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -159,14 +172,13 @@ $radius: 16px;
   }
 }
 
-// ── Grid piatti ───────────────────────────────────────
+// ── Grid / Card ───────────────────────────────────────
 .pg-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
 }
 
-// ── Card piatto — BIANCA SOLIDA ───────────────────────
 .pg-card {
   background: #ffffff;
   border-radius: $radius;
@@ -178,7 +190,6 @@ $radius: 16px;
   transition:
     transform 0.22s,
     box-shadow 0.22s;
-
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
@@ -223,11 +234,11 @@ $radius: 16px;
   font-size: 0.75rem;
   color: #6b7280;
 }
+
 .pg-card-body {
   padding: 0.9rem 1.2rem 1rem;
   flex: 1;
 }
-
 .pg-nome {
   font-size: 1.05rem;
   font-weight: 700;
@@ -254,15 +265,16 @@ $radius: 16px;
 }
 
 .pg-all-cerchio {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 .pg-all-img {
   width: 100%;
@@ -271,7 +283,7 @@ $radius: 16px;
   border-radius: 50%;
 }
 .pg-all-iniziale {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: #fff;
   text-transform: uppercase;
@@ -348,18 +360,22 @@ $radius: 16px;
   }
 }
 
-// ══ MODAL ════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+//  MODALE — Dark Elegante ad Alta Visibilità
+// ══════════════════════════════════════════════════════
+
 .pg-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(6px);
+  // Overlay molto più scuro per massima visibilità del modal
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
   padding: 1rem;
-  animation: fadeIn 0.2s ease;
+  animation: fadeIn 0.18s ease;
 }
 @keyframes fadeIn {
   from {
@@ -371,20 +387,38 @@ $radius: 16px;
 }
 
 .pg-modal-box {
-  background: #ffffff;
+  // Sfondo più chiaro e contrastato rispetto all'overlay scurissimo
+  background: #2a1810;
+  border: 1.5px solid rgba(200, 16, 46, 0.55);
   border-radius: 20px;
-  padding: 2rem 1.75rem;
-  max-width: 520px;
+  max-width: 560px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+  // Ombra molto pronunciata per staccarsi dal fondo
+  box-shadow:
+    0 40px 100px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
   animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(200, 16, 46, 0.5);
+    border-radius: 10px;
+  }
 }
 @keyframes modalIn {
   from {
     opacity: 0;
-    transform: scale(0.9) translateY(16px);
+    transform: scale(0.9) translateY(24px);
   }
   to {
     opacity: 1;
@@ -392,77 +426,202 @@ $radius: 16px;
   }
 }
 
+// ── Header modale ──────────────────────────────────────
+.pg-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 1.5rem 1.5rem 1.1rem;
+  // Bordo inferiore più visibile
+  border-bottom: 1px solid rgba(200, 16, 46, 0.3);
+  flex-shrink: 0;
+  // Leggero gradiente per dare profondità
+  background: linear-gradient(180deg, rgba(200, 16, 46, 0.08) 0%, transparent 100%);
+}
+
+.pg-modal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(200, 16, 46, 0.22);
+  border: 1.5px solid rgba(200, 16, 46, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  box-shadow: 0 0 20px rgba(200, 16, 46, 0.2);
+}
+
+.pg-modal-icon-blue {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
 .pg-modal-title {
+  font-family: 'Playfair Display', serif;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #111;
-  margin: 0 0 1.5rem;
-  text-align: center;
+  color: #ffffff;
+  margin: 0 0 3px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
 }
+
+.pg-modal-subtitle {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+}
+
+.pg-modal-close {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  &:hover {
+    background: rgba(200, 16, 46, 0.25);
+    border-color: rgba(200, 16, 46, 0.5);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(200, 16, 46, 0.2);
+  }
+}
+
+// ── Body modale ────────────────────────────────────────
+.pg-modal-body {
+  padding: 1.4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  overflow-y: auto;
+}
+
+// ── Footer modale ──────────────────────────────────────
+.pg-modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 1rem 1.5rem 1.5rem;
+  border-top: 1px solid rgba(200, 16, 46, 0.2);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+// ── Form ───────────────────────────────────────────────
 .pg-form-group {
   margin-bottom: 1rem;
 }
+
+.pg-form-row {
+  display: flex;
+  gap: 12px;
+  .pg-form-group {
+    margin-bottom: 1rem;
+  }
+}
+
+.pg-form-group-prezzo {
+  width: 130px;
+  flex-shrink: 0;
+}
+
 .pg-form-label {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-weight: 700;
-  font-size: 0.8rem;
-  margin-bottom: 6px;
-  color: #374151;
+  font-size: 0.73rem;
+  margin-bottom: 7px;
+  // Più luminoso per maggiore leggibilità
+  color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.06em;
+
+  svg {
+    color: rgba(200, 16, 46, 0.9);
+    flex-shrink: 0;
+  }
 }
 
 .pg-form-control {
   width: 100%;
-  background: #fafafa;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 9px;
+  // Sfondo leggermente più visibile
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
   padding: 10px 14px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   box-sizing: border-box;
   font-family: inherit;
-  color: #111;
-  transition: border-color 0.2s;
+  color: #ffffff;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+
   &::placeholder {
-    color: #c4c4c4;
+    color: rgba(255, 255, 255, 0.25);
   }
   &:focus {
     outline: none;
-    border-color: #111;
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+    border-color: rgba(200, 16, 46, 0.7);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.15);
   }
   option {
-    background: #fff;
-    color: #111;
+    background: #2a1810;
+    color: #fff;
   }
 }
 textarea.pg-form-control {
   resize: vertical;
-  min-height: 72px;
+  min-height: 68px;
 }
 
-.pg-modal-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
-  flex-wrap: wrap;
+// ── Alert ──────────────────────────────────────────────
+.pg-alert {
+  border-radius: 9px;
+  padding: 10px 14px;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  &.pg-alert-success {
+    background: rgba(74, 222, 128, 0.12);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+  }
+  &.pg-alert-error {
+    background: rgba(200, 16, 46, 0.14);
+    color: #ff7a7a;
+    border: 1px solid rgba(200, 16, 46, 0.35);
+  }
 }
 
+// ── Bottoni modale ─────────────────────────────────────
 .pg-btn-cancel {
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 0.65rem 1.4rem;
   border-radius: 9px;
   cursor: pointer;
   font-weight: 600;
   font-family: inherit;
-  font-size: 0.9rem;
-  transition: background 0.2s;
+  font-size: 0.88rem;
+  transition: all 0.2s;
   &:hover {
-    background: #e5e7eb;
+    background: rgba(255, 255, 255, 0.13);
+    color: $text-white;
+    border-color: rgba(255, 255, 255, 0.25);
   }
 }
 
@@ -470,45 +629,43 @@ textarea.pg-form-control {
   background: $accent;
   color: #fff;
   border: none;
-  padding: 0.65rem 1.4rem;
+  padding: 0.65rem 1.5rem;
   border-radius: 9px;
   cursor: pointer;
   font-weight: 700;
   font-family: inherit;
-  font-size: 0.9rem;
-  transition: background 0.2s;
-  &:hover {
-    background: #a50d25;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  box-shadow: 0 4px 16px rgba(200, 16, 46, 0.35);
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  &:hover:not(:disabled) {
+    background: $accent-hover;
+    box-shadow: 0 6px 22px rgba(200, 16, 46, 0.5);
+    transform: translateY(-1px);
   }
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.45;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 }
 
-.pg-alert {
-  border-radius: 9px;
-  padding: 10px 14px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  &.pg-alert-success {
-    background: #dcfce7;
-    color: #15803d;
-    border: 1px solid #bbf7d0;
-  }
-  &.pg-alert-error {
-    background: #fee2e2;
-    color: #dc2626;
-    border: 1px solid #fecaca;
-  }
+.pg-saving-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.pg-allergeni-hint {
-  font-size: 0.8rem;
-  color: #6b7280;
-  margin-bottom: 8px;
-}
+// ── Allergeni ──────────────────────────────────────────
 .pg-allergeni-grid {
   display: flex;
   flex-wrap: wrap;
@@ -522,23 +679,28 @@ textarea.pg-form-control {
   gap: 6px;
   padding: 5px 10px 5px 5px;
   border-radius: 20px;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid rgba(255, 255, 255, 0.13);
   cursor: pointer;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.05);
   transition: all 0.18s;
-  color: #374151;
-  font-size: 0.82rem;
-  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  font-weight: 500;
+  &:hover {
+    border-color: rgba(200, 16, 46, 0.5);
+    background: rgba(200, 16, 46, 0.08);
+    color: $text-white;
+  }
   &.selected {
-    border-color: $accent;
-    background: #fff0f2;
-    color: $accent;
+    border-color: rgba(200, 16, 46, 0.7);
+    background: rgba(200, 16, 46, 0.16);
+    color: #ff9aaa;
   }
 }
 
 .pg-allergene-icona {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -559,26 +721,86 @@ textarea.pg-form-control {
   text-transform: uppercase;
 }
 
+.pg-check-icon {
+  color: #ff6b7a;
+  flex-shrink: 0;
+  margin-left: 2px;
+}
+
 .pg-custom-row {
   display: flex;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .pg-btn-custom {
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 8px 14px;
-  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  padding: 9px 14px;
+  font-size: 0.82rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.2s;
+  transition: all 0.2s;
   &:hover {
-    background: #e5e7eb;
+    background: rgba(255, 255, 255, 0.12);
+    color: $text-white;
+  }
+}
+
+// ── Steps (modale Da Menu) ─────────────────────────────
+.pg-step {
+  margin-bottom: 1.2rem;
+}
+
+.pg-step-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.pg-step-num {
+  width: 24px;
+  height: 24px;
+  background: rgba(200, 16, 46, 0.25);
+  border: 1.5px solid rgba(200, 16, 46, 0.5);
+  color: #ff8a9a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+// ── Lista prodotti ─────────────────────────────────────
+.pg-prodotti-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(200, 16, 46, 0.45);
+    border-radius: 10px;
   }
 }
 
@@ -587,27 +809,101 @@ textarea.pg-form-control {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 0.75rem 1rem;
+  padding: 12px 14px;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  background: #fafafa;
-  margin-bottom: 8px;
+  // Sfondo più visibile per ogni item
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.18s;
+
   &:hover {
-    background: #f0f0f0;
+    background: rgba(200, 16, 46, 0.12);
+    border-color: rgba(200, 16, 46, 0.45);
+    transform: translateX(4px);
+    box-shadow: 0 2px 12px rgba(200, 16, 46, 0.15);
+  }
+
+  &.pg-prodotto-saving {
+    opacity: 0.6;
+    pointer-events: none;
   }
 }
-.pg-prodotto-nome {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: #111;
+
+.pg-prodotto-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
-.pg-prodotto-prezzo {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: $accent;
+
+.pg-prodotto-nome {
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: #ffffff;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pg-prodotto-desc {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.pg-prodotto-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.pg-prodotto-prezzo {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ff8a8a;
+  white-space: nowrap;
+}
+
+.pg-prodotto-add-icon {
+  width: 28px;
+  height: 28px;
+  background: rgba(200, 16, 46, 0.2);
+  border: 1.5px solid rgba(200, 16, 46, 0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff8a8a;
+  flex-shrink: 0;
+  transition: all 0.18s;
+
+  .pg-prodotto-item:hover & {
+    background: $accent;
+    color: #fff;
+    border-color: $accent;
+    box-shadow: 0 0 12px rgba(200, 16, 46, 0.4);
+  }
+}
+
+.pg-empty-prodotti {
+  text-align: center;
+  padding: 2.5rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+  span {
+    font-size: 2.2rem;
+    display: block;
+    margin-bottom: 10px;
+  }
+  p {
+    margin: 0;
+  }
 }
 
 // ══ RESPONSIVE ════════════════════════════════════════
@@ -634,8 +930,12 @@ textarea.pg-form-control {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  .pg-modal-box {
-    padding: 1.5rem 1.25rem;
+  .pg-form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  .pg-form-group-prezzo {
+    width: 100%;
   }
 }
 
@@ -648,7 +948,7 @@ textarea.pg-form-control {
     align-items: flex-end;
   }
   .pg-modal-box {
-    border-radius: 16px 16px 0 0;
+    border-radius: 20px 20px 0 0;
     max-height: 92vh;
     width: 100%;
     max-width: 100%;

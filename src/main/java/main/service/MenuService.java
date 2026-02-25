@@ -1,11 +1,11 @@
 package main.service;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import main.domain.Menu;
+import main.domain.PiattoDelGiorno;
 import main.repository.MenuRepository;
 import main.repository.PiattoDelGiornoRepository;
 import main.service.dto.MenuDTO;
@@ -70,7 +70,6 @@ public class MenuService {
      */
     public Optional<MenuDTO> partialUpdate(MenuDTO menuDTO) {
         LOG.debug("Request to partially update Menu : {}", menuDTO);
-
         return menuRepository
             .findById(menuDTO.getId())
             .map(existingMenu -> {
@@ -87,12 +86,9 @@ public class MenuService {
     @Transactional(readOnly = true)
     public List<MenuDTO> findAll() {
         LOG.debug("Request to get all Menus");
-        return menuRepository.findAll().stream().map(menuMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return menuRepository.findAll().stream().map(menuMapper::toDto).collect(Collectors.toList());
     }
 
-    /**
-     * Get all the menus with eager load of many-to-many relationships.
-     */
     public Page<MenuDTO> findAllWithEagerRelationships(Pageable pageable) {
         return menuRepository.findAllWithEagerRelationships(pageable).map(menuMapper::toDto);
     }
@@ -108,32 +104,40 @@ public class MenuService {
 
     /**
      * Delete the menu by id.
-     * Prima elimina tutti i piatti del giorno collegati (FK constraint),
-     * poi elimina il menu stesso.
      */
     public void delete(UUID id) {
         LOG.debug("Request to delete Menu : {}", id);
-
-        // 1. Elimina prima i piatti del giorno collegati al menu
-        //    (FK_PIATTO_DEL_GIORNO_MENU_ID blocca altrimenti la delete)
         piattoDelGiornoRepository.deleteByMenuId(id);
-
-        // 2. Flush per assicurarsi che la delete dei piatti venga eseguita
-        //    prima della delete del menu nella stessa transazione
         piattoDelGiornoRepository.flush();
-
-        // 3. Ora elimina il menu (le portate e i prodotti sono gestiti
-        //    dal cascade della entity o dal loro service)
         menuRepository.deleteById(id);
     }
 
+    /**
+     * Restituisce i piatti del giorno ATTIVI per un menu con allergenis popolati.
+     *
+     * Pattern a 3 query nella stessa transazione:
+     *
+     * Query 1 (findPiattiDelGiornoAttiviByMenuId): piatti attivi + prodotto
+     * Query 2 (findPiattiDelGiornoAttiviByMenuIdConAllergeniProdotto): + prodotto.allergenis
+     * Query 3 (findPiattiDelGiornoAttiviByMenuIdConAllergeniDiretti): + p.allergenis diretti
+     *
+     * Hibernate 1st-level cache garantisce che le query lavorino sulle stesse
+     * istanze. Le collection vengono inizializzate in memoria prima della
+     * serializzazione del mapper → icone allergeni correttamente incluse nella risposta.
+     */
     @Transactional(readOnly = true)
     public List<PiattoDelGiornoDTO> findPiattiDelGiornoAttiviByMenuId(UUID menuId) {
-        LOG.debug("Request to get active PiattiDelGiorno for Menu : {}", menuId);
-        return menuRepository
-            .findPiattiDelGiornoAttiviByMenuId(menuId)
-            .stream()
-            .map(piattoDelGiornoMapper::toDto)
-            .collect(Collectors.toList());
+        LOG.debug("Request to get active PiattiDelGiorno with allergenis for Menu : {}", menuId);
+
+        // Query 1: piatti attivi + prodotto
+        List<PiattoDelGiorno> baseList = menuRepository.findPiattiDelGiornoAttiviByMenuId(menuId);
+
+        // Query 2: inizializza prodotto.allergenis sulle stesse istanze
+        menuRepository.findPiattiDelGiornoAttiviByMenuIdConAllergeniProdotto(menuId);
+
+        // Query 3: inizializza p.allergenis (piatti personalizzati) sulle stesse istanze
+        menuRepository.findPiattiDelGiornoAttiviByMenuIdConAllergeniDiretti(menuId);
+
+        return baseList.stream().map(piattoDelGiornoMapper::toDto).collect(Collectors.toList());
     }
 }

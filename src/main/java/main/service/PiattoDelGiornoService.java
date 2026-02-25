@@ -1,7 +1,6 @@
 package main.service;
 
 import java.time.LocalDate;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +24,6 @@ public class PiattoDelGiornoService {
     private static final Logger LOG = LoggerFactory.getLogger(PiattoDelGiornoService.class);
 
     private final PiattoDelGiornoRepository piattoDelGiornoRepository;
-
     private final PiattoDelGiornoMapper piattoDelGiornoMapper;
 
     public PiattoDelGiornoService(PiattoDelGiornoRepository piattoDelGiornoRepository, PiattoDelGiornoMapper piattoDelGiornoMapper) {
@@ -35,17 +33,12 @@ public class PiattoDelGiornoService {
 
     /**
      * Save a piattoDelGiorno.
-     *
-     * @param piattoDelGiornoDTO the entity to save.
-     * @return the persisted entity.
      */
     public PiattoDelGiornoDTO save(PiattoDelGiornoDTO piattoDelGiornoDTO) {
         LOG.debug("Request to save PiattoDelGiorno : {}", piattoDelGiornoDTO);
-
         if (piattoDelGiornoDTO.getData() == null) {
             piattoDelGiornoDTO.setData(LocalDate.now());
         }
-
         PiattoDelGiorno piattoDelGiorno = piattoDelGiornoMapper.toEntity(piattoDelGiornoDTO);
         piattoDelGiorno = piattoDelGiornoRepository.save(piattoDelGiorno);
         return piattoDelGiornoMapper.toDto(piattoDelGiorno);
@@ -53,9 +46,6 @@ public class PiattoDelGiornoService {
 
     /**
      * Update a piattoDelGiorno.
-     *
-     * @param piattoDelGiornoDTO the entity to save.
-     * @return the persisted entity.
      */
     public PiattoDelGiornoDTO update(PiattoDelGiornoDTO piattoDelGiornoDTO) {
         LOG.debug("Request to update PiattoDelGiorno : {}", piattoDelGiornoDTO);
@@ -66,18 +56,13 @@ public class PiattoDelGiornoService {
 
     /**
      * Partially update a piattoDelGiorno.
-     *
-     * @param piattoDelGiornoDTO the entity to update partially.
-     * @return the persisted entity.
      */
     public Optional<PiattoDelGiornoDTO> partialUpdate(PiattoDelGiornoDTO piattoDelGiornoDTO) {
         LOG.debug("Request to partially update PiattoDelGiorno : {}", piattoDelGiornoDTO);
-
         return piattoDelGiornoRepository
             .findById(piattoDelGiornoDTO.getId())
             .map(existingPiattoDelGiorno -> {
                 piattoDelGiornoMapper.partialUpdate(existingPiattoDelGiorno, piattoDelGiornoDTO);
-
                 return existingPiattoDelGiorno;
             })
             .map(piattoDelGiornoRepository::save)
@@ -85,25 +70,36 @@ public class PiattoDelGiornoService {
     }
 
     /**
-     * Get all the piattoDelGiornos.
+     * Restituisce tutti i piatti del giorno con allergenis completamente popolati.
      *
-     * @return the list of entities.
+     * Pattern a 3 query nella stessa transazione per evitare MultipleBagFetchException:
+     *
+     * Query 1 (findAllConProdotto): carica p + p.prodotto
+     * Query 2 (findAllConAllergeniProdotto): carica p + p.prodotto + prodotto.allergenis
+     * Query 3 (findAllConAllergeniDiretti): carica p + p.allergenis
+     *
+     * Hibernate 1st-level cache garantisce che tutte le query lavorino sulle stesse
+     * istanze Java in memoria. Dopo le query 2 e 3, ogni entità ha le collection
+     * inizializzate. Il mapper serializza tutto correttamente incluse icona e colore.
      */
     @Transactional(readOnly = true)
     public List<PiattoDelGiornoDTO> findAll() {
-        LOG.debug("Request to get all PiattoDelGiornos");
-        return piattoDelGiornoRepository
-            .findAll()
-            .stream()
-            .map(piattoDelGiornoMapper::toDto)
-            .collect(Collectors.toCollection(LinkedList::new));
+        LOG.debug("Request to get all PiattoDelGiornos with full allergenis");
+
+        // Query 1: piatti + prodotto
+        List<PiattoDelGiorno> baseList = piattoDelGiornoRepository.findAllConProdotto();
+
+        // Query 2: inizializza prodotto.allergenis sulle istanze già in sessione
+        piattoDelGiornoRepository.findAllConAllergeniProdotto();
+
+        // Query 3: inizializza p.allergenis (piatti personalizzati) sulle istanze già in sessione
+        piattoDelGiornoRepository.findAllConAllergeniDiretti();
+
+        return baseList.stream().map(piattoDelGiornoMapper::toDto).collect(Collectors.toList());
     }
 
     /**
      * Get one piattoDelGiorno by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
      */
     @Transactional(readOnly = true)
     public Optional<PiattoDelGiornoDTO> findOne(UUID id) {
@@ -113,8 +109,6 @@ public class PiattoDelGiornoService {
 
     /**
      * Delete the piattoDelGiorno by id.
-     *
-     * @param id the id of the entity.
      */
     public void delete(UUID id) {
         LOG.debug("Request to delete PiattoDelGiorno : {}", id);

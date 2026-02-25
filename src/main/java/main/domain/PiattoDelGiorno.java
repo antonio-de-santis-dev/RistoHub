@@ -6,6 +6,8 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -50,6 +52,23 @@ public class PiattoDelGiorno implements Serializable {
     @ManyToOne
     @JoinColumn(name = "menu_id")
     private Menu menu;
+
+    /**
+     * Allergeni diretti per piatti personalizzati (senza prodotto collegato).
+     *
+     * FIX: inverseJoinColumns usa "allegene_id" (senza 'n') per corrispondere
+     * alla colonna reale nella tabella piatto_del_giorno_allergenis creata
+     * dalla migration 20240101_add_piatto_del_giorno_allergenis.xml
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JoinTable(
+        name = "piatto_del_giorno_allergenis",
+        joinColumns = @JoinColumn(name = "piatto_del_giorno_id"),
+        inverseJoinColumns = @JoinColumn(name = "allegene_id")
+    )
+    @JsonIgnoreProperties(value = { "prodottos" }, allowSetters = true)
+    private Set<Allergene> allergenis = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -152,6 +171,34 @@ public class PiattoDelGiorno implements Serializable {
         this.menu = menu;
     }
 
+    public PiattoDelGiorno menu(Menu menu) {
+        this.setMenu(menu);
+        return this;
+    }
+
+    public Set<Allergene> getAllergenis() {
+        return this.allergenis;
+    }
+
+    public void setAllergenis(Set<Allergene> allergenis) {
+        this.allergenis = allergenis;
+    }
+
+    public PiattoDelGiorno allergenis(Set<Allergene> allergenis) {
+        this.setAllergenis(allergenis);
+        return this;
+    }
+
+    public PiattoDelGiorno addAllergeni(Allergene allergene) {
+        this.allergenis.add(allergene);
+        return this;
+    }
+
+    public PiattoDelGiorno removeAllergeni(Allergene allergene) {
+        this.allergenis.remove(allergene);
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -167,7 +214,6 @@ public class PiattoDelGiorno implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 

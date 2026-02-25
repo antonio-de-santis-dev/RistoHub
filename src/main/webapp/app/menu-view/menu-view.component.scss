@@ -82,7 +82,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
 .logo-img {
   max-width: 200px;
-  max-height: 80px;
+  max-height: 200px;
   object-fit: contain;
   border-radius: 8px;
 }
@@ -698,8 +698,8 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   padding: 2px 0 1px;
 }
 .rustico-logo-img {
-  max-height: 40px;
-  max-width: 140px;
+  max-height: 150px;
+  max-width: 200px;
   object-fit: contain;
 }
 
@@ -1056,7 +1056,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
   .moderno-logo-img {
     max-width: 240px;
-    max-height: 90px;
+    max-height: 150px;
   }
   .moderno-title {
     font-size: 38px;
@@ -1097,7 +1097,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     width: 80px;
   }
   .rustico-logo-img {
-    max-height: 50px;
     max-width: 180px;
   }
   .rustico-back-btn {
@@ -1133,7 +1132,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
   .logo-img {
     max-width: 150px;
-    max-height: 60px;
+    max-height: 150px;
   }
   .portata-header {
     padding: 11px 13px;
@@ -1153,7 +1152,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
   .moderno-logo-img {
     max-width: 150px;
-    max-height: 60px;
+    max-height: 150px;
   }
   .moderno-carousel-btn {
     width: 28px;
@@ -1194,7 +1193,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     font-size: 13px;
   }
   .rustico-logo-img {
-    max-height: 30px;
+    max-height: 100px;
   }
   .rustico-carousel-btn {
     width: 26px;

@@ -40,6 +40,29 @@ public interface MenuRepository extends JpaRepository<Menu, UUID> {
     @Query("select menu from Menu menu left join fetch menu.ristoratore where menu.id =:id")
     Optional<Menu> findOneWithToOneRelationships(@Param("id") UUID id);
 
-    @Query("SELECT p FROM PiattoDelGiorno p " + "LEFT JOIN FETCH p.prodotto " + "WHERE p.attivo = true " + "AND p.menu.id = :menuId")
+    /**
+     * Passo 1 — piatti attivi del menu con prodotto collegato.
+     */
+    @Query("SELECT DISTINCT p FROM PiattoDelGiorno p " + "LEFT JOIN FETCH p.prodotto " + "WHERE p.attivo = true AND p.menu.id = :menuId")
     List<PiattoDelGiorno> findPiattiDelGiornoAttiviByMenuId(@Param("menuId") UUID menuId);
+
+    /**
+     * Passo 2 — stessi piatti con allergeni del prodotto collegato.
+     * Query separata per evitare MultipleBagFetchException.
+     * Hibernate 1st-level cache aggiorna le stesse istanze in memoria.
+     */
+    @Query(
+        "SELECT DISTINCT p FROM PiattoDelGiorno p " +
+        "LEFT JOIN FETCH p.prodotto prod " +
+        "LEFT JOIN FETCH prod.allergenis " +
+        "WHERE p.attivo = true AND p.menu.id = :menuId AND p.prodotto IS NOT NULL"
+    )
+    List<PiattoDelGiorno> findPiattiDelGiornoAttiviByMenuIdConAllergeniProdotto(@Param("menuId") UUID menuId);
+
+    /**
+     * Passo 3 — stessi piatti con allergeni diretti (piatti personalizzati).
+     * Query separata per evitare MultipleBagFetchException.
+     */
+    @Query("SELECT DISTINCT p FROM PiattoDelGiorno p " + "LEFT JOIN FETCH p.allergenis " + "WHERE p.attivo = true AND p.menu.id = :menuId")
+    List<PiattoDelGiorno> findPiattiDelGiornoAttiviByMenuIdConAllergeniDiretti(@Param("menuId") UUID menuId);
 }
