@@ -120,28 +120,30 @@
     <div class="lingua-selettore" (click)="$event.stopPropagation()">
       <button
         class="lingua-btn-attuale"
-        [style.borderColor]="colorePrimario + '55'"
+        [style.borderColor]="colorePrimario"
         [style.color]="colorePrimario"
         (click)="mostraDropdownLingua = !mostraDropdownLingua"
         [attr.aria-label]="'Lingua: ' + linguaAttuale.nome"
       >
-        <span class="lingua-bandiera">{{ linguaAttuale.bandiera }}</span>
-        <span class="lingua-codice">{{ linguaAttuale.codice | uppercase }}</span>
+        <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(linguaAttuale.svgBandiera)"></span>
         <span class="lingua-chevron" [class.aperto]="mostraDropdownLingua">▾</span>
       </button>
-      <div class="lingua-dropdown" *ngIf="mostraDropdownLingua" [style.borderColor]="colorePrimario + '33'">
-        <button
-          *ngFor="let l of LINGUE"
-          class="lingua-opzione"
-          [class.attiva]="l.codice === linguaCorrente"
-          [style.color]="l.codice === linguaCorrente ? colorePrimario : ''"
-          [style.backgroundColor]="l.codice === linguaCorrente ? colorePrimario + '12' : ''"
-          (click)="cambiaLingua(l.codice)"
-        >
-          <span class="lingua-bandiera">{{ l.bandiera }}</span>
-          <span class="lingua-nome">{{ l.nome }}</span>
-          <span *ngIf="l.codice === linguaCorrente" class="lingua-check">✓</span>
-        </button>
+      <div class="lingua-dropdown" *ngIf="mostraDropdownLingua">
+        <div class="lingua-dropdown-header">Lingua</div>
+        <div class="lingua-griglia">
+          <button
+            *ngFor="let l of LINGUE"
+            class="lingua-opzione"
+            [class.attiva]="l.codice === linguaCorrente"
+            [style.borderColor]="l.codice === linguaCorrente ? colorePrimario : 'transparent'"
+            (click)="cambiaLingua(l.codice)"
+          >
+            <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(l.svgBandiera)"></span>
+            <span class="lingua-nome-corto" [style.color]="l.codice === linguaCorrente ? colorePrimario : ''">{{
+              l.codice | uppercase
+            }}</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -311,28 +313,30 @@
     <!-- SELETTORE LINGUA MODERNO -->
     <div class="lingua-selettore lingua-selettore-moderno" (click)="$event.stopPropagation()">
       <button
-        class="lingua-btn-attuale lingua-btn-moderno"
-        [style.borderColor]="colorePrimario + '66'"
+        class="lingua-btn-attuale"
+        [style.borderColor]="colorePrimario"
         [style.color]="colorePrimario"
         (click)="mostraDropdownLingua = !mostraDropdownLingua"
       >
-        <span class="lingua-bandiera">{{ linguaAttuale.bandiera }}</span>
-        <span class="lingua-codice">{{ linguaAttuale.codice | uppercase }}</span>
+        <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(linguaAttuale.svgBandiera)"></span>
         <span class="lingua-chevron" [class.aperto]="mostraDropdownLingua">▾</span>
       </button>
-      <div class="lingua-dropdown lingua-dropdown-moderno" *ngIf="mostraDropdownLingua" [style.borderColor]="colorePrimario + '33'">
-        <button
-          *ngFor="let l of LINGUE"
-          class="lingua-opzione"
-          [class.attiva]="l.codice === linguaCorrente"
-          [style.color]="l.codice === linguaCorrente ? colorePrimario : ''"
-          [style.backgroundColor]="l.codice === linguaCorrente ? colorePrimario + '12' : ''"
-          (click)="cambiaLingua(l.codice)"
-        >
-          <span class="lingua-bandiera">{{ l.bandiera }}</span>
-          <span class="lingua-nome">{{ l.nome }}</span>
-          <span *ngIf="l.codice === linguaCorrente" class="lingua-check">✓</span>
-        </button>
+      <div class="lingua-dropdown lingua-dropdown-moderno" *ngIf="mostraDropdownLingua">
+        <div class="lingua-dropdown-header">Lingua</div>
+        <div class="lingua-griglia">
+          <button
+            *ngFor="let l of LINGUE"
+            class="lingua-opzione"
+            [class.attiva]="l.codice === linguaCorrente"
+            [style.borderColor]="l.codice === linguaCorrente ? colorePrimario : 'transparent'"
+            (click)="cambiaLingua(l.codice)"
+          >
+            <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(l.svgBandiera)"></span>
+            <span class="lingua-nome-corto" [style.color]="l.codice === linguaCorrente ? colorePrimario : ''">{{
+              l.codice | uppercase
+            }}</span>
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -564,26 +568,29 @@
       <div class="lingua-selettore lingua-selettore-rustico" (click)="$event.stopPropagation()">
         <button
           class="lingua-btn-attuale lingua-btn-rustico"
-          [style.borderColor]="colorePrimario + '66'"
+          [style.borderColor]="colorePrimario"
           [style.color]="colorePrimario"
           (click)="mostraDropdownLingua = !mostraDropdownLingua"
         >
-          <span class="lingua-bandiera">{{ linguaAttuale.bandiera }}</span>
+          <span class="lingua-bandiera-svg lingua-bandiera-svg-sm" [innerHTML]="getSafeSvg(linguaAttuale.svgBandiera)"></span>
           <span class="lingua-chevron" [class.aperto]="mostraDropdownLingua">▾</span>
         </button>
-        <div class="lingua-dropdown lingua-dropdown-rustico" *ngIf="mostraDropdownLingua" [style.borderColor]="colorePrimario + '33'">
-          <button
-            *ngFor="let l of LINGUE"
-            class="lingua-opzione"
-            [class.attiva]="l.codice === linguaCorrente"
-            [style.color]="l.codice === linguaCorrente ? colorePrimario : ''"
-            [style.backgroundColor]="l.codice === linguaCorrente ? colorePrimario + '12' : ''"
-            (click)="cambiaLingua(l.codice)"
-          >
-            <span class="lingua-bandiera">{{ l.bandiera }}</span>
-            <span class="lingua-nome">{{ l.nome }}</span>
-            <span *ngIf="l.codice === linguaCorrente" class="lingua-check">✓</span>
-          </button>
+        <div class="lingua-dropdown lingua-dropdown-rustico" *ngIf="mostraDropdownLingua">
+          <div class="lingua-dropdown-header">Lingua</div>
+          <div class="lingua-griglia">
+            <button
+              *ngFor="let l of LINGUE"
+              class="lingua-opzione"
+              [class.attiva]="l.codice === linguaCorrente"
+              [style.borderColor]="l.codice === linguaCorrente ? colorePrimario : 'transparent'"
+              (click)="cambiaLingua(l.codice)"
+            >
+              <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(l.svgBandiera)"></span>
+              <span class="lingua-nome-corto" [style.color]="l.codice === linguaCorrente ? colorePrimario : ''">{{
+                l.codice | uppercase
+              }}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

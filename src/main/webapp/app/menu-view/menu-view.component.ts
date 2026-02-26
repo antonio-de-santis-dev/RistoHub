@@ -3,7 +3,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl, SafeHtml } from '@angular/platform-browser';
 
 // ── COSTANTE PER L'IMMAGINE DEGLI ALLERGENI PERSONALIZZATI ──
 const ALLERGENE_MANUALE_ICONA = '/content/images/allergene-manuale.png';
@@ -47,7 +47,8 @@ interface Menu {
 interface Lingua {
   codice: string;
   nome: string;
-  bandiera: string;
+  bandiera: string; // emoji fallback
+  svgBandiera: string; // SVG inline
 }
 
 @Component({
@@ -89,11 +90,36 @@ export class MenuViewComponent implements OnInit {
   // ══════════════════════════════════════════════════
 
   readonly LINGUE: Lingua[] = [
-    { codice: 'it', nome: 'Italiano', bandiera: '🇮🇹' },
-    { codice: 'en', nome: 'English', bandiera: '🇬🇧' },
-    { codice: 'fr', nome: 'Français', bandiera: '🇫🇷' },
-    { codice: 'de', nome: 'Deutsch', bandiera: '🇩🇪' },
-    { codice: 'es', nome: 'Español', bandiera: '🇪🇸' },
+    {
+      codice: 'it',
+      nome: 'Italiano',
+      bandiera: '🇮🇹',
+      svgBandiera: `<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><mask id="mIT" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="30" height="30"><path d="M0 15C0 6.71573 6.71573 0 15 0C23.2843 0 30 6.71573 30 15C30 23.2843 23.2843 30 15 30C6.71573 30 0 23.2843 0 15Z" fill="white"/></mask><g mask="url(#mIT)"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.625 0H30V30H20.625V0Z" fill="#C51918"/><path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H11.25V30H0V0Z" fill="#5EAA22"/><path fill-rule="evenodd" clip-rule="evenodd" d="M9.375 0H20.625V30H9.375V0Z" fill="white"/></g></svg>`,
+    },
+    {
+      codice: 'en',
+      nome: 'English',
+      bandiera: '🇬🇧',
+      svgBandiera: `<svg width="30" height="30" viewBox="0 0 37.5 37.5" fill="none" xmlns="http://www.w3.org/2000/svg"><mask id="mEN" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="38" height="38"><path d="M0 18.75C0 8.39466 8.39466 0 18.75 0C29.1053 0 37.5 8.39466 37.5 18.75C37.5 29.1053 29.1053 37.5 18.75 37.5C8.39466 37.5 0 29.1053 0 18.75Z" fill="white"/></mask><g mask="url(#mEN)"><path fill-rule="evenodd" clip-rule="evenodd" d="M0 0V37.5H37.5V0H0Z" fill="#2E42A5"/><path d="M-4.17554 34.8209L4.07644 39.4741L37.6873 5.05909L42.04 -1.85572L33.2157 -3.41097L19.5066 11.4195L8.47226 21.4117L-4.17554 34.8209Z" fill="white"/><path d="M-3.04596 38.081L1.15804 40.7814L40.4768 -2.49822H34.5739L-3.04596 38.081Z" fill="#F50100"/><path d="M41.6755 34.8209L33.4235 39.4741L-0.187329 5.05909L-4.54006 -1.85572L4.28424 -3.41097L17.9933 11.4195L29.0277 21.4117L41.6755 34.8209Z" fill="white"/><path d="M41.394 37.1607L37.19 39.8611L20.4476 21.3308L15.4839 19.2605L-4.95881 -1.832H0.944093L21.3753 18.7599L26.8023 21.2424L41.394 37.1607Z" fill="#F50100"/><path d="M19.3755 -12.5C21.7915 -12.4997 23.7505 -10.5411 23.7505 -8.125V13.75H39.2515C42.3579 13.7502 44.8765 16.2685 44.8765 19.375C44.8765 22.4815 42.3579 24.9998 39.2515 25H23.7505V38.125C23.7505 40.5411 21.7915 42.4997 19.3755 42.5C16.9592 42.5 15.0005 40.5412 15.0005 38.125V25H0.501465C-2.60514 25 -5.12354 22.4816 -5.12354 19.375C-5.12353 16.2684 -2.60513 13.75 0.501465 13.75H15.0005V-8.125C15.0005 -10.5412 16.9592 -12.5 19.3755 -12.5Z" fill="#F50100"/></g></svg>`,
+    },
+    {
+      codice: 'fr',
+      nome: 'Français',
+      bandiera: '🇫🇷',
+      svgBandiera: `<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><mask id="mFR" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="30" height="30"><path d="M0 15C0 6.71573 6.71573 0 15 0C23.2843 0 30 6.71573 30 15C30 23.2843 23.2843 30 15 30C6.71573 30 0 23.2843 0 15Z" fill="white"/></mask><g mask="url(#mFR)"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.625 0H30V30H20.625V0Z" fill="#F50100"/><path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H11.25V30H0V0Z" fill="#2E42A5"/><path fill-rule="evenodd" clip-rule="evenodd" d="M9.375 0H20.625V30H9.375V0Z" fill="#F7FCFF"/></g></svg>`,
+    },
+    {
+      codice: 'de',
+      nome: 'Deutsch',
+      bandiera: '🇩🇪',
+      svgBandiera: `<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><mask id="mDE" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="30" height="30"><path d="M0 15C0 6.71573 6.71573 0 15 0C23.2843 0 30 6.71573 30 15C30 23.2843 23.2843 30 15 30C6.71573 30 0 23.2843 0 15Z" fill="white"/></mask><g mask="url(#mDE)"><path fill-rule="evenodd" clip-rule="evenodd" d="M0 20H30V30H0V20Z" fill="#FFD018"/><path fill-rule="evenodd" clip-rule="evenodd" d="M0 10H30V20H0V10Z" fill="#E31D1C"/><path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H30V10H0V0Z" fill="#272727"/></g></svg>`,
+    },
+    {
+      codice: 'es',
+      nome: 'Español',
+      bandiera: '🇪🇸',
+      svgBandiera: `<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><mask id="mES" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="30" height="30"><path d="M0 15C0 6.71573 6.71573 0 15 0C23.2843 0 30 6.71573 30 15C30 23.2843 23.2843 30 15 30C6.71573 30 0 23.2843 0 15Z" fill="white"/></mask><g mask="url(#mES)"><rect width="30" height="30" fill="#AA151B"/><rect y="7.5" width="30" height="15" fill="#F1BF00"/></g></svg>`,
+    },
   ];
 
   linguaCorrente = 'it';
@@ -224,6 +250,11 @@ export class MenuViewComponent implements OnInit {
     return this.UI_LABELS[chiave]?.[this.linguaCorrente] ?? this.UI_LABELS[chiave]?.['it'] ?? chiave;
   }
 
+  /** Sanitizza SVG per uso con [innerHTML] */
+  getSafeSvg(svg: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(svg);
+  }
+
   /** Chiude il dropdown se si clicca fuori */
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
@@ -287,7 +318,9 @@ export class MenuViewComponent implements OnInit {
             }
             const data = await resp.json();
             const tradotto = data.responseData?.translatedText;
-            if (tradotto && tradotto !== testo && data.responseStatus === 200) {
+            // MyMemory restituisce responseStatus come stringa ("200"), non numero
+            const statusOk = Number(data.responseStatus) === 200;
+            if (tradotto && tradotto !== testo && statusOk) {
               nuovaCache.set(testo, tradotto);
             }
           } catch {
