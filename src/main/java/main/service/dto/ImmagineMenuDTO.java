@@ -3,6 +3,7 @@ package main.service.dto;
 import jakarta.persistence.Lob;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
 import main.domain.enumeration.TipoImmagine;
@@ -27,8 +28,17 @@ public class ImmagineMenuDTO implements Serializable {
     @NotNull
     private TipoImmagine tipo;
 
+    // ── NUOVI campi carosello ─────────────────────────────
+    private Integer ordine = 0;
+
+    private Boolean visibile = true;
+
+    // ─────────────────────────────────────────────────────
+
     @NotNull
     private MenuDTO menu;
+
+    // ── Getter/Setter ────────────────────────────────────
 
     public UUID getId() {
         return id;
@@ -78,6 +88,22 @@ public class ImmagineMenuDTO implements Serializable {
         this.tipo = tipo;
     }
 
+    public Integer getOrdine() {
+        return ordine;
+    }
+
+    public void setOrdine(Integer ordine) {
+        this.ordine = ordine;
+    }
+
+    public Boolean getVisibile() {
+        return visibile;
+    }
+
+    public void setVisibile(Boolean visibile) {
+        this.visibile = visibile;
+    }
+
     public MenuDTO getMenu() {
         return menu;
     }
@@ -86,19 +112,21 @@ public class ImmagineMenuDTO implements Serializable {
         this.menu = menu;
     }
 
+    /**
+     * Utility: restituisce l'immagine come data-URL base64 pronta per il tag <img>.
+     * Usato dal frontend Angular nel template.
+     */
+    public String getImmagineBase64() {
+        if (immagine == null || immagineContentType == null) return null;
+        return "data:" + immagineContentType + ";base64," + Base64.getEncoder().encodeToString(immagine);
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ImmagineMenuDTO)) {
-            return false;
-        }
-
+        if (this == o) return true;
+        if (!(o instanceof ImmagineMenuDTO)) return false;
         ImmagineMenuDTO immagineMenuDTO = (ImmagineMenuDTO) o;
-        if (this.id == null) {
-            return false;
-        }
+        if (this.id == null) return false;
         return Objects.equals(this.id, immagineMenuDTO.id);
     }
 
@@ -113,9 +141,10 @@ public class ImmagineMenuDTO implements Serializable {
         return "ImmagineMenuDTO{" +
             "id='" + getId() + "'" +
             ", nome='" + getNome() + "'" +
-            ", immagine='" + getImmagine() + "'" +
             ", contentType='" + getContentType() + "'" +
             ", tipo='" + getTipo() + "'" +
+            ", ordine=" + getOrdine() +
+            ", visibile=" + getVisibile() +
             ", menu=" + getMenu() +
             "}";
     }

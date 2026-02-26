@@ -43,7 +43,6 @@
         <div class="mce-spinner"></div>
         <span>Caricamento immagini...</span>
       </div>
-
     } @else {
       <!-- Info Banner -->
       <div class="mce-info-banner">
@@ -87,7 +86,7 @@
 
               <!-- Immagine -->
               <div class="mce-card-img-wrap">
-                <img [src]="img.preview ?? img.url" [alt]="'Immagine copertina ' + (i + 1)" class="mce-card-img" />
+                <img [src]="img.dataUrl" [alt]="'Immagine copertina ' + (i + 1)" class="mce-card-img" />
                 @if (img.uploading) {
                   <div class="mce-card-upload-overlay">
                     <div class="mce-spinner"></div>
@@ -202,7 +201,7 @@
           <div class="mce-preview-strip">
             @for (img of immagini; track $index; let i = $index) {
               <div class="mce-preview-thumb" [class.mce-preview-hidden]="!img.visibile" [title]="img.visibile ? 'Visibile' : 'Nascosta'">
-                <img [src]="img.preview ?? img.url" [alt]="'thumb ' + (i + 1)" />
+                <img [src]="img.dataUrl" [alt]="'thumb ' + (i + 1)" />
                 <span class="mce-preview-num">{{ i + 1 }}</span>
                 @if (!img.visibile) {
                   <div class="mce-preview-eye-off">🚫</div>

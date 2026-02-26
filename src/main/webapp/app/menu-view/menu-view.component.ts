@@ -353,23 +353,13 @@ export class MenuViewComponent implements OnInit {
   modernoPortataAttiva: Portata | null = null;
   modernoCarouselIndex = 0;
   modernoAutoplayTimer: any = null;
-  modernoImmagini: string[] = [
-    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80',
-    'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=800&q=80',
-    'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80',
-    'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80',
-  ];
+  modernoImmagini: string[] = []; // ← popolato dal DB (immagini COPERTINA visibili)
 
   rusticoTabAttiva: string | null = null;
   rusticoPortataAttiva: Portata | null = null;
   rusticoCarouselIndex = 0;
   rusticoAutoplayTimer: any = null;
-  rusticoImmagini: string[] = [
-    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=900&q=80',
-    'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=900&q=80',
-    'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=80',
-    'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=900&q=80',
-  ];
+  rusticoImmagini: string[] = []; // ← popolato dal DB (immagini COPERTINA visibili)
 
   private readonly ORDINE_PORTATE: Record<string, number> = {
     ANTIPASTO: 0,
@@ -441,6 +431,14 @@ export class MenuViewComponent implements OnInit {
         this.logoUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob));
       }
 
+      // ── Carosello: carica immagini COPERTINA visibili ordinate per 'ordine' ──
+      const copertine = immagini
+        .filter(i => i.tipo === 'COPERTINA' && i.visibile !== false)
+        .sort((a, b) => (a.ordine ?? 0) - (b.ordine ?? 0))
+        .map(i => `data:${i.immagineContentType};base64,${i.immagine}`);
+      this.modernoImmagini = copertine;
+      this.rusticoImmagini = copertine;
+
       const portateRaw: any[] = (await this.http.get<any[]>(`/api/menus/${id}/portatas`).toPromise()) ?? [];
       const portateCaricate = await Promise.all(
         portateRaw.map(async p => {
@@ -454,8 +452,8 @@ export class MenuViewComponent implements OnInit {
       const piattiAttivi: any[] = (await this.http.get<any[]>(`/api/menus/${id}/piatti-del-giorno`).toPromise()) ?? [];
       this.piattiDelGiorno = piattiAttivi.map(p => this.arricchisciPiatto(p));
 
-      if (this.menu?.templateStyle === 'MODERNO') this.avviaAutoplay();
-      if (this.menu?.templateStyle === 'RUSTICO') this.avviaAutoplayRustico();
+      if (this.menu?.templateStyle === 'MODERNO' && this.modernoImmagini.length > 0) this.avviaAutoplay();
+      if (this.menu?.templateStyle === 'RUSTICO' && this.rusticoImmagini.length > 0) this.avviaAutoplayRustico();
     } catch (err) {
       console.error('Errore caricamento menu:', err);
       this.errore = true;

@@ -719,7 +719,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 .moderno-carousel {
   position: relative;
   width: 100%;
-  height: 300px;
+  aspect-ratio: 16 / 9; /* ← proporzionato, nessuna altezza fissa */
   overflow: hidden;
   background: #2d2419;
 }
@@ -739,7 +739,8 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: revert; /* ← riempie il rettangolo, croppa se necessario */
+    object-position: center center;
     display: block;
     pointer-events: none;
   }
@@ -1103,7 +1104,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
 .rustico-carousel {
   width: 100%;
-  height: 80vw;
+  aspect-ratio: 4 / 3; /* ← più quadrato, adatto a immagini portrait/square */
   max-height: 600px;
   position: relative;
   overflow: hidden;
@@ -1124,7 +1125,8 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: revert;
+    object-position: center center;
     display: block;
     pointer-events: none;
   }
@@ -1133,7 +1135,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 .rustico-slide-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(26, 20, 16, 0.08) 0%, transparent 40%, rgba(26, 20, 16, 0.5) 100%);
 }
 
 .rustico-carousel-btn {
@@ -1845,9 +1846,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   .moderno-tabs-wrapper {
     padding: 12px 24px;
   }
-  .moderno-carousel {
-    height: 420px;
-  }
+
   .moderno-prodotto-nome {
     font-size: 17px;
   }
@@ -1941,9 +1940,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     padding: 11px 13px;
   }
 
-  .moderno-carousel {
-    height: 210px;
-  }
   .moderno-title {
     font-size: 22px;
   }
@@ -1972,9 +1968,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   .rustico-sidebar {
     width: 78px;
   }
-  .rustico-carousel {
-    height: 70vw;
-  }
+
   .rustico-nav-btn {
     font-size: 8.5px;
     padding: 6px 3px;

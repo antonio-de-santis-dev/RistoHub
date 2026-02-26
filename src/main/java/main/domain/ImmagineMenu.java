@@ -44,6 +44,15 @@ public class ImmagineMenu implements Serializable {
     @Column(name = "tipo", nullable = false)
     private TipoImmagine tipo;
 
+    // ── NUOVI CAMPI per gestione carosello ────────────────
+    @Column(name = "ordine", nullable = false)
+    private Integer ordine = 0;
+
+    @Column(name = "visibile", nullable = false)
+    private Boolean visibile = true;
+
+    // ─────────────────────────────────────────────────────
+
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties(value = { "portates", "immaginis", "ristoratore" }, allowSetters = true)
@@ -129,6 +138,32 @@ public class ImmagineMenu implements Serializable {
         this.tipo = tipo;
     }
 
+    public Integer getOrdine() {
+        return this.ordine;
+    }
+
+    public ImmagineMenu ordine(Integer ordine) {
+        this.setOrdine(ordine);
+        return this;
+    }
+
+    public void setOrdine(Integer ordine) {
+        this.ordine = ordine;
+    }
+
+    public Boolean getVisibile() {
+        return this.visibile;
+    }
+
+    public ImmagineMenu visibile(Boolean visibile) {
+        this.setVisibile(visibile);
+        return this;
+    }
+
+    public void setVisibile(Boolean visibile) {
+        this.visibile = visibile;
+    }
+
     public Menu getMenu() {
         return this.menu;
     }
@@ -157,7 +192,6 @@ public class ImmagineMenu implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
@@ -171,6 +205,8 @@ public class ImmagineMenu implements Serializable {
             ", immagineContentType='" + getImmagineContentType() + "'" +
             ", contentType='" + getContentType() + "'" +
             ", tipo='" + getTipo() + "'" +
+            ", ordine=" + getOrdine() +
+            ", visibile=" + getVisibile() +
             "}";
     }
 }

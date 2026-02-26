@@ -61,14 +61,16 @@ export class MenuCoverEditorComponent implements OnInit {
       this.menuNome = menu.nome ?? 'Menu';
 
       const imgs: any[] = (await this.http.get<any[]>(`/api/menus/${this.menuId}/immagini`).toPromise()) ?? [];
-      this.immagini = imgs.map((img: any, i: number) => ({
-        id: img.id,
-        immagine: img.immagine,
-        immagineContentType: img.immagineContentType,
-        ordine: img.ordine ?? i,
-        visibile: img.visibile ?? true,
-        dataUrl: img.immagine ? `data:${img.immagineContentType};base64,${img.immagine}` : undefined,
-      }));
+      this.immagini = imgs
+        .filter((img: any) => img.tipo === 'COPERTINA') // ← esclude LOGO e altri tipi
+        .map((img: any, i: number) => ({
+          id: img.id,
+          immagine: img.immagine,
+          immagineContentType: img.immagineContentType,
+          ordine: img.ordine ?? i,
+          visibile: img.visibile ?? true,
+          dataUrl: img.immagine ? `data:${img.immagineContentType};base64,${img.immagine}` : undefined,
+        }));
     } catch (err) {
       console.error('Errore caricamento:', err);
       this.mostraToast('❌ Errore nel caricamento delle immagini', 'error');
@@ -211,6 +213,9 @@ export class MenuCoverEditorComponent implements OnInit {
         img.id = risposta.id;
         img.immagine = risposta.immagine;
         img.immagineContentType = risposta.immagineContentType;
+        img.dataUrl = risposta.immagine // ← aggiorna con i byte reali del server
+          ? `data:${risposta.immagineContentType};base64,${risposta.immagine}`
+          : img.dataUrl;
         img.isNew = false;
         img.file = undefined;
         img.uploading = false;

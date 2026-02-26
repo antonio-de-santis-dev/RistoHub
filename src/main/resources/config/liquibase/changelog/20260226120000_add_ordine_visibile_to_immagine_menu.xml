@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <!--
+      Aggiunge i campi 'ordine' e 'visibile' alla tabella immagine_menu.
+      Necessari per la gestione del carosello di copertina nei template MODERNO e RUSTICO.
+  -->
+  <changeSet id="20260226120000-1" author="dev">
+
+    <addColumn tableName="immagine_menu">
+      <column name="ordine" type="integer" defaultValueNumeric="0">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+
+    <addColumn tableName="immagine_menu">
+      <column name="visibile" type="boolean" defaultValueBoolean="true">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+
+  </changeSet>
+
+  <!--
+      Inizializzazione dati esistenti per righe pre-esistenti.
+  -->
+  <changeSet id="20260226120000-2" author="dev">
+    <sql>
+      UPDATE immagine_menu SET ordine = 0 WHERE ordine IS NULL;
+      UPDATE immagine_menu SET visibile = TRUE WHERE visibile IS NULL;
+    </sql>
+  </changeSet>
+
+</databaseChangeLog>
