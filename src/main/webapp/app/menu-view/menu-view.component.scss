@@ -113,30 +113,46 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   z-index: 200;
 }
 
-// Bottone — solo bandiera attiva + freccia
+// Bottone — bandiera attiva + codice lingua + freccia
 .lingua-btn-attuale {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  background: rgba(255, 255, 255, 0.92);
+  gap: 6px;
+  background: white;
   border: 2px solid;
   border-radius: 50px;
-  padding: 4px 9px 4px 5px;
+  padding: 5px 11px 5px 6px;
   cursor: pointer;
   backdrop-filter: blur(6px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.16),
+    0 1px 3px rgba(0, 0, 0, 0.08);
   transition: all 0.2s ease;
   line-height: 1;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  min-width: 72px;
 
   &:hover {
     background: white;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+    transform: translateY(-2px);
   }
   &:active {
     transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   }
+}
+
+// Codice lingua nel bottone
+.lingua-codice-btn {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 // Wrapper SVG nel bottone principale
@@ -174,25 +190,26 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
 }
 
-// Dropdown — griglia di bandiere
+// Dropdown — lista verticale di lingue
 .lingua-dropdown {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
   background: white;
   border: 1.5px solid rgba(0, 0, 0, 0.08);
-  border-radius: 18px;
-  padding: 12px 10px 10px;
+  border-radius: 16px;
+  padding: 8px 6px 8px;
   box-shadow:
     0 16px 40px rgba(0, 0, 0, 0.15),
     0 2px 8px rgba(0, 0, 0, 0.07);
   animation: dropdownFadeIn 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+  min-width: 170px;
 
   &::before {
     content: '';
     position: absolute;
     top: -7px;
-    right: 15px;
+    right: 18px;
     width: 13px;
     height: 13px;
     background: white;
@@ -215,49 +232,49 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .lingua-dropdown-header {
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 1.8px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: #c0c0c0;
+  color: #bbb;
   text-align: center;
-  padding-bottom: 9px;
-  margin-bottom: 4px;
+  padding: 0 6px 8px;
+  margin-bottom: 3px;
   border-bottom: 1px solid #f0f0f0;
 }
 
-// Griglia 5 bandiere in riga
+// Lista verticale lingue
 .lingua-griglia {
   display: flex;
-  gap: 5px;
-  flex-wrap: nowrap;
+  flex-direction: column;
+  gap: 3px;
 }
 
-// Ogni opzione bandiera
+// Ogni opzione lingua — layout orizzontale (bandiera + nome + check)
 .lingua-opzione {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 5px;
-  padding: 8px 7px 7px;
-  background: #f8f8f8;
-  border: 2px solid transparent;
-  border-radius: 12px;
+  gap: 10px;
+  padding: 9px 12px;
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.18s ease;
-  min-width: 48px;
+  transition: all 0.15s ease;
+  width: 100%;
+  text-align: left;
 
   &:hover:not(.attiva) {
-    background: #f0f0f0;
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: #f5f5f5;
+    transform: translateX(2px);
   }
 
   &.attiva {
-    background: rgba(0, 0, 0, 0.06);
+    background: rgba(0, 0, 0, 0.05);
     // border-color viene applicato inline
 
-    .lingua-bandiera-emoji {
+    .lingua-bandiera-svg {
       filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
       transform: scale(1.08);
     }
@@ -268,25 +285,29 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
 }
 
-// Bandiera nella griglia dropdown (usa la stessa classe .lingua-bandiera-svg con dimensione più grande)
+// Bandiera nel dropdown verticale
 .lingua-griglia .lingua-bandiera-svg {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
   transition: transform 0.18s ease;
-
-  .lingua-opzione:hover:not(.attiva) & {
-    transform: scale(1.1);
-  }
 }
 
 .lingua-nome-corto {
-  font-size: 8px;
-  font-weight: 600;
-  color: #666;
-  letter-spacing: 0.5px;
-  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  letter-spacing: 0.2px;
+  text-align: left;
   line-height: 1;
-  text-transform: uppercase;
+  flex: 1;
+}
+
+.lingua-check-icon {
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 // ── Variante MODERNO ──
@@ -331,7 +352,8 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .lingua-btn-rustico {
-  padding: 3px 7px 3px 4px;
+  padding: 4px 9px 4px 5px;
+  min-width: 64px;
 }
 
 .lingua-dropdown-rustico {
@@ -1989,31 +2011,31 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     font-size: 0.65rem;
   }
 
-  // Selettore lingua mobile — bandiere più piccole
+  // Selettore lingua mobile
   .lingua-btn-attuale {
-    padding: 3px 7px 3px 4px;
-  }
-  .lingua-bandiera-attiva {
-    font-size: 17px;
+    padding: 4px 9px 4px 5px;
+    min-width: 62px;
+    font-size: 10px;
   }
   .lingua-chevron {
     font-size: 7px;
   }
   .lingua-griglia {
-    gap: 3px;
+    gap: 2px;
   }
   .lingua-opzione {
-    min-width: 38px;
-    padding: 6px 4px 5px;
-    border-radius: 9px;
+    padding: 7px 10px;
+    gap: 8px;
   }
-  .lingua-bandiera-emoji {
-    font-size: 21px;
+  .lingua-griglia .lingua-bandiera-svg {
+    width: 24px;
+    height: 24px;
   }
   .lingua-nome-corto {
-    font-size: 7.5px;
+    font-size: 12px;
   }
   .lingua-dropdown {
-    padding: 9px 8px 8px;
+    padding: 6px 5px 6px;
+    min-width: 155px;
   }
 }

@@ -126,6 +126,7 @@
         [attr.aria-label]="'Lingua: ' + linguaAttuale.nome"
       >
         <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(linguaAttuale.svgBandiera)"></span>
+        <span class="lingua-codice-btn">{{ linguaAttuale.codice | uppercase }}</span>
         <span class="lingua-chevron" [class.aperto]="mostraDropdownLingua">▾</span>
       </button>
       <div class="lingua-dropdown" *ngIf="mostraDropdownLingua">
@@ -139,9 +140,8 @@
             (click)="cambiaLingua(l.codice)"
           >
             <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(l.svgBandiera)"></span>
-            <span class="lingua-nome-corto" [style.color]="l.codice === linguaCorrente ? colorePrimario : ''">{{
-              l.codice | uppercase
-            }}</span>
+            <span class="lingua-nome-corto" [style.color]="l.codice === linguaCorrente ? colorePrimario : ''">{{ l.nome }}</span>
+            <span *ngIf="l.codice === linguaCorrente" class="lingua-check-icon" [style.color]="colorePrimario">✓</span>
           </button>
         </div>
       </div>
@@ -319,6 +319,7 @@
         (click)="mostraDropdownLingua = !mostraDropdownLingua"
       >
         <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(linguaAttuale.svgBandiera)"></span>
+        <span class="lingua-codice-btn">{{ linguaAttuale.codice | uppercase }}</span>
         <span class="lingua-chevron" [class.aperto]="mostraDropdownLingua">▾</span>
       </button>
       <div class="lingua-dropdown lingua-dropdown-moderno" *ngIf="mostraDropdownLingua">
@@ -332,9 +333,8 @@
             (click)="cambiaLingua(l.codice)"
           >
             <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(l.svgBandiera)"></span>
-            <span class="lingua-nome-corto" [style.color]="l.codice === linguaCorrente ? colorePrimario : ''">{{
-              l.codice | uppercase
-            }}</span>
+            <span class="lingua-nome-corto" [style.color]="l.codice === linguaCorrente ? colorePrimario : ''">{{ l.nome }}</span>
+            <span *ngIf="l.codice === linguaCorrente" class="lingua-check-icon" [style.color]="colorePrimario">✓</span>
           </button>
         </div>
       </div>
@@ -573,6 +573,7 @@
           (click)="mostraDropdownLingua = !mostraDropdownLingua"
         >
           <span class="lingua-bandiera-svg lingua-bandiera-svg-sm" [innerHTML]="getSafeSvg(linguaAttuale.svgBandiera)"></span>
+          <span class="lingua-codice-btn">{{ linguaAttuale.codice | uppercase }}</span>
           <span class="lingua-chevron" [class.aperto]="mostraDropdownLingua">▾</span>
         </button>
         <div class="lingua-dropdown lingua-dropdown-rustico" *ngIf="mostraDropdownLingua">
@@ -586,9 +587,8 @@
               (click)="cambiaLingua(l.codice)"
             >
               <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(l.svgBandiera)"></span>
-              <span class="lingua-nome-corto" [style.color]="l.codice === linguaCorrente ? colorePrimario : ''">{{
-                l.codice | uppercase
-              }}</span>
+              <span class="lingua-nome-corto" [style.color]="l.codice === linguaCorrente ? colorePrimario : ''">{{ l.nome }}</span>
+              <span *ngIf="l.codice === linguaCorrente" class="lingua-check-icon" [style.color]="colorePrimario">✓</span>
             </button>
           </div>
         </div>
