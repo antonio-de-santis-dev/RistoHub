@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -44,6 +44,12 @@ interface Menu {
   templateStyle?: string;
 }
 
+interface Lingua {
+  codice: string;
+  nome: string;
+  bandiera: string;
+}
+
 @Component({
   selector: 'jhi-menu-view',
   standalone: true,
@@ -77,6 +83,234 @@ export class MenuViewComponent implements OnInit {
   // ── Conferma eliminazione ──
   prodottoInEliminazione: Prodotto | null = null;
   isDeleting = false;
+
+  // ══════════════════════════════════════════════════
+  //  SISTEMA MULTILINGUA
+  // ══════════════════════════════════════════════════
+
+  readonly LINGUE: Lingua[] = [
+    { codice: 'it', nome: 'Italiano', bandiera: '🇮🇹' },
+    { codice: 'en', nome: 'English', bandiera: '🇬🇧' },
+    { codice: 'fr', nome: 'Français', bandiera: '🇫🇷' },
+    { codice: 'de', nome: 'Deutsch', bandiera: '🇩🇪' },
+    { codice: 'es', nome: 'Español', bandiera: '🇪🇸' },
+  ];
+
+  linguaCorrente = 'it';
+  isTraducendo = false;
+  mostraDropdownLingua = false;
+  erroreTraduzioneVisible = false;
+
+  // Cache traduzioni: lingua -> Map<originale, tradotto>
+  private cacheTraduzioni = new Map<string, Map<string, string>>();
+
+  // Traduzioni statiche per i nomi portate default
+  private readonly NOMI_PORTATE: Record<string, Record<string, string>> = {
+    ANTIPASTO: { it: 'ANTIPASTO', en: 'STARTER', fr: 'ENTRÉE', de: 'VORSPEISE', es: 'ENTRANTE' },
+    PRIMO: { it: 'PRIMO', en: 'FIRST COURSE', fr: 'PREMIER PLAT', de: 'ERSTER GANG', es: 'PRIMER PLATO' },
+    SECONDO: { it: 'SECONDO', en: 'MAIN COURSE', fr: 'PLAT PRINCIPAL', de: 'HAUPTGERICHT', es: 'PLATO PRINCIPAL' },
+    CONTORNO: { it: 'CONTORNO', en: 'SIDE DISH', fr: 'ACCOMPAGNEMENT', de: 'BEILAGE', es: 'GUARNICIÓN' },
+    DOLCE: { it: 'DOLCE', en: 'DESSERT', fr: 'DESSERT', de: 'DESSERT', es: 'POSTRE' },
+    BEVANDA: { it: 'BEVANDA', en: 'DRINK', fr: 'BOISSON', de: 'GETRÄNK', es: 'BEBIDA' },
+    BIRRA: { it: 'BIRRA', en: 'BEER', fr: 'BIÈRE', de: 'BIER', es: 'CERVEZA' },
+    VINO_ROSSO: { it: 'VINO ROSSO', en: 'RED WINE', fr: 'VIN ROUGE', de: 'ROTWEIN', es: 'VINO TINTO' },
+    VINO_BIANCO: { it: 'VINO BIANCO', en: 'WHITE WINE', fr: 'VIN BLANC', de: 'WEISSWEIN', es: 'VINO BLANCO' },
+    VINO_ROSATO: { it: 'VINO ROSATO', en: 'ROSÉ WINE', fr: 'VIN ROSÉ', de: 'ROSÉ', es: 'VINO ROSADO' },
+    DIGESTIVO: { it: 'DIGESTIVO', en: 'DIGESTIF', fr: 'DIGESTIF', de: 'DIGESTIF', es: 'DIGESTIVO' },
+  };
+
+  // Traduzioni statiche etichette UI
+  private readonly UI_LABELS: Record<string, Record<string, string>> = {
+    PIATTI_GIORNO: {
+      it: '✨ PIATTI DEL GIORNO / FUORI MENU',
+      en: "✨ TODAY'S SPECIALS / OFF-MENU",
+      fr: '✨ PLATS DU JOUR / HORS MENU',
+      de: '✨ TAGESGERICHTE / AUSSER DER KARTE',
+      es: '✨ PLATOS DEL DÍA / FUERA DE CARTA',
+    },
+    PIATTI_GIORNO_SHORT: {
+      it: '✨ Piatti del Giorno',
+      en: "✨ Today's Specials",
+      fr: '✨ Plats du Jour',
+      de: '✨ Tagesgerichte',
+      es: '✨ Platos del Día',
+    },
+    BADGE_SPECIALE: {
+      it: '🌟 Speciale',
+      en: '🌟 Special',
+      fr: '🌟 Spécial',
+      de: '🌟 Speziell',
+      es: '🌟 Especial',
+    },
+    ALLERGENI_TITOLO: {
+      it: 'Allergeni presenti in questo menu',
+      en: 'Allergens in this menu',
+      fr: 'Allergènes présents dans ce menu',
+      de: 'Allergene in dieser Speisekarte',
+      es: 'Alérgenos presentes en este menú',
+    },
+    ALLERGENI_NOTA: {
+      it: 'Per ulteriori informazioni sugli allergeni rivolgiti al personale di sala.',
+      en: 'For more information about allergens, please ask our staff.',
+      fr: "Pour plus d'informations sur les allergènes, adressez-vous au personnel de salle.",
+      de: 'Für weitere Informationen zu Allergenen wenden Sie sich bitte an das Servicepersonal.',
+      es: 'Para más información sobre los alérgenos, consulte al personal de sala.',
+    },
+    MENU_NOTE: {
+      it: 'Tutti i nostri piatti sono preparati con ingredienti freschi e di qualità.',
+      en: 'All our dishes are prepared with fresh, quality ingredients.',
+      fr: 'Tous nos plats sont préparés avec des ingrédients frais et de qualité.',
+      de: 'Alle unsere Gerichte werden mit frischen, hochwertigen Zutaten zubereitet.',
+      es: 'Todos nuestros platos se preparan con ingredientes frescos y de calidad.',
+    },
+    TORNA_HOME: {
+      it: '‹ Torna al menu',
+      en: '‹ Back to menu',
+      fr: '‹ Retour au menu',
+      de: '‹ Zurück zum Menü',
+      es: '‹ Volver al menú',
+    },
+    AGGIUNGI_PIATTO: {
+      it: '➕ Aggiungi piatto',
+      en: '➕ Add dish',
+      fr: '➕ Ajouter un plat',
+      de: '➕ Gericht hinzufügen',
+      es: '➕ Añadir plato',
+    },
+    NESSUN_PIATTO: {
+      it: 'Nessun piatto ancora aggiunto in questa sezione.',
+      en: 'No dishes added to this section yet.',
+      fr: 'Aucun plat encore ajouté dans cette section.',
+      de: 'Noch keine Gerichte in diesem Abschnitt hinzugefügt.',
+      es: 'Aún no se han añadido platos en esta sección.',
+    },
+    TORNA_FOTO: {
+      it: 'Torna alle foto',
+      en: 'Back to photos',
+      fr: 'Retour aux photos',
+      de: 'Zurück zu den Fotos',
+      es: 'Volver a las fotos',
+    },
+    SELEZIONA_PORTATA: {
+      it: 'Seleziona una portata per scoprire i nostri piatti',
+      en: 'Select a course to discover our dishes',
+      fr: 'Sélectionnez un plat pour découvrir notre carte',
+      de: 'Wählen Sie einen Gang, um unsere Gerichte zu entdecken',
+      es: 'Seleccione un plato para descubrir nuestros platos',
+    },
+    PIATTI_PAROLA: {
+      it: 'piatti',
+      en: 'dishes',
+      fr: 'plats',
+      de: 'Gerichte',
+      es: 'platos',
+    },
+  };
+
+  // ── Getters di comodità ──
+  get linguaAttuale(): Lingua {
+    return this.LINGUE.find(l => l.codice === this.linguaCorrente) ?? this.LINGUE[0];
+  }
+
+  /** Restituisce testo dinamico tradotto (nome/descrizione prodotto) */
+  getT(testo: string | undefined | null): string {
+    if (!testo) return testo ?? '';
+    if (this.linguaCorrente === 'it') return testo;
+    return this.cacheTraduzioni.get(this.linguaCorrente)?.get(testo) ?? testo;
+  }
+
+  /** Restituisce etichetta UI statica tradotta */
+  getUI(chiave: string): string {
+    return this.UI_LABELS[chiave]?.[this.linguaCorrente] ?? this.UI_LABELS[chiave]?.['it'] ?? chiave;
+  }
+
+  /** Chiude il dropdown se si clicca fuori */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.lingua-selettore')) {
+      this.mostraDropdownLingua = false;
+    }
+  }
+
+  async cambiaLingua(codice: string): Promise<void> {
+    this.mostraDropdownLingua = false;
+    if (codice === this.linguaCorrente) return;
+    this.linguaCorrente = codice;
+
+    if (codice === 'it') return; // Italiano = nessuna traduzione necessaria
+
+    // Se già in cache, niente da fare
+    if (this.cacheTraduzioni.has(codice)) return;
+
+    // Raccolta di tutte le stringhe da tradurre
+    const stringhe = new Set<string>();
+
+    this.portate.forEach(p => {
+      if (p.tipo === 'PERSONALIZZATA' && p.nomePersonalizzato) {
+        stringhe.add(p.nomePersonalizzato);
+      }
+      (p.prodotti ?? []).forEach(prod => {
+        if (prod.nome) stringhe.add(prod.nome);
+        if (prod.descrizione) stringhe.add(prod.descrizione);
+      });
+    });
+
+    this.piattiDelGiorno.forEach(p => {
+      const nome = p.prodotto?.nome ?? p.nome;
+      const desc = p.prodotto?.descrizione ?? p.descrizione;
+      if (nome) stringhe.add(nome);
+      if (desc) stringhe.add(desc);
+    });
+
+    if (stringhe.size === 0) return;
+
+    this.isTraducendo = true;
+    this.erroreTraduzioneVisible = false;
+    const nuovaCache = new Map<string, string>();
+    const lista = Array.from(stringhe).filter(s => s.trim().length > 0);
+
+    // Traduzione in batch paralleli (5 alla volta per rispettare rate-limit)
+    const BATCH = 5;
+    let errori = 0;
+
+    for (let i = 0; i < lista.length; i += BATCH) {
+      const batch = lista.slice(i, i + BATCH);
+      await Promise.all(
+        batch.map(async testo => {
+          try {
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(testo)}&langpair=it|${codice}`;
+            const resp = await fetch(url);
+            if (!resp.ok) {
+              errori++;
+              return;
+            }
+            const data = await resp.json();
+            const tradotto = data.responseData?.translatedText;
+            if (tradotto && tradotto !== testo && data.responseStatus === 200) {
+              nuovaCache.set(testo, tradotto);
+            }
+          } catch {
+            errori++;
+          }
+        }),
+      );
+      // Piccola pausa tra batch per non inondare l'API
+      if (i + BATCH < lista.length) {
+        await new Promise(res => setTimeout(res, 120));
+      }
+    }
+
+    this.cacheTraduzioni.set(codice, nuovaCache);
+    this.isTraducendo = false;
+
+    if (errori > 0 && nuovaCache.size === 0) {
+      this.erroreTraduzioneVisible = true;
+      setTimeout(() => (this.erroreTraduzioneVisible = false), 4000);
+    }
+  }
+
+  // ══════════════════════════════════════════════════
 
   get backRoute(): string {
     return '/menus';
@@ -244,13 +478,14 @@ export class MenuViewComponent implements OnInit {
       };
       const aggiornato: any = await this.http.put(`/api/prodottos/${this.prodottoInModifica.id}`, body).toPromise();
 
-      // Aggiorna localmente in tutte le portate
       aggiornato.allergenis = allergenis.map(a => this.allergeniMap.get(String(a.id))).filter(Boolean);
       this.portate = this.portate.map(portata => ({
         ...portata,
         prodotti: (portata.prodotti ?? []).map(p => (p.id === aggiornato.id ? { ...aggiornato } : p)),
       }));
       this.prodottiMap.set(String(aggiornato.id), aggiornato);
+      // Invalida le cache di traduzione perché il testo è cambiato
+      this.cacheTraduzioni.clear();
       this.chiudiModifica();
     } catch (err) {
       console.error('Errore modifica prodotto:', err);
@@ -301,7 +536,7 @@ export class MenuViewComponent implements OnInit {
   }
 
   // ══════════════════════════════════════════════════
-  //  METODI ESISTENTI (invariati)
+  //  METODI ESISTENTI
   // ══════════════════════════════════════════════════
 
   private arricchisciPiatto(piatto: any): any {
@@ -398,7 +633,6 @@ export class MenuViewComponent implements OnInit {
     }
   }
 
-  // ── MODIFICA CRUCIALE QUI: RESTITUISCE L'IMMAGINE INVECE DI '' ──
   getAllergeneIcona(a: Allergene): string {
     if (!a) return '';
     if (a.icona && a.iconaContentType) return `data:${a.iconaContentType};base64,${a.icona}`;
@@ -428,8 +662,13 @@ export class MenuViewComponent implements OnInit {
   }
 
   nomePortata(p: Portata): string {
-    if (p.tipo === 'PERSONALIZZATA' && p.nomePersonalizzato) return p.nomePersonalizzato;
-    return (p.nomeDefault ?? '').replace(/_/g, ' ');
+    if (p.tipo === 'PERSONALIZZATA' && p.nomePersonalizzato) {
+      return this.getT(p.nomePersonalizzato);
+    }
+    const chiave = p.nomeDefault ?? '';
+    const trad = this.NOMI_PORTATE[chiave];
+    if (trad) return trad[this.linguaCorrente] ?? chiave.replace(/_/g, ' ');
+    return chiave.replace(/_/g, ' ');
   }
 
   formatPrezzo(p: number | undefined | null): string {

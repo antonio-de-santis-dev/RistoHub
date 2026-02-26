@@ -41,6 +41,238 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 // ══════════════════════════════════════════════════
+//  TRADUZIONE OVERLAY & TOAST
+// ══════════════════════════════════════════════════
+
+.traduzione-overlay {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 20, 0.88);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10000;
+  backdrop-filter: blur(8px);
+  animation: slideUpFade 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.traduzione-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.traduzione-errore-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #dc2626;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  z-index: 10000;
+  animation: slideUpFade 0.3s ease;
+  box-shadow: 0 4px 20px rgba(220, 38, 38, 0.35);
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  SELETTORE LINGUA — BASE
+// ══════════════════════════════════════════════════
+
+.lingua-selettore {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  z-index: 100;
+}
+
+.lingua-btn-attuale {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid;
+  border-radius: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(4px);
+  transition:
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.15s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+  }
+}
+
+.lingua-bandiera {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.lingua-codice {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.lingua-chevron {
+  font-size: 9px;
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+  &.aperto {
+    transform: rotate(180deg);
+  }
+}
+
+.lingua-dropdown {
+  position: absolute;
+  top: calc(100% + 7px);
+  right: 0;
+  background: white;
+  border: 1px solid;
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 155px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+  animation: dropdownFadeIn 0.18s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lingua-opzione {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #374151;
+  text-align: left;
+  transition: background 0.15s ease;
+
+  &:hover:not(.attiva) {
+    background: #f9fafb;
+  }
+
+  &.attiva {
+    font-weight: 700;
+  }
+
+  & + .lingua-opzione {
+    border-top: 1px solid #f3f4f6;
+  }
+}
+
+.lingua-nome {
+  flex: 1;
+}
+
+.lingua-check {
+  font-size: 11px;
+  font-weight: 800;
+}
+
+// Variante Moderno — posizionamento adattato
+.lingua-selettore-moderno {
+  top: auto;
+  bottom: 14px;
+  transform: none;
+  right: 14px;
+}
+
+.lingua-btn-moderno {
+  background: rgba(255, 255, 255, 0.75);
+  font-family: 'Jost', sans-serif;
+}
+
+.lingua-dropdown-moderno {
+  bottom: calc(100% + 7px);
+  top: auto;
+  animation: dropdownFadeInUp 0.18s ease;
+}
+
+@keyframes dropdownFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Variante Rustico — posizionamento nel header-right
+.lingua-selettore-rustico {
+  position: relative;
+  top: auto;
+  right: auto;
+  transform: none;
+  margin-top: 4px;
+}
+
+.lingua-btn-rustico {
+  padding: 3px 7px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  font-family: 'Jost', sans-serif;
+}
+
+.lingua-dropdown-rustico {
+  right: 0;
+  top: calc(100% + 5px);
+  min-width: 145px;
+}
+
+// ══════════════════════════════════════════════════
 //  TEMPLATE CLASSICO
 // ══════════════════════════════════════════════════
 
@@ -279,6 +511,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   position: relative;
+  padding-bottom: 40px; // spazio extra per il selettore lingua in basso
 }
 
 .moderno-btn-back {
@@ -657,10 +890,13 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
 }
 .rustico-header-right {
-  width: 36px;
+  width: auto;
   flex-shrink: 0;
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 60px;
 }
 .rustico-header-center {
   flex: 1;
@@ -1048,7 +1284,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   gap: 3px;
   margin-top: 5px;
 }
-
 .allergene-icona-mini-wrap {
   width: 24px;
   height: 24px;
@@ -1059,7 +1294,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   flex-shrink: 0;
 }
-
 .allergene-icona-mini {
   width: 24px;
   height: 24px;
@@ -1068,7 +1302,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   display: block;
   flex-shrink: 0;
 }
-
 .allergene-tag-solo-nome {
   display: inline-block;
   font-size: 9px;
@@ -1098,21 +1331,18 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   letter-spacing: 0.1em;
   margin: 0 0 10px;
 }
-
 .allergeni-footer-lista {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 6px 10px;
   margin-bottom: 10px;
 }
-
 .allergene-footer-item {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 6px;
 }
-
 .allergene-footer-cerchio {
   width: 24px;
   height: 24px;
@@ -1123,7 +1353,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   flex-shrink: 0;
 }
-
 .allergene-footer-icona {
   width: 100%;
   height: 100%;
@@ -1131,21 +1360,18 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   border-radius: 50%;
   display: block;
 }
-
 .allergene-footer-iniziale {
   font-size: 11px;
   font-weight: 700;
   color: white;
   line-height: 1;
 }
-
 .allergene-footer-nome {
   font-size: 11px;
   font-weight: 500;
   line-height: 1.2;
   word-break: break-word;
 }
-
 .allergeni-footer-nota {
   font-size: 9px;
   color: #999;
@@ -1163,16 +1389,13 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   gap: 6px;
   flex-shrink: 0;
 }
-
-// Azioni inline (Moderno + Rustico) — allineati nella riga prezzo
 .prodotto-azioni-row {
   margin-left: 8px;
   gap: 4px;
 }
 
-// ── Pulsante MODIFICA ──
 .btn-edit {
-  --edit-color: #8b1a1a; // fallback, sovrascritto da [style.--edit-color]
+  --edit-color: #8b1a1a;
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -1192,12 +1415,10 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     transform 0.15s ease;
   line-height: 1;
   white-space: nowrap;
-
   svg {
     flex-shrink: 0;
     transition: transform 0.2s ease;
   }
-
   &:hover {
     background: var(--edit-color);
     color: white;
@@ -1207,14 +1428,12 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
       transform: rotate(-8deg) scale(1.1);
     }
   }
-
   &:active {
     transform: translateY(0);
     box-shadow: none;
   }
 }
 
-// ── Pulsante ELIMINA ──
 .btn-delete {
   display: inline-flex;
   align-items: center;
@@ -1235,12 +1454,10 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     transform 0.15s ease;
   line-height: 1;
   white-space: nowrap;
-
   svg {
     flex-shrink: 0;
     transition: transform 0.2s ease;
   }
-
   &:hover {
     background: #dc2626;
     color: white;
@@ -1250,14 +1467,12 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
       transform: scale(1.15);
     }
   }
-
   &:active {
     transform: translateY(0);
     box-shadow: none;
   }
 }
 
-// ── Variante compatta (Moderno + Rustico) — solo icona, cerchio ──
 .btn-edit-compact,
 .btn-delete-compact {
   padding: 5px;
@@ -1265,16 +1480,13 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   width: 28px;
   height: 28px;
   justify-content: center;
-
   .btn-label {
     display: none;
   }
 }
 
-// ── Label testo (visibile solo in Classico ≥ 500px) ──
 .btn-label {
   display: inline;
-
   @media (max-width: 500px) {
     display: none;
   }
@@ -1295,7 +1507,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   padding: 16px;
   animation: fadeInOverlay 0.2s ease;
 }
-
 @keyframes fadeInOverlay {
   from {
     opacity: 0;
@@ -1315,7 +1526,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUpModal 0.25s ease;
 }
-
 .modal-box-small {
   max-width: 360px;
 }
@@ -1338,18 +1548,15 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   padding: 14px 18px;
   border-radius: 14px 14px 0 0;
 }
-
 .modal-header-danger {
   background: #dc2626 !important;
 }
-
 .modal-titolo {
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
   color: white;
 }
-
 .modal-close {
   background: rgba(255, 255, 255, 0.25);
   border: none;
@@ -1366,14 +1573,12 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     background: rgba(255, 255, 255, 0.4);
   }
 }
-
 .modal-body {
   padding: 16px 18px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
-
 .modal-field {
   display: flex;
   flex-direction: column;
@@ -1386,7 +1591,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     letter-spacing: 0.05em;
   }
 }
-
 .modal-input,
 .modal-textarea {
   width: 100%;
@@ -1402,18 +1606,15 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     border-color: #6b7280;
   }
 }
-
 .modal-textarea {
   resize: vertical;
   min-height: 60px;
 }
-
 .modal-allergeni-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
-
 .modal-allergene-chip {
   display: flex;
   align-items: center;
@@ -1429,33 +1630,28 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     filter: brightness(0.97);
   }
 }
-
 .modal-allergene-icona {
   width: 18px;
   height: 18px;
   object-fit: contain;
   border-radius: 50%;
 }
-
 .modal-allergene-dot {
   width: 12px;
   height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
 }
-
 .modal-allergene-nome {
   font-weight: 500;
   color: #374151;
 }
-
 .modal-allergene-check {
   font-size: 10px;
   font-weight: 700;
   color: inherit;
   margin-left: 2px;
 }
-
 .modal-errore {
   color: #dc2626;
   font-size: 0.82rem;
@@ -1464,7 +1660,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   background: #fef2f2;
   border-radius: 6px;
 }
-
 .modal-footer {
   display: flex;
   gap: 10px;
@@ -1472,7 +1667,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   padding: 12px 18px 16px;
   border-top: 1px solid #f3f4f6;
 }
-
 .btn-modal-annulla {
   background: #f3f4f6;
   color: #374151;
@@ -1486,7 +1680,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     background: #e5e7eb;
   }
 }
-
 .btn-modal-salva {
   color: white;
   border: none;
@@ -1504,7 +1697,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     cursor: not-allowed;
   }
 }
-
 .btn-modal-elimina {
   background: #dc2626;
   color: white;
@@ -1523,14 +1715,12 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     cursor: not-allowed;
   }
 }
-
 .modal-conferma-testo {
   font-size: 0.92rem;
   color: #374151;
   line-height: 1.6;
   margin: 0;
 }
-
 .modal-conferma-nota {
   font-size: 0.8rem;
   color: #9ca3af;
@@ -1549,7 +1739,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
 
   .moderno-header {
-    padding: 28px 40px 16px;
+    padding: 28px 40px 40px;
   }
   .moderno-btn-back {
     top: 16px;
@@ -1683,7 +1873,11 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     left: 8px;
   }
   .moderno-header {
-    padding: 20px 14px 12px;
+    padding: 20px 14px 36px;
+  }
+  .lingua-selettore-moderno {
+    bottom: 8px;
+    right: 8px;
   }
 
   .rustico-sidebar {
@@ -1726,5 +1920,15 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
   .rustico-btn-back {
     font-size: 0.65rem;
+  }
+
+  .lingua-btn-attuale {
+    padding: 4px 8px;
+  }
+  .lingua-codice {
+    display: none;
+  }
+  .lingua-dropdown {
+    min-width: 135px;
   }
 }

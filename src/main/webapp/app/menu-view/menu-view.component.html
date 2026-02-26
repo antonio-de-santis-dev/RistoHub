@@ -8,6 +8,22 @@
   <button (click)="tornaAiMieiMenu()" class="btn-torna">← I miei menu</button>
 </div>
 
+<!-- ══════════════════════════════════════════════════ -->
+<!--  OVERLAY TRADUZIONE IN CORSO                       -->
+<!-- ══════════════════════════════════════════════════ -->
+<div *ngIf="isTraducendo" class="traduzione-overlay">
+  <div class="traduzione-spinner"></div>
+  <span>{{ linguaAttuale.bandiera }} Traduzione in corso...</span>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!--  TOAST ERRORE TRADUZIONE                           -->
+<!-- ══════════════════════════════════════════════════ -->
+<div *ngIf="erroreTraduzioneVisible" class="traduzione-errore-toast">⚠️ Traduzione non disponibile. Riprova più tardi.</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!--  MODALI (invariate)                               -->
+<!-- ══════════════════════════════════════════════════ -->
 <div *ngIf="prodottoInModifica" class="modal-overlay" (click)="chiudiModifica()">
   <div class="modal-box" (click)="$event.stopPropagation()">
     <div class="modal-header" [style.backgroundColor]="colorePrimario">
@@ -83,6 +99,9 @@
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════ -->
+<!--  TEMPLATE CLASSICO                                -->
+<!-- ══════════════════════════════════════════════════ -->
 <div
   *ngIf="!isLoading && !errore && menu && !isModerno && !isRustico"
   class="menu-page"
@@ -97,6 +116,34 @@
       </div>
       <div *ngIf="!logoUrl" class="logo-placeholder" [style.color]="colorePrimario">{{ menu.nome }}</div>
     </div>
+    <!-- SELETTORE LINGUA -->
+    <div class="lingua-selettore" (click)="$event.stopPropagation()">
+      <button
+        class="lingua-btn-attuale"
+        [style.borderColor]="colorePrimario + '55'"
+        [style.color]="colorePrimario"
+        (click)="mostraDropdownLingua = !mostraDropdownLingua"
+        [attr.aria-label]="'Lingua: ' + linguaAttuale.nome"
+      >
+        <span class="lingua-bandiera">{{ linguaAttuale.bandiera }}</span>
+        <span class="lingua-codice">{{ linguaAttuale.codice | uppercase }}</span>
+        <span class="lingua-chevron" [class.aperto]="mostraDropdownLingua">▾</span>
+      </button>
+      <div class="lingua-dropdown" *ngIf="mostraDropdownLingua" [style.borderColor]="colorePrimario + '33'">
+        <button
+          *ngFor="let l of LINGUE"
+          class="lingua-opzione"
+          [class.attiva]="l.codice === linguaCorrente"
+          [style.color]="l.codice === linguaCorrente ? colorePrimario : ''"
+          [style.backgroundColor]="l.codice === linguaCorrente ? colorePrimario + '12' : ''"
+          (click)="cambiaLingua(l.codice)"
+        >
+          <span class="lingua-bandiera">{{ l.bandiera }}</span>
+          <span class="lingua-nome">{{ l.nome }}</span>
+          <span *ngIf="l.codice === linguaCorrente" class="lingua-check">✓</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <main class="menu-main">
@@ -107,17 +154,17 @@
 
     <section *ngIf="piattiDelGiorno.length > 0" class="portata-section">
       <div class="portata-header" [style.backgroundColor]="colorePrimario" (click)="togglePiattiGiorno()">
-        <h2 class="portata-nome">✨ PIATTI DEL GIORNO / FUORI MENU</h2>
+        <h2 class="portata-nome">{{ getUI('PIATTI_GIORNO') }}</h2>
         <span class="portata-arrow" [class.open]="piattiGiornoAperti">›</span>
       </div>
       <div class="prodotti-list" [class.aperta]="piattiGiornoAperti">
         <div *ngFor="let piatto of piattiDelGiorno" class="prodotto-card prodotto-speciale" [style.borderLeftColor]="colorePrimario">
           <div class="prodotto-top">
-            <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ piatto.prodotto?.nome ?? piatto.nome }}</h4>
+            <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ getT(piatto.prodotto?.nome ?? piatto.nome) }}</h4>
             <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}</h4>
           </div>
           <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="prodotto-desc">
-            {{ piatto.prodotto?.descrizione ?? piatto.descrizione }}
+            {{ getT(piatto.prodotto?.descrizione ?? piatto.descrizione) }}
           </p>
           <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
             <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis || []">
@@ -137,7 +184,9 @@
               >
             </ng-container>
           </div>
-          <span class="badge-speciale" [style.backgroundColor]="coloreSecondario" [style.color]="colorePrimario">🌟 Speciale</span>
+          <span class="badge-speciale" [style.backgroundColor]="coloreSecondario" [style.color]="colorePrimario">{{
+            getUI('BADGE_SPECIALE')
+          }}</span>
         </div>
       </div>
     </section>
@@ -149,11 +198,11 @@
       </div>
       <div class="prodotti-list" [class.aperta]="portata.aperta">
         <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="prodotti-empty">
-          <span>Nessun piatto ancora aggiunto in questa sezione.</span>
+          <span>{{ getUI('NESSUN_PIATTO') }}</span>
         </div>
         <div *ngFor="let prodotto of portata.prodotti" class="prodotto-card">
           <div class="prodotto-top">
-            <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ prodotto.nome }}</h4>
+            <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ getT(prodotto.nome) }}</h4>
             <div class="prodotto-azioni">
               <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</h4>
               <button class="btn-edit" [style.--edit-color]="colorePrimario" (click)="apriModifica(prodotto)" title="Modifica">
@@ -193,7 +242,7 @@
               </button>
             </div>
           </div>
-          <p *ngIf="prodotto.descrizione" class="prodotto-desc">{{ prodotto.descrizione }}</p>
+          <p *ngIf="prodotto.descrizione" class="prodotto-desc">{{ getT(prodotto.descrizione) }}</p>
           <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
             <ng-container *ngFor="let a of prodotto.allergenis">
               <img
@@ -213,12 +262,12 @@
             </ng-container>
           </div>
         </div>
-        <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
+        <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">{{ getUI('AGGIUNGI_PIATTO') }}</a>
       </div>
     </section>
 
     <div class="sezione-allergeni-footer" *ngIf="tuttiAllergeniMenu.length > 0" [style.borderTopColor]="colorePrimario + '44'">
-      <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">Allergeni presenti in questo menu</h3>
+      <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">{{ getUI('ALLERGENI_TITOLO') }}</h3>
       <div class="allergeni-footer-lista">
         <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
           <div class="allergene-footer-cerchio" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'">
@@ -234,14 +283,15 @@
           <span class="allergene-footer-nome">{{ a.nome }}</span>
         </div>
       </div>
-      <p class="allergeni-footer-nota">Per ulteriori informazioni sugli allergeni rivolgiti al personale di sala.</p>
+      <p class="allergeni-footer-nota">{{ getUI('ALLERGENI_NOTA') }}</p>
     </div>
-    <div class="menu-note" [style.borderLeftColor]="colorePrimario">
-      Tutti i nostri piatti sono preparati con ingredienti freschi e di qualità.
-    </div>
+    <div class="menu-note" [style.borderLeftColor]="colorePrimario">{{ getUI('MENU_NOTE') }}</div>
   </main>
 </div>
 
+<!-- ══════════════════════════════════════════════════ -->
+<!--  TEMPLATE MODERNO                                 -->
+<!-- ══════════════════════════════════════════════════ -->
 <div
   *ngIf="!isLoading && !errore && menu && isModerno"
   class="moderno-page"
@@ -258,6 +308,33 @@
       <h1 class="moderno-title" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{ menu.nome | uppercase }}</h1>
     </ng-template>
     <div class="moderno-divider" [style.background]="colorePrimario"></div>
+    <!-- SELETTORE LINGUA MODERNO -->
+    <div class="lingua-selettore lingua-selettore-moderno" (click)="$event.stopPropagation()">
+      <button
+        class="lingua-btn-attuale lingua-btn-moderno"
+        [style.borderColor]="colorePrimario + '66'"
+        [style.color]="colorePrimario"
+        (click)="mostraDropdownLingua = !mostraDropdownLingua"
+      >
+        <span class="lingua-bandiera">{{ linguaAttuale.bandiera }}</span>
+        <span class="lingua-codice">{{ linguaAttuale.codice | uppercase }}</span>
+        <span class="lingua-chevron" [class.aperto]="mostraDropdownLingua">▾</span>
+      </button>
+      <div class="lingua-dropdown lingua-dropdown-moderno" *ngIf="mostraDropdownLingua" [style.borderColor]="colorePrimario + '33'">
+        <button
+          *ngFor="let l of LINGUE"
+          class="lingua-opzione"
+          [class.attiva]="l.codice === linguaCorrente"
+          [style.color]="l.codice === linguaCorrente ? colorePrimario : ''"
+          [style.backgroundColor]="l.codice === linguaCorrente ? colorePrimario + '12' : ''"
+          (click)="cambiaLingua(l.codice)"
+        >
+          <span class="lingua-bandiera">{{ l.bandiera }}</span>
+          <span class="lingua-nome">{{ l.nome }}</span>
+          <span *ngIf="l.codice === linguaCorrente" class="lingua-check">✓</span>
+        </button>
+      </div>
+    </div>
   </header>
 
   <div class="moderno-tabs-wrapper" [style.backgroundColor]="coloreSecondario + '30'" [style.borderBottomColor]="colorePrimario + '33'">
@@ -271,7 +348,7 @@
         [style.color]="modernoTabAttiva === 'piatti-giorno' ? '#fff' : colorePrimario"
         (click)="modernoTabAttiva = 'piatti-giorno'; modernoPortataAttiva = null; fermaAutoplay()"
       >
-        ✨ Piatti del Giorno
+        {{ getUI('PIATTI_GIORNO_SHORT') }}
       </button>
       <button
         *ngFor="let portata of portate"
@@ -310,29 +387,31 @@
       </div>
       <div class="moderno-welcome">
         <p class="moderno-welcome-text" [style.color]="colorePrimario + 'aa'" [style.fontFamily]="fontTesto">
-          Seleziona una portata per scoprire i nostri piatti
+          {{ getUI('SELEZIONA_PORTATA') }}
         </p>
       </div>
     </div>
 
     <div class="moderno-lista" [class.visible]="modernoTabAttiva === 'piatti-giorno'" [style.backgroundColor]="coloreSecondario + '18'">
-      <button class="moderno-back-btn" [style.color]="colorePrimario" (click)="modernoTornaHome()">‹ Torna al menu</button>
+      <button class="moderno-back-btn" [style.color]="colorePrimario" (click)="modernoTornaHome()">{{ getUI('TORNA_HOME') }}</button>
       <div class="moderno-lista-header" [style.borderBottomColor]="colorePrimario">
-        <span class="moderno-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">✨ Piatti del Giorno</span>
-        <span class="moderno-lista-count">{{ piattiDelGiorno.length }} piatti</span>
+        <span class="moderno-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{
+          getUI('PIATTI_GIORNO_SHORT')
+        }}</span>
+        <span class="moderno-lista-count">{{ piattiDelGiorno.length }} {{ getUI('PIATTI_PAROLA') }}</span>
       </div>
       <div class="moderno-prodotti">
         <div *ngFor="let piatto of piattiDelGiorno" class="moderno-prodotto-item moderno-speciale" [style.borderLeftColor]="colorePrimario">
           <div class="moderno-prodotto-row">
             <span class="moderno-bullet" [style.background]="colorePrimario"></span>
-            <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto">{{ piatto.prodotto?.nome ?? piatto.nome }}</span>
+            <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto">{{ getT(piatto.prodotto?.nome ?? piatto.nome) }}</span>
             <span class="moderno-dots-leader"></span>
             <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">{{
               formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
             }}</span>
           </div>
           <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="moderno-prodotto-desc">
-            {{ piatto.prodotto?.descrizione ?? piatto.descrizione }}
+            {{ getT(piatto.prodotto?.descrizione ?? piatto.descrizione) }}
           </p>
           <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
             <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis || []">
@@ -358,17 +437,19 @@
       [class.visible]="modernoTabAttiva === portata.id"
       [style.backgroundColor]="coloreSecondario + '18'"
     >
-      <button class="moderno-back-btn" [style.color]="colorePrimario" (click)="modernoTornaHome()">‹ Torna al menu</button>
+      <button class="moderno-back-btn" [style.color]="colorePrimario" (click)="modernoTornaHome()">{{ getUI('TORNA_HOME') }}</button>
       <div class="moderno-lista-header" [style.borderBottomColor]="colorePrimario">
         <span class="moderno-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{ nomePortata(portata) }}</span>
-        <span class="moderno-lista-count">{{ portata.prodotti?.length ?? 0 }} piatti</span>
+        <span class="moderno-lista-count">{{ portata.prodotti?.length ?? 0 }} {{ getUI('PIATTI_PAROLA') }}</span>
       </div>
       <div class="moderno-prodotti">
-        <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="moderno-empty"><p>Nessun piatto ancora aggiunto.</p></div>
+        <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="moderno-empty">
+          <p>{{ getUI('NESSUN_PIATTO') }}</p>
+        </div>
         <div *ngFor="let prodotto of portata.prodotti" class="moderno-prodotto-item">
           <div class="moderno-prodotto-row">
             <span class="moderno-bullet" [style.background]="colorePrimario"></span>
-            <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto">{{ prodotto.nome }}</span>
+            <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto">{{ getT(prodotto.nome) }}</span>
             <span class="moderno-dots-leader"></span>
             <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
             <div class="prodotto-azioni prodotto-azioni-row">
@@ -414,7 +495,7 @@
               </button>
             </div>
           </div>
-          <p *ngIf="prodotto.descrizione" class="moderno-prodotto-desc">{{ prodotto.descrizione }}</p>
+          <p *ngIf="prodotto.descrizione" class="moderno-prodotto-desc">{{ getT(prodotto.descrizione) }}</p>
           <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
             <ng-container *ngFor="let a of prodotto.allergenis">
               <img
@@ -430,12 +511,12 @@
             </ng-container>
           </div>
         </div>
-        <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
+        <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">{{ getUI('AGGIUNGI_PIATTO') }}</a>
       </div>
     </div>
 
     <div class="sezione-allergeni-footer" *ngIf="tuttiAllergeniMenu.length > 0" [style.borderTopColor]="colorePrimario + '44'">
-      <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">Allergeni presenti in questo menu</h3>
+      <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">{{ getUI('ALLERGENI_TITOLO') }}</h3>
       <div class="allergeni-footer-lista">
         <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
           <div class="allergene-footer-cerchio" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'">
@@ -451,11 +532,14 @@
           <span class="allergene-footer-nome">{{ a.nome }}</span>
         </div>
       </div>
-      <p class="allergeni-footer-nota">Per ulteriori informazioni sugli allergeni rivolgiti al personale di sala.</p>
+      <p class="allergeni-footer-nota">{{ getUI('ALLERGENI_NOTA') }}</p>
     </div>
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════ -->
+<!--  TEMPLATE RUSTICO                                 -->
+<!-- ══════════════════════════════════════════════════ -->
 <div
   *ngIf="!isLoading && !errore && menu && isRustico"
   class="rustico-page"
@@ -474,7 +558,35 @@
         <h1 class="rustico-title" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{ menu.nome | uppercase }}</h1>
       </ng-template>
     </div>
-    <div class="rustico-header-right"><div class="rustico-flag">🇮🇹</div></div>
+    <div class="rustico-header-right">
+      <div class="rustico-flag">🇮🇹</div>
+      <!-- SELETTORE LINGUA RUSTICO -->
+      <div class="lingua-selettore lingua-selettore-rustico" (click)="$event.stopPropagation()">
+        <button
+          class="lingua-btn-attuale lingua-btn-rustico"
+          [style.borderColor]="colorePrimario + '66'"
+          [style.color]="colorePrimario"
+          (click)="mostraDropdownLingua = !mostraDropdownLingua"
+        >
+          <span class="lingua-bandiera">{{ linguaAttuale.bandiera }}</span>
+          <span class="lingua-chevron" [class.aperto]="mostraDropdownLingua">▾</span>
+        </button>
+        <div class="lingua-dropdown lingua-dropdown-rustico" *ngIf="mostraDropdownLingua" [style.borderColor]="colorePrimario + '33'">
+          <button
+            *ngFor="let l of LINGUE"
+            class="lingua-opzione"
+            [class.attiva]="l.codice === linguaCorrente"
+            [style.color]="l.codice === linguaCorrente ? colorePrimario : ''"
+            [style.backgroundColor]="l.codice === linguaCorrente ? colorePrimario + '12' : ''"
+            (click)="cambiaLingua(l.codice)"
+          >
+            <span class="lingua-bandiera">{{ l.bandiera }}</span>
+            <span class="lingua-nome">{{ l.nome }}</span>
+            <span *ngIf="l.codice === linguaCorrente" class="lingua-check">✓</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </header>
 
   <div class="rustico-layout">
@@ -489,7 +601,7 @@
           [style.background]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario + '18' : 'white'"
           (click)="rusticoApriTab('piatti-giorno', null)"
         >
-          ✨ Piatti<br />del Giorno
+          ✨ {{ getUI('PIATTI_PAROLA') | titlecase }}<br />del Giorno
         </button>
         <button
           *ngFor="let portata of portate"
@@ -530,13 +642,15 @@
 
       <div class="rustico-lista-wrap" [class.visibile]="rusticoTabAttiva !== null" [style.backgroundColor]="coloreSecondario + '18'">
         <button class="rustico-back-btn" [style.color]="colorePrimario" (click)="rusticoTornaCarosello()">
-          <span class="rustico-back-arrow">‹</span><span class="rustico-back-label">Torna alle foto</span>
+          <span class="rustico-back-arrow">‹</span><span class="rustico-back-label">{{ getUI('TORNA_FOTO') }}</span>
         </button>
 
         <ng-container *ngIf="rusticoTabAttiva === 'piatti-giorno'">
           <div class="rustico-lista-header" [style.borderBottomColor]="colorePrimario">
-            <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">✨ Piatti del Giorno</span>
-            <span class="rustico-lista-count">{{ piattiDelGiorno.length }} piatti</span>
+            <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{
+              getUI('PIATTI_GIORNO_SHORT')
+            }}</span>
+            <span class="rustico-lista-count">{{ piattiDelGiorno.length }} {{ getUI('PIATTI_PAROLA') }}</span>
           </div>
           <div class="rustico-prodotti">
             <div
@@ -546,14 +660,14 @@
             >
               <div class="rustico-prodotto-row">
                 <span class="rustico-bullet" [style.background]="colorePrimario"></span>
-                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto">{{ piatto.prodotto?.nome ?? piatto.nome }}</span>
+                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto">{{ getT(piatto.prodotto?.nome ?? piatto.nome) }}</span>
                 <span class="rustico-leader"></span>
                 <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{
                   formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
                 }}</span>
               </div>
               <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="rustico-prodotto-desc">
-                {{ piatto.prodotto?.descrizione ?? piatto.descrizione }}
+                {{ getT(piatto.prodotto?.descrizione ?? piatto.descrizione) }}
               </p>
               <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
                 <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis || []">
@@ -578,16 +692,16 @@
             <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{
               nomePortata(rusticoPortataAttiva)
             }}</span>
-            <span class="rustico-lista-count">{{ rusticoPortataAttiva.prodotti?.length ?? 0 }} piatti</span>
+            <span class="rustico-lista-count">{{ rusticoPortataAttiva.prodotti?.length ?? 0 }} {{ getUI('PIATTI_PAROLA') }}</span>
           </div>
           <div class="rustico-prodotti">
             <div *ngIf="rusticoPortataAttiva.prodotti && rusticoPortataAttiva.prodotti.length === 0" class="rustico-empty">
-              <p>Nessun piatto ancora aggiunto.</p>
+              <p>{{ getUI('NESSUN_PIATTO') }}</p>
             </div>
             <div *ngFor="let prodotto of rusticoPortataAttiva.prodotti" class="rustico-prodotto-item">
               <div class="rustico-prodotto-row">
                 <span class="rustico-bullet" [style.background]="colorePrimario"></span>
-                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto">{{ prodotto.nome }}</span>
+                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto">{{ getT(prodotto.nome) }}</span>
                 <span class="rustico-leader"></span>
                 <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
                 <div class="prodotto-azioni prodotto-azioni-row">
@@ -633,7 +747,7 @@
                   </button>
                 </div>
               </div>
-              <p *ngIf="prodotto.descrizione" class="rustico-prodotto-desc">{{ prodotto.descrizione }}</p>
+              <p *ngIf="prodotto.descrizione" class="rustico-prodotto-desc">{{ getT(prodotto.descrizione) }}</p>
               <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
                 <ng-container *ngFor="let a of prodotto.allergenis">
                   <img
@@ -649,7 +763,7 @@
                 </ng-container>
               </div>
             </div>
-            <a [routerLink]="['/prodotto-add', rusticoPortataAttiva.id]" class="btn-add-prodotto">➕ Aggiungi piatto</a>
+            <a [routerLink]="['/prodotto-add', rusticoPortataAttiva.id]" class="btn-add-prodotto">{{ getUI('AGGIUNGI_PIATTO') }}</a>
           </div>
         </ng-container>
 
@@ -658,7 +772,7 @@
           *ngIf="rusticoTabAttiva && tuttiAllergeniMenu.length > 0"
           [style.borderTopColor]="colorePrimario + '44'"
         >
-          <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">Allergeni presenti in questo menu</h3>
+          <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">{{ getUI('ALLERGENI_TITOLO') }}</h3>
           <div class="allergeni-footer-lista">
             <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
               <div class="allergene-footer-cerchio" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'">
@@ -674,7 +788,7 @@
               <span class="allergene-footer-nome">{{ a.nome }}</span>
             </div>
           </div>
-          <p class="allergeni-footer-nota">Per ulteriori informazioni sugli allergeni rivolgiti al personale di sala.</p>
+          <p class="allergeni-footer-nota">{{ getUI('ALLERGENI_NOTA') }}</p>
         </div>
       </div>
     </main>
