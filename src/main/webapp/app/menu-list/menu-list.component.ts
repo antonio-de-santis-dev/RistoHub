@@ -18,10 +18,8 @@ export class MenuListComponent implements OnInit {
   qrMenuId: string | null = null;
   qrVisible = false;
 
-  // Toggle attivo
   toggling: string | null = null;
 
-  // Toast feedback
   toastMsg: string | null = null;
   toastType: 'success' | 'error' = 'success';
   private toastTimer: any = null;
@@ -47,26 +45,16 @@ export class MenuListComponent implements OnInit {
     }
   }
 
-  /**
-   * Toggle attivo/inattivo del menu.
-   * Usa PATCH per aggiornare solo il campo 'attivo'.
-   * Se il server non supporta PATCH, fallback a PUT con tutti i dati.
-   */
   async toggleAttivo(menu: any): Promise<void> {
     if (this.toggling === menu.id) return;
     this.toggling = menu.id;
-
     const nuovoStato = !menu.attivo;
-
     try {
-      // Prova prima con PATCH (più sicuro, non tocca altri campi)
       try {
         await this.http.patch(`/api/menus/${menu.id}`, { id: menu.id, attivo: nuovoStato }).toPromise();
       } catch {
-        // Fallback a PUT con tutti i dati del menu
         await this.http.put(`/api/menus/${menu.id}`, { ...menu, attivo: nuovoStato }).toPromise();
       }
-
       menu.attivo = nuovoStato;
       this.mostraToast(
         nuovoStato ? `✅ "${menu.nome}" è ora visibile ai clienti` : `🔒 "${menu.nome}" è stato nascosto ai clienti`,
@@ -147,5 +135,19 @@ export class MenuListComponent implements OnInit {
       RUSTICO: '🌿 Rustico',
     };
     return map[style ?? ''] ?? '📋 Standard';
+  }
+
+  // ── Nuovi metodi per immagini copertina ───────────────
+
+  /**
+   * Restituisce true per i template che hanno il carosello immagini.
+   * Moderno e Rustico = carosello attivo.
+   */
+  haCarosello(menu: any): boolean {
+    return menu.templateStyle === 'MODERNO' || menu.templateStyle === 'RUSTICO';
+  }
+
+  modificaCopertina(id: string): void {
+    this.router.navigate(['/menu-cover-editor', id]);
   }
 }

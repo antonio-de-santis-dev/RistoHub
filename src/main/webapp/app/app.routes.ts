@@ -12,6 +12,7 @@ import { MenuListComponent } from './menu-list/menu-list.component';
 import { MenuWizardEditComponent } from './menu-wizard-edit/menu-wizard-edit.component';
 import { ProdottoAddComponent } from './prodotto-add/prodotto-add.component';
 import { PiattiGiornoGestioneComponent } from './piatti-giorno-gestione/piatti-giorno-gestione.component';
+import { MenuCoverEditorComponent } from './menu-cover-editor/menu-cover-editor.component';
 
 const routes: Routes = [
   // ── LANDING: prima pagina visibile senza login ──────────────────
@@ -94,6 +95,11 @@ const routes: Routes = [
   {
     path: 'piatti-giorno',
     component: PiattiGiornoGestioneComponent,
+  },
+  {
+    path: 'menu-cover-editor/:id',
+    component: MenuCoverEditorComponent,
+    // Se hai AuthGuard, aggiungilo qui
   },
 
   ...errorRoute,

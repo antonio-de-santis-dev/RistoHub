@@ -49,7 +49,7 @@ class ImmagineMenuResourceIT {
     private static final String UPDATED_CONTENT_TYPE = "BBBBBBBBBB";
 
     private static final TipoImmagine DEFAULT_TIPO = TipoImmagine.LOGO;
-    private static final TipoImmagine UPDATED_TIPO = TipoImmagine.VETRINA;
+    private static final TipoImmagine UPDATED_TIPO = TipoImmagine.COPERTINA;
 
     private static final String ENTITY_API_URL = "/api/immagine-menus";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";

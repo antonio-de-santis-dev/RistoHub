@@ -5,5 +5,5 @@ package main.domain.enumeration;
  */
 public enum TipoImmagine {
     LOGO,
-    VETRINA,
+    COPERTINA,
 }

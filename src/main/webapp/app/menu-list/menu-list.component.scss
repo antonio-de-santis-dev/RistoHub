@@ -179,7 +179,6 @@ $border-glass: rgba(255, 255, 255, 0.14);
   }
 }
 
-// Barra colore in cima alla card
 .ml-card-bar {
   height: 4px;
   flex-shrink: 0;
@@ -300,6 +299,18 @@ $border-glass: rgba(255, 255, 255, 0.14);
   color: rgba(255, 255, 255, 0.4);
 }
 
+// Badge carosello — indica visivamente che il menu ha il carosello
+.ml-carosello-badge {
+  display: inline-block;
+  background: rgba(168, 85, 247, 0.15);
+  color: #d8b4fe;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(168, 85, 247, 0.22);
+}
+
 // ── Card azioni ───────────────────────────────────────
 .ml-card-actions {
   display: grid;
@@ -308,6 +319,20 @@ $border-glass: rgba(255, 255, 255, 0.14);
   padding: 0.875rem;
   background: rgba(0, 0, 0, 0.2);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+  // Quando ci sono 5 pulsanti (template con carosello), usa griglia 3+2
+  &.ml-card-actions-5 {
+    grid-template-columns: 1fr 1fr 1fr;
+
+    // Il quarto e quinto pulsante (Copertina + Elimina) occupano il centro
+    // sulla seconda riga rimanendo proporzionati
+    .ml-btn:nth-child(4) {
+      grid-column: 1 / 2;
+    }
+    .ml-btn:nth-child(5) {
+      grid-column: 2 / 4;
+    }
+  }
 }
 
 .ml-btn {
@@ -344,6 +369,12 @@ $border-glass: rgba(255, 255, 255, 0.14);
     background: rgba(52, 211, 153, 0.18);
     color: #6ee7b7;
     border: 1px solid rgba(52, 211, 153, 0.22);
+  }
+  // ── Nuovo: pulsante Copertina (viola/lavanda) ─────
+  &.ml-btn-cover {
+    background: rgba(168, 85, 247, 0.18);
+    color: #d8b4fe;
+    border: 1px solid rgba(168, 85, 247, 0.25);
   }
   &.ml-btn-delete {
     background: rgba(239, 68, 68, 0.18);
@@ -571,6 +602,17 @@ $border-glass: rgba(255, 255, 255, 0.14);
     grid-template-columns: 1fr 1fr;
     gap: 5px;
     padding: 0.7rem;
+
+    // Su mobile, con 5 pulsanti usa 2 colonne e il Copertina occupa una riga intera
+    &.ml-card-actions-5 {
+      grid-template-columns: 1fr 1fr;
+      .ml-btn:nth-child(4) {
+        grid-column: 1 / 2;
+      }
+      .ml-btn:nth-child(5) {
+        grid-column: 2 / 3;
+      }
+    }
   }
   .ml-btn {
     font-size: 0.76rem;

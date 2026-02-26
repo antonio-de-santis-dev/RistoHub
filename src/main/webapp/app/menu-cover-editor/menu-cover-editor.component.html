@@ -1,0 +1,239 @@
+<div class="mce-page">
+  <div class="mce-inner">
+    <!-- Header -->
+    <div class="mce-header">
+      <div class="mce-header-left">
+        <button class="btn-back" (click)="tornaAllaLista()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          I miei Menu
+        </button>
+        <h1>🖼️ Immagini di Copertina</h1>
+        <p class="mce-subtitle">
+          <span class="mce-menu-name">{{ menuNome }}</span>
+          &nbsp;·&nbsp;
+          {{ immagini.length }}/{{ MAX_IMMAGINI }} immagini
+          @if (immaginiVisibili < immagini.length) {
+            &nbsp;·&nbsp;
+            <span class="mce-hidden-hint"
+              >{{ immagini.length - immaginiVisibili }} nascosta{{ immagini.length - immaginiVisibili > 1 ? 'e' : '' }}</span
+            >
+          }
+        </p>
+      </div>
+      <button class="btn-salva" [disabled]="isSaving" (click)="salva()">
+        @if (isSaving) {
+          <div class="btn-spinner"></div>
+          Salvataggio...
+        } @else {
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          Salva Modifiche
+        }
+      </button>
+    </div>
+
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="mce-loading">
+        <div class="mce-spinner"></div>
+        <span>Caricamento immagini...</span>
+      </div>
+
+    } @else {
+      <!-- Info Banner -->
+      <div class="mce-info-banner">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        Le immagini vengono adattate automaticamente allo stesso formato (16:9) e visualizzate nel carosello del menu. Trascina le card per
+        cambiare l'ordine. Massimo {{ MAX_IMMAGINI }} immagini.
+      </div>
+
+      <!-- Griglia immagini -->
+      @if (immagini.length > 0) {
+        <div class="mce-grid">
+          @for (img of immagini; track $index; let i = $index) {
+            <div
+              class="mce-card"
+              [class.mce-card-hidden]="!img.visibile"
+              [class.mce-card-dragging]="draggingIndex === i"
+              [class.mce-card-dragover]="dragOverIndex === i"
+              [class.mce-card-uploading]="img.uploading"
+              draggable="true"
+              (dragstart)="onDragStart(i)"
+              (dragover)="onDragOver($event, i)"
+              (drop)="onDragDrop(i)"
+              (dragend)="onDragEnd()"
+            >
+              <!-- Badge ordine -->
+              <div class="mce-card-order">{{ i + 1 }}</div>
+
+              <!-- Badge hidden -->
+              @if (!img.visibile) {
+                <div class="mce-card-hidden-badge">👁️‍🗨️ Nascosta</div>
+              }
+
+              <!-- Badge nuovo -->
+              @if (img.isNew) {
+                <div class="mce-card-new-badge">✨ Nuova</div>
+              }
+
+              <!-- Immagine -->
+              <div class="mce-card-img-wrap">
+                <img [src]="img.preview ?? img.url" [alt]="'Immagine copertina ' + (i + 1)" class="mce-card-img" />
+                @if (img.uploading) {
+                  <div class="mce-card-upload-overlay">
+                    <div class="mce-spinner"></div>
+                    <span>Caricamento...</span>
+                  </div>
+                }
+                <!-- Drag handle overlay -->
+                <div class="mce-drag-handle" title="Trascina per riordinare">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="16" y2="6" />
+                    <line x1="8" y1="12" x2="16" y2="12" />
+                    <line x1="8" y1="18" x2="16" y2="18" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Azioni card -->
+              <div class="mce-card-actions">
+                <!-- Frecce ordine -->
+                <div class="mce-order-btns">
+                  <button class="mce-btn-icon" [disabled]="i === 0" (click)="sposta(i, -1)" title="Sposta a sinistra">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                  </button>
+                  <button class="mce-btn-icon" [disabled]="i === immagini.length - 1" (click)="sposta(i, 1)" title="Sposta a destra">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Toggle visibilità -->
+                <button
+                  class="mce-btn-visibility"
+                  [class.is-visible]="img.visibile"
+                  [class.is-hidden]="!img.visibile"
+                  (click)="toggleVisibile(img)"
+                  [title]="img.visibile ? 'Clicca per nascondere' : 'Clicca per mostrare'"
+                >
+                  @if (img.visibile) {
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    Visibile
+                  } @else {
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path
+                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                      />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                    Nascosta
+                  }
+                </button>
+
+                <!-- Elimina -->
+                <button class="mce-btn-delete" (click)="chiediConfermaElimina(i)" title="Elimina immagine">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Drop Zone aggiunta nuove -->
+      @if (puoAggiungere) {
+        <div
+          class="mce-dropzone"
+          (dragover)="onDragOverZone($event)"
+          (dragleave)="onDragLeaveZone($event)"
+          (drop)="onDrop($event)"
+          (click)="fileInput.click()"
+        >
+          <input #fileInput type="file" accept="image/*" multiple style="display: none" (change)="onFileSelected($event)" />
+          <div class="mce-dropzone-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="3" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
+            </svg>
+          </div>
+          <p class="mce-dropzone-title">Aggiungi immagini</p>
+          <p class="mce-dropzone-sub">
+            Clicca o trascina qui le immagini
+            <br />
+            <span>Ancora {{ MAX_IMMAGINI - immagini.length }} slot disponibil{{ MAX_IMMAGINI - immagini.length === 1 ? 'e' : 'i' }}</span>
+          </p>
+        </div>
+      } @else {
+        <div class="mce-limit-reached">
+          <span>🖼️ Limite di {{ MAX_IMMAGINI }} immagini raggiunto. Elimina un'immagine per aggiungerne un'altra.</span>
+        </div>
+      }
+
+      <!-- Empty state -->
+      @if (immagini.length === 0) {
+        <div class="mce-empty-hint">
+          <span>☝️ Aggiungi la prima immagine di copertina per il carosello del tuo menu</span>
+        </div>
+      }
+
+      <!-- Anteprima ordine carosello -->
+      @if (immagini.length > 0) {
+        <div class="mce-preview-section">
+          <h3 class="mce-preview-title">Anteprima ordine carosello</h3>
+          <div class="mce-preview-strip">
+            @for (img of immagini; track $index; let i = $index) {
+              <div class="mce-preview-thumb" [class.mce-preview-hidden]="!img.visibile" [title]="img.visibile ? 'Visibile' : 'Nascosta'">
+                <img [src]="img.preview ?? img.url" [alt]="'thumb ' + (i + 1)" />
+                <span class="mce-preview-num">{{ i + 1 }}</span>
+                @if (!img.visibile) {
+                  <div class="mce-preview-eye-off">🚫</div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- Modal conferma eliminazione -->
+@if (confermaEliminaVisible) {
+  <div class="rh-modal-overlay" (click)="annullaElimina()">
+    <div class="rh-modal-box" (click)="$event.stopPropagation()">
+      <div class="rh-modal-icon">🗑️</div>
+      <h3>Rimuovi immagine</h3>
+      <p>Sei sicuro di voler rimuovere questa immagine dal carosello?<br />L'operazione non è reversibile.</p>
+      <div class="rh-modal-actions">
+        <button class="btn-annulla" (click)="annullaElimina()">Annulla</button>
+        <button class="btn-conferma-elimina" (click)="confermaElimina()">Rimuovi</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Toast -->
+@if (toastMsg) {
+  <div class="rh-toast" [class.rh-toast-success]="toastType === 'success'" [class.rh-toast-error]="toastType === 'error'">
+    {{ toastMsg }}
+  </div>
+}
