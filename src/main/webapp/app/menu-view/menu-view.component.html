@@ -287,6 +287,56 @@
       </div>
       <p class="allergeni-footer-nota">{{ getUI('ALLERGENI_NOTA') }}</p>
     </div>
+
+    <!-- ── CONTATTI (classico) ────────────────────────────────── -->
+    <div class="contatti-card" *ngIf="listeContatti.length > 0" [style.backgroundColor]="colorePrimario">
+      <div class="contatti-card-title">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        <span>Contatti</span>
+      </div>
+      <div *ngFor="let lista of listeContatti" class="contatti-lista-wrap">
+        <p class="contatti-lista-nome" *ngIf="listeContatti.length > 1">{{ lista.nome }}</p>
+        <div class="contatti-items">
+          <a
+            *ngFor="let item of lista.items"
+            [href]="getContattoLink(item)"
+            [attr.target]="item.tipo === 'SOCIAL' ? '_blank' : null"
+            [attr.rel]="item.tipo === 'SOCIAL' ? 'noopener noreferrer' : null"
+            class="contatto-item"
+            [class.no-link]="!getContattoLink(item)"
+          >
+            <span
+              class="contatto-icona"
+              *ngIf="item.tipo === 'SOCIAL' && item.reteSociale !== 'ALTRO' && getSocialIconSvg(item.reteSociale)"
+              [innerHTML]="getSafeSocialSvg(item.reteSociale)"
+            ></span>
+            <span
+              class="contatto-emoji"
+              *ngIf="item.tipo !== 'SOCIAL' || item.reteSociale === 'ALTRO' || !getSocialIconSvg(item.reteSociale)"
+            >
+              {{ item.tipo === 'TELEFONO' ? '📞' : item.tipo === 'EMAIL' ? '✉️' : item.tipo === 'INDIRIZZO' ? '📍' : '🔗' }}
+            </span>
+            <div class="contatto-testo">
+              <span class="contatto-label">{{ getContattoLabel(item) }}</span>
+              <span class="contatto-valore" *ngIf="item.tipo === 'INDIRIZZO'">{{ item.valore }}</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
     <div class="menu-note" [style.borderLeftColor]="colorePrimario">{{ getUI('MENU_NOTE') }}</div>
   </main>
 </div>
@@ -537,6 +587,55 @@
         </div>
       </div>
       <p class="allergeni-footer-nota">{{ getUI('ALLERGENI_NOTA') }}</p>
+    </div>
+
+    <!-- ── CONTATTI (moderno) ─────────────────────────────────── -->
+    <div class="contatti-card" *ngIf="listeContatti.length > 0" [style.backgroundColor]="colorePrimario">
+      <div class="contatti-card-title">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        <span>Contatti</span>
+      </div>
+      <div *ngFor="let lista of listeContatti" class="contatti-lista-wrap">
+        <p class="contatti-lista-nome" *ngIf="listeContatti.length > 1">{{ lista.nome }}</p>
+        <div class="contatti-items">
+          <a
+            *ngFor="let item of lista.items"
+            [href]="getContattoLink(item)"
+            [attr.target]="item.tipo === 'SOCIAL' ? '_blank' : null"
+            [attr.rel]="item.tipo === 'SOCIAL' ? 'noopener noreferrer' : null"
+            class="contatto-item"
+            [class.no-link]="!getContattoLink(item)"
+          >
+            <span
+              class="contatto-icona"
+              *ngIf="item.tipo === 'SOCIAL' && item.reteSociale !== 'ALTRO' && getSocialIconSvg(item.reteSociale)"
+              [innerHTML]="getSafeSocialSvg(item.reteSociale)"
+            ></span>
+            <span
+              class="contatto-emoji"
+              *ngIf="item.tipo !== 'SOCIAL' || item.reteSociale === 'ALTRO' || !getSocialIconSvg(item.reteSociale)"
+            >
+              {{ item.tipo === 'TELEFONO' ? '📞' : item.tipo === 'EMAIL' ? '✉️' : item.tipo === 'INDIRIZZO' ? '📍' : '🔗' }}
+            </span>
+            <div class="contatto-testo">
+              <span class="contatto-label">{{ getContattoLabel(item) }}</span>
+              <span class="contatto-valore" *ngIf="item.tipo === 'INDIRIZZO'">{{ item.valore }}</span>
+            </div>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -796,6 +895,58 @@
             </div>
           </div>
           <p class="allergeni-footer-nota">{{ getUI('ALLERGENI_NOTA') }}</p>
+        </div>
+      </div>
+      <!-- fine rustico-lista-wrap -->
+
+      <!-- ── CONTATTI (rustico) — sempre visibili sotto il carosello ── -->
+      <div class="rustico-contatti-wrap" *ngIf="listeContatti.length > 0">
+        <div class="contatti-card" [style.backgroundColor]="colorePrimario">
+          <div class="contatti-card-title">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span>Contatti</span>
+          </div>
+          <div *ngFor="let lista of listeContatti" class="contatti-lista-wrap">
+            <p class="contatti-lista-nome" *ngIf="listeContatti.length > 1">{{ lista.nome }}</p>
+            <div class="contatti-items">
+              <a
+                *ngFor="let item of lista.items"
+                [href]="getContattoLink(item)"
+                [attr.target]="item.tipo === 'SOCIAL' ? '_blank' : null"
+                [attr.rel]="item.tipo === 'SOCIAL' ? 'noopener noreferrer' : null"
+                class="contatto-item"
+                [class.no-link]="!getContattoLink(item)"
+              >
+                <span
+                  class="contatto-icona"
+                  *ngIf="item.tipo === 'SOCIAL' && item.reteSociale !== 'ALTRO' && getSocialIconSvg(item.reteSociale)"
+                  [innerHTML]="getSafeSocialSvg(item.reteSociale)"
+                ></span>
+                <span
+                  class="contatto-emoji"
+                  *ngIf="item.tipo !== 'SOCIAL' || item.reteSociale === 'ALTRO' || !getSocialIconSvg(item.reteSociale)"
+                >
+                  {{ item.tipo === 'TELEFONO' ? '📞' : item.tipo === 'EMAIL' ? '✉️' : item.tipo === 'INDIRIZZO' ? '📍' : '🔗' }}
+                </span>
+                <div class="contatto-testo">
+                  <span class="contatto-label">{{ getContattoLabel(item) }}</span>
+                  <span class="contatto-valore" *ngIf="item.tipo === 'INDIRIZZO'">{{ item.valore }}</span>
+                </div>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </main>

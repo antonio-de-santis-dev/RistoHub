@@ -38,4 +38,6 @@
   <include file="config/liquibase/changelog/20260219_insert_allergeni_default.xml"/>
   <include file="config/liquibase/changelog/20240101_add_piatto_del_giorno_allergenis.xml" relativeToChangelogFile="false"/>
   <include file="config/liquibase/changelog/20260226120000_add_ordine_visibile_to_immagine_menu.xml" relativeToChangelogFile="false"/>
+  <include file="config/liquibase/changelog/20240001000000_added_entity_ListaContatti.xml"
+           relativeToChangelogFile="false"/>
 </databaseChangeLog>

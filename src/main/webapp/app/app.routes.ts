@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 
 import { Authority } from 'app/config/authority.constants';
-
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { errorRoute } from './layouts/error/error.route';
 
@@ -13,23 +12,20 @@ import { MenuWizardEditComponent } from './menu-wizard-edit/menu-wizard-edit.com
 import { ProdottoAddComponent } from './prodotto-add/prodotto-add.component';
 import { PiattiGiornoGestioneComponent } from './piatti-giorno-gestione/piatti-giorno-gestione.component';
 import { MenuCoverEditorComponent } from './menu-cover-editor/menu-cover-editor.component';
+import { ContattiGestioneComponent } from './contatti-gestione/contatti-gestione.component';
 
 const routes: Routes = [
-  // ── LANDING: prima pagina visibile senza login ──────────────────
-  {
-    path: '',
-    component: LandingComponent,
-    pathMatch: 'full',
-  },
+  // ── LANDING ─────────────────────────────────────────────────────
+  { path: '', component: LandingComponent, pathMatch: 'full' },
 
-  // ── NAVBAR (outlet secondario, invariato) ────────────────────────
+  // ── NAVBAR (outlet secondario) ───────────────────────────────────
   {
     path: '',
     loadComponent: () => import('./layouts/navbar/navbar.component'),
     outlet: 'navbar',
   },
 
-  // ── HOME (dopo login) ────────────────────────────────────────────
+  // ── HOME ─────────────────────────────────────────────────────────
   {
     path: 'home',
     loadComponent: () => import('./home/home.component'),
@@ -39,68 +35,34 @@ const routes: Routes = [
   // ── ADMIN ────────────────────────────────────────────────────────
   {
     path: 'admin',
-    data: {
-      authorities: [Authority.ADMIN],
-    },
+    data: { authorities: [Authority.ADMIN] },
     canActivate: [UserRouteAccessService],
     loadChildren: () => import('./admin/admin.routes'),
   },
 
   // ── ACCOUNT / LOGIN ──────────────────────────────────────────────
-  {
-    path: 'account',
-    loadChildren: () => import('./account/account.route'),
-  },
-  {
-    path: 'login',
-    loadComponent: () => import('./login/login.component'),
-    title: 'login.title',
-  },
+  { path: 'account', loadChildren: () => import('./account/account.route') },
+  { path: 'login', loadComponent: () => import('./login/login.component'), title: 'login.title' },
 
   // ── ENTITÀ JHIPSTER ──────────────────────────────────────────────
-  {
-    path: '',
-    loadChildren: () => import(`./entities/entity.routes`),
-  },
+  { path: '', loadChildren: () => import('./entities/entity.routes') },
 
   // ── MENU ─────────────────────────────────────────────────────────
-  {
-    path: 'menu-wizard',
-    component: MenuWizardComponent,
-  },
-  {
-    path: 'menu-view/:id',
-    component: MenuViewComponent,
-  },
-  {
-    path: 'menu-list',
-    component: MenuListComponent,
-  },
-  {
-    path: 'menu-wizard-edit/:id',
-    component: MenuWizardEditComponent,
-  },
+  { path: 'menu-wizard', component: MenuWizardComponent },
+  { path: 'menu-view/:id', component: MenuViewComponent },
+  { path: 'menu-list', component: MenuListComponent },
+  { path: 'menu-wizard-edit/:id', component: MenuWizardEditComponent },
+  { path: 'menu-cover-editor/:id', component: MenuCoverEditorComponent },
 
   // ── PRODOTTI ─────────────────────────────────────────────────────
-  {
-    path: 'prodotto-add',
-    component: ProdottoAddComponent,
-  },
-  {
-    path: 'prodotto-add/:portataId',
-    component: ProdottoAddComponent,
-  },
+  { path: 'prodotto-add', component: ProdottoAddComponent },
+  { path: 'prodotto-add/:portataId', component: ProdottoAddComponent },
 
   // ── PIATTI DEL GIORNO ────────────────────────────────────────────
-  {
-    path: 'piatti-giorno',
-    component: PiattiGiornoGestioneComponent,
-  },
-  {
-    path: 'menu-cover-editor/:id',
-    component: MenuCoverEditorComponent,
-    // Se hai AuthGuard, aggiungilo qui
-  },
+  { path: 'piatti-giorno', component: PiattiGiornoGestioneComponent },
+
+  // ── CONTATTI (accessibile a tutti gli utenti registrati) ─────────
+  { path: 'contatti', component: ContattiGestioneComponent },
 
   ...errorRoute,
 ];

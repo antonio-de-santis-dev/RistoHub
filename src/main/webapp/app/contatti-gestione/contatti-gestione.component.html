@@ -1,0 +1,307 @@
+<div class="cg-page">
+  <!-- ══ HEADER ══════════════════════════════════════════════════ -->
+  <div class="cg-header">
+    <div class="cg-header-left">
+      <a routerLink="/home" class="cg-btn-back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+        Home
+      </a>
+      <div>
+        <h1 class="cg-title">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          Liste Contatti
+        </h1>
+        <p class="cg-subtitle">Gestisci i recapiti da mostrare sui tuoi menu</p>
+      </div>
+    </div>
+    <button class="cg-btn-primary" (click)="apriCrea()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+      Nuova lista
+    </button>
+  </div>
+
+  <!-- ══ LOADING ══════════════════════════════════════════════════ -->
+  @if (isLoading) {
+    <div class="cg-loading">
+      <div class="cg-spinner"></div>
+      <span>Caricamento...</span>
+    </div>
+  }
+
+  <!-- ══ STATO VUOTO ══════════════════════════════════════════════ -->
+  @if (!isLoading && liste.length === 0) {
+    <div class="cg-empty">
+      <div class="cg-empty-icon">📋</div>
+      <h2>Nessuna lista contatti</h2>
+      <p>Crea la tua prima lista di contatti e associala ai tuoi menu.</p>
+      <button class="cg-btn-primary" (click)="apriCrea()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Crea la prima lista
+      </button>
+    </div>
+  }
+
+  <!-- ══ GRIGLIA LISTE ════════════════════════════════════════════ -->
+  @if (!isLoading && liste.length > 0) {
+    <div class="cg-grid">
+      @for (lista of liste; track lista.id) {
+        <div class="cg-card">
+          <div class="cg-card-header">
+            <h3 class="cg-card-nome">{{ lista.nome }}</h3>
+            <div class="cg-card-actions">
+              <button class="cg-btn-icon" title="Modifica" (click)="apriModifica(lista)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
+              <button class="cg-btn-icon cg-btn-icon-danger" title="Elimina" (click)="apriEliminazione(lista)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14H6L5 6" />
+                  <path d="M10 11v6" />
+                  <path d="M14 11v6" />
+                  <path d="M9 6V4h6v2" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="cg-card-items">
+            @for (it of lista.items?.slice(0, 4); track it.id) {
+              <div class="cg-item-preview">
+                <span class="cg-item-emoji">{{ iconaTipo(it.tipo) }}</span>
+                <span class="cg-item-label">{{ getLabelItem(it) }}</span>
+                <span class="cg-item-valore">{{ it.valore }}</span>
+              </div>
+            }
+            @if ((lista.items?.length ?? 0) > 4) {
+              <p class="cg-item-altri">+ altri {{ lista.items.length - 4 }} campi</p>
+            }
+            @if ((lista.items?.length ?? 0) === 0) {
+              <p class="cg-item-vuoto">Nessun campo aggiunto</p>
+            }
+          </div>
+
+          <div class="cg-card-footer">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </svg>
+            <span>{{ menuSelezionati(lista) }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  MODAL CREA / MODIFICA                                        -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+@if (modalAperta) {
+  <div class="cg-modal-overlay" (click)="chiudiModal()">
+    <div class="cg-modal" (click)="$event.stopPropagation()">
+      <div class="cg-modal-header">
+        <h2>{{ isEdit ? '✏️ Modifica lista' : '➕ Nuova lista contatti' }}</h2>
+        <button class="cg-modal-close" (click)="chiudiModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="cg-modal-body">
+        <!-- ── Nome lista ──────────────────────────────────────── -->
+        <div class="cg-field">
+          <label class="cg-label">Nome lista *</label>
+          <input class="cg-input" [(ngModel)]="form.nome" placeholder="Es. Contatti Principale" />
+        </div>
+
+        <!-- ── Seleziona menu ──────────────────────────────────── -->
+        <div class="cg-field">
+          <label class="cg-label">Mostra su questi menu</label>
+          @if (menu.length === 0) {
+            <p class="cg-field-nota">Nessun menu disponibile. Crea prima un menu.</p>
+          } @else {
+            <div class="cg-menu-chips">
+              @for (m of menu; track m.id) {
+                <button type="button" class="cg-menu-chip" [class.selected]="form.menuIds.has(m.id)" (click)="toggleMenu(m.id)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                  </svg>
+                  {{ m.nome }}
+                  @if (form.menuIds.has(m.id)) {
+                    <svg
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  }
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- ── Campi contatto ──────────────────────────────────── -->
+        <div class="cg-field">
+          <div class="cg-field-header">
+            <label class="cg-label">Campi di contatto</label>
+            <button type="button" class="cg-btn-aggiungi" (click)="aggiungiItem()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Aggiungi campo
+            </button>
+          </div>
+
+          @if (form.items.length === 0) {
+            <div class="cg-items-empty">
+              <p>Nessun campo. Clicca "Aggiungi campo" per iniziare.</p>
+            </div>
+          }
+
+          @for (item of form.items; track trackByIdx($index); let i = $index) {
+            <div class="cg-item-row">
+              <!-- Ordinamento -->
+              <div class="cg-item-order">
+                <button type="button" class="cg-order-btn" (click)="spostaItem(i, -1)" [disabled]="i === 0">▲</button>
+                <span class="cg-order-num">{{ i + 1 }}</span>
+                <button type="button" class="cg-order-btn" (click)="spostaItem(i, 1)" [disabled]="i === form.items.length - 1">▼</button>
+              </div>
+
+              <div class="cg-item-fields">
+                <!-- Riga tipo + rete sociale -->
+                <div class="cg-item-row-top">
+                  <select class="cg-select cg-select-tipo" [(ngModel)]="item.tipo" (ngModelChange)="onTipoChange(item)">
+                    @for (t of TIPI; track t) {
+                      <option [value]="t">{{ nomeTipo(t) }}</option>
+                    }
+                  </select>
+
+                  @if (item.tipo === 'SOCIAL') {
+                    <select class="cg-select cg-select-social" [(ngModel)]="item.reteSociale" (ngModelChange)="onReteSocialeChange(item)">
+                      <option [ngValue]="undefined" disabled>— Seleziona social —</option>
+                      @for (rs of RETI_SOCIALI; track rs.value) {
+                        <option [value]="rs.value">{{ rs.label }}</option>
+                      }
+                    </select>
+                  }
+                </div>
+
+                <!-- URL profilo (solo social) -->
+                @if (item.tipo === 'SOCIAL') {
+                  <input class="cg-input cg-input-valore" [(ngModel)]="item.valore" placeholder="https://www.instagram.com/mioprofilo" />
+                  <!-- Nome visualizzato nel menu -->
+                  <input
+                    class="cg-input"
+                    [(ngModel)]="item.etichetta"
+                    [placeholder]="
+                      item.reteSociale === 'ALTRO'
+                        ? 'Nome del social (obbligatorio per Altro)'
+                        : 'Nome visualizzato nel menu (opzionale, es. Seguici su Instagram!)'
+                    "
+                  />
+                  <p class="cg-field-nota" style="margin-top: -2px; font-size: 0.76rem">
+                    💡 Se lasci vuoto, nel menu verrà mostrato il nome della piattaforma (es. "Instagram")
+                  </p>
+                } @else {
+                  <!-- Valore per telefono / email / indirizzo -->
+                  <input class="cg-input cg-input-valore" [(ngModel)]="item.valore" [placeholder]="getPlaceholderValore(item)" />
+                }
+              </div>
+
+              <!-- Rimuovi -->
+              <button type="button" class="cg-btn-rimuovi" (click)="rimuoviItem(i)" title="Rimuovi campo">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Errore -->
+        @if (erroreForm) {
+          <div class="cg-errore">⚠️ {{ erroreForm }}</div>
+        }
+      </div>
+
+      <div class="cg-modal-footer">
+        <button class="cg-btn-annulla" (click)="chiudiModal()" [disabled]="isSaving">Annulla</button>
+        <button class="cg-btn-primary" (click)="salva()" [disabled]="isSaving">
+          @if (isSaving) {
+            <div class="cg-spinner-sm"></div>
+            Salvataggio...
+          } @else {
+            💾 Salva lista
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  MODAL CONFERMA ELIMINAZIONE                                  -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+@if (listaInEliminazione) {
+  <div class="cg-modal-overlay" (click)="chiudiEliminazione()">
+    <div class="cg-modal cg-modal-sm" (click)="$event.stopPropagation()">
+      <div class="cg-modal-header cg-modal-header-danger">
+        <h2>🗑 Elimina lista</h2>
+      </div>
+
+      <div class="cg-modal-body">
+        <p>
+          Sei sicuro di voler eliminare
+          <strong>{{ listaInEliminazione.nome }}</strong
+          >?<br />
+          Questa azione non può essere annullata.
+        </p>
+      </div>
+
+      <div class="cg-modal-footer">
+        <button class="cg-btn-annulla" (click)="chiudiEliminazione()" [disabled]="isDeleting">Annulla</button>
+        <button class="cg-btn-danger" (click)="confermaEliminazione()" [disabled]="isDeleting">
+          @if (isDeleting) {
+            Eliminazione...
+          } @else {
+            🗑 Elimina
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

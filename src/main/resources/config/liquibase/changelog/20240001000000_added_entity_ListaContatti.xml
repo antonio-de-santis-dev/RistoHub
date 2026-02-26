@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <!-- ── Tabella principale lista_contatti ── -->
+  <changeSet id="20240001000000-1" author="auto">
+    <createTable tableName="lista_contatti">
+      <column name="id" type="uuid">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="nome" type="varchar(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="ristoratore_id" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <!-- ── Tabella join lista_contatti_menu (Set<UUID> menuIds) ── -->
+  <changeSet id="20240001000000-2" author="auto">
+    <createTable tableName="lista_contatti_menu">
+      <column name="lista_contatti_id" type="uuid">
+        <constraints nullable="false"/>
+      </column>
+      <column name="menu_id" type="uuid">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addPrimaryKey tableName="lista_contatti_menu"
+                   columnNames="lista_contatti_id, menu_id"/>
+    <addForeignKeyConstraint
+      baseTableName="lista_contatti_menu"
+      baseColumnNames="lista_contatti_id"
+      constraintName="fk_lista_contatti_menu"
+      referencedTableName="lista_contatti"
+      referencedColumnNames="id"/>
+  </changeSet>
+
+  <!-- ── Tabella contatto_item ── -->
+  <changeSet id="20240001000000-3" author="auto">
+    <createTable tableName="contatto_item">
+      <column name="id" type="uuid">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="tipo" type="varchar(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="valore" type="varchar(1000)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="rete_sociale" type="varchar(50)"/>
+      <column name="etichetta" type="varchar(255)"/>
+      <column name="ordine" type="integer"/>
+      <column name="lista_contatti_id" type="uuid">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addForeignKeyConstraint
+      baseTableName="contatto_item"
+      baseColumnNames="lista_contatti_id"
+      constraintName="fk_contatto_item_lista"
+      referencedTableName="lista_contatti"
+      referencedColumnNames="id"/>
+  </changeSet>
+
+  <!-- ── FK verso la tabella jhi_user ── -->
+  <changeSet id="20240001000000-4" author="auto">
+    <addForeignKeyConstraint
+      baseTableName="lista_contatti"
+      baseColumnNames="ristoratore_id"
+      constraintName="fk_lista_contatti_ristoratore"
+      referencedTableName="jhi_user"
+      referencedColumnNames="id"/>
+  </changeSet>
+
+</databaseChangeLog>

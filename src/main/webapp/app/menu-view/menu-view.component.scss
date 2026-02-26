@@ -2033,3 +2033,162 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     min-width: 155px;
   }
 }
+
+// ══════════════════════════════════════════════════════════════════
+//  SEZIONE CONTATTI — card piena col colore primario, tutti i template
+// ══════════════════════════════════════════════════════════════════
+
+// Card: sfondo intero = colorePrimario, tutto bianco dentro
+.contatti-card {
+  margin: 1.75rem 0 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  padding: 1.1rem 1.25rem 1.25rem;
+  // background-color iniettato via [style.backgroundColor]
+}
+
+// Titolo "Contatti" in bianco
+.contatti-card-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin: 0 0 1rem;
+  opacity: 0.95;
+
+  svg {
+    flex-shrink: 0;
+    stroke: #fff;
+  }
+}
+
+// Separatore tra più liste
+.contatti-lista-nome {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0 0 0.5rem;
+}
+
+.contatti-lista-wrap {
+  & + & {
+    margin-top: 0.9rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+// Griglia item
+.contatti-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
+}
+
+// Singolo contatto: sfondo bianco semitrasparente, tutto bianco
+.contatto-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  text-decoration: none;
+  color: #ffffff;
+  transition:
+    background 0.18s,
+    transform 0.18s;
+  cursor: pointer;
+
+  &:hover:not(.no-link) {
+    background: rgba(255, 255, 255, 0.28);
+    transform: translateY(-2px);
+  }
+  &.no-link {
+    cursor: default;
+    &:hover {
+      transform: none;
+      background: rgba(255, 255, 255, 0.18);
+    }
+  }
+}
+
+// Icona SVG social — cerchio bianco semitrasparente, logo bianco
+.contatto-icona {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 5px;
+  box-sizing: border-box;
+
+  ::ng-deep svg {
+    width: 100%;
+    height: 100%;
+    fill: #fff;
+    display: block;
+  }
+}
+
+// Emoji telefono / email / indirizzo
+.contatto-emoji {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  line-height: 1;
+  width: 30px;
+  text-align: center;
+}
+
+.contatto-testo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.contatto-label {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contatto-valore {
+  font-size: 0.73rem;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Rustico: wrap esterno con padding per posizionare la card sotto il carosello
+.rustico-contatti-wrap {
+  padding: 0 1rem 1.25rem;
+}
+
+@media (max-width: 480px) {
+  .contatti-items {
+    grid-template-columns: 1fr;
+  }
+  .contatti-card {
+    padding: 0.9rem 1rem 1rem;
+  }
+}
