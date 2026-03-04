@@ -37,9 +37,7 @@ import tech.jhipster.config.JHipsterProperties;
 public class SecurityConfiguration {
 
     private final Environment env;
-
     private final JHipsterProperties jHipsterProperties;
-
     private final RememberMeServices rememberMeServices;
 
     public SecurityConfiguration(Environment env, RememberMeServices rememberMeServices, JHipsterProperties jHipsterProperties) {
@@ -77,19 +75,25 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(authz ->
                 // prettier-ignore
                 authz
+                    // ── Risorse statiche Angular ───────────────────────────────────────────
                     .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.txt"), mvc.pattern("/*.json"), mvc.pattern("/*.map"), mvc.pattern("/*.css")).permitAll()
                     .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp")).permitAll()
                     .requestMatchers(mvc.pattern("/app/**")).permitAll()
                     .requestMatchers(mvc.pattern("/i18n/**")).permitAll()
                     .requestMatchers(mvc.pattern("/content/**")).permitAll()
                     .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
+                    // ── Endpoint di autenticazione ─────────────────────────────────────────
                     .requestMatchers(mvc.pattern("/api/authenticate")).permitAll()
                     .requestMatchers(mvc.pattern("/api/register")).permitAll()
                     .requestMatchers(mvc.pattern("/api/activate")).permitAll()
                     .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
                     .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
+                    // ── API PUBBLICHE (menu clienti via QR code) — SENZA autenticazione ────
+                    .requestMatchers(mvc.pattern("/api/public/**")).permitAll()
+                    // ── API protette ───────────────────────────────────────────────────────
                     .requestMatchers(mvc.pattern("/api/admin/**")).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/api/**")).authenticated()
+                    // ── Actuator / Management ──────────────────────────────────────────────
                     .requestMatchers(mvc.pattern("/v3/api-docs/**")).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/management/health")).permitAll()
                     .requestMatchers(mvc.pattern("/management/health/**")).permitAll()
@@ -133,13 +137,6 @@ public class SecurityConfiguration {
         return new MvcRequestMatcher.Builder(introspector);
     }
 
-    /**
-     * Custom CSRF handler to provide BREACH protection for Single-Page Applications (SPA).
-     *
-     * @see <a href="https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html#csrf-integration-javascript-spa">Spring Security Documentation - Integrating with CSRF Protection</a>
-     * @see <a href="https://github.com/jhipster/generator-jhipster/pull/25907">JHipster - use customized SpaCsrfTokenRequestHandler to handle CSRF token</a>
-     * @see <a href="https://stackoverflow.com/q/74447118/65681">CSRF protection not working with Spring Security 6</a>
-     */
     static final class SpaCsrfTokenRequestHandler implements CsrfTokenRequestHandler {
 
         private final CsrfTokenRequestHandler plain = new CsrfTokenRequestAttributeHandler();
@@ -147,33 +144,15 @@ public class SecurityConfiguration {
 
         @Override
         public void handle(HttpServletRequest request, HttpServletResponse response, Supplier<CsrfToken> csrfToken) {
-            /*
-             * Always use XorCsrfTokenRequestAttributeHandler to provide BREACH protection of
-             * the CsrfToken when it is rendered in the response body.
-             */
             this.xor.handle(request, response, csrfToken);
-
-            // Render the token value to a cookie by causing the deferred token to be loaded.
             csrfToken.get();
         }
 
         @Override
         public String resolveCsrfTokenValue(HttpServletRequest request, CsrfToken csrfToken) {
-            /*
-             * If the request contains a request header, use CsrfTokenRequestAttributeHandler
-             * to resolve the CsrfToken. This applies when a single-page application includes
-             * the header value automatically, which was obtained via a cookie containing the
-             * raw CsrfToken.
-             */
             if (StringUtils.hasText(request.getHeader(csrfToken.getHeaderName()))) {
                 return this.plain.resolveCsrfTokenValue(request, csrfToken);
             }
-            /*
-             * In all other cases (e.g. if the request contains a request parameter), use
-             * XorCsrfTokenRequestAttributeHandler to resolve the CsrfToken. This applies
-             * when a server-side rendered form includes the _csrf request parameter as a
-             * hidden input.
-             */
             return this.xor.resolveCsrfTokenValue(request, csrfToken);
         }
     }

@@ -13,6 +13,7 @@ import { ProdottoAddComponent } from './prodotto-add/prodotto-add.component';
 import { PiattiGiornoGestioneComponent } from './piatti-giorno-gestione/piatti-giorno-gestione.component';
 import { MenuCoverEditorComponent } from './menu-cover-editor/menu-cover-editor.component';
 import { ContattiGestioneComponent } from './contatti-gestione/contatti-gestione.component';
+import { MenuPublicComponent } from './menu-public/menu-public.component'; // ← AGGIUNTO
 
 const routes: Routes = [
   // ── LANDING ─────────────────────────────────────────────────────
@@ -46,6 +47,10 @@ const routes: Routes = [
 
   // ── ENTITÀ JHIPSTER ──────────────────────────────────────────────
   { path: '', loadChildren: () => import('./entities/entity.routes') },
+
+  // ── MENU PUBBLICO (QR Code – nessuna autenticazione richiesta) ───
+  // NOTA: questa route deve stare PRIMA di menu-view/:id
+  { path: 'menu-public/:id', component: MenuPublicComponent, title: 'Menu' },
 
   // ── MENU ─────────────────────────────────────────────────────────
   { path: 'menu-wizard', component: MenuWizardComponent },
