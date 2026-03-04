@@ -10,12 +10,7 @@ $border-glass: rgba(255, 255, 255, 0.14);
 
 :host {
   display: block;
-  /* Copre tutta la larghezza viewport ignorando i padding del container */
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-  /* Sale sopra la navbar (~56px) + padding wrapper */
+  width: 100%;
   margin-top: -80px;
   margin-bottom: -1.5rem;
 }

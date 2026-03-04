@@ -2192,3 +2192,170 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     padding: 0.9rem 1rem 1rem;
   }
 }
+
+// ══════════════════════════════════════════════════
+//  EXTRA SMALL — schermi ≤ 380px (iPhone SE, ecc.)
+// ══════════════════════════════════════════════════
+
+@media (max-width: 380px) {
+  // Classico
+  .menu-nome {
+    font-size: 1.1rem;
+  }
+  .menu-header {
+    padding: 10px 12px 10px;
+  }
+  .logo-img {
+    max-width: 110px;
+    max-height: 110px;
+  }
+  .portata-nome {
+    font-size: 0.85rem;
+  }
+  .prodotto-nome {
+    font-size: 0.9rem;
+  }
+  .prodotto-card {
+    padding: 9px 10px;
+  }
+
+  // Moderno
+  .moderno-title {
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+  .moderno-header {
+    padding: 16px 10px 32px;
+  }
+  .moderno-tab {
+    font-size: 10px;
+    padding: 6px 12px;
+  }
+  .moderno-prodotto-item {
+    padding: 9px 12px;
+  }
+
+  // Rustico
+  .rustico-sidebar {
+    width: 66px;
+  }
+  .rustico-nav-btn {
+    font-size: 7.5px;
+    padding: 5px 2px;
+  }
+  .rustico-header {
+    padding: 5px 6px 5px;
+  }
+  .rustico-header-left {
+    width: 36px;
+  }
+  .rustico-prodotto-nome {
+    max-width: 48%;
+    font-size: 11px;
+  }
+
+  // Selettore lingua
+  .lingua-btn-attuale {
+    min-width: 56px;
+    padding: 3px 7px 3px 4px;
+  }
+  .lingua-dropdown {
+    min-width: 140px;
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  SAFE AREA — iPhone con notch / Dynamic Island
+// ══════════════════════════════════════════════════
+
+// Header: evita che il contenuto finisca sotto la status bar
+.menu-header,
+.moderno-header,
+.rustico-header {
+  padding-top: max(16px, env(safe-area-inset-top, 16px));
+}
+
+// Footer/bottom: evita che il contenuto finisca sotto la home bar
+.menu-page,
+.moderno-page,
+.rustico-page {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+// Toast: sposta su di eventuali barre di sistema
+.traduzione-overlay,
+.traduzione-errore-toast {
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+// ══════════════════════════════════════════════════
+//  TOUCH — ottimizzazioni scroll e tap per mobile
+// ══════════════════════════════════════════════════
+
+.moderno-tabs-wrapper {
+  // Scroll orizzontale smooth su iOS
+  -webkit-overflow-scrolling: touch;
+}
+
+.portata-header,
+.moderno-tab,
+.rustico-nav-btn,
+.lingua-btn-attuale,
+.lingua-opzione {
+  // Area tap minima raccomandata da Apple/Google: 44px
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+// Per i tab moderno e nav rustico che usano inline-flex o altri display
+.moderno-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px; // i tab sono naturalmente compatti, 40px è ok
+}
+
+.rustico-nav-btn {
+  min-height: 40px;
+}
+
+// ══════════════════════════════════════════════════
+//  LANDSCAPE su telefono (altezza ridotta)
+// ══════════════════════════════════════════════════
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .menu-header {
+    padding: 8px 16px 8px;
+  }
+  .logo-img {
+    max-height: 60px;
+  }
+  .menu-nome {
+    font-size: 1.1rem;
+  }
+
+  .moderno-header {
+    padding: 8px 14px 28px;
+  }
+  .moderno-logo-img {
+    max-height: 50px;
+  }
+  .moderno-title {
+    font-size: 18px;
+  }
+  .moderno-carousel {
+    aspect-ratio: 21 / 9;
+  }
+
+  .rustico-header {
+    padding: 5px 10px;
+  }
+  .rustico-carousel {
+    aspect-ratio: 16 / 9;
+    max-height: 250px;
+  }
+  .rustico-logo-img {
+    max-height: 50px;
+  }
+}

@@ -6,6 +6,12 @@
 Bootstrap tweaks
 ===============================================================*/
 
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body,
 h1,
 h2,
@@ -249,7 +255,9 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 .card.jh-card:has(jhi-piatti-giorno-gestione),
 .card.jh-card:has(jhi-prodotto-add),
 .card.jh-card:has(jhi-settings),
-.card.jh-card:has(jhi-password) {
+.card.jh-card:has(jhi-password),
+.card.jh-card:has(jhi-menu-public),
+.card.jh-card:has(app-contatti-gestione) {
   padding: 0 !important;
   margin-top: 0 !important;
   border: none !important;
@@ -262,4 +270,41 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 jhi-home {
   display: block;
   /* Il margin negativo nel :host del componente si occupa del resto */
+}
+
+/* ==========================================================================
+   MENU PUBBLICO — pagina QR code full-screen senza navbar/footer
+========================================================================== */
+
+/* Rimuove padding/bordo dalla card wrapper quando contiene menu-public */
+.card.jh-card-public {
+  padding: 0 !important;
+  margin-top: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Safe area per iPhone con notch e home bar */
+.menu-page,
+.moderno-page,
+.rustico-page {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Scroll fluido su iOS */
+html {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Tap highlight trasparente su mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Testo non selezionabile sui pulsanti di navigazione */
+button {
+  -webkit-user-select: none;
+  user-select: none;
 }
