@@ -96,19 +96,19 @@
 @keyframes rhSwingFork {
   0%,
   100% {
-    transform: rotate(-9deg);
+    transform: rotate(-2deg);
   }
   50% {
-    transform: rotate(9deg);
+    transform: rotate(2deg);
   }
 }
 @keyframes rhSwingKnife {
   0%,
   100% {
-    transform: rotate(9deg);
+    transform: rotate(2deg);
   }
   50% {
-    transform: rotate(-9deg);
+    transform: rotate(-2deg);
   }
 }
 

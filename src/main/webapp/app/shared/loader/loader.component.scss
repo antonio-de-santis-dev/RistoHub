@@ -92,15 +92,15 @@
   stroke-dashoffset: 55;
 }
 
-// Forchetta — oscillazione lenta ed elegante
+// Forchetta — oscillazione lenta ed elegante (origin centrata sul nuovo translate 34,38)
 .fork {
-  transform-origin: 72px 90px;
+  transform-origin: 54px 90px;
   animation: swingFork 2.4s ease-in-out infinite;
 }
 
-// Coltello — oscillazione sfasata
+// Coltello — oscillazione sfasata (origin centrata sul nuovo translate 140,38)
 .knife {
-  transform-origin: 141px 90px;
+  transform-origin: 159px 90px;
   animation: swingKnife 2.4s ease-in-out infinite;
   animation-delay: 0.4s;
 }
@@ -118,19 +118,19 @@
 @keyframes swingFork {
   0%,
   100% {
-    transform: rotate(-9deg);
+    transform: rotate(-2deg);
   }
   50% {
-    transform: rotate(9deg);
+    transform: rotate(2deg);
   }
 }
 @keyframes swingKnife {
   0%,
   100% {
-    transform: rotate(9deg);
+    transform: rotate(2deg);
   }
   50% {
-    transform: rotate(-9deg);
+    transform: rotate(-2deg);
   }
 }
 
