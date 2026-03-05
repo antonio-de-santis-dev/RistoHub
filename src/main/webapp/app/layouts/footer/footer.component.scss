@@ -4,7 +4,19 @@
 
 :host {
   display: block;
+  // Esce dal padding del container padre
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  width: 100vw;
+  max-width: 100vw;
+  box-sizing: border-box;
+  // Assicura che non ci siano overflow nascosti
+  overflow: visible;
+}
+
+.footer {
   width: 100%;
+  box-sizing: border-box;
 }
 
 .rh-footer {

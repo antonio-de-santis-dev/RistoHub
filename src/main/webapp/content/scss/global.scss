@@ -6,10 +6,14 @@
 Bootstrap tweaks
 ===============================================================*/
 
+/* Reset fondamentale — evita che Bootstrap aggiunga padding al body
+   per la scrollbar, che rompe i layout a larghezza piena */
 html,
 body {
+  margin: 0;
+  padding: 0 !important;
   overflow-x: hidden;
-  max-width: 100%;
+  width: 100%;
 }
 
 body,
@@ -111,6 +115,20 @@ Generic styles
 
 .footer {
   border-top: 1px solid rgba(0, 0, 0, 0.125);
+  width: 100%;
+  box-sizing: border-box;
+  /* Annulla eventuali margin/padding ereditati da Bootstrap */
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Wrapper principale del contenuto — senza padding Bootstrap */
+.rh-main-wrapper {
+  width: 100%;
+  padding: 0;
+  margin: 0;
 }
 
 .hand,
@@ -255,9 +273,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 .card.jh-card:has(jhi-piatti-giorno-gestione),
 .card.jh-card:has(jhi-prodotto-add),
 .card.jh-card:has(jhi-settings),
-.card.jh-card:has(jhi-password),
-.card.jh-card:has(jhi-menu-public),
-.card.jh-card:has(app-contatti-gestione) {
+.card.jh-card:has(jhi-password) {
   padding: 0 !important;
   margin-top: 0 !important;
   border: none !important;
@@ -270,41 +286,4 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 jhi-home {
   display: block;
   /* Il margin negativo nel :host del componente si occupa del resto */
-}
-
-/* ==========================================================================
-   MENU PUBBLICO — pagina QR code full-screen senza navbar/footer
-========================================================================== */
-
-/* Rimuove padding/bordo dalla card wrapper quando contiene menu-public */
-.card.jh-card-public {
-  padding: 0 !important;
-  margin-top: 0 !important;
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-}
-
-/* Safe area per iPhone con notch e home bar */
-.menu-page,
-.moderno-page,
-.rustico-page {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-/* Scroll fluido su iOS */
-html {
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Tap highlight trasparente su mobile */
-* {
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Testo non selezionabile sui pulsanti di navigazione */
-button {
-  -webkit-user-select: none;
-  user-select: none;
 }
