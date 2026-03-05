@@ -1,17 +1,16 @@
 <jhi-page-ribbon />
 
-@if (showNavbar) {
-  <div>
-    <router-outlet name="navbar" />
-  </div>
-}
+<!-- Loader globale: appare su ogni chiamata HTTP -->
+<rh-loader />
 
-<div class="container-fluid px-0">
-  <div class="card jh-card" [class.jh-card-public]="!showNavbar">
-    <router-outlet />
-  </div>
+<div>
+  <router-outlet name="navbar" />
 </div>
 
-@if (showFooter) {
+<div class="container-fluid">
+  <div class="card jh-card">
+    <router-outlet />
+  </div>
+
   <jhi-footer />
-}
+</div>
