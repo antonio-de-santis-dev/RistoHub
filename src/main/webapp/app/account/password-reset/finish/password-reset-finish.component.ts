@@ -10,9 +10,10 @@ import { PasswordResetFinishService } from './password-reset-finish.service';
   selector: 'jhi-password-reset-finish',
   imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent],
   templateUrl: './password-reset-finish.component.html',
+  styleUrl: './password-reset-finish.component.scss',
 })
 export default class PasswordResetFinishComponent implements OnInit, AfterViewInit {
-  newPassword = viewChild.required<ElementRef>('newPassword');
+  newPassword = viewChild<ElementRef>('newPassword');
 
   initialized = signal(false);
   doNotMatch = signal(false);
@@ -44,7 +45,10 @@ export default class PasswordResetFinishComponent implements OnInit, AfterViewIn
   }
 
   ngAfterViewInit(): void {
-    this.newPassword().nativeElement.focus();
+    const el = this.newPassword();
+    if (el) {
+      el.nativeElement.focus();
+    }
   }
 
   finishReset(): void {

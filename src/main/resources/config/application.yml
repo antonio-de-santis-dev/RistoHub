@@ -62,7 +62,7 @@ management:
       enabled: true
   health:
     mail:
-      enabled: false # When using the MailService, configure an SMTP server and set this to true
+      enabled: true # When using the MailService, configure an SMTP server and set this to true
   prometheus:
     metrics:
       export:
@@ -182,7 +182,7 @@ jhipster:
   clientApp:
     name: 'ristoHubApp'
   mail:
-    from: ristoHub@localhost
+    from: boardroom.progetto@gmail.com
   api-docs:
     default-include-pattern: /api/**
     management-include-pattern: /management/**
