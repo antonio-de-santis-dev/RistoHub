@@ -90,7 +90,7 @@
           <div class="cg-card-items">
             @for (it of lista.items?.slice(0, 4); track it.id) {
               <div class="cg-item-preview">
-                <span class="cg-item-emoji">{{ iconaTipo(it.tipo) }}</span>
+                <span class="cg-item-emoji" [innerHTML]="iconaTipo(it.tipo)"></span>
                 <span class="cg-item-label">{{ getLabelItem(it) }}</span>
                 <span class="cg-item-valore">{{ it.valore }}</span>
               </div>

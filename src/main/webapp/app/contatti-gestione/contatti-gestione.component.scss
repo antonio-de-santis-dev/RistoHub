@@ -10,7 +10,11 @@ $border-glass: rgba(255, 255, 255, 0.14);
 
 :host {
   display: block;
-  width: 100%;
+  /* Copre tutta la larghezza viewport ignorando i padding del container */
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  /* Sale sopra la navbar (~56px) + padding wrapper */
   margin-top: -80px;
   margin-bottom: -1.5rem;
 }
@@ -300,10 +304,18 @@ $border-glass: rgba(255, 255, 255, 0.14);
 }
 
 .cg-item-emoji {
-  font-size: 0.95rem;
   flex-shrink: 0;
-  width: 20px;
-  text-align: center;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
 }
 
 .cg-item-label {
