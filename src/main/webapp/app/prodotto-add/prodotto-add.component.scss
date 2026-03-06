@@ -913,23 +913,38 @@ textarea.pa-form-control {
 
 @media (max-width: 768px) {
   .pa-inner {
-    padding: 1.5rem 1rem 2rem;
-  }
-  .pa-header h1 {
-    font-size: 1.45rem;
+    padding: 68px 1rem 2rem; /* 68px = navbar (52px) + respiro (16px) */
   }
   .pa-header {
+    padding: 2rem 0.6rem 0;
     margin-bottom: 1.25rem;
+    h1 {
+      font-size: 1.45rem;
+    }
   }
   .pa-layout {
     grid-template-columns: 1fr;
     gap: 1.25rem;
+    padding: 0 0.6rem;
   }
   .pa-card {
     padding: 1.25rem 1rem;
   }
   .pa-allergene-chip {
     padding: 4px 8px 4px 4px;
+  }
+  /* Prevent iOS zoom on input focus */
+  .pa-form-control {
+    font-size: 16px;
+  }
+  /* Modal centrato con spazio su tutti i lati */
+  .pa-modal-overlay {
+    padding: 1rem;
+    align-items: center;
+  }
+  .pa-modal-box {
+    border-radius: 18px;
+    max-width: 100%;
   }
 }
 
@@ -941,7 +956,7 @@ textarea.pa-form-control {
     padding: 1rem 0.875rem;
   }
   .pa-form-control {
-    font-size: 1rem;
+    font-size: 16px;
   }
   .pa-btn-aggiungi {
     padding: 14px;
@@ -951,12 +966,8 @@ textarea.pa-form-control {
     padding: 0.75rem;
     gap: 0.75rem;
   }
-  .pa-modal-overlay {
-    padding: 0;
-    align-items: flex-end;
-  }
   .pa-modal-box {
-    border-radius: 20px 20px 0 0;
+    border-radius: 18px;
     max-width: 100%;
   }
 }
