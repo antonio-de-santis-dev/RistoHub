@@ -10,10 +10,10 @@ import { PasswordResetFinishService } from './password-reset-finish.service';
   selector: 'jhi-password-reset-finish',
   imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent],
   templateUrl: './password-reset-finish.component.html',
-  styleUrl: './password-reset-finish.component.scss',
+  styleUrls: ['./password-reset-finish.component.scss'],
 })
 export default class PasswordResetFinishComponent implements OnInit, AfterViewInit {
-  newPassword = viewChild<ElementRef>('newPassword');
+  newPassword = viewChild.required<ElementRef>('newPassword');
 
   initialized = signal(false);
   doNotMatch = signal(false);
@@ -35,7 +35,17 @@ export default class PasswordResetFinishComponent implements OnInit, AfterViewIn
   private readonly passwordResetFinishService = inject(PasswordResetFinishService);
   private readonly route = inject(ActivatedRoute);
 
+  // Nasconde navbar e footer sulla pagina di reset
+  private styleTag: HTMLStyleElement | null = null;
+
   ngOnInit(): void {
+    this.styleTag = document.createElement('style');
+    this.styleTag.textContent = `
+      jhi-navbar, nav.navbar, jhi-footer, footer,
+      router-outlet[name="navbar"] ~ * { display: none !important; }
+    `;
+    document.head.appendChild(this.styleTag);
+
     this.route.queryParams.subscribe(params => {
       if (params.key) {
         this.key.set(params.key);
@@ -45,9 +55,13 @@ export default class PasswordResetFinishComponent implements OnInit, AfterViewIn
   }
 
   ngAfterViewInit(): void {
-    const el = this.newPassword();
-    if (el) {
-      el.nativeElement.focus();
+    this.newPassword().nativeElement.focus();
+  }
+
+  ngOnDestroy(): void {
+    if (this.styleTag) {
+      this.styleTag.remove();
+      this.styleTag = null;
     }
   }
 
