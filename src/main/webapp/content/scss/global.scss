@@ -287,3 +287,23 @@ jhi-home {
   display: block;
   /* Il margin negativo nel :host del componente si occupa del resto */
 }
+
+/* ==========================================================================
+   NAVBAR FIXED — il contenuto interno parte SOTTO la topbar (52px)
+   Lo sfondo copre tutto dall'alto, solo il contenuto è rientrato.
+========================================================================== */
+
+$rh-topbar-h: 52px;
+
+@media (max-width: 992px) {
+  /* Lo sfondo deve partire da top:0, solo il contenuto scende di 52px */
+  jhi-home .rh-hero,
+  jhi-menu-wizard .wiz-inner,
+  jhi-menu-wizard-edit .wiz-inner,
+  jhi-piatti-giorno-gestione .pg-inner,
+  jhi-contatti-gestione .cg-header,
+  jhi-prodotto-add .pa-inner,
+  jhi-menu-cover-editor .ce-inner {
+    padding-top: $rh-topbar-h;
+  }
+}

@@ -13,6 +13,12 @@ $border-glass: rgba(255, 255, 255, 0.14);
   margin: -1.5rem -15px 0;
 }
 
+@media (max-width: 768px) {
+  :host {
+    margin: -0.75rem -0.75rem 0;
+  }
+}
+
 // ── Sfondo globale uguale alla home ───────────────────
 .ml-page {
   min-height: 100vh;
@@ -20,7 +26,7 @@ $border-glass: rgba(255, 255, 255, 0.14);
   background-image: url('/content/images/sfondo.png');
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
+  background-repeat: repeat;
   background-attachment: fixed;
 
   &::before {
@@ -320,18 +326,28 @@ $border-glass: rgba(255, 255, 255, 0.14);
   background: rgba(0, 0, 0, 0.2);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 
-  // Quando ci sono 5 pulsanti (template con carosello), usa griglia 3+2
+  // 5 pulsanti: layout 2+2+1
+  // riga 1: Visualizza | Modifica
+  // riga 2: QR Code    | Copertina
+  // riga 3: Elimina (piena larghezza)
   &.ml-card-actions-5 {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
 
-    // Il quarto e quinto pulsante (Copertina + Elimina) occupano il centro
-    // sulla seconda riga rimanendo proporzionati
-    .ml-btn:nth-child(4) {
+    .ml-btn:nth-child(1) {
       grid-column: 1 / 2;
     }
-    .ml-btn:nth-child(5) {
-      grid-column: 2 / 4;
+    .ml-btn:nth-child(2) {
+      grid-column: 2 / 3;
     }
+    .ml-btn:nth-child(3) {
+      grid-column: 1 / 2;
+    }
+    .ml-btn:nth-child(4) {
+      grid-column: 2 / 3;
+    }
+    .ml-btn:nth-child(5) {
+      grid-column: 1 / 3;
+    } // Elimina — riga intera
   }
 }
 
@@ -580,12 +596,13 @@ $border-glass: rgba(255, 255, 255, 0.14);
 
 @media (max-width: 768px) {
   .ml-inner {
-    padding: 1.5rem 1rem 2rem;
+    padding: 68px 1rem 2rem; /* 52px navbar + 16px respiro */
   }
   .ml-header {
     flex-direction: column;
     align-items: flex-start;
     margin-bottom: 1.25rem;
+    padding: 0 0.6rem; /* spazio laterale intestazione */
   }
   .ml-header h1 {
     font-size: 1.45rem;
@@ -593,25 +610,35 @@ $border-glass: rgba(255, 255, 255, 0.14);
   .btn-crea {
     width: 100%;
     justify-content: center;
+    margin: 0; /* niente margini extra, il padding del header ci pensa */
   }
   .ml-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
+    padding: 0 0.6rem; /* card rientrate dai bordi */
   }
   .ml-card-actions {
     grid-template-columns: 1fr 1fr;
     gap: 5px;
     padding: 0.7rem;
 
-    // Su mobile, con 5 pulsanti usa 2 colonne e il Copertina occupa una riga intera
     &.ml-card-actions-5 {
       grid-template-columns: 1fr 1fr;
-      .ml-btn:nth-child(4) {
+      .ml-btn:nth-child(1) {
         grid-column: 1 / 2;
       }
-      .ml-btn:nth-child(5) {
+      .ml-btn:nth-child(2) {
         grid-column: 2 / 3;
       }
+      .ml-btn:nth-child(3) {
+        grid-column: 1 / 2;
+      }
+      .ml-btn:nth-child(4) {
+        grid-column: 2 / 3;
+      }
+      .ml-btn:nth-child(5) {
+        grid-column: 1 / 3;
+      } // Elimina — riga intera
     }
   }
   .ml-btn {
