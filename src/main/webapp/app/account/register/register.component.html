@@ -1,8 +1,8 @@
 <div class="split-page">
-  <!-- ══════════════════════════════════════════
-       SINISTRA — Sfondo + card con solo logo
-  ══════════════════════════════════════════ -->
-  <div class="split-right">
+  <!-- ══════════════════════════════════════════════════════════
+       PANNELLO SINISTRO — Sfondo + logo card (solo desktop)
+  ══════════════════════════════════════════════════════════ -->
+  <div class="split-right" aria-hidden="true">
     <div class="right-card">
       <img
         src="content/images/LogoNero.png"
@@ -14,28 +14,33 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       DESTRA — Form di registrazione
-  ══════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════════
+       PANNELLO DESTRO / CARD MOBILE — Form registrazione
+  ══════════════════════════════════════════════════════════ -->
   <div class="split-left">
     <div class="form-wrapper">
-      <h1 class="form-title">Crea il tuo account</h1>
+      <!-- Logo centrato -->
+      <div class="form-logo">
+        <img src="content/images/LogoNero.png" alt="RistoHub" onerror="this.style.display='none'" />
+      </div>
+
+      <h1 class="form-title">Crea account</h1>
       <p class="form-subtitle">Unisciti a RistoHub e gestisci il tuo menu digitale</p>
 
       <!-- Messaggio successo -->
       @if (success()) {
-        <div class="alert-success">
+        <div class="alert-success" role="status">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
-          <span jhiTranslate="register.messages.success"> Registrazione salvata! Controlla la tua email per confermare. </span>
+          <span jhiTranslate="register.messages.success">Registrazione salvata! Controlla la tua email per confermare.</span>
         </div>
       }
 
       <!-- Errori -->
       @if (error()) {
-        <div class="alert-error">
+        <div class="alert-error" role="alert">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
@@ -45,7 +50,7 @@
         </div>
       }
       @if (errorUserExists()) {
-        <div class="alert-error">
+        <div class="alert-error" role="alert">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
@@ -55,7 +60,7 @@
         </div>
       }
       @if (errorEmailExists()) {
-        <div class="alert-error">
+        <div class="alert-error" role="alert">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
@@ -65,7 +70,7 @@
         </div>
       }
       @if (doNotMatch()) {
-        <div class="alert-error">
+        <div class="alert-error" role="alert">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
@@ -77,7 +82,7 @@
 
       <!-- Form -->
       @if (!success()) {
-        <form class="register-form" (ngSubmit)="register()" [formGroup]="registerForm">
+        <form class="register-form" (ngSubmit)="register()" [formGroup]="registerForm" autocomplete="on">
           <!-- Username -->
           <div class="field-group">
             <label class="field-label" for="login">Username</label>
@@ -94,6 +99,7 @@
                 name="login"
                 placeholder="Il tuo nome utente"
                 formControlName="login"
+                autocomplete="username"
                 data-cy="username"
               />
             </div>
@@ -131,6 +137,7 @@
                 name="email"
                 placeholder="La tua email"
                 formControlName="email"
+                autocomplete="email"
                 data-cy="email"
               />
             </div>
@@ -140,20 +147,20 @@
                 @if (emailRef.errors?.['required']) {
                   L'email è obbligatoria.
                 }
-                @if (emailRef.errors?.['invalid'] || emailRef.errors?.['email']) {
+                @if (emailRef.errors?.['email'] || emailRef.errors?.['invalid']) {
                   Email non valida.
                 }
                 @if (emailRef.errors?.['minlength']) {
                   Almeno 5 caratteri.
                 }
                 @if (emailRef.errors?.['maxlength']) {
-                  Massimo 50 caratteri.
+                  Massimo 254 caratteri.
                 }
               </span>
             }
           </div>
 
-          <!-- Nuova Password -->
+          <!-- Password -->
           <div class="field-group">
             <label class="field-label" for="password">Password</label>
             <div class="field-input-wrap">
@@ -168,9 +175,11 @@
                 name="password"
                 placeholder="Crea una password"
                 formControlName="password"
+                autocomplete="new-password"
                 data-cy="firstPassword"
               />
             </div>
+            <jhi-password-strength-bar [passwordToCheck]="registerForm.get('password')!.value"></jhi-password-strength-bar>
             @let passwordRef = registerForm.get('password')!;
             @if (passwordRef.invalid && (passwordRef.dirty || passwordRef.touched)) {
               <span class="field-error">
@@ -202,6 +211,7 @@
                 name="confirmPassword"
                 placeholder="Ripeti la password"
                 formControlName="confirmPassword"
+                autocomplete="new-password"
                 data-cy="secondPassword"
               />
             </div>

@@ -1,8 +1,8 @@
 <div class="split-page">
-  <!-- ══════════════════════════════════════════
-       SINISTRA — Sfondo + card con solo logo
-  ══════════════════════════════════════════ -->
-  <div class="split-right">
+  <!-- ══════════════════════════════════════════════════════════
+       PANNELLO SINISTRO — Sfondo + logo card (solo desktop)
+  ══════════════════════════════════════════════════════════ -->
+  <div class="split-right" aria-hidden="true">
     <div class="right-card">
       <img
         src="content/images/LogoNero.png"
@@ -14,23 +14,28 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       DESTRA — Form di accesso
-  ══════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════════
+       PANNELLO DESTRO / CARD MOBILE — Form di accesso
+  ══════════════════════════════════════════════════════════ -->
   <div class="split-left">
     <div class="form-wrapper">
-      <h1 class="form-title">Benvenuto</h1>
+      <!-- Logo centrato (mobile + desktop) -->
+      <div class="form-logo">
+        <img src="content/images/LogoNero.png" alt="RistoHub" onerror="this.style.display='none'" />
+      </div>
+
+      <h1 class="form-title">Bentornato</h1>
       <p class="form-subtitle">Accedi al tuo spazio RistoHub</p>
 
       <!-- Errore credenziali -->
       @if (authenticationError()) {
-        <div class="alert-error">
+        <div class="alert-error" role="alert">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
-          <span jhiTranslate="login.messages.error.authentication"> Credenziali non valide. Controlla e riprova. </span>
+          <span jhiTranslate="login.messages.error.authentication">Credenziali non valide. Controlla e riprova.</span>
         </div>
       }
 
@@ -62,10 +67,6 @@
         <div class="field-group">
           <div class="field-label-row">
             <label class="field-label" for="password">Password</label>
-            <!--
-              ✅ FIX: usa (click) invece di routerLink
-              Così il modal si apre SOPRA il login, senza navigare via
-            -->
             <button type="button" class="link-forgot" (click)="apriRecuperoPassword()" data-cy="forgetYourPasswordSelector">
               Password dimenticata?
             </button>
@@ -113,13 +114,12 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════
-     MODAL RECUPERO PASSWORD (inline — rimane sulla pagina login)
-══════════════════════════════════════════════════════════════ -->
+<!-- ================================================================
+     MODAL RECUPERO PASSWORD
+================================================================ -->
 @if (mostraModalRecupero()) {
   <div class="modal-overlay" (click)="chiudiSuOverlay($event)">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <!-- Pulsante chiudi -->
       <button class="btn-close-modal" type="button" (click)="chiudiRecuperoPassword()" aria-label="Chiudi">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
           <line x1="18" y1="6" x2="6" y2="18" />
@@ -127,7 +127,6 @@
         </svg>
       </button>
 
-      <!-- Icona lucchetto -->
       <div class="modal-icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -136,7 +135,6 @@
       </div>
 
       @if (!recuperoSuccess()) {
-        <!-- Stato: inserimento email -->
         <h2 class="modal-title" id="modal-title">Password dimenticata?</h2>
         <p class="modal-subtitle">
           Inserisci l'email del tuo account.<br />
@@ -192,7 +190,6 @@
 
         <button class="btn-annulla" type="button" (click)="chiudiRecuperoPassword()">Annulla</button>
       } @else {
-        <!-- Stato: email inviata con successo -->
         <div class="success-state">
           <div class="success-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
