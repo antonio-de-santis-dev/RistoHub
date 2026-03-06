@@ -510,10 +510,16 @@ $border-glass: rgba(255, 255, 255, 0.14);
 }
 
 .qr-image {
-  width: 200px;
-  height: 200px;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
+  width: 220px;
+  height: 220px;
+  // Nessun border-radius sull'immagine — evita che i quiet zone del QR vengano tagliati
+  border-radius: 0;
+  // Padding bianco intorno al codice + bordo arrotondato sul wrapper
+  padding: 10px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  display: block;
 }
 
 .qr-link {
