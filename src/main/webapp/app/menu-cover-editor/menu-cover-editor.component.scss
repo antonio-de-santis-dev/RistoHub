@@ -18,12 +18,15 @@ $card-bg: rgba(255, 255, 255, 0.09);
 // ── Sfondo uguale alla home ───────────────────────────
 .mce-page {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   position: relative;
   background-image: url('/content/images/sfondo.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  background-color: #1a0a05;
 
   &::before {
     content: '';
@@ -40,7 +43,7 @@ $card-bg: rgba(255, 255, 255, 0.09);
   z-index: 1;
   max-width: 1080px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem 4rem;
+  padding: 5.5rem 1.5rem 4rem;
 }
 
 // ── Header ────────────────────────────────────────────
@@ -716,11 +719,23 @@ $card-bg: rgba(255, 255, 255, 0.09);
 
 @media (max-width: 768px) {
   .mce-inner {
-    padding: 1.5rem 1rem 3rem;
+    padding: 52px 1rem 3rem; /* 52px = esatto bordo navbar */
   }
   .mce-header {
     flex-direction: column;
     align-items: flex-start;
+    padding: 0.8rem 0.6rem 0;
+  }
+  .mce-grid {
+    padding: 0 0.6rem;
+  }
+  .mce-info-banner {
+    margin-left: 0.6rem;
+    margin-right: 0.6rem;
+  }
+  .mce-dropzone {
+    margin-left: 0.6rem;
+    margin-right: 0.6rem;
   }
   .btn-salva {
     width: 100%;

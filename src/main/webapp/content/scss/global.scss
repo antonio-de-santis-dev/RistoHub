@@ -273,7 +273,9 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 .card.jh-card:has(jhi-piatti-giorno-gestione),
 .card.jh-card:has(jhi-prodotto-add),
 .card.jh-card:has(jhi-settings),
-.card.jh-card:has(jhi-password) {
+.card.jh-card:has(jhi-password),
+.card.jh-card:has(jhi-menu-cover-editor),
+.card.jh-card:has(jhi-contatti-gestione) {
   padding: 0 !important;
   margin-top: 0 !important;
   border: none !important;
