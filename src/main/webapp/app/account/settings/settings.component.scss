@@ -217,8 +217,8 @@ $card-glass: rgba(255, 255, 255, 0.09);
   flex-shrink: 0;
 
   &.ua-nav-icon-edit {
-    background: #eff6ff;
-    color: #2563eb;
+    background: #fefce8;
+    color: #eab308;
   }
   &.ua-nav-icon-pwd {
     background: #fff0f2;
@@ -310,7 +310,7 @@ $card-glass: rgba(255, 255, 255, 0.09);
   }
 
   &.ua-form-card-header-edit {
-    border-top: 4px solid #2563eb;
+    border-top: 4px solid #eab308;
   }
   &.ua-form-card-header-pwd {
     border-top: 4px solid $accent;
@@ -327,8 +327,8 @@ $card-glass: rgba(255, 255, 255, 0.09);
   flex-shrink: 0;
 
   .ua-form-card-header-edit & {
-    background: #eff6ff;
-    color: #2563eb;
+    background: #fefce8;
+    color: #eab308;
   }
   .ua-form-card-header-pwd & {
     background: #fff0f2;
@@ -535,13 +535,18 @@ $card-glass: rgba(255, 255, 255, 0.09);
     margin: -1rem -15px 0;
   }
   .ua-inner {
-    padding: 4.5rem 1rem 1.5rem;
+    padding: 68px 1rem 2rem; /* 68px = navbar (52px) + respiro (16px) */
   }
   .ua-hero-card {
     flex-direction: column;
     text-align: center;
     padding: 1.4rem 1.25rem;
     gap: 1rem;
+    margin-left: 0.6rem;
+    margin-right: 0.6rem;
+  }
+  .ua-nav-grid {
+    padding: 0 0.6rem;
   }
   .ua-hero-badges {
     flex-direction: row;
@@ -562,8 +567,11 @@ $card-glass: rgba(255, 255, 255, 0.09);
   .ua-form {
     padding: 1.2rem 1.25rem 1.5rem;
   }
-  .ua-alert {
-    margin: 0.75rem 1.25rem 0;
+  .ua-back-btn {
+    margin-left: 0.6rem;
+  }
+  .ua-form-card {
+    margin: 0 0.6rem;
   }
 }
 
