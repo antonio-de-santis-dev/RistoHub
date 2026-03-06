@@ -1107,37 +1107,51 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .rustico-sidebar {
-  width: 110px;
+  width: 120px;
   flex-shrink: 0;
   border-right: 1px solid;
+  // Altezza esatta del carosello: aspect-ratio 4/5 della larghezza disponibile
+  // (larghezza totale - sidebar) con cap a 520px
+  height: min(calc((100vw - 120px) * 5 / 4), 520px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .rustico-nav {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 8px 5px;
+  gap: 6px;
+  padding: 10px 7px;
 }
 
 .rustico-nav-btn {
   width: 100%;
-  padding: 8px 4px;
+  padding: 11px 6px;
   background: white;
   border: 1.5px solid;
-  border-radius: 7px;
+  border-radius: 8px;
   cursor: pointer;
   font-family: 'Jost', sans-serif;
-  font-size: 9.5px;
-  font-weight: 400;
+  font-size: 11px;
+  font-weight: 500;
   text-align: center;
   line-height: 1.35;
   letter-spacing: 0.2px;
   transition: all 0.22s ease;
   user-select: none;
   word-break: break-word;
+  min-height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   &.active {
-    font-weight: 600;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -1940,10 +1954,11 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
   .rustico-sidebar {
     width: 145px;
+    height: min(calc((100vw - 145px) * 5 / 4), 520px);
   }
   .rustico-nav-btn {
-    font-size: 10.5px;
-    padding: 10px 7px;
+    font-size: 11.5px;
+    padding: 12px 8px;
   }
   .rustico-header {
     padding: 12px 20px 10px;
@@ -2042,11 +2057,12 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
   .rustico-sidebar {
     width: 78px;
+    height: min(calc((100vw - 78px) * 5 / 4), 520px);
   }
 
   .rustico-nav-btn {
-    font-size: 8.5px;
-    padding: 6px 3px;
+    font-size: 10px;
+    padding: 10px 4px;
     border-radius: 6px;
   }
   .rustico-header {
@@ -2163,7 +2179,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 // Griglia item
 .contatti-items {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  grid-template-columns: 1fr;
   gap: 8px;
 }
 
@@ -2210,21 +2226,22 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   padding: 5px;
   box-sizing: border-box;
 
-  ::ng-deep svg {
+  // Icone social (fill)
+  ::ng-deep svg[fill='currentColor'] {
     width: 100%;
     height: 100%;
     fill: #fff;
     display: block;
   }
-}
 
-// Emoji telefono / email / indirizzo
-.contatto-emoji {
-  font-size: 1.2rem;
-  flex-shrink: 0;
-  line-height: 1;
-  width: 30px;
-  text-align: center;
+  // Icone contatti: telefono, email, indirizzo, link (stroke)
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    stroke: #fff;
+    fill: none;
+  }
 }
 
 .contatto-testo {
@@ -2256,7 +2273,35 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
 // Rustico: wrap esterno con padding per posizionare la card sotto il carosello
 .rustico-contatti-wrap {
-  padding: 0 1rem 1.25rem;
+  width: 100%;
+  padding: 0 0 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+
+  .contatti-card {
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 1.1rem 1rem 1.25rem;
+  }
+
+  .contatti-items {
+    // Colonna singola — ogni contatto occupa tutta la larghezza
+    grid-template-columns: 1fr;
+  }
+
+  .contatto-item {
+    padding: 0.75rem 1rem;
+    // Impedisce overflow del testo (es. email lunghe)
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .contatto-label,
+  .contatto-valore {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2313,10 +2358,11 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   // Rustico
   .rustico-sidebar {
     width: 66px;
+    height: min(calc((100vw - 66px) * 5 / 4), 520px);
   }
   .rustico-nav-btn {
-    font-size: 7.5px;
-    padding: 5px 2px;
+    font-size: 9.5px;
+    padding: 8px 3px;
   }
   .rustico-header {
     padding: 5px 6px 5px;

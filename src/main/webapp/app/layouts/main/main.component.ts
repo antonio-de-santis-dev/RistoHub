@@ -13,6 +13,9 @@ import { LoaderComponent } from 'app/shared/loader/loader.component';
 // Rotte su cui il footer NON deve apparire
 const ROUTES_WITHOUT_FOOTER = ['/menu-view', '/menu-public'];
 
+// Rotte su cui la navbar NON deve apparire
+const ROUTES_WITHOUT_NAVBAR = ['/menu-public'];
+
 @Component({
   selector: 'jhi-main',
   templateUrl: './main.component.html',
@@ -23,6 +26,7 @@ export default class MainComponent implements OnInit {
   private readonly renderer: Renderer2;
 
   showFooter = signal(true);
+  showNavbar = signal(true);
 
   private readonly router = inject(Router);
   private readonly appPageTitleStrategy = inject(AppPageTitleStrategy);
@@ -42,6 +46,8 @@ export default class MainComponent implements OnInit {
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe((e: NavigationEnd) => {
       const hide = ROUTES_WITHOUT_FOOTER.some(r => e.urlAfterRedirects.startsWith(r));
       this.showFooter.set(!hide);
+      const hideNavbar = ROUTES_WITHOUT_NAVBAR.some(r => e.urlAfterRedirects.startsWith(r));
+      this.showNavbar.set(!hideNavbar);
     });
 
     this.translateService.onLangChange.subscribe((langChangeEvent: LangChangeEvent) => {

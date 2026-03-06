@@ -3,9 +3,11 @@
 <!-- Loader globale: appare su ogni chiamata HTTP -->
 <rh-loader />
 
-<div>
-  <router-outlet name="navbar" />
-</div>
+@if (showNavbar()) {
+  <div>
+    <router-outlet name="navbar" />
+  </div>
+}
 
 <div class="rh-main-wrapper">
   <div class="card jh-card">
