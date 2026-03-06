@@ -786,13 +786,13 @@ $border-glass: rgba(255, 255, 255, 0.14);
   }
 
   .cg-page {
-    padding-top: 68px; /* navbar 52px + respiro 16px */
+    padding-top: 96px; /* -80px margin host + 52px navbar + 24px respiro */
   }
 
   .cg-header {
     flex-direction: column;
     align-items: flex-start;
-    padding: 1.5rem 1rem 1rem;
+    padding: 2rem 1rem 1rem;
   }
   .cg-title {
     font-size: 1.4rem;
