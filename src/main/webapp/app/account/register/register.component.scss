@@ -11,10 +11,25 @@
   position: fixed;
   inset: 0;
   z-index: 900;
-  /* MOBILE: scroll abilitato perché il form è più lungo */
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+
+  /* Sfondo food pattern su TUTTO lo schermo */
+  background-image: url('/content/images/unnamed.jpg');
+  background-size: auto;
+  background-repeat: repeat;
+  background-attachment: fixed;
+  background-color: #111;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 4, 2, 0.72);
+    z-index: 0;
+    pointer-events: none;
+  }
 }
 
 jhi-footer,
@@ -38,22 +53,6 @@ router-outlet[name='navbar'] ~ * {
   width: 100vw;
   font-family: 'DM Sans', sans-serif;
   position: relative;
-
-  /* Sfondo food pattern */
-  background-image: url('/content/images/unnamed.jpg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-color: #111;
-
-  &::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: rgba(8, 4, 2, 0.72);
-    z-index: 0;
-    pointer-events: none;
-  }
 }
 
 /* ── PANNELLO SFONDO (nascosto su mobile, visibile su desktop) ─── */
@@ -101,6 +100,7 @@ router-outlet[name='navbar'] ~ * {
 }
 
 /* ── LOGO ──────────────────────────────────────────────────────── */
+/* Mobile/tablet: visibile — Desktop: nascosto (logo già nel pannello sx) */
 .form-logo {
   display: flex;
   justify-content: center;
@@ -359,6 +359,7 @@ router-outlet[name='navbar'] ~ * {
     background-image: none;
     background: #fff;
     height: 100vh;
+    overflow: hidden;
 
     &::before {
       display: none;
@@ -436,10 +437,12 @@ router-outlet[name='navbar'] ~ * {
     height: 100vh;
     background: #ffffff;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     padding: 2rem;
     overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
     flex-shrink: 0;
     min-height: unset;
   }
@@ -447,10 +450,10 @@ router-outlet[name='navbar'] ~ * {
   .form-wrapper {
     background: transparent;
     border-radius: 0;
-    padding: 0;
+    padding: 2rem 0;
     box-shadow: none;
     max-width: 380px;
-    margin: 0;
+    margin: 0 auto;
     animation: slide-in-right 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
   }
 
@@ -466,11 +469,7 @@ router-outlet[name='navbar'] ~ * {
   }
 
   .form-logo {
-    justify-content: flex-start;
-    margin-bottom: 1.8rem;
-    img {
-      height: 200px;
-    }
+    display: none;
   }
 
   .form-title {
