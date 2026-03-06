@@ -1078,19 +1078,19 @@ textarea.pg-form-control {
   .pg-form-control {
     font-size: 16px;
   }
-  /* Modal: better sizing on tablet */
+  /* Modal: centered with space on all sides */
   .pg-modal-overlay {
-    padding: 0.75rem;
-    align-items: flex-end;
+    padding: 1rem;
+    align-items: center;
   }
   .pg-modal-box {
-    border-radius: 20px 20px 0 0;
+    border-radius: 18px;
     max-height: 88vh;
     width: 100%;
     max-width: 100%;
   }
   .pg-modal-box-sm {
-    border-radius: 20px 20px 0 0;
+    border-radius: 18px;
     max-width: 100%;
   }
   .pg-modal-header {

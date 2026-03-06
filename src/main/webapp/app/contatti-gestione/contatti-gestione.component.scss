@@ -785,6 +785,10 @@ $border-glass: rgba(255, 255, 255, 0.14);
     margin-bottom: -0.75rem;
   }
 
+  .cg-page {
+    padding-top: 68px; /* navbar 52px + respiro 16px */
+  }
+
   .cg-header {
     flex-direction: column;
     align-items: flex-start;
@@ -796,16 +800,75 @@ $border-glass: rgba(255, 255, 255, 0.14);
   .cg-btn-primary {
     width: 100%;
     justify-content: center;
+    min-height: 48px;
   }
 
   .cg-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
-    padding: 0 1rem 2rem;
+    padding: 0 0.6rem 2rem;
   }
+
+  /* ── Icone card header: più grandi e toccabili ── */
+  .cg-card-actions {
+    gap: 8px;
+  }
+  .cg-btn-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  /* ── Icone tipo contatto nelle card ── */
+  .cg-item-emoji {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+
+    svg {
+      width: 20px !important;
+      height: 20px !important;
+      display: block;
+      flex-shrink: 0;
+    }
+  }
+
+  .cg-item-preview {
+    padding: 7px 0;
+    gap: 10px;
+  }
+
+  .cg-item-label {
+    font-size: 0.82rem;
+    min-width: 75px;
+  }
+
+  .cg-item-valore {
+    font-size: 0.82rem;
+  }
+
+  /* ── Input zoom prevention ── */
+  .cg-input,
+  .cg-select {
+    font-size: 16px;
+  }
+
+  /* ── Modal ── */
   .cg-modal {
     max-width: 100%;
-    margin: 0 0.5rem;
+    margin: 0;
+    border-radius: 18px;
+    max-height: 88vh;
+  }
+  .cg-modal-overlay {
+    padding: 1rem;
+    align-items: center;
   }
   .cg-modal-body {
     padding: 1rem 1.1rem;
@@ -822,6 +885,7 @@ $border-glass: rgba(255, 255, 255, 0.14);
     width: 100%;
     text-align: center;
     justify-content: center;
+    min-height: 48px;
   }
   .cg-item-row-top {
     flex-direction: column;
@@ -829,5 +893,8 @@ $border-glass: rgba(255, 255, 255, 0.14);
   .cg-select-tipo {
     min-width: unset;
     width: 100%;
+  }
+  .cg-card:hover {
+    transform: none;
   }
 }
