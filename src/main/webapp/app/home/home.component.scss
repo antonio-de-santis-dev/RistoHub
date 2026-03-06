@@ -587,11 +587,17 @@ $accent-soft: #ffb3be;
     width: clamp(100px, 42vw, 180px);
   }
   .rh-dashboard {
-    padding: 1.25rem 1rem 1.5rem;
+    padding: 1.25rem 1.1rem 1.5rem;
   }
   .rh-dash-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
+  }
+  .rh-dash-card {
+    margin: 0 0.6rem;
+  }
+  .rh-dashboard-greeting {
+    padding: 0 0.6rem;
   }
   .rh-dashboard-greeting h2 {
     font-size: 1.3rem;
@@ -612,5 +618,8 @@ $accent-soft: #ffb3be;
   .rh-qr-btn {
     width: 28px;
     height: 28px;
+  }
+  .rh-dash-card {
+    margin: 0 0.5rem;
   }
 }

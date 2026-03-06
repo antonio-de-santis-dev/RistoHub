@@ -51,17 +51,10 @@ spring:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: boardroom.progetto@gmail.com
-    password: lkuwzixrdrtwhfun
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
+    host: localhost
+    port: 25
+    username:
+    password:
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
@@ -87,8 +80,8 @@ jhipster:
   cors:
     # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
     allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000,http://localhost:4200,https://localhost:4200'
-    # Enable CORS when running in GitHub Codespaces
-    allowed-origin-patterns: 'https://*.githubpreview.dev'
+    # Enable CORS when running in GitHub Codespaces or from local network devices (es. telefono)
+    allowed-origin-patterns: 'https://*.githubpreview.dev,http://192.168.*.*:*,https://192.168.*.*:*,http://172.*.*.*:*,https://172.*.*.*:*,http://10.*.*.*:*,https://10.*.*.*:*'
     allowed-methods: '*'
     allowed-headers: '*'
     exposed-headers: 'Link,X-Total-Count,X-${jhipster.clientApp.name}-alert,X-${jhipster.clientApp.name}-error,X-${jhipster.clientApp.name}-params'
@@ -99,7 +92,6 @@ jhipster:
       # security key (this key should be unique for your application, and kept secret)
       key: 10f1681abeca2b2b5356522f6bbeb17fe89382fa48c26b53d6bcb91f0cbf7ce07842b04d27b912da6e51d36c65a0b928f82e
   mail: # specific JHipster mail property, for standard properties see MailProperties
-    from: boardroom.progetto@gmail.com
     base-url: http://127.0.0.1:8080
   logging:
     use-json-format: false # By default, logs are not in Json format
