@@ -337,23 +337,6 @@ $radius: 16px;
   }
 }
 
-.pg-footer {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  padding: 2rem 1.5rem;
-  margin-top: 3rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  p {
-    color: $muted-white;
-    font-size: 0.82rem;
-    margin: 0;
-    strong {
-      color: rgba(255, 255, 255, 0.85);
-    }
-  }
-}
-
 // ══════════════════════════════════════════════════════
 //  MODALI — Base
 // ══════════════════════════════════════════════════════
@@ -1061,11 +1044,12 @@ textarea.pg-form-control {
     margin: -1rem -15px 0;
   }
   .pg-inner {
-    padding: 4.5rem 1rem 0;
+    padding: 68px 1rem 2rem; /* 68px = navbar (52px) + respiro (16px) */
   }
   .pg-header {
     flex-direction: column;
     align-items: flex-start;
+    padding: 0 0.6rem;
   }
   .pg-header-actions {
     width: 100%;
@@ -1078,6 +1062,10 @@ textarea.pg-form-control {
   .pg-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
+    padding: 0 0.6rem;
+  }
+  .pg-empty {
+    padding: 3rem 1.5rem;
   }
   .pg-form-row {
     flex-direction: column;
@@ -1086,24 +1074,47 @@ textarea.pg-form-control {
   .pg-form-group-prezzo {
     width: 100%;
   }
-}
-
-@media (max-width: 480px) {
-  .pg-card:hover {
-    transform: none;
+  /* Prevent iOS zoom on input focus */
+  .pg-form-control {
+    font-size: 16px;
   }
+  /* Modal: better sizing on tablet */
   .pg-modal-overlay {
-    padding: 0;
+    padding: 0.75rem;
     align-items: flex-end;
   }
   .pg-modal-box {
     border-radius: 20px 20px 0 0;
-    max-height: 92vh;
+    max-height: 88vh;
     width: 100%;
     max-width: 100%;
   }
   .pg-modal-box-sm {
     border-radius: 20px 20px 0 0;
+    max-width: 100%;
+  }
+  .pg-modal-header {
+    padding: 1.2rem 1.2rem 0.9rem;
+  }
+  .pg-modal-body {
+    padding: 1rem 1.2rem;
+  }
+  .pg-modal-footer {
+    padding: 0.9rem 1.2rem 1.2rem;
+  }
+  .pg-modal-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+  .pg-modal-title {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pg-card:hover {
+    transform: none;
   }
   .pg-elimina-stato {
     display: none;
