@@ -210,12 +210,17 @@ export class MenuPublicComponent implements OnInit {
   modernoCarouselIndex = 0;
   modernoAutoplayTimer: any = null;
   modernoImmagini: string[] = [];
+  modernoImmaginiCaricate: boolean[] = [];
 
   rusticoTabAttiva: string | null = null;
   rusticoPortataAttiva: Portata | null = null;
   rusticoCarouselIndex = 0;
   rusticoAutoplayTimer: any = null;
   rusticoImmagini: string[] = [];
+  rusticoImmaginiCaricate: boolean[] = [];
+
+  private touchStartX = 0;
+  private readonly SWIPE_THRESHOLD = 40;
 
   private readonly ORDINE_PORTATE: Record<string, number> = {
     ANTIPASTO: 0,
@@ -378,6 +383,8 @@ export class MenuPublicComponent implements OnInit {
         .map(i => `data:${i.immagineContentType};base64,${i.immagine}`);
       this.modernoImmagini = copertine;
       this.rusticoImmagini = copertine;
+      this.modernoImmaginiCaricate = new Array(copertine.length).fill(false);
+      this.rusticoImmaginiCaricate = new Array(copertine.length).fill(false);
 
       const portateRaw: any[] = (await this.http.get<any[]>(`${BASE}/menus/${id}/portatas`).toPromise()) ?? [];
       const portateCaricate = await Promise.all(
@@ -520,6 +527,46 @@ export class MenuPublicComponent implements OnInit {
       clearInterval(this.rusticoAutoplayTimer);
       this.rusticoAutoplayTimer = null;
     }
+  }
+
+  // ── Touch / Swipe ─────────────────────────────────────────────
+
+  onTouchStart(event: TouchEvent, template: 'moderno' | 'rustico'): void {
+    this.touchStartX = event.changedTouches[0].clientX;
+    if (template === 'moderno') this.fermaAutoplay();
+    else this.fermaAutoplayRustico();
+  }
+
+  onTouchEnd(event: TouchEvent, template: 'moderno' | 'rustico'): void {
+    const deltaX = event.changedTouches[0].clientX - this.touchStartX;
+    if (Math.abs(deltaX) >= this.SWIPE_THRESHOLD) {
+      if (template === 'moderno') {
+        this.modernoGoToSlide(deltaX < 0 ? this.modernoCarouselIndex + 1 : this.modernoCarouselIndex - 1);
+        setTimeout(() => this.avviaAutoplay(), 4000);
+      } else {
+        this.rusticoGoToSlide(deltaX < 0 ? this.rusticoCarouselIndex + 1 : this.rusticoCarouselIndex - 1);
+        setTimeout(() => this.avviaAutoplayRustico(), 4000);
+      }
+    } else {
+      if (template === 'moderno') this.avviaAutoplay();
+      else this.avviaAutoplayRustico();
+    }
+  }
+
+  // ── Stato caricamento immagini ─────────────────────────────────
+
+  onImmagineCaricata(template: 'moderno' | 'rustico', index: number): void {
+    if (template === 'moderno') {
+      this.modernoImmaginiCaricate = [...this.modernoImmaginiCaricate];
+      this.modernoImmaginiCaricate[index] = true;
+    } else {
+      this.rusticoImmaginiCaricate = [...this.rusticoImmaginiCaricate];
+      this.rusticoImmaginiCaricate[index] = true;
+    }
+  }
+
+  onImmagineErrore(template: 'moderno' | 'rustico', index: number): void {
+    this.onImmagineCaricata(template, index);
   }
 
   getAllergeneIcona(a: Allergene): string {

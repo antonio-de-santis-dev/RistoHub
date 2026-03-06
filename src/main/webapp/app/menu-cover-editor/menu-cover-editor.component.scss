@@ -715,6 +715,176 @@ $card-bg: rgba(255, 255, 255, 0.09);
   }
 }
 
+// ── Pannello Specifiche Immagini ──────────────────────
+.mce-specs {
+  margin-bottom: 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mce-specs-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  gap: 8px;
+  transition:
+    color 0.2s,
+    background 0.2s;
+  letter-spacing: 0.01em;
+
+  &:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.mce-specs-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mce-specs-chevron {
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+  &.open {
+    transform: rotate(180deg);
+  }
+}
+
+.mce-specs-body {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  animation: specsOpen 0.22s ease;
+}
+
+@keyframes specsOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Griglia 3 colonne spec card
+.mce-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  padding-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.mce-spec-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  padding: 0.75rem 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mce-spec-card-icon {
+  font-size: 1.1rem;
+  margin-bottom: 2px;
+  line-height: 1;
+}
+
+.mce-spec-card-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.mce-spec-card-value {
+  font-size: 0.97rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.mce-spec-card-note {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+// Riga consigli / errori
+.mce-specs-tips-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.mce-specs-tip {
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+
+  &--ok {
+    background: rgba(74, 222, 128, 0.07);
+    border: 1px solid rgba(74, 222, 128, 0.18);
+  }
+  &--warn {
+    background: rgba(251, 191, 36, 0.07);
+    border: 1px solid rgba(251, 191, 36, 0.18);
+  }
+
+  ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  li {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.62);
+    line-height: 1.4;
+  }
+}
+
+.mce-specs-tip-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.mce-specs-tip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  &--ok {
+    background: #4ade80;
+  }
+  &--warn {
+    background: #fcd34d;
+  }
+}
+
 // ══ RESPONSIVE ════════════════════════════════════════
 
 @media (max-width: 768px) {
@@ -745,12 +915,21 @@ $card-bg: rgba(255, 255, 255, 0.09);
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 1rem;
   }
+  .mce-specs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .mce-specs-tips-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 480px) {
   .mce-grid {
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
+  }
+  .mce-specs-grid {
+    grid-template-columns: 1fr 1fr;
   }
   .rh-modal-box {
     padding: 1.5rem 1.2rem;

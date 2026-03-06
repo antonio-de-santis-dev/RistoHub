@@ -420,15 +420,49 @@
 
   <div class="moderno-content">
     <div class="moderno-home" [class.hidden]="modernoTabAttiva !== null">
-      <div class="moderno-carousel">
+      <div
+        class="moderno-carousel"
+        (touchstart)="onTouchStart($event, 'moderno')"
+        (touchend)="onTouchEnd($event, 'moderno')"
+        (touchmove)="$event.preventDefault()"
+        [attr.aria-label]="'Galleria immagini ' + menu.nome"
+        role="region"
+      >
         <div class="moderno-carousel-track" [style.transform]="'translateX(-' + modernoCarouselIndex * 100 + '%)'">
-          <div *ngFor="let img of modernoImmagini" class="moderno-slide">
-            <img [src]="img" alt="Piatto" />
+          <div
+            *ngFor="let img of modernoImmagini; let i = index"
+            class="moderno-slide"
+            [class.moderno-slide-attiva]="i === modernoCarouselIndex"
+          >
+            <!-- Skeleton loader mostrato finché l'immagine non è caricata -->
+            <div class="slide-skeleton" [class.slide-skeleton-hidden]="modernoImmaginiCaricate[i]"></div>
+            <img
+              [src]="img"
+              [alt]="menu.nome + ' – immagine ' + (i + 1)"
+              loading="lazy"
+              decoding="async"
+              (load)="onImmagineCaricata('moderno', i)"
+              (error)="onImmagineErrore('moderno', i)"
+              [class.img-caricata]="modernoImmaginiCaricate[i]"
+            />
             <div class="moderno-slide-overlay"></div>
           </div>
         </div>
-        <button class="moderno-carousel-btn prev" (click)="modernoGoToSlide(modernoCarouselIndex - 1)"><span>‹</span></button>
-        <button class="moderno-carousel-btn next" (click)="modernoGoToSlide(modernoCarouselIndex + 1)"><span>›</span></button>
+
+        <!-- Navigazione frecce (nascoste se una sola immagine) -->
+        <ng-container *ngIf="modernoImmagini.length > 1">
+          <button class="moderno-carousel-btn prev" (click)="modernoGoToSlide(modernoCarouselIndex - 1)" aria-label="Immagine precedente">
+            <span>‹</span>
+          </button>
+          <button class="moderno-carousel-btn next" (click)="modernoGoToSlide(modernoCarouselIndex + 1)" aria-label="Immagine successiva">
+            <span>›</span>
+          </button>
+        </ng-container>
+
+        <!-- Indicatore slide (solo se più di una immagine) -->
+        <div class="moderno-slide-counter" *ngIf="modernoImmagini.length > 1">
+          {{ modernoCarouselIndex + 1 }}&thinsp;/&thinsp;{{ modernoImmagini.length }}
+        </div>
       </div>
       <div class="moderno-dots">
         <div
@@ -725,15 +759,46 @@
 
     <main class="rustico-main">
       <div class="rustico-carousel-wrap" [class.nascosto]="rusticoTabAttiva !== null">
-        <div class="rustico-carousel">
+        <div
+          class="rustico-carousel"
+          (touchstart)="onTouchStart($event, 'rustico')"
+          (touchend)="onTouchEnd($event, 'rustico')"
+          (touchmove)="$event.preventDefault()"
+          [attr.aria-label]="'Galleria immagini ' + menu.nome"
+          role="region"
+        >
           <div class="rustico-carousel-track" [style.transform]="'translateX(-' + rusticoCarouselIndex * 100 + '%)'">
-            <div *ngFor="let img of rusticoImmagini" class="rustico-slide">
-              <img [src]="img" alt="Piatto del ristorante" />
+            <div
+              *ngFor="let img of rusticoImmagini; let i = index"
+              class="rustico-slide"
+              [class.rustico-slide-attiva]="i === rusticoCarouselIndex"
+            >
+              <div class="slide-skeleton" [class.slide-skeleton-hidden]="rusticoImmaginiCaricate[i]"></div>
+              <img
+                [src]="img"
+                [alt]="menu.nome + ' – immagine ' + (i + 1)"
+                loading="lazy"
+                decoding="async"
+                (load)="onImmagineCaricata('rustico', i)"
+                (error)="onImmagineErrore('rustico', i)"
+                [class.img-caricata]="rusticoImmaginiCaricate[i]"
+              />
               <div class="rustico-slide-overlay"></div>
             </div>
           </div>
-          <button class="rustico-carousel-btn prev" (click)="rusticoGoToSlide(rusticoCarouselIndex - 1)">‹</button>
-          <button class="rustico-carousel-btn next" (click)="rusticoGoToSlide(rusticoCarouselIndex + 1)">›</button>
+
+          <ng-container *ngIf="rusticoImmagini.length > 1">
+            <button class="rustico-carousel-btn prev" (click)="rusticoGoToSlide(rusticoCarouselIndex - 1)" aria-label="Immagine precedente">
+              ‹
+            </button>
+            <button class="rustico-carousel-btn next" (click)="rusticoGoToSlide(rusticoCarouselIndex + 1)" aria-label="Immagine successiva">
+              ›
+            </button>
+          </ng-container>
+
+          <div class="rustico-slide-counter" *ngIf="rusticoImmagini.length > 1">
+            {{ rusticoCarouselIndex + 1 }}&thinsp;/&thinsp;{{ rusticoImmagini.length }}
+          </div>
           <div class="rustico-dots">
             <button
               *ngFor="let img of rusticoImmagini; let i = index"

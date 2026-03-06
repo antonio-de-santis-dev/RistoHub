@@ -42,6 +42,8 @@ export class MenuCoverEditorComponent implements OnInit {
   eliminaIndex: number | null = null;
   confermaEliminaVisible = false;
 
+  specsAperte = false;
+
   readonly MAX_IMMAGINI = 5;
 
   constructor(
