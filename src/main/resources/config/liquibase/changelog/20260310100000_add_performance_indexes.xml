@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        OPT-03: Indici di performance sulle colonne FK.
+
+        In PostgreSQL le FOREIGN KEY non creano automaticamente un indice sulla
+        colonna referenziante (solo sulla PK della tabella di destinazione).
+        Senza questi indici ogni query con WHERE su queste colonne esegue un
+        Sequential Scan sull'intera tabella → O(n).
+        Con gli indici → Index Scan → O(log n).
+
+        Impatto stimato:
+          - idx_prodotto_portata_id   → findByPortataId()             -90% query time
+          - idx_portata_menu_id       → findByMenuId()                -90% query time
+          - idx_immagine_menu_id      → findByMenuIdOrderByOrdine()   -90% query time
+          - idx_pdg_menu_attivo       → findPiattiDelGiornoAttivi*()  -95% query time (filtro composito)
+          - idx_rel_prodotto_allergeni_prodotto → JOIN allergeni       -80% query time
+    -->
+    <changeSet id="20260310100000-add-performance-indexes" author="dev">
+
+        <!-- ── prodotto.portata_id ────────────────────────────────────────────
+             Query: SELECT * FROM prodotto WHERE portata_id = ?
+             Usato da: ProdottoRepository.findByPortataId()
+             Chiamata in: MenuPublicResource (una volta per ogni portata)
+        -->
+        <createIndex tableName="prodotto"
+                     indexName="idx_prodotto_portata_id">
+            <column name="portata_id"/>
+        </createIndex>
+
+        <!-- ── portata.menu_id ───────────────────────────────────────────────
+             Query: SELECT * FROM portata WHERE menu_id = ?
+             Usato da: PortataRepository.findByMenuId()
+        -->
+        <createIndex tableName="portata"
+                     indexName="idx_portata_menu_id">
+            <column name="menu_id"/>
+        </createIndex>
+
+        <!-- ── immagine_menu.menu_id ─────────────────────────────────────────
+             Query: SELECT * FROM immagine_menu WHERE menu_id = ? ORDER BY ordine
+             Usato da: ImmagineMenuRepository.findByMenuIdOrderByOrdine()
+        -->
+        <createIndex tableName="immagine_menu"
+                     indexName="idx_immagine_menu_menu_id">
+            <column name="menu_id"/>
+        </createIndex>
+
+        <!-- ── piatto_del_giorno: indice composito (menu_id + attivo) ────────
+             Query: SELECT * FROM piatto_del_giorno WHERE menu_id = ? AND attivo = true
+             Usato da: MenuRepository.findPiattiDelGiornoAttiviByMenuId*()
+             Indice composito: copre sia il filtro menu_id che il filtro attivo
+             in una sola struttura B-tree → più efficiente di due indici separati.
+        -->
+        <createIndex tableName="piatto_del_giorno"
+                     indexName="idx_pdg_menu_id_attivo">
+            <column name="menu_id"/>
+            <column name="attivo"/>
+        </createIndex>
+
+        <!-- ── rel_prodotto__allergeni.prodotto_id ───────────────────────────
+             Query: JOIN su rel_prodotto__allergeni per caricare gli allergeni
+             dei prodotti. Senza questo indice il JOIN fa un SeqScan sulla
+             tabella di join per ogni prodotto → O(n*m).
+        -->
+        <createIndex tableName="rel_prodotto__allergeni"
+                     indexName="idx_rel_prodotto_allergeni_prodotto_id">
+            <column name="prodotto_id"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex tableName="prodotto"              indexName="idx_prodotto_portata_id"/>
+            <dropIndex tableName="portata"               indexName="idx_portata_menu_id"/>
+            <dropIndex tableName="immagine_menu"         indexName="idx_immagine_menu_menu_id"/>
+            <dropIndex tableName="piatto_del_giorno"     indexName="idx_pdg_menu_id_attivo"/>
+            <dropIndex tableName="rel_prodotto__allergeni" indexName="idx_rel_prodotto_allergeni_prodotto_id"/>
+        </rollback>
+
+    </changeSet>
+
+</databaseChangeLog>
