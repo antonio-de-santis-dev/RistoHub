@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -79,7 +79,7 @@ interface Lingua {
   templateUrl: './menu-public.component.html',
   styleUrls: ['./menu-public.component.scss'],
 })
-export class MenuPublicComponent implements OnInit {
+export class MenuPublicComponent implements OnInit, OnDestroy {
   menu: Menu | null = null;
   portate: Portata[] = [];
   logoUrl: SafeUrl | null = null;
@@ -250,6 +250,11 @@ export class MenuPublicComponent implements OnInit {
       return;
     }
     this.caricaMenu(id);
+  }
+
+  ngOnDestroy(): void {
+    this.fermaAutoplay();
+    this.fermaAutoplayRustico();
   }
 
   // ── Getters ─────────────────────────────────────────────────────
