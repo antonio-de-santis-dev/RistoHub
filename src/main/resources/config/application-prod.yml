@@ -94,8 +94,12 @@ jhipster:
       timeToLiveInDays: 1461
   cache: # Cache configuration
     ehcache: # Ehcache configuration
-      time-to-live-seconds: 3600 # By default objects stay 1 hour in the cache
-      max-entries: 1000 # Number of objects in each cache entry
+      # OPT-05: valori prod aumentati rispetto a dev (500 entry / 3600s).
+      # Questa configurazione è il default per tutte le cache JHipster/Hibernate.
+      # Le cache per-tipo (Allergene, Menu, PiattoDelGiorno) hanno TTL dedicati
+      # configurati in CacheConfiguration.java.
+      time-to-live-seconds: 7200 # 2 ore — dati di sessione utente, menu attivi
+      max-entries: 2000 # più entry per gestire carico prod multi-utente
   security:
     remember-me:
       # security key (this key should be unique for your application, and kept secret)
