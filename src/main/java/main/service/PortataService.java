@@ -85,7 +85,7 @@ public class PortataService {
     @Transactional(readOnly = true)
     public List<PortataDTO> findAll() {
         LOG.debug("Request to get all Portatas");
-        return portataRepository.findAll().stream().map(portataMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return portataRepository.findAll().stream().map(portataMapper::toDto).collect(Collectors.toList());
     }
 
     /**

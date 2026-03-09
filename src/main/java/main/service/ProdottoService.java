@@ -1,6 +1,5 @@
 package main.service;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -88,7 +87,7 @@ public class ProdottoService {
     @Transactional(readOnly = true)
     public List<ProdottoDTO> findAll() {
         LOG.debug("Request to get all Prodottos");
-        return prodottoRepository.findAll().stream().map(prodottoMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return prodottoRepository.findAll().stream().map(prodottoMapper::toDto).collect(Collectors.toList());
     }
 
     /**

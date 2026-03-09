@@ -1,6 +1,5 @@
 package main.service;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -72,7 +71,7 @@ public class ImmagineMenuService {
     @Transactional(readOnly = true)
     public List<ImmagineMenuDTO> findAll() {
         LOG.debug("Request to get all ImmagineMenus");
-        return immagineMenuRepository.findAll().stream().map(immagineMenuMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return immagineMenuRepository.findAll().stream().map(immagineMenuMapper::toDto).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -124,19 +123,34 @@ public class ImmagineMenuService {
     }
 
     /**
-     * Aggiorna in bulk ordine e visibilità delle immagini di copertina di un menu.
-     * Riceve una lista di {id, ordine, visibile} — NON tocca i byte dell'immagine.
+     * OPT-07: Aggiorna in bulk ordine e visibilità con query JPQL dirette.
+     *
+     * PRIMA: N × (SELECT * + UPDATE *) + 1 × SELECT * (con blob!)
+     *   = 2N+1 query, carica tutti i blob in memoria solo per restituirli.
+     *
+     * DOPO: N × UPDATE (JPQL, nessun SELECT) + 1 × SELECT metadati (senza blob)
+     *   = N+1 query, zero blob in memoria.
+     *
+     * La WHERE i.menu.id = :menuId nel JPQL garantisce che non si possano
+     * modificare immagini di altri menu (security by design, senza check applicativo).
+     *
+     * @return lista di metadati aggiornati (senza byte[] immagine)
      */
     public List<ImmagineMenuMetaDTO> aggiornaOrdineEVisibilita(UUID menuId, List<ImmagineMenuDTO> updates) {
+        LOG.debug("Request to bulk-update ordine/visibilita for Menu : {}", menuId);
+
         for (ImmagineMenuDTO update : updates) {
             if (update.getId() == null) continue;
-            immagineMenuRepository.updateOrdineAndVisibile(
-                update.getId(),
-                menuId,
-                update.getOrdine() != null ? update.getOrdine() : 0,
-                update.getVisibile() != null ? update.getVisibile() : true
-            );
+            Integer ordine = update.getOrdine() != null ? update.getOrdine() : 0;
+            Boolean visibile = update.getVisibile() != null ? update.getVisibile() : true;
+
+            int updated = immagineMenuRepository.updateOrdineAndVisibile(update.getId(), menuId, ordine, visibile);
+            if (updated == 0) {
+                LOG.warn("Immagine {} non trovata o non appartiene al menu {}", update.getId(), menuId);
+            }
         }
+
+        // Ricarica solo i metadati (senza blob) per la risposta di conferma
         return immagineMenuRepository
             .findMetaByMenuId(menuId)
             .stream()
@@ -150,6 +164,6 @@ public class ImmagineMenuService {
                     m.getVisibile()
                 )
             )
-            .collect(Collectors.toList());
+            .collect(java.util.stream.Collectors.toList());
     }
 }

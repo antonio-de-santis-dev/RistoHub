@@ -1,6 +1,5 @@
 package main.service;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -86,7 +85,7 @@ public class AllergeneService {
     @Transactional(readOnly = true)
     public List<AllergeneDTO> findAll() {
         LOG.debug("Request to get all Allergenes");
-        return allergeneRepository.findAll().stream().map(allergeneMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return allergeneRepository.findAll().stream().map(allergeneMapper::toDto).collect(Collectors.toList());
     }
 
     /**
