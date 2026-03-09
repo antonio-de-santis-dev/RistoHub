@@ -39,12 +39,6 @@ public class ProdottoService {
      * @param prodottoDTO the entity to save.
      * @return the persisted entity.
      */
-    public ProdottoDTO save(ProdottoDTO prodottoDTO) {
-        LOG.debug("Request to save Prodotto : {}", prodottoDTO);
-        Prodotto prodotto = prodottoMapper.toEntity(prodottoDTO);
-        prodotto = prodottoRepository.save(prodotto);
-        return prodottoMapper.toDto(prodotto);
-    }
 
     /**
      * Update a prodotto.
@@ -52,11 +46,20 @@ public class ProdottoService {
      * @param prodottoDTO the entity to save.
      * @return the persisted entity.
      */
+    public ProdottoDTO save(ProdottoDTO prodottoDTO) {
+        LOG.debug("Request to save Prodotto : {}", prodottoDTO);
+        return persistProdotto(prodottoDTO);
+    }
+
     public ProdottoDTO update(ProdottoDTO prodottoDTO) {
         LOG.debug("Request to update Prodotto : {}", prodottoDTO);
-        Prodotto prodotto = prodottoMapper.toEntity(prodottoDTO);
-        prodotto = prodottoRepository.save(prodotto);
-        return prodottoMapper.toDto(prodotto);
+        return persistProdotto(prodottoDTO);
+    }
+
+    // OPT-10: metodo privato condiviso — evita duplicazione tra save() e update()
+    private ProdottoDTO persistProdotto(ProdottoDTO dto) {
+        Prodotto prodotto = prodottoMapper.toEntity(dto);
+        return prodottoMapper.toDto(prodottoRepository.save(prodotto));
     }
 
     /**

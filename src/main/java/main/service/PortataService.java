@@ -37,12 +37,6 @@ public class PortataService {
      * @param portataDTO the entity to save.
      * @return the persisted entity.
      */
-    public PortataDTO save(PortataDTO portataDTO) {
-        LOG.debug("Request to save Portata : {}", portataDTO);
-        Portata portata = portataMapper.toEntity(portataDTO);
-        portata = portataRepository.save(portata);
-        return portataMapper.toDto(portata);
-    }
 
     /**
      * Update a portata.
@@ -50,11 +44,20 @@ public class PortataService {
      * @param portataDTO the entity to save.
      * @return the persisted entity.
      */
+    public PortataDTO save(PortataDTO portataDTO) {
+        LOG.debug("Request to save Portata : {}", portataDTO);
+        return persistPortata(portataDTO);
+    }
+
     public PortataDTO update(PortataDTO portataDTO) {
         LOG.debug("Request to update Portata : {}", portataDTO);
-        Portata portata = portataMapper.toEntity(portataDTO);
-        portata = portataRepository.save(portata);
-        return portataMapper.toDto(portata);
+        return persistPortata(portataDTO);
+    }
+
+    // OPT-10: metodo privato condiviso — evita duplicazione tra save() e update()
+    private PortataDTO persistPortata(PortataDTO dto) {
+        Portata portata = portataMapper.toEntity(dto);
+        return portataMapper.toDto(portataRepository.save(portata));
     }
 
     /**

@@ -37,12 +37,6 @@ public class AllergeneService {
      * @param allergeneDTO the entity to save.
      * @return the persisted entity.
      */
-    public AllergeneDTO save(AllergeneDTO allergeneDTO) {
-        LOG.debug("Request to save Allergene : {}", allergeneDTO);
-        Allergene allergene = allergeneMapper.toEntity(allergeneDTO);
-        allergene = allergeneRepository.save(allergene);
-        return allergeneMapper.toDto(allergene);
-    }
 
     /**
      * Update a allergene.
@@ -50,11 +44,20 @@ public class AllergeneService {
      * @param allergeneDTO the entity to save.
      * @return the persisted entity.
      */
+    public AllergeneDTO save(AllergeneDTO allergeneDTO) {
+        LOG.debug("Request to save Allergene : {}", allergeneDTO);
+        return persistAllergene(allergeneDTO);
+    }
+
     public AllergeneDTO update(AllergeneDTO allergeneDTO) {
         LOG.debug("Request to update Allergene : {}", allergeneDTO);
-        Allergene allergene = allergeneMapper.toEntity(allergeneDTO);
-        allergene = allergeneRepository.save(allergene);
-        return allergeneMapper.toDto(allergene);
+        return persistAllergene(allergeneDTO);
+    }
+
+    // OPT-10: metodo privato condiviso — evita duplicazione tra save() e update()
+    private AllergeneDTO persistAllergene(AllergeneDTO dto) {
+        Allergene allergene = allergeneMapper.toEntity(dto);
+        return allergeneMapper.toDto(allergeneRepository.save(allergene));
     }
 
     /**

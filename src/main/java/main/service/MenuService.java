@@ -69,21 +69,24 @@ public class MenuService {
     /**
      * Save a menu.
      */
-    public MenuDTO save(MenuDTO menuDTO) {
-        LOG.debug("Request to save Menu : {}", menuDTO);
-        Menu menu = menuMapper.toEntity(menuDTO);
-        menu = menuRepository.save(menu);
-        return menuMapper.toDto(menu);
-    }
 
     /**
      * Update a menu.
      */
+    public MenuDTO save(MenuDTO menuDTO) {
+        LOG.debug("Request to save Menu : {}", menuDTO);
+        return persistMenu(menuDTO);
+    }
+
     public MenuDTO update(MenuDTO menuDTO) {
         LOG.debug("Request to update Menu : {}", menuDTO);
-        Menu menu = menuMapper.toEntity(menuDTO);
-        menu = menuRepository.save(menu);
-        return menuMapper.toDto(menu);
+        return persistMenu(menuDTO);
+    }
+
+    // OPT-10: metodo privato condiviso — evita duplicazione tra save() e update()
+    private MenuDTO persistMenu(MenuDTO dto) {
+        Menu menu = menuMapper.toEntity(dto);
+        return menuMapper.toDto(menuRepository.save(menu));
     }
 
     /**
@@ -133,6 +136,19 @@ public class MenuService {
         menuRepository.deleteById(id);
     }
 
+    /**
+     * Restituisce i piatti del giorno ATTIVI per un menu con allergenis popolati.
+     *
+     * Pattern a 3 query nella stessa transazione:
+     *
+     * Query 1 (findPiattiDelGiornoAttiviByMenuId): piatti attivi + prodotto
+     * Query 2 (findPiattiDelGiornoAttiviByMenuIdConAllergeniProdotto): + prodotto.allergenis
+     * Query 3 (findPiattiDelGiornoAttiviByMenuIdConAllergeniDiretti): + p.allergenis diretti
+     *
+     * Hibernate 1st-level cache garantisce che le query lavorino sulle stesse
+     * istanze. Le collection vengono inizializzate in memoria prima della
+     * serializzazione del mapper → icone allergeni correttamente incluse nella risposta.
+     */
     @Transactional(readOnly = true)
     public List<PiattoDelGiornoDTO> findPiattiDelGiornoAttiviByMenuId(UUID menuId) {
         LOG.debug("Request to get active PiattiDelGiorno with allergenis for Menu : {}", menuId);
@@ -149,6 +165,19 @@ public class MenuService {
         return baseList.stream().map(piattoDelGiornoMapper::toDto).collect(Collectors.toList());
     }
 
+    /**
+     * Carica tutto il necessario per la vista pubblica in un'unica transazione.
+     * Sostituisce le N+6 chiamate HTTP separate con una sola: GET /api/public/menus/{id}/full
+     *
+     * Flusso interno (tutto nello stesso thread, stessa connessione DB):
+     *  1. Carica il menu (se non esiste → Optional.empty() → 404)
+     *  2. Carica portate + prodotti per portata
+     *  3. Carica piatti del giorno attivi con allergeni
+     *  4. Carica immagini, allergeni, contatti
+     *
+     * @param id UUID del menu pubblico
+     * @return Optional con il DTO aggregato, vuoto se il menu non esiste
+     */
     @Transactional(readOnly = true)
     public Optional<MenuCompletoDTO> findMenuCompleto(UUID id) {
         LOG.debug("Request to get MenuCompleto (aggregato) : {}", id);

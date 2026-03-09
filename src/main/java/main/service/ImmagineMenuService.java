@@ -44,16 +44,18 @@ public class ImmagineMenuService {
 
     public ImmagineMenuDTO save(ImmagineMenuDTO immagineMenuDTO) {
         LOG.debug("Request to save ImmagineMenu : {}", immagineMenuDTO);
-        ImmagineMenu immagineMenu = immagineMenuMapper.toEntity(immagineMenuDTO);
-        immagineMenu = immagineMenuRepository.save(immagineMenu);
-        return immagineMenuMapper.toDto(immagineMenu);
+        return persistImmagineMenu(immagineMenuDTO);
     }
 
     public ImmagineMenuDTO update(ImmagineMenuDTO immagineMenuDTO) {
         LOG.debug("Request to update ImmagineMenu : {}", immagineMenuDTO);
-        ImmagineMenu immagineMenu = immagineMenuMapper.toEntity(immagineMenuDTO);
-        immagineMenu = immagineMenuRepository.save(immagineMenu);
-        return immagineMenuMapper.toDto(immagineMenu);
+        return persistImmagineMenu(immagineMenuDTO);
+    }
+
+    // OPT-10: metodo privato condiviso — evita duplicazione tra save() e update()
+    private ImmagineMenuDTO persistImmagineMenu(ImmagineMenuDTO dto) {
+        ImmagineMenu immagineMenu = immagineMenuMapper.toEntity(dto);
+        return immagineMenuMapper.toDto(immagineMenuRepository.save(immagineMenu));
     }
 
     public Optional<ImmagineMenuDTO> partialUpdate(ImmagineMenuDTO immagineMenuDTO) {
