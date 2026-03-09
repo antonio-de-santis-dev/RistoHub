@@ -15,8 +15,13 @@
 
 logging:
   level:
-    ROOT: INFO
-    tech.jhipster: INFO
+    # OPT-01 FIX: livelli ottimizzati per produzione.
+    # ROOT a WARN: silenzia framework (Spring, Hibernate, HikariCP) tranne errori reali.
+    # main a INFO: mantiene visibili i log applicativi di RistoHub.
+    # tech.jhipster a WARN: ridotto da INFO, è rumore in prod.
+    # org.hibernate.SQL e type rimossi: non devono MAI girare in prod (erano in dev).
+    ROOT: WARN
+    tech.jhipster: WARN
     main: INFO
 
 management:
