@@ -9,8 +9,10 @@ import main.domain.ImmagineMenu;
 import main.domain.Menu;
 import main.domain.enumeration.TipoImmagine;
 import main.repository.ImmagineMenuRepository;
+import main.repository.ImmagineMenuRepository.ImmagineMenuMeta;
 import main.repository.MenuRepository;
 import main.service.dto.ImmagineMenuDTO;
+import main.service.dto.ImmagineMenuMetaDTO;
 import main.service.mapper.ImmagineMenuMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,23 +127,29 @@ public class ImmagineMenuService {
      * Aggiorna in bulk ordine e visibilità delle immagini di copertina di un menu.
      * Riceve una lista di {id, ordine, visibile} — NON tocca i byte dell'immagine.
      */
-    public List<ImmagineMenuDTO> aggiornaOrdineEVisibilita(UUID menuId, List<ImmagineMenuDTO> updates) {
-        LOG.debug("Request to update ordine/visibilita for Menu : {}", menuId);
-
+    public List<ImmagineMenuMetaDTO> aggiornaOrdineEVisibilita(UUID menuId, List<ImmagineMenuDTO> updates) {
         for (ImmagineMenuDTO update : updates) {
-            immagineMenuRepository
-                .findById(update.getId())
-                .ifPresent(img -> {
-                    // Verifica che l'immagine appartenga al menu richiesto
-                    if (!img.getMenu().getId().equals(menuId)) {
-                        throw new IllegalArgumentException("Immagine non appartiene al menu: " + update.getId());
-                    }
-                    if (update.getOrdine() != null) img.setOrdine(update.getOrdine());
-                    if (update.getVisibile() != null) img.setVisibile(update.getVisibile());
-                    immagineMenuRepository.save(img);
-                });
+            if (update.getId() == null) continue;
+            immagineMenuRepository.updateOrdineAndVisibile(
+                update.getId(),
+                menuId,
+                update.getOrdine() != null ? update.getOrdine() : 0,
+                update.getVisibile() != null ? update.getVisibile() : true
+            );
         }
-
-        return findByMenuId(menuId);
+        return immagineMenuRepository
+            .findMetaByMenuId(menuId)
+            .stream()
+            .map(m ->
+                new ImmagineMenuMetaDTO(
+                    m.getId(),
+                    m.getNome(),
+                    m.getImmagineContentType(),
+                    m.getTipo() != null ? m.getTipo().toString() : null,
+                    m.getOrdine(),
+                    m.getVisibile()
+                )
+            )
+            .collect(Collectors.toList());
     }
 }

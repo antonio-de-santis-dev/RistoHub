@@ -13,6 +13,7 @@ import main.service.ImmagineMenuService;
 import main.service.MenuService;
 import main.service.PortataService;
 import main.service.dto.ImmagineMenuDTO;
+import main.service.dto.ImmagineMenuMetaDTO;
 import main.service.dto.MenuCompletoDTO;
 import main.service.dto.MenuDTO;
 import main.service.dto.PiattoDelGiornoDTO;
@@ -192,7 +193,7 @@ public class MenuResource {
      * Usato dal frontend menu-cover-editor al salvataggio.
      */
     @PutMapping("/{id}/immagini-copertina")
-    public ResponseEntity<List<ImmagineMenuDTO>> aggiornaImmaginiCopertina(
+    public ResponseEntity<List<ImmagineMenuMetaDTO>> aggiornaImmaginiCopertina(
         @PathVariable("id") UUID menuId,
         @RequestBody List<ImmagineMenuDTO> updates
     ) {
@@ -201,7 +202,7 @@ public class MenuResource {
             throw new BadRequestAlertException("Menu non trovato", ENTITY_NAME, "idnotfound");
         }
         try {
-            List<ImmagineMenuDTO> result = immagineMenuService.aggiornaOrdineEVisibilita(menuId, updates);
+            List<ImmagineMenuMetaDTO> result = immagineMenuService.aggiornaOrdineEVisibilita(menuId, updates);
             return ResponseEntity.ok(result);
         } catch (IllegalArgumentException e) {
             throw new BadRequestAlertException(e.getMessage(), "immagineMenu", "invalidmenu");
