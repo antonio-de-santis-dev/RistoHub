@@ -9,7 +9,7 @@ export class LoaderService {
 
   show(): void {
     this.activeRequests++;
-    this.loadingSubject.next(true);
+    if (this.activeRequests === 1) this.loadingSubject.next(true);
   }
 
   hide(): void {
