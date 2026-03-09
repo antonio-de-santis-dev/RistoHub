@@ -1,5 +1,10 @@
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
+// OPT-06 FIX: rimossi @import 'bootstrap/scss/functions' e @import 'bootstrap/scss/variables'.
+// Questo file non usa variabili o mixin Bootstrap nel proprio codice SCSS —
+// i soli @import erano ereditati dal template JHipster e non servono qui.
+// La migrazione @import→@use di Bootstrap richiede che i moduli siano caricati
+// nella catena corretta (functions → variables → mixins), ma poiché non c'è
+// nessun riferimento a simboli Bootstrap in questo file, la soluzione più pulita
+// è rimuoverli del tutto.
 
 iframe {
   background: white;

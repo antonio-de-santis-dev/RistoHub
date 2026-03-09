@@ -1,3 +1,6 @@
+// OPT-06 FIX: @use "sass:color" per color.adjust() — sostituisce darken() deprecato in Dart Sass 3
+@use 'sass:color';
+
 // ══════════════════════════════════════════════════════
 //  RistoHub — Menu Cover Editor  (dark glassmorphism)
 //  Stile coerente con menu-list e menu-view
@@ -124,7 +127,7 @@ $card-bg: rgba(255, 255, 255, 0.09);
   flex-shrink: 0;
 
   &:hover:not(:disabled) {
-    background: darken(#c8102e, 8%);
+    background: color.adjust(#c8102e, $lightness: -8%);
     transform: translateY(-1px);
     box-shadow: 0 4px 16px rgba($accent, 0.45);
   }
@@ -673,7 +676,7 @@ $card-bg: rgba(255, 255, 255, 0.09);
   font-size: 0.9rem;
   transition: background 0.2s;
   &:hover {
-    background: darken(#c8102e, 8%);
+    background: color.adjust(#c8102e, $lightness: -8%);
   }
 }
 

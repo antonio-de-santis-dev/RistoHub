@@ -1,3 +1,6 @@
+// OPT-06 FIX: @use "sass:color" per color.adjust() — sostituisce darken() deprecato in Dart Sass 3
+@use 'sass:color';
+
 // ══════════════════════════════════════════════════════
 //  RistoHub — Area Utente (Settings con 3 sezioni)
 //  Stile identico a home/menu-list: sfondo + glassmorphism
@@ -495,7 +498,7 @@ $card-glass: rgba(255, 255, 255, 0.09);
   color: #fff;
   box-shadow: 0 3px 12px rgba($accent, 0.26);
   &:hover:not(:disabled) {
-    background: darken(#c8102e, 6%);
+    background: color.adjust(#c8102e, $lightness: -6%);
     box-shadow: 0 6px 18px rgba($accent, 0.36);
   }
 }

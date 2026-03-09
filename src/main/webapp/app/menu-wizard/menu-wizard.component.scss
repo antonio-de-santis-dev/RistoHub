@@ -1,3 +1,6 @@
+// OPT-06 FIX: @use "sass:color" per color.adjust() — sostituisce darken() deprecato in Dart Sass 3
+@use 'sass:color';
+
 // ══════════════════════════════════════════════════════
 //  RistoHub — Wizard Menu (Tema Dark Glassmorphism)
 //  Struttura e dimensioni originali mantenute al 100%
@@ -429,7 +432,7 @@ $shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   font-weight: 700;
   font-size: 0.9rem;
   &:hover {
-    background: darken($accent, 8%);
+    background: color.adjust(#c8102e, $lightness: -8%);
   }
 }
 .logo-preview-img {
@@ -691,7 +694,7 @@ $shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   transition: all 0.2s;
   box-shadow: 0 4px 14px rgba(200, 16, 46, 0.35);
   &:hover:not(:disabled) {
-    background: darken($accent, 8%);
+    background: color.adjust(#c8102e, $lightness: -8%);
     transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(200, 16, 46, 0.45);
   }
