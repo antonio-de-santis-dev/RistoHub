@@ -347,9 +347,9 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
 
   // ── Caricamento ─────────────────────────────────────────────────
   async caricaMenu(id: string): Promise<void> {
-    // ⚠️  Tutti gli endpoint usano /api/PUBLIC → nessuna auth richiesta
     const BASE = '/api/public';
     try {
+      // ── PASSO 1: carica il menu per primo (serve per font e templateStyle) ──
       this.menu = (await this.http.get<Menu>(`${BASE}/menus/${id}`).toPromise()) ?? null;
 
       if (this.menu?.fontMenu) {
@@ -367,22 +367,50 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
         document.head.appendChild(linkFonts);
       }
 
-      try {
-        const tuttiAllergeni: Allergene[] = (await this.http.get<Allergene[]>(`${BASE}/allergenes`).toPromise()) ?? [];
-        this.allergeniMap = new Map(tuttiAllergeni.map(a => [String(a.id), a]));
-        this.allergeniByNome = new Map(tuttiAllergeni.map(a => [a.nome.toLowerCase().trim(), a]));
-      } catch (e) {
-        console.warn('Allergeni non disponibili.', e);
-      }
+      // ── PASSO 2: tutte le chiamate indipendenti in parallelo ──────────────
+      const [tuttiAllergeni, immagini, portateRaw, piattiAttivi, listeContatti] = await Promise.all([
+        this.http
+          .get<Allergene[]>(`${BASE}/allergenes`)
+          .toPromise()
+          .catch(e => {
+            console.warn('Allergeni non disponibili.', e);
+            return [] as Allergene[];
+          }),
+        this.http
+          .get<any[]>(`${BASE}/menus/${id}/immagini`)
+          .toPromise()
+          .catch(() => [] as any[]),
+        this.http
+          .get<any[]>(`${BASE}/menus/${id}/portatas`)
+          .toPromise()
+          .catch(() => [] as any[]),
+        this.http
+          .get<any[]>(`${BASE}/menus/${id}/piatti-del-giorno`)
+          .toPromise()
+          .catch(() => [] as any[]),
+        this.http
+          .get<ListaContatti[]>(`${BASE}/lista-contattis/menu/${id}`)
+          .toPromise()
+          .catch(e => {
+            console.warn('Contatti non disponibili:', e);
+            return [] as ListaContatti[];
+          }),
+      ]);
 
-      const immagini: any[] = (await this.http.get<any[]>(`${BASE}/menus/${id}/immagini`).toPromise()) ?? [];
-      const logo = immagini.find(i => i.tipo === 'LOGO');
+      // ── elabora allergeni ─────────────────────────────────────────────────
+      const allergeni = tuttiAllergeni ?? [];
+      this.allergeniMap = new Map(allergeni.map(a => [String(a.id), a]));
+      this.allergeniByNome = new Map(allergeni.map(a => [a.nome.toLowerCase().trim(), a]));
+
+      // ── elabora immagini ──────────────────────────────────────────────────
+      const immaginiList = immagini ?? [];
+      const logo = immaginiList.find(i => i.tipo === 'LOGO');
       if (logo?.immagine) {
         const blob = this.base64ToBlob(logo.immagine, logo.immagineContentType);
         this.logoUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob));
       }
 
-      const copertine = immagini
+      const copertine = immaginiList
         .filter(i => i.tipo === 'COPERTINA' && i.visibile !== false)
         .sort((a, b) => (a.ordine ?? 0) - (b.ordine ?? 0))
         .map(i => `data:${i.immagineContentType};base64,${i.immagine}`);
@@ -391,28 +419,26 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
       this.modernoImmaginiCaricate = new Array(copertine.length).fill(false);
       this.rusticoImmaginiCaricate = new Array(copertine.length).fill(false);
 
-      const portateRaw: any[] = (await this.http.get<any[]>(`${BASE}/menus/${id}/portatas`).toPromise()) ?? [];
+      // ── PASSO 3: prodotti per portata in parallelo (dipendono da portateRaw) ──
       const portateCaricate = await Promise.all(
-        portateRaw.map(async p => {
-          const prodotti: Prodotto[] = (await this.http.get<Prodotto[]>(`${BASE}/prodottos/by-portata/${p.id}`).toPromise()) ?? [];
-          prodotti.forEach(prod => this.prodottiMap.set(String(prod.id), prod));
-          return { ...p, prodotti, aperta: false };
-        }),
+        (portateRaw ?? []).map(p =>
+          this.http
+            .get<Prodotto[]>(`${BASE}/prodottos/by-portata/${p.id}`)
+            .toPromise()
+            .then(prodotti => {
+              (prodotti ?? []).forEach(prod => this.prodottiMap.set(String(prod.id), prod));
+              return { ...p, prodotti: prodotti ?? [], aperta: false };
+            }),
+        ),
       );
       this.portate = this.ordinaPortate(portateCaricate);
 
-      const piattiAttivi: any[] = (await this.http.get<any[]>(`${BASE}/menus/${id}/piatti-del-giorno`).toPromise()) ?? [];
-      this.piattiDelGiorno = piattiAttivi.map(p => this.arricchisciPiatto(p));
+      // ── elabora piatti del giorno e contatti ──────────────────────────────
+      this.piattiDelGiorno = (piattiAttivi ?? []).map(p => this.arricchisciPiatto(p));
+      this.listeContatti = listeContatti ?? [];
 
       if (this.menu?.templateStyle === 'MODERNO' && this.modernoImmagini.length > 0) this.avviaAutoplay();
       if (this.menu?.templateStyle === 'RUSTICO' && this.rusticoImmagini.length > 0) this.avviaAutoplayRustico();
-
-      try {
-        this.listeContatti = (await this.http.get<ListaContatti[]>(`${BASE}/lista-contattis/menu/${id}`).toPromise()) ?? [];
-      } catch (e) {
-        console.warn('Contatti non disponibili:', e);
-        this.listeContatti = [];
-      }
     } catch (err) {
       console.error('Errore caricamento menu pubblico:', err);
       this.errore = true;
