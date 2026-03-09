@@ -439,7 +439,21 @@ export class MenuViewComponent implements OnInit {
 
   async caricaMenu(id: string): Promise<void> {
     try {
-      this.menu = (await this.http.get<Menu>(`/api/menus/${id}`).toPromise()) ?? null;
+      // BUG-02 FIX: sostituisce N+1 chiamate HTTP separate con un'unica chiamata aggregata.
+      // L'endpoint /api/public/menus/{id}/full restituisce in una sola risposta:
+      //   menu, portate (con prodotti annidati), piattiDelGiorno, immagini, allergeni, contatti.
+      // Prima: 1 (menu) + 1 (allergeni) + 1 (immagini) + 1 (portate) + N (prodotti per portata)
+      //        + 1 (piatti giorno) + 1 (contatti) = 6 + N richieste serializzate.
+      // Dopo:  1 sola richiesta.
+      const dati: any = await this.http.get<any>(`/api/public/menus/${id}/full`).toPromise();
+
+      if (!dati) {
+        this.errore = true;
+        return;
+      }
+
+      // ── 1. Menu ───────────────────────────────────────────────
+      this.menu = dati.menu ?? null;
 
       if (this.menu?.fontMenu) {
         const fontName = this.menu.fontMenu.replace(/ /g, '+');
@@ -456,56 +470,49 @@ export class MenuViewComponent implements OnInit {
         document.head.appendChild(linkFonts);
       }
 
-      try {
-        const tuttiAllergeni: Allergene[] = (await this.http.get<Allergene[]>('/api/allergenes').toPromise()) ?? [];
-        this.allergeniDisponibili = tuttiAllergeni;
-        this.allergeniMap = new Map(tuttiAllergeni.map(a => [String(a.id), a]));
-        this.allergeniByNome = new Map(tuttiAllergeni.map(a => [a.nome.toLowerCase().trim(), a]));
-      } catch (e) {
-        console.warn('Allergeni non disponibili.', e);
-      }
+      // ── 2. Allergeni ─────────────────────────────────────────
+      const tuttiAllergeni: Allergene[] = dati.allergeni ?? [];
+      this.allergeniDisponibili = tuttiAllergeni;
+      this.allergeniMap = new Map(tuttiAllergeni.map((a: Allergene) => [String(a.id), a]));
+      this.allergeniByNome = new Map(tuttiAllergeni.map((a: Allergene) => [a.nome.toLowerCase().trim(), a]));
 
-      const immagini: any[] = (await this.http.get<any[]>(`/api/menus/${id}/immagini`).toPromise()) ?? [];
-      const logo = immagini.find(i => i.tipo === 'LOGO');
+      // ── 3. Immagini (logo + carosello copertine) ─────────────
+      const immagini: any[] = dati.immagini ?? [];
+      const logo = immagini.find((i: any) => i.tipo === 'LOGO');
       if (logo?.immagine) {
         const blob = this.base64ToBlob(logo.immagine, logo.immagineContentType);
         this.logoUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob));
       }
-
-      // ── Carosello: carica immagini COPERTINA visibili ordinate per 'ordine' ──
       const copertine = immagini
-        .filter(i => i.tipo === 'COPERTINA' && i.visibile !== false)
-        .sort((a, b) => (a.ordine ?? 0) - (b.ordine ?? 0))
-        .map(i => `data:${i.immagineContentType};base64,${i.immagine}`);
+        .filter((i: any) => i.tipo === 'COPERTINA' && i.visibile !== false)
+        .sort((a: any, b: any) => (a.ordine ?? 0) - (b.ordine ?? 0))
+        .map((i: any) => `data:${i.immagineContentType};base64,${i.immagine}`);
       this.modernoImmagini = copertine;
       this.rusticoImmagini = copertine;
-      // Inizializza stato di caricamento (false = non ancora caricata)
       this.modernoImmaginiCaricate = new Array(copertine.length).fill(false);
       this.rusticoImmaginiCaricate = new Array(copertine.length).fill(false);
 
-      const portateRaw: any[] = (await this.http.get<any[]>(`/api/menus/${id}/portatas`).toPromise()) ?? [];
-      const portateCaricate = await Promise.all(
-        portateRaw.map(async p => {
-          const prodotti: Prodotto[] = (await this.http.get<Prodotto[]>(`/api/prodottos/by-portata/${p.id}`).toPromise()) ?? [];
-          prodotti.forEach(prod => this.prodottiMap.set(String(prod.id), prod));
-          return { ...p, prodotti, aperta: false };
-        }),
-      );
-      this.portate = this.ordinaPortate(portateCaricate);
+      // ── 4. Portate con prodotti annidati ─────────────────────
+      // Il backend restituisce portate già con i prodotti dentro (PortataConProdottiDTO).
+      // Popoliamo prodottiMap per riuso in arricchisciPiatto e salvaModifica.
+      const portateRaw: any[] = dati.portate ?? [];
+      const portateConProdotti = portateRaw.map((p: any) => {
+        const prodotti: Prodotto[] = p.prodotti ?? [];
+        prodotti.forEach((prod: Prodotto) => this.prodottiMap.set(String(prod.id), prod));
+        return { ...p, prodotti, aperta: false };
+      });
+      this.portate = this.ordinaPortate(portateConProdotti);
 
-      const piattiAttivi: any[] = (await this.http.get<any[]>(`/api/menus/${id}/piatti-del-giorno`).toPromise()) ?? [];
-      this.piattiDelGiorno = piattiAttivi.map(p => this.arricchisciPiatto(p));
+      // ── 5. Piatti del giorno ─────────────────────────────────
+      const piattiAttivi: any[] = dati.piattiDelGiorno ?? [];
+      this.piattiDelGiorno = piattiAttivi.map((p: any) => this.arricchisciPiatto(p));
 
+      // ── 6. Autoplay carosello ─────────────────────────────────
       if (this.menu?.templateStyle === 'MODERNO' && this.modernoImmagini.length > 0) this.avviaAutoplay();
       if (this.menu?.templateStyle === 'RUSTICO' && this.rusticoImmagini.length > 0) this.avviaAutoplayRustico();
 
-      // ── Carica contatti associati al menu ──────────────────────
-      try {
-        this.listeContatti = (await this.http.get<ListaContatti[]>(`/api/lista-contattis/menu/${id}`).toPromise()) ?? [];
-      } catch (e) {
-        console.warn('Contatti non disponibili:', e);
-        this.listeContatti = [];
-      }
+      // ── 7. Contatti ───────────────────────────────────────────
+      this.listeContatti = dati.contatti ?? [];
     } catch (err) {
       console.error('Errore caricamento menu:', err);
       this.errore = true;
