@@ -1,5 +1,5 @@
 export enum TipoImmagine {
   LOGO = 'LOGO',
 
-  VETRINA = 'VETRINA',
+  COPERTINA = 'COPERTINA',
 }

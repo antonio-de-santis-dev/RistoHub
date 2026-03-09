@@ -4,7 +4,7 @@ export const sampleWithRequiredData: IImmagineMenu = {
   id: '3ebb7132-322b-44a2-8776-ef9fe5e88fcb',
   immagine: '../fake-data/blob/hipster.png',
   immagineContentType: 'unknown',
-  tipo: 'VETRINA',
+  tipo: 'COPERTINA',
 };
 
 export const sampleWithPartialData: IImmagineMenu = {
@@ -13,7 +13,7 @@ export const sampleWithPartialData: IImmagineMenu = {
   immagine: '../fake-data/blob/hipster.png',
   immagineContentType: 'unknown',
   contentType: 'intelligent instantly',
-  tipo: 'VETRINA',
+  tipo: 'COPERTINA',
 };
 
 export const sampleWithFullData: IImmagineMenu = {

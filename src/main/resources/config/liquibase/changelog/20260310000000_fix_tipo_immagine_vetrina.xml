@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="20260310000000-fix-vetrina" author="dev">
+    <sql>
+      UPDATE immagine_menu
+      SET tipo = 'COPERTINA'
+      WHERE tipo = 'VETRINA';
+    </sql>
+    <rollback>
+      <sql>
+        UPDATE immagine_menu
+        SET tipo = 'VETRINA'
+        WHERE tipo = 'COPERTINA';
+      </sql>
+    </rollback>
+  </changeSet>
+
+</databaseChangeLog>

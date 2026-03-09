@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import main.domain.ImmagineMenu;
 import main.domain.Menu;
+import main.domain.enumeration.TipoImmagine;
 import main.repository.ImmagineMenuRepository;
 import main.repository.MenuRepository;
 import main.service.dto.ImmagineMenuDTO;
@@ -103,7 +104,7 @@ public class ImmagineMenuService {
 
         // Conta immagini esistenti per assegnare l'ordine
         // Conta solo le COPERTINA (non il LOGO) per il limite di 5
-        long count = immagineMenuRepository.countByMenuIdAndTipo(menuId, main.domain.enumeration.TipoImmagine.COPERTINA);
+        long count = immagineMenuRepository.countByMenuIdAndTipo(menuId, TipoImmagine.COPERTINA);
         if (count >= 5) {
             throw new IllegalStateException("Limite massimo di 5 immagini di copertina raggiunto");
         }
@@ -116,16 +117,7 @@ public class ImmagineMenuService {
         img.setContentType(file.getContentType());
         img.setOrdine((int) count);
         img.setVisibile(true);
-
-        // Usa TipoImmagine.COPERTINA — assicurati che esista nell'enum,
-        // altrimenti usa TipoImmagine.values()[0] o un valore esistente
-        try {
-            img.setTipo(main.domain.enumeration.TipoImmagine.valueOf("COPERTINA"));
-        } catch (IllegalArgumentException e) {
-            // Se COPERTINA non esiste nell'enum, usa il primo valore disponibile
-            img.setTipo(main.domain.enumeration.TipoImmagine.values()[0]);
-        }
-
+        img.setTipo(TipoImmagine.COPERTINA);
         img = immagineMenuRepository.save(img);
         return immagineMenuMapper.toDto(img);
     }

@@ -98,7 +98,7 @@
               </td>
               <td>{{ immagineMenu.contentType }}</td>
               <td [jhiTranslate]="'ristoHubApp.TipoImmagine.' + (immagineMenu.tipo ?? 'null')">
-                {{ { null: '', LOGO: 'LOGO', VETRINA: 'VETRINA' }[immagineMenu.tipo ?? 'null'] }}
+                {{ { null: '', LOGO: 'LOGO', COPERTINA: 'COPERTINA' }[immagineMenu.tipo ?? 'null'] }}
               </td>
               <td>
                 @if (immagineMenu.menu) {
