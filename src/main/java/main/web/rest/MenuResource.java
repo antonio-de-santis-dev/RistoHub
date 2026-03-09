@@ -13,6 +13,7 @@ import main.service.ImmagineMenuService;
 import main.service.MenuService;
 import main.service.PortataService;
 import main.service.dto.ImmagineMenuDTO;
+import main.service.dto.MenuCompletoDTO;
 import main.service.dto.MenuDTO;
 import main.service.dto.PiattoDelGiornoDTO;
 import main.service.dto.PortataDTO;
@@ -216,5 +217,11 @@ public class MenuResource {
         LOG.debug("REST request to delete immagine copertina {} for Menu : {}", immagineId, menuId);
         immagineMenuService.delete(immagineId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/menus/{id}/full")
+    public ResponseEntity<MenuCompletoDTO> getMenuCompleto(@PathVariable("id") UUID id) {
+        LOG.debug("PUBLIC request to get MenuCompleto (aggregato) : {}", id);
+        return menuService.findMenuCompleto(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 }

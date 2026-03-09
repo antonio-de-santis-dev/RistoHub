@@ -58,6 +58,23 @@ interface ListaContatti {
   items: ContattoItem[];
 }
 
+interface PortataConProdotti {
+  id: string;
+  tipo: string;
+  nomeDefault?: string;
+  nomePersonalizzato?: string;
+  prodotti: Prodotto[];
+}
+
+interface MenuCompleto {
+  menu: Menu;
+  portate: PortataConProdotti[];
+  piattiDelGiorno: any[];
+  immagini: any[];
+  allergeni: Allergene[];
+  contatti: ListaContatti[];
+}
+
 const SOCIAL_ICONS_SVG: Record<string, string> = {
   FACEBOOK: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`,
   INSTAGRAM: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`,
@@ -349,8 +366,11 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
   async caricaMenu(id: string): Promise<void> {
     const BASE = '/api/public';
     try {
-      // ── PASSO 1: carica il menu per primo (serve per font e templateStyle) ──
-      this.menu = (await this.http.get<Menu>(`${BASE}/menus/${id}`).toPromise()) ?? null;
+      // ── UNICA CHIAMATA HTTP: sostituisce le precedenti N+6 chiamate separate ──
+      const dati = (await this.http.get<MenuCompleto>(`${BASE}/menus/${id}/full`).toPromise())!;
+
+      // ── menu: caricato, applicare font ────────────────────────────────────
+      this.menu = dati.menu ?? null;
 
       if (this.menu?.fontMenu) {
         const fontName = this.menu.fontMenu.replace(/ /g, '+');
@@ -367,43 +387,13 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
         document.head.appendChild(linkFonts);
       }
 
-      // ── PASSO 2: tutte le chiamate indipendenti in parallelo ──────────────
-      const [tuttiAllergeni, immagini, portateRaw, piattiAttivi, listeContatti] = await Promise.all([
-        this.http
-          .get<Allergene[]>(`${BASE}/allergenes`)
-          .toPromise()
-          .catch(e => {
-            console.warn('Allergeni non disponibili.', e);
-            return [] as Allergene[];
-          }),
-        this.http
-          .get<any[]>(`${BASE}/menus/${id}/immagini`)
-          .toPromise()
-          .catch(() => [] as any[]),
-        this.http
-          .get<any[]>(`${BASE}/menus/${id}/portatas`)
-          .toPromise()
-          .catch(() => [] as any[]),
-        this.http
-          .get<any[]>(`${BASE}/menus/${id}/piatti-del-giorno`)
-          .toPromise()
-          .catch(() => [] as any[]),
-        this.http
-          .get<ListaContatti[]>(`${BASE}/lista-contattis/menu/${id}`)
-          .toPromise()
-          .catch(e => {
-            console.warn('Contatti non disponibili:', e);
-            return [] as ListaContatti[];
-          }),
-      ]);
-
-      // ── elabora allergeni ─────────────────────────────────────────────────
-      const allergeni = tuttiAllergeni ?? [];
+      // ── allergeni ─────────────────────────────────────────────────────────
+      const allergeni = dati.allergeni ?? [];
       this.allergeniMap = new Map(allergeni.map(a => [String(a.id), a]));
       this.allergeniByNome = new Map(allergeni.map(a => [a.nome.toLowerCase().trim(), a]));
 
-      // ── elabora immagini ──────────────────────────────────────────────────
-      const immaginiList = immagini ?? [];
+      // ── immagini ──────────────────────────────────────────────────────────
+      const immaginiList = dati.immagini ?? [];
       const logo = immaginiList.find(i => i.tipo === 'LOGO');
       if (logo?.immagine) {
         const blob = this.base64ToBlob(logo.immagine, logo.immagineContentType);
@@ -419,23 +409,16 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
       this.modernoImmaginiCaricate = new Array(copertine.length).fill(false);
       this.rusticoImmaginiCaricate = new Array(copertine.length).fill(false);
 
-      // ── PASSO 3: prodotti per portata in parallelo (dipendono da portateRaw) ──
-      const portateCaricate = await Promise.all(
-        (portateRaw ?? []).map(p =>
-          this.http
-            .get<Prodotto[]>(`${BASE}/prodottos/by-portata/${p.id}`)
-            .toPromise()
-            .then(prodotti => {
-              (prodotti ?? []).forEach(prod => this.prodottiMap.set(String(prod.id), prod));
-              return { ...p, prodotti: prodotti ?? [], aperta: false };
-            }),
-        ),
-      );
+      // ── portate con prodotti già annidati (nessuna chiamata extra) ────────
+      const portateCaricate = (dati.portate ?? []).map(p => {
+        (p.prodotti ?? []).forEach(prod => this.prodottiMap.set(String(prod.id), prod));
+        return { ...p, aperta: false };
+      });
       this.portate = this.ordinaPortate(portateCaricate);
 
-      // ── elabora piatti del giorno e contatti ──────────────────────────────
-      this.piattiDelGiorno = (piattiAttivi ?? []).map(p => this.arricchisciPiatto(p));
-      this.listeContatti = listeContatti ?? [];
+      // ── piatti del giorno e contatti ──────────────────────────────────────
+      this.piattiDelGiorno = (dati.piattiDelGiorno ?? []).map(p => this.arricchisciPiatto(p));
+      this.listeContatti = dati.contatti ?? [];
 
       if (this.menu?.templateStyle === 'MODERNO' && this.modernoImmagini.length > 0) this.avviaAutoplay();
       if (this.menu?.templateStyle === 'RUSTICO' && this.rusticoImmagini.length > 0) this.avviaAutoplayRustico();

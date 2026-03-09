@@ -11,6 +11,7 @@ import main.service.ProdottoService;
 import main.service.dto.AllergeneDTO;
 import main.service.dto.ImmagineMenuDTO;
 import main.service.dto.ListaContattiDTO;
+import main.service.dto.MenuCompletoDTO;
 import main.service.dto.MenuDTO;
 import main.service.dto.PiattoDelGiornoDTO;
 import main.service.dto.PortataDTO;
@@ -124,5 +125,16 @@ public class MenuPublicResource {
     public List<ListaContattiDTO> getContattiByMenu(@PathVariable("menuId") UUID menuId) {
         LOG.debug("PUBLIC request to get contatti for Menu : {}", menuId);
         return listaContattiService.findByMenuId(menuId);
+    }
+
+    /**
+     * GET /api/public/menus/{id}/full
+     * Endpoint aggregato: restituisce menu + portate + prodotti + immagini + allergeni + contatti
+     * in una sola chiamata HTTP. Elimina il pattern N+6 del frontend.
+     */
+    @GetMapping("/menus/{id}/full")
+    public ResponseEntity<MenuCompletoDTO> getMenuCompleto(@PathVariable("id") UUID id) {
+        LOG.debug("PUBLIC request to get MenuCompleto (aggregato) : {}", id);
+        return menuService.findMenuCompleto(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 }

@@ -8,8 +8,14 @@ import main.domain.Menu;
 import main.domain.PiattoDelGiorno;
 import main.repository.MenuRepository;
 import main.repository.PiattoDelGiornoRepository;
+import main.service.dto.AllergeneDTO;
+import main.service.dto.ImmagineMenuDTO;
+import main.service.dto.ListaContattiDTO;
+import main.service.dto.MenuCompletoDTO;
 import main.service.dto.MenuDTO;
 import main.service.dto.PiattoDelGiornoDTO;
+import main.service.dto.PortataConProdottiDTO;
+import main.service.dto.ProdottoDTO;
 import main.service.mapper.MenuMapper;
 import main.service.mapper.PiattoDelGiornoMapper;
 import org.slf4j.Logger;
@@ -32,17 +38,32 @@ public class MenuService {
     private final MenuMapper menuMapper;
     private final PiattoDelGiornoMapper piattoDelGiornoMapper;
     private final PiattoDelGiornoRepository piattoDelGiornoRepository;
+    private final PortataService portataService;
+    private final ProdottoService prodottoService;
+    private final ImmagineMenuService immagineMenuService;
+    private final AllergeneService allergeneService;
+    private final ListaContattiService listaContattiService;
 
     public MenuService(
         MenuRepository menuRepository,
         MenuMapper menuMapper,
         PiattoDelGiornoMapper piattoDelGiornoMapper,
-        PiattoDelGiornoRepository piattoDelGiornoRepository
+        PiattoDelGiornoRepository piattoDelGiornoRepository,
+        PortataService portataService,
+        ProdottoService prodottoService,
+        ImmagineMenuService immagineMenuService,
+        AllergeneService allergeneService,
+        ListaContattiService listaContattiService
     ) {
         this.menuRepository = menuRepository;
         this.menuMapper = menuMapper;
         this.piattoDelGiornoMapper = piattoDelGiornoMapper;
         this.piattoDelGiornoRepository = piattoDelGiornoRepository;
+        this.portataService = portataService;
+        this.prodottoService = prodottoService;
+        this.immagineMenuService = immagineMenuService;
+        this.allergeneService = allergeneService;
+        this.listaContattiService = listaContattiService;
     }
 
     /**
@@ -112,19 +133,6 @@ public class MenuService {
         menuRepository.deleteById(id);
     }
 
-    /**
-     * Restituisce i piatti del giorno ATTIVI per un menu con allergenis popolati.
-     *
-     * Pattern a 3 query nella stessa transazione:
-     *
-     * Query 1 (findPiattiDelGiornoAttiviByMenuId): piatti attivi + prodotto
-     * Query 2 (findPiattiDelGiornoAttiviByMenuIdConAllergeniProdotto): + prodotto.allergenis
-     * Query 3 (findPiattiDelGiornoAttiviByMenuIdConAllergeniDiretti): + p.allergenis diretti
-     *
-     * Hibernate 1st-level cache garantisce che le query lavorino sulle stesse
-     * istanze. Le collection vengono inizializzate in memoria prima della
-     * serializzazione del mapper → icone allergeni correttamente incluse nella risposta.
-     */
     @Transactional(readOnly = true)
     public List<PiattoDelGiornoDTO> findPiattiDelGiornoAttiviByMenuId(UUID menuId) {
         LOG.debug("Request to get active PiattiDelGiorno with allergenis for Menu : {}", menuId);
@@ -139,5 +147,43 @@ public class MenuService {
         menuRepository.findPiattiDelGiornoAttiviByMenuIdConAllergeniDiretti(menuId);
 
         return baseList.stream().map(piattoDelGiornoMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<MenuCompletoDTO> findMenuCompleto(UUID id) {
+        LOG.debug("Request to get MenuCompleto (aggregato) : {}", id);
+
+        // Se il menu non esiste restituiamo subito empty → il controller risponde 404
+        Optional<MenuDTO> menuOpt = menuRepository.findOneWithEagerRelationships(id).map(menuMapper::toDto);
+        if (menuOpt.isEmpty()) {
+            return Optional.empty();
+        }
+        MenuDTO menu = menuOpt.get();
+
+        // Portate con prodotti annidati
+        List<PortataConProdottiDTO> portateConProdotti = portataService
+            .findByMenuId(id)
+            .stream()
+            .map(portata -> {
+                List<ProdottoDTO> prodotti = prodottoService.findByPortataId(portata.getId());
+                return new PortataConProdottiDTO(
+                    portata.getId(),
+                    portata.getTipo(),
+                    portata.getNomeDefault(),
+                    portata.getNomePersonalizzato(),
+                    prodotti
+                );
+            })
+            .collect(Collectors.toList());
+
+        // Piatti del giorno attivi (già con allergeni — vedi findPiattiDelGiornoAttiviByMenuId)
+        List<PiattoDelGiornoDTO> piattiDelGiorno = findPiattiDelGiornoAttiviByMenuId(id);
+
+        // Immagini, allergeni, contatti
+        List<ImmagineMenuDTO> immagini = immagineMenuService.findByMenuId(id);
+        List<AllergeneDTO> allergeni = allergeneService.findAll();
+        List<ListaContattiDTO> contatti = listaContattiService.findByMenuId(id);
+
+        return Optional.of(new MenuCompletoDTO(menu, portateConProdotti, piattiDelGiorno, immagini, allergeni, contatti));
     }
 }
