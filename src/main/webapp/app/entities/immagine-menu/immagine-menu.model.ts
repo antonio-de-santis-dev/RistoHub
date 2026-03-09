@@ -6,7 +6,6 @@ export interface IImmagineMenu {
   nome?: string | null;
   immagine?: string | null;
   immagineContentType?: string | null;
-  contentType?: string | null;
   tipo?: keyof typeof TipoImmagine | null;
   menu?: Pick<IMenu, 'id'> | null;
 }

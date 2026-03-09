@@ -45,9 +45,6 @@ class ImmagineMenuResourceIT {
     private static final String DEFAULT_IMMAGINE_CONTENT_TYPE = "image/jpg";
     private static final String UPDATED_IMMAGINE_CONTENT_TYPE = "image/png";
 
-    private static final String DEFAULT_CONTENT_TYPE = "AAAAAAAAAA";
-    private static final String UPDATED_CONTENT_TYPE = "BBBBBBBBBB";
-
     private static final TipoImmagine DEFAULT_TIPO = TipoImmagine.LOGO;
     private static final TipoImmagine UPDATED_TIPO = TipoImmagine.COPERTINA;
 
@@ -84,7 +81,6 @@ class ImmagineMenuResourceIT {
             .nome(DEFAULT_NOME)
             .immagine(DEFAULT_IMMAGINE)
             .immagineContentType(DEFAULT_IMMAGINE_CONTENT_TYPE)
-            .contentType(DEFAULT_CONTENT_TYPE)
             .tipo(DEFAULT_TIPO);
         // Add required entity
         Menu menu;
@@ -110,7 +106,6 @@ class ImmagineMenuResourceIT {
             .nome(UPDATED_NOME)
             .immagine(UPDATED_IMMAGINE)
             .immagineContentType(UPDATED_IMMAGINE_CONTENT_TYPE)
-            .contentType(UPDATED_CONTENT_TYPE)
             .tipo(UPDATED_TIPO);
         // Add required entity
         Menu menu;
@@ -218,7 +213,6 @@ class ImmagineMenuResourceIT {
             .andExpect(jsonPath("$.[*].nome").value(hasItem(DEFAULT_NOME)))
             .andExpect(jsonPath("$.[*].immagineContentType").value(hasItem(DEFAULT_IMMAGINE_CONTENT_TYPE)))
             .andExpect(jsonPath("$.[*].immagine").value(hasItem(Base64.getEncoder().encodeToString(DEFAULT_IMMAGINE))))
-            .andExpect(jsonPath("$.[*].contentType").value(hasItem(DEFAULT_CONTENT_TYPE)))
             .andExpect(jsonPath("$.[*].tipo").value(hasItem(DEFAULT_TIPO.toString())));
     }
 
@@ -237,7 +231,6 @@ class ImmagineMenuResourceIT {
             .andExpect(jsonPath("$.nome").value(DEFAULT_NOME))
             .andExpect(jsonPath("$.immagineContentType").value(DEFAULT_IMMAGINE_CONTENT_TYPE))
             .andExpect(jsonPath("$.immagine").value(Base64.getEncoder().encodeToString(DEFAULT_IMMAGINE)))
-            .andExpect(jsonPath("$.contentType").value(DEFAULT_CONTENT_TYPE))
             .andExpect(jsonPath("$.tipo").value(DEFAULT_TIPO.toString()));
     }
 
@@ -264,7 +257,6 @@ class ImmagineMenuResourceIT {
             .nome(UPDATED_NOME)
             .immagine(UPDATED_IMMAGINE)
             .immagineContentType(UPDATED_IMMAGINE_CONTENT_TYPE)
-            .contentType(UPDATED_CONTENT_TYPE)
             .tipo(UPDATED_TIPO);
         ImmagineMenuDTO immagineMenuDTO = immagineMenuMapper.toDto(updatedImmagineMenu);
 
@@ -394,7 +386,6 @@ class ImmagineMenuResourceIT {
             .nome(UPDATED_NOME)
             .immagine(UPDATED_IMMAGINE)
             .immagineContentType(UPDATED_IMMAGINE_CONTENT_TYPE)
-            .contentType(UPDATED_CONTENT_TYPE)
             .tipo(UPDATED_TIPO);
 
         restImmagineMenuMockMvc

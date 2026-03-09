@@ -23,8 +23,6 @@ public class ImmagineMenuDTO implements Serializable {
 
     private String immagineContentType;
 
-    private String contentType;
-
     @NotNull
     private TipoImmagine tipo;
 
@@ -70,14 +68,6 @@ public class ImmagineMenuDTO implements Serializable {
 
     public void setImmagineContentType(String immagineContentType) {
         this.immagineContentType = immagineContentType;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
     }
 
     public TipoImmagine getTipo() {
@@ -141,7 +131,6 @@ public class ImmagineMenuDTO implements Serializable {
         return "ImmagineMenuDTO{" +
             "id='" + getId() + "'" +
             ", nome='" + getNome() + "'" +
-            ", contentType='" + getContentType() + "'" +
             ", tipo='" + getTipo() + "'" +
             ", ordine=" + getOrdine() +
             ", visibile=" + getVisibile() +

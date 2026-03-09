@@ -12,7 +12,6 @@ export const sampleWithPartialData: IImmagineMenu = {
   nome: 'neaten',
   immagine: '../fake-data/blob/hipster.png',
   immagineContentType: 'unknown',
-  contentType: 'intelligent instantly',
   tipo: 'COPERTINA',
 };
 
@@ -21,7 +20,6 @@ export const sampleWithFullData: IImmagineMenu = {
   nome: 'important',
   immagine: '../fake-data/blob/hipster.png',
   immagineContentType: 'unknown',
-  contentType: 'sesame',
   tipo: 'LOGO',
 };
 

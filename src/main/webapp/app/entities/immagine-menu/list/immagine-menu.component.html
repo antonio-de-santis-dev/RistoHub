@@ -54,13 +54,6 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="contentType">
-              <div class="d-flex">
-                <span jhiTranslate="ristoHubApp.immagineMenu.contentType">Content Type</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
             <th scope="col" jhiSortBy="tipo">
               <div class="d-flex">
                 <span jhiTranslate="ristoHubApp.immagineMenu.tipo">Tipo</span>
@@ -96,7 +89,6 @@
                   <span>{{ immagineMenu.immagineContentType }}, {{ byteSize(immagineMenu.immagine) }}</span>
                 }
               </td>
-              <td>{{ immagineMenu.contentType }}</td>
               <td [jhiTranslate]="'ristoHubApp.TipoImmagine.' + (immagineMenu.tipo ?? 'null')">
                 {{ { null: '', LOGO: 'LOGO', COPERTINA: 'COPERTINA' }[immagineMenu.tipo ?? 'null'] }}
               </td>

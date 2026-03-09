@@ -52,7 +52,6 @@ public class ImmagineMenuAsserts {
             .satisfies(a ->
                 assertThat(a.getImmagineContentType()).as("check immagine contenty type").isEqualTo(expected.getImmagineContentType())
             )
-            .satisfies(a -> assertThat(a.getContentType()).as("check contentType").isEqualTo(expected.getContentType()))
             .satisfies(a -> assertThat(a.getTipo()).as("check tipo").isEqualTo(expected.getTipo()));
     }
 

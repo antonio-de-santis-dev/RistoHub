@@ -114,7 +114,6 @@ public class ImmagineMenuService {
         img.setNome(file.getOriginalFilename());
         img.setImmagine(file.getBytes());
         img.setImmagineContentType(file.getContentType());
-        img.setContentType(file.getContentType());
         img.setOrdine((int) count);
         img.setVisibile(true);
         img.setTipo(TipoImmagine.COPERTINA);

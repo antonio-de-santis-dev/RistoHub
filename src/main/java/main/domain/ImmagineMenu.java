@@ -36,22 +36,16 @@ public class ImmagineMenu implements Serializable {
     @Column(name = "immagine_content_type", nullable = false)
     private String immagineContentType;
 
-    @Column(name = "content_type")
-    private String contentType;
-
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false)
     private TipoImmagine tipo;
 
-    // ── NUOVI CAMPI per gestione carosello ────────────────
     @Column(name = "ordine", nullable = false)
     private Integer ordine = 0;
 
     @Column(name = "visibile", nullable = false)
     private Boolean visibile = true;
-
-    // ─────────────────────────────────────────────────────
 
     @ManyToOne(optional = false)
     @NotNull
@@ -110,19 +104,6 @@ public class ImmagineMenu implements Serializable {
 
     public void setImmagineContentType(String immagineContentType) {
         this.immagineContentType = immagineContentType;
-    }
-
-    public String getContentType() {
-        return this.contentType;
-    }
-
-    public ImmagineMenu contentType(String contentType) {
-        this.setContentType(contentType);
-        return this;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
     }
 
     public TipoImmagine getTipo() {
@@ -203,7 +184,6 @@ public class ImmagineMenu implements Serializable {
             ", nome='" + getNome() + "'" +
             ", immagine='" + getImmagine() + "'" +
             ", immagineContentType='" + getImmagineContentType() + "'" +
-            ", contentType='" + getContentType() + "'" +
             ", tipo='" + getTipo() + "'" +
             ", ordine=" + getOrdine() +
             ", visibile=" + getVisibile() +

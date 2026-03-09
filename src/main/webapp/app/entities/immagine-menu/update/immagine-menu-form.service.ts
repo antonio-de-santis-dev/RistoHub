@@ -21,7 +21,6 @@ type ImmagineMenuFormGroupContent = {
   nome: FormControl<IImmagineMenu['nome']>;
   immagine: FormControl<IImmagineMenu['immagine']>;
   immagineContentType: FormControl<IImmagineMenu['immagineContentType']>;
-  contentType: FormControl<IImmagineMenu['contentType']>;
   tipo: FormControl<IImmagineMenu['tipo']>;
   menu: FormControl<IImmagineMenu['menu']>;
 };
@@ -48,7 +47,6 @@ export class ImmagineMenuFormService {
         validators: [Validators.required],
       }),
       immagineContentType: new FormControl(immagineMenuRawValue.immagineContentType),
-      contentType: new FormControl(immagineMenuRawValue.contentType),
       tipo: new FormControl(immagineMenuRawValue.tipo, {
         validators: [Validators.required],
       }),
