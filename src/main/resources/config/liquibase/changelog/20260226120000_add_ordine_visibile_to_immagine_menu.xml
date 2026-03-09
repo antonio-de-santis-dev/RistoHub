@@ -10,6 +10,9 @@
       Necessari per la gestione del carosello di copertina nei template MODERNO e RUSTICO.
   -->
   <changeSet id="20260226120000-1" author="dev">
+    <!-- BUG-01 FIX: la struttura del changeSet è cambiata dopo la prima esecuzione.
+         validCheckSum ANY dice a Liquibase di ignorare il mismatch del checksum. -->
+    <validCheckSum>ANY</validCheckSum>
 
     <addColumn tableName="immagine_menu">
       <column name="ordine" type="integer" defaultValueNumeric="0">
@@ -29,6 +32,9 @@
       Inizializzazione dati esistenti per righe pre-esistenti.
   -->
   <changeSet id="20260226120000-2" author="dev">
+    <!-- BUG-01 FIX: la struttura del changeSet è cambiata dopo la prima esecuzione.
+         validCheckSum ANY dice a Liquibase di ignorare il mismatch del checksum. -->
+    <validCheckSum>ANY</validCheckSum>
     <sql>
       UPDATE immagine_menu SET ordine = 0 WHERE ordine IS NULL;
       UPDATE immagine_menu SET visibile = TRUE WHERE visibile IS NULL;
