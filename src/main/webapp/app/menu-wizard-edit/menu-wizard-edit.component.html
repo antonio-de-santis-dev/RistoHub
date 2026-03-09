@@ -103,7 +103,7 @@
           <ng-container *ngIf="logoFile">
             <img [src]="logoPreview" class="logo-preview-img" alt="Nuovo logo" />
             <div class="logo-actions">
-              <span class="logo-filename">{{ logoFile?.name }}</span>
+              <span class="logo-filename">{{ logoFile.name }}</span>
               <button class="btn-remove" (click)="rimuoviLogo()">✕ Rimuovi</button>
             </div>
           </ng-container>

@@ -11,14 +11,14 @@ import { LoginService } from 'app/login/login.service';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { EntityNavbarItems } from 'app/entities/entity-navbar-items';
 import { environment } from 'environments/environment';
-import ActiveMenuDirective from './active-menu.directive';
+// BUG-03 FIX (NG8113): ActiveMenuDirective rimossa — non è usata nel template di NavbarComponent.
 import NavbarItem from './navbar-item.model';
 
 @Component({
   selector: 'jhi-navbar',
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
-  imports: [RouterModule, SharedModule, HasAnyAuthorityDirective, ActiveMenuDirective],
+  imports: [RouterModule, SharedModule, HasAnyAuthorityDirective],
 })
 export default class NavbarComponent implements OnInit {
   inProduction?: boolean;
