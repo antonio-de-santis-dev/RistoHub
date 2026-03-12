@@ -35,6 +35,14 @@ export class UserManagementService {
     return this.http.delete(`${this.resourceUrl}/${login}`);
   }
 
+  /**
+   * Approva l'account di un utente in attesa.
+   * Chiama POST /api/admin/users/{login}/approve
+   */
+  approve(login: string): Observable<{}> {
+    return this.http.post(`${this.resourceUrl}/${login}/approve`, {});
+  }
+
   authorities(): Observable<string[]> {
     return this.http
       .get<{ name: string }[]>(this.applicationConfigService.getEndpointFor('api/authorities'))

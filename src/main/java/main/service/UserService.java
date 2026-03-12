@@ -64,7 +64,6 @@ public class UserService {
         return userRepository
             .findOneByActivationKey(key)
             .map(user -> {
-                // activate given user for the registration key.
                 user.setActivated(true);
                 user.setActivationKey(null);
                 this.clearUserCaches(user);
@@ -119,7 +118,6 @@ public class UserService {
         User newUser = new User();
         String encryptedPassword = passwordEncoder.encode(password);
         newUser.setLogin(userDTO.getLogin().toLowerCase());
-        // new user gets initially a generated password
         newUser.setPassword(encryptedPassword);
         newUser.setFirstName(userDTO.getFirstName());
         newUser.setLastName(userDTO.getLastName());
@@ -128,9 +126,9 @@ public class UserService {
         }
         newUser.setImageUrl(userDTO.getImageUrl());
         newUser.setLangKey(userDTO.getLangKey());
-        // new user is not active
+        // Il nuovo utente NON è attivo: aspetta l'approvazione dell'admin
         newUser.setActivated(false);
-        // new user gets registration key
+        // Genera comunque la chiave di attivazione (per compatibilità e pulizia schedulata)
         newUser.setActivationKey(RandomUtil.generateActivationKey());
         Set<Authority> authorities = new HashSet<>();
         authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
@@ -161,7 +159,7 @@ public class UserService {
         }
         user.setImageUrl(userDTO.getImageUrl());
         if (userDTO.getLangKey() == null) {
-            user.setLangKey(Constants.DEFAULT_LANGUAGE); // default language
+            user.setLangKey(Constants.DEFAULT_LANGUAGE);
         } else {
             user.setLangKey(userDTO.getLangKey());
         }
@@ -184,6 +182,28 @@ public class UserService {
         this.clearUserCaches(user);
         LOG.debug("Created Information for User: {}", user);
         return user;
+    }
+
+    /**
+     * Approva e attiva l'account di un utente in attesa.
+     *
+     * Usato dall'admin per abilitare un account che si è registrato
+     * ma non è ancora stato approvato.
+     *
+     * @param login il login dell'utente da approvare.
+     * @return l'utente approvato, o empty se non trovato.
+     */
+    public Optional<User> approveUser(String login) {
+        LOG.debug("Approving user account: {}", login);
+        return userRepository
+            .findOneByLogin(login)
+            .map(user -> {
+                user.setActivated(true);
+                user.setActivationKey(null);
+                this.clearUserCaches(user);
+                LOG.debug("Approved user: {}", user);
+                return user;
+            });
     }
 
     /**

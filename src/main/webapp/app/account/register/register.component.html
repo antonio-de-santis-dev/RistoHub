@@ -27,14 +27,18 @@
       <h1 class="form-title">Crea account</h1>
       <p class="form-subtitle">Unisciti a RistoHub e gestisci il tuo menu digitale</p>
 
-      <!-- Messaggio successo -->
+      <!-- Messaggio successo — in attesa di approvazione admin -->
       @if (success()) {
         <div class="alert-success" role="status">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
-          <span jhiTranslate="register.messages.success">Registrazione salvata! Controlla la tua email per confermare.</span>
+          <div>
+            <strong>Registrazione completata!</strong><br />
+            Il tuo account è in attesa di approvazione da parte dell'amministratore.<br />
+            Riceverai una email di conferma non appena il tuo account sarà abilitato.
+          </div>
         </div>
       }
 
@@ -120,6 +124,73 @@
                 }
               </span>
             }
+          </div>
+
+          <!-- Nome e Cognome — riga affiancata -->
+          <div class="field-row">
+            <!-- Nome -->
+            <div class="field-group">
+              <label class="field-label" for="firstName">Nome</label>
+              <div class="field-input-wrap">
+                <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <input
+                  type="text"
+                  class="field-input"
+                  id="firstName"
+                  name="firstName"
+                  placeholder="Il tuo nome"
+                  formControlName="firstName"
+                  autocomplete="given-name"
+                  data-cy="firstName"
+                />
+              </div>
+              @let firstNameRef = registerForm.get('firstName')!;
+              @if (firstNameRef.invalid && (firstNameRef.dirty || firstNameRef.touched)) {
+                <span class="field-error">
+                  @if (firstNameRef.errors?.['required']) {
+                    Il nome è obbligatorio.
+                  }
+                  @if (firstNameRef.errors?.['maxlength']) {
+                    Massimo 50 caratteri.
+                  }
+                </span>
+              }
+            </div>
+
+            <!-- Cognome -->
+            <div class="field-group">
+              <label class="field-label" for="lastName">Cognome</label>
+              <div class="field-input-wrap">
+                <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <input
+                  type="text"
+                  class="field-input"
+                  id="lastName"
+                  name="lastName"
+                  placeholder="Il tuo cognome"
+                  formControlName="lastName"
+                  autocomplete="family-name"
+                  data-cy="lastName"
+                />
+              </div>
+              @let lastNameRef = registerForm.get('lastName')!;
+              @if (lastNameRef.invalid && (lastNameRef.dirty || lastNameRef.touched)) {
+                <span class="field-error">
+                  @if (lastNameRef.errors?.['required']) {
+                    Il cognome è obbligatorio.
+                  }
+                  @if (lastNameRef.errors?.['maxlength']) {
+                    Massimo 50 caratteri.
+                  }
+                </span>
+              }
+            </div>
           </div>
 
           <!-- Email -->

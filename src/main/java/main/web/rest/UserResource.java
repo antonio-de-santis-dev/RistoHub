@@ -33,27 +33,6 @@ import tech.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing users.
- * <p>
- * This class accesses the {@link main.domain.User} entity, and needs to fetch its collection of authorities.
- * <p>
- * For a normal use-case, it would be better to have an eager relationship between User and Authority,
- * and send everything to the client side: there would be no View Model and DTO, a lot less code, and an outer-join
- * which would be good for performance.
- * <p>
- * We use a View Model and a DTO for 3 reasons:
- * <ul>
- * <li>We want to keep a lazy association between the user and the authorities, because people will
- * quite often do relationships with the user, and we don't want them to get the authorities all
- * the time for nothing (for performance reasons). This is the #1 goal: we should not impact our users'
- * application because of this use-case.</li>
- * <li> Not having an outer join causes n+1 requests to the database. This is not a real issue as
- * we have by default a second-level cache. This means on the first HTTP call we do the n+1 requests,
- * but then all authorities come from the cache, so in fact it's much better than doing an outer join
- * (which will get lots of data from the database, for each HTTP call).</li>
- * <li> As this manages users, for security reasons, we'd rather have a DTO layer.</li>
- * </ul>
- * <p>
- * Another option would be to have a specific JPA entity graph to handle this case.
  */
 @RestController
 @RequestMapping("/api/admin")
@@ -93,16 +72,12 @@ public class UserResource {
     }
 
     /**
-     * {@code POST  /admin/users}  : Creates a new user.
-     * <p>
-     * Creates a new user if the login and email are not already used, and sends a
-     * mail with an activation link.
-     * The user needs to be activated on creation.
+     * {@code POST  /admin/users}  : Crea un nuovo utente.
      *
-     * @param userDTO the user to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new user, or with status {@code 400 (Bad Request)} if the login or email is already in use.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     * @throws BadRequestAlertException {@code 400 (Bad Request)} if the login or email is already in use.
+     * @param userDTO il DTO dell'utente da creare.
+     * @return {@link ResponseEntity} con status {@code 201 (Created)} e il corpo del nuovo utente.
+     * @throws URISyntaxException se la Location URI non è corretta.
+     * @throws BadRequestAlertException {@code 400 (Bad Request)} se il login o l'email sono già in uso.
      */
     @PostMapping("/users")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
@@ -111,7 +86,6 @@ public class UserResource {
 
         if (userDTO.getId() != null) {
             throw new BadRequestAlertException("A new user cannot already have an ID", "userManagement", "idexists");
-            // Lowercase the user login before comparing with database
         } else if (userRepository.findOneByLogin(userDTO.getLogin().toLowerCase()).isPresent()) {
             throw new LoginAlreadyUsedException();
         } else if (userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()).isPresent()) {
@@ -126,12 +100,12 @@ public class UserResource {
     }
 
     /**
-     * {@code PUT /admin/users} : Updates an existing User.
+     * {@code PUT /admin/users} : Aggiorna un utente esistente.
      *
-     * @param userDTO the user to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated user.
-     * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already in use.
-     * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already in use.
+     * @param userDTO il DTO dell'utente da aggiornare.
+     * @return {@link ResponseEntity} con status {@code 200 (OK)} e il corpo dell'utente aggiornato.
+     * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} se l'email è già in uso.
+     * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} se il login è già in uso.
      */
     @PutMapping({ "/users", "/users/{login}" })
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
@@ -157,10 +131,33 @@ public class UserResource {
     }
 
     /**
-     * {@code GET /admin/users} : get all users with all the details - calling this are only allowed for the administrators.
+     * {@code POST /admin/users/{login}/approve} : Approva e attiva l'account di un utente in attesa.
      *
-     * @param pageable the pagination information.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body all users.
+     * Usato dall'admin per abilitare un account registrato ma non ancora attivo.
+     * Dopo l'approvazione, l'utente riceve una email di conferma.
+     *
+     * @param login il login dell'utente da approvare.
+     * @return {@link ResponseEntity} con status {@code 200 (OK)} se approvato,
+     *         o {@code 404 (Not Found)} se l'utente non esiste.
+     */
+    @PostMapping("/users/{login}/approve")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public ResponseEntity<Void> approveUser(@PathVariable("login") @Pattern(regexp = Constants.LOGIN_REGEX) String login) {
+        LOG.debug("REST request to approve User: {}", login);
+        Optional<User> user = userService.approveUser(login);
+        if (user.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        // Invia email di conferma approvazione all'utente
+        mailService.sendAccountApprovedEmail(user.get());
+        return ResponseEntity.ok().headers(HeaderUtil.createAlert(applicationName, "userManagement.approved", login)).build();
+    }
+
+    /**
+     * {@code GET /admin/users} : restituisce tutti gli utenti (solo admin).
+     *
+     * @param pageable le informazioni di paginazione.
+     * @return {@link ResponseEntity} con status {@code 200 (OK)} e il corpo di tutti gli utenti.
      */
     @GetMapping("/users")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
@@ -180,10 +177,11 @@ public class UserResource {
     }
 
     /**
-     * {@code GET /admin/users/:login} : get the "login" user.
+     * {@code GET /admin/users/:login} : restituisce l'utente con il login specificato.
      *
-     * @param login the login of the user to find.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the "login" user, or with status {@code 404 (Not Found)}.
+     * @param login il login dell'utente da trovare.
+     * @return {@link ResponseEntity} con status {@code 200 (OK)} e il corpo dell'utente,
+     *         o {@code 404 (Not Found)}.
      */
     @GetMapping("/users/{login}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
@@ -193,10 +191,10 @@ public class UserResource {
     }
 
     /**
-     * {@code DELETE /admin/users/:login} : delete the "login" User.
+     * {@code DELETE /admin/users/:login} : elimina l'utente con il login specificato.
      *
-     * @param login the login of the user to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
+     * @param login il login dell'utente da eliminare.
+     * @return {@link ResponseEntity} con status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/users/{login}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")

@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="loadAll()" [disabled]="isLoading()">
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined"></fa-icon>
-        <span jhiTranslate="userManagement.home.refreshListLabel">Refresh list</span>
+        <span jhiTranslate="userManagement.home.refreshListLabel">Aggiorna lista</span>
       </button>
       <button class="btn btn-primary jh-create-entity" [routerLink]="['./new']">
         <fa-icon icon="plus"></fa-icon> <span jhiTranslate="userManagement.home.createLabel">Crea un nuovo utente</span>
@@ -14,7 +14,6 @@
   </h2>
 
   <jhi-alert-error />
-
   <jhi-alert />
 
   @if (users()) {
@@ -24,8 +23,10 @@
           <tr jhiSort [(sortState)]="sortState" (sortChange)="transition($event)">
             <th scope="col" jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
             <th scope="col" jhiSortBy="login"><span jhiTranslate="userManagement.login">Login</span> <fa-icon icon="sort"></fa-icon></th>
+            <th scope="col" jhiSortBy="firstName"><span>Nome</span> <fa-icon icon="sort"></fa-icon></th>
+            <th scope="col" jhiSortBy="lastName"><span>Cognome</span> <fa-icon icon="sort"></fa-icon></th>
             <th scope="col" jhiSortBy="email"><span jhiTranslate="userManagement.email">Email</span> <fa-icon icon="sort"></fa-icon></th>
-            <th scope="col"></th>
+            <th scope="col"><span>Stato</span></th>
             <th scope="col" jhiSortBy="langKey">
               <span jhiTranslate="userManagement.langKey">Lingua</span> <fa-icon icon="sort"></fa-icon>
             </th>
@@ -49,23 +50,32 @@
                 <a [routerLink]="['./', user.login, 'view']">{{ user.id }}</a>
               </td>
               <td>{{ user.login }}</td>
+              <td>{{ user.firstName }}</td>
+              <td>{{ user.lastName }}</td>
               <td>{{ user.email }}</td>
+
+              <!-- Colonna stato: Approva / Attivo / Disattiva -->
               <td>
                 @if (!user.activated) {
-                  <button class="btn btn-danger btn-sm" (click)="setActive(user, true)" jhiTranslate="userManagement.deactivated">
-                    Disattivato
+                  <!-- Account in attesa di approvazione -->
+                  <button class="btn btn-warning btn-sm" (click)="approveUser(user)" title="Approva e attiva questo account">
+                    <fa-icon icon="check"></fa-icon>
+                    <span class="d-none d-md-inline ms-1">Approva</span>
                   </button>
                 } @else {
+                  <!-- Account già attivo — click per disattivarlo -->
                   <button
                     class="btn btn-success btn-sm"
                     (click)="setActive(user, false)"
                     [disabled]="!currentAccount() || currentAccount()?.login === user.login"
-                    jhiTranslate="userManagement.activated"
+                    title="Account attivo — clicca per disattivare"
                   >
-                    Attivato
+                    <fa-icon icon="check"></fa-icon>
+                    <span class="d-none d-md-inline ms-1" jhiTranslate="userManagement.activated">Attivo</span>
                   </button>
                 }
               </td>
+
               <td>{{ user.langKey }}</td>
               <td>
                 @for (authority of user.authorities; track $index) {

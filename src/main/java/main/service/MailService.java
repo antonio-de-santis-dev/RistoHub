@@ -66,7 +66,6 @@ public class MailService {
             content
         );
 
-        // Prepare message using a Spring helper
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, StandardCharsets.UTF_8.name());
@@ -116,5 +115,25 @@ public class MailService {
     public void sendPasswordResetMail(User user) {
         LOG.debug("Sending password reset email to '{}'", user.getEmail());
         sendEmailFromTemplateSync(user, "mail/passwordResetEmail", "email.reset.title");
+    }
+
+    /**
+     * Invia email all'utente appena registrato per informarlo
+     * che il suo account è in attesa di approvazione da parte dell'admin.
+     */
+    @Async
+    public void sendPendingApprovalEmail(User user) {
+        LOG.debug("Sending pending approval email to '{}'", user.getEmail());
+        sendEmailFromTemplateSync(user, "mail/pendingApprovalEmail", "email.pendingApproval.title");
+    }
+
+    /**
+     * Invia email all'utente per informarlo che il suo account
+     * è stato approvato e attivato dall'amministratore.
+     */
+    @Async
+    public void sendAccountApprovedEmail(User user) {
+        LOG.debug("Sending account approved email to '{}'", user.getEmail());
+        sendEmailFromTemplateSync(user, "mail/accountApprovedEmail", "email.accountApproved.title");
     }
 }

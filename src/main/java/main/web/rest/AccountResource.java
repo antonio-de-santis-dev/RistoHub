@@ -61,12 +61,16 @@ public class AccountResource {
     }
 
     /**
-     * {@code POST  /register} : register the user.
+     * {@code POST  /register} : registra un nuovo utente.
+     *
+     * Il nuovo utente viene salvato come NON attivato.
+     * L'utente riceve una email "in attesa di approvazione".
+     * L'admin dovrà approvare l'account dalla sezione di gestione utenti.
      *
      * @param managedUserVM the managed user View Model.
-     * @throws InvalidPasswordException {@code 400 (Bad Request)} if the password is incorrect.
-     * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
-     * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already used.
+     * @throws InvalidPasswordException {@code 400 (Bad Request)} se la password non è valida.
+     * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} se l'email è già in uso.
+     * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} se il login è già in uso.
      */
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
@@ -75,14 +79,16 @@ public class AccountResource {
             throw new InvalidPasswordException();
         }
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-        mailService.sendActivationEmail(user);
+        // Invia email "in attesa di approvazione" invece dell'email di attivazione diretta
+        mailService.sendPendingApprovalEmail(user);
     }
 
     /**
-     * {@code GET  /activate} : activate the registered user.
+     * {@code GET  /activate} : attiva l'utente registrato tramite chiave.
+     * (Mantenuto per compatibilità, ma il flusso principale ora usa l'approvazione admin)
      *
      * @param key the activation key.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be activated.
+     * @throws RuntimeException {@code 500 (Internal Server Error)} se l'utente non è trovato.
      */
     @GetMapping("/activate")
     public void activateAccount(@RequestParam(value = "key") String key) {
@@ -93,10 +99,10 @@ public class AccountResource {
     }
 
     /**
-     * {@code GET  /authenticate} : check if the user is authenticated.
+     * {@code GET  /authenticate} : controlla se l'utente è autenticato.
      *
-     * @return the {@link ResponseEntity} with status {@code 204 (No Content)},
-     * or with status {@code 401 (Unauthorized)} if not authenticated.
+     * @return {@link ResponseEntity} con status {@code 204 (No Content)},
+     * o {@code 401 (Unauthorized)} se non autenticato.
      */
     @GetMapping("/authenticate")
     public ResponseEntity<Void> isAuthenticated(Principal principal) {
@@ -105,10 +111,10 @@ public class AccountResource {
     }
 
     /**
-     * {@code GET  /account} : get the current user.
+     * {@code GET  /account} : restituisce l'utente corrente.
      *
-     * @return the current user.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
+     * @return l'utente corrente.
+     * @throws RuntimeException {@code 500 (Internal Server Error)} se l'utente non è trovato.
      */
     @GetMapping("/account")
     public AdminUserDTO getAccount() {
@@ -119,11 +125,11 @@ public class AccountResource {
     }
 
     /**
-     * {@code POST  /account} : update the current user information.
+     * {@code POST  /account} : aggiorna le informazioni dell'utente corrente.
      *
-     * @param userDTO the current user information.
-     * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user login wasn't found.
+     * @param userDTO le informazioni aggiornate dell'utente corrente.
+     * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} se l'email è già in uso.
+     * @throws RuntimeException {@code 500 (Internal Server Error)} se il login non è trovato.
      */
     @PostMapping("/account")
     public void saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
@@ -147,10 +153,10 @@ public class AccountResource {
     }
 
     /**
-     * {@code POST  /account/change-password} : changes the current user's password.
+     * {@code POST  /account/change-password} : cambia la password dell'utente corrente.
      *
-     * @param passwordChangeDto current and new password.
-     * @throws InvalidPasswordException {@code 400 (Bad Request)} if the new password is incorrect.
+     * @param passwordChangeDto la password attuale e la nuova.
+     * @throws InvalidPasswordException {@code 400 (Bad Request)} se la nuova password non è valida.
      */
     @PostMapping(path = "/account/change-password")
     public void changePassword(@RequestBody PasswordChangeDTO passwordChangeDto) {
@@ -161,10 +167,10 @@ public class AccountResource {
     }
 
     /**
-     * {@code GET  /account/sessions} : get the current open sessions.
+     * {@code GET  /account/sessions} : restituisce le sessioni aperte dell'utente corrente.
      *
-     * @return the current open sessions.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the current open sessions couldn't be retrieved.
+     * @return le sessioni aperte correnti.
+     * @throws RuntimeException {@code 500 (Internal Server Error)} se le sessioni non sono recuperabili.
      */
     @GetMapping("/account/sessions")
     public List<PersistentToken> getCurrentSessions() {
@@ -178,17 +184,7 @@ public class AccountResource {
     }
 
     /**
-     * {@code DELETE  /account/sessions?series={series}} : invalidate an existing session.
-     *
-     * - You can only delete your own sessions, not any other user's session
-     * - If you delete one of your existing sessions, and that you are currently logged in on that session, you will
-     *   still be able to use that session, until you quit your browser: it does not work in real time (there is
-     *   no API for that), it only removes the "remember me" cookie
-     * - This is also true if you invalidate your current session: you will still be able to use it until you close
-     *   your browser or that the session times out. But automatic login (the "remember me" cookie) will not work
-     *   anymore.
-     *   There is an API to invalidate the current session, but there is no API to check which session uses which
-     *   cookie.
+     * {@code DELETE  /account/sessions?series={series}} : invalida una sessione esistente.
      *
      * @param series the series of an existing session.
      * @throws IllegalArgumentException if the series couldn't be URL decoded.
@@ -209,9 +205,9 @@ public class AccountResource {
     }
 
     /**
-     * {@code POST   /account/reset-password/init} : Send an email to reset the password of the user.
+     * {@code POST   /account/reset-password/init} : invia email per il reset della password.
      *
-     * @param mail the mail of the user.
+     * @param mail l'email dell'utente.
      */
     @PostMapping(path = "/account/reset-password/init")
     public void requestPasswordReset(@RequestBody String mail) {
@@ -219,18 +215,16 @@ public class AccountResource {
         if (user.isPresent()) {
             mailService.sendPasswordResetMail(user.orElseThrow());
         } else {
-            // Pretend the request has been successful to prevent checking which emails really exist
-            // but log that an invalid attempt has been made
             LOG.warn("Password reset requested for non existing mail");
         }
     }
 
     /**
-     * {@code POST   /account/reset-password/finish} : Finish to reset the password of the user.
+     * {@code POST   /account/reset-password/finish} : completa il reset della password.
      *
-     * @param keyAndPassword the generated key and the new password.
-     * @throws InvalidPasswordException {@code 400 (Bad Request)} if the password is incorrect.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the password could not be reset.
+     * @param keyAndPassword la chiave generata e la nuova password.
+     * @throws InvalidPasswordException {@code 400 (Bad Request)} se la password non è valida.
+     * @throws RuntimeException {@code 500 (Internal Server Error)} se la password non può essere reimpostata.
      */
     @PostMapping(path = "/account/reset-password/finish")
     public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {

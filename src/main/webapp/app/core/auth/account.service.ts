@@ -9,6 +9,10 @@ import { StateStorageService } from 'app/core/auth/state-storage.service';
 import { Account } from 'app/core/auth/account.model';
 import { ApplicationConfigService } from '../config/application-config.service';
 
+// Pagine pubbliche che NON richiedono autenticazione.
+// Su queste pagine NON facciamo mai redirect automatico al login.
+const PUBLIC_PAGES = ['/', '/login', '/register', '/account/activate', '/account/reset', '/menu-public'];
+
 @Injectable({ providedIn: 'root' })
 export class AccountService {
   private readonly userIdentity = signal<Account | null>(null);
@@ -54,9 +58,8 @@ export class AccountService {
         tap((account: Account) => {
           this.authenticate(account);
 
-          // After retrieve the account info, the language will be changed to
-          // the user's preferred language configured in the account setting
-          // unless user have chosen another language in the current session
+          // Dopo aver recuperato l'account, imposta la lingua dell'utente
+          // a meno che non abbia già scelto una lingua nella sessione corrente
           if (!this.stateStorageService.getLocale()) {
             this.translateService.use(account.langKey);
           }
@@ -66,7 +69,25 @@ export class AccountService {
         shareReplay(),
       );
     }
-    return this.accountCache$.pipe(catchError(() => of(null)));
+    return this.accountCache$.pipe(
+      catchError(() => {
+        // Utente non autenticato: resetta lo stato
+        this.authenticate(null);
+
+        // Controlla se la pagina corrente è pubblica
+        const currentUrl = this.router.url;
+        const isPublicPage = PUBLIC_PAGES.some(page => currentUrl === page || currentUrl.startsWith(page + '/'));
+
+        // Redirect al login SOLO se l'utente è su una pagina protetta
+        // La landing '/' e le altre pagine pubbliche non fanno redirect
+        if (!isPublicPage) {
+          this.stateStorageService.storeUrl(currentUrl);
+          this.router.navigate(['/login']);
+        }
+
+        return of(null);
+      }),
+    );
   }
 
   isAuthenticated(): boolean {
@@ -82,8 +103,8 @@ export class AccountService {
   }
 
   private navigateToStoredUrl(): void {
-    // previousState can be set in the authExpiredInterceptor and in the userRouteAccessService
-    // if login is successful, go to stored previousState and clear previousState
+    // previousState può essere impostato in authExpiredInterceptor e in userRouteAccessService
+    // se il login ha successo, vai all'URL salvato e cancellalo
     const previousUrl = this.stateStorageService.getUrl();
     if (previousUrl) {
       this.stateStorageService.clearUrl();

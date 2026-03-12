@@ -3,13 +3,23 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>ristoHub</title>
-    <meta name="description" content="Description for ristoHub" />
+    <title>RistoHub</title>
+    <meta name="description" content="RistoHub – Gestisci il tuo menu digitale" />
     <meta name="google" content="notranslate" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#1a1a1a" />
     <base href="/" />
-    <link rel="icon" href="favicon.ico" />
+
+    <!--
+    FAVICON — file generati dal logo RistoHub (LogoBianco.png ritagliato quadrato).
+    Tutti i file devono essere presenti in src/main/webapp/ e src/main/webapp/content/images/
+    Il ?v=2 forza il browser a ricaricare l'icona svuotando la cache.
+  -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico?v=2" />
+    <link rel="icon" type="image/png" sizes="32x32" href="content/images/favicon-32x32.png?v=2" />
+    <link rel="icon" type="image/png" sizes="16x16" href="content/images/favicon-16x16.png?v=2" />
+    <link rel="apple-touch-icon" sizes="180x180" href="content/images/apple-touch-icon.png?v=2" />
+
     <link rel="manifest" href="manifest.webapp" />
     <link rel="stylesheet" href="content/css/loading.css" />
     <!-- jhipster-needle-add-resources-to-root - JHipster will add new resources here -->
@@ -24,15 +34,10 @@
     <jhi-app>
       <div class="app-loading">
         <div class="rh-splash-icon">
-          <!-- Logo RistoHub -->
           <img src="content/images/LogoBianco.png" alt="RistoHub" />
-          <!-- SVG: piatto oro + turchese, posate bianche -->
           <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <!-- Piatto esterno: oro caldo -->
             <circle class="rh-plate-outer" cx="100" cy="108" r="62" fill="none" stroke="#FFD200" stroke-width="8" stroke-linecap="round" />
-            <!-- Piatto interno: turchese brillante -->
             <circle class="rh-plate-inner" cx="100" cy="108" r="40" fill="none" stroke="#3DD6C8" stroke-width="8" stroke-linecap="round" />
-            <!-- Forchetta: bianco puro — più a sinistra -->
             <g class="rh-fork" style="transform-origin: 58px 92px">
               <path
                 d="M14 75 L14 130 Q14 136 20 136 Q26 136 26 130 L26 75"
@@ -55,7 +60,6 @@
               <line x1="54" y1="66" x2="54" y2="102" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
               <line x1="64" y1="70" x2="64" y2="102" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
             </g>
-            <!-- Coltello: bianco puro — più a destra -->
             <g class="rh-knife" style="transform-origin: 159px 92px">
               <path
                 d="M13 80 L13 130 Q13 136 19 136 Q25 136 25 130 L25 80"
@@ -81,75 +85,11 @@
           <div class="rh-splash-dots"><span></span><span></span><span></span></div>
         </div>
       </div>
-      <div class="app-loading">
-        <div id="jhipster-error" style="display: none">
-          <!-- This content is for troubleshooting purpose and will be removed when app renders -->
-          <h1>An error has occurred :-(</h1>
-          <h2>Usual error causes</h2>
-          <ol>
-            <li>
-              You started the application from an IDE and you didn't run <code style="color: red">npm start</code> or
-              <code style="color: red">npm run webapp:build</code>.
-            </li>
-            <li>
-              You had a network error while running <code style="color: red">npm install</code>. If you are behind a corporate proxy, it is
-              likely that this error was caused by your proxy. Have a look at the JHipster error logs, you will probably have the cause of
-              the error.
-            </li>
-            <li>
-              You installed a Node.js version that doesn't work with JHipster: please use an LTS (long-term support) version, as it's the
-              only version we support.
-            </li>
-          </ol>
-          <h2>Building the client side code again</h2>
-          <p>If you want to go fast, run <code style="color: red">./mvnw</code> to build and run everything.</p>
-          <p>If you want to have more control, so you can debug your issue more easily, you should follow the following steps:</p>
-          <ol>
-            <li>Install npm dependencies with the command <code style="color: red">npm install</code></li>
-            <li>
-              Build the client with the command <code style="color: red">npm run webapp:build</code> or
-              <code style="color: red">npm start</code>
-            </li>
-            <li>Start the server with <code style="color: red">./mvnw</code> or using your IDE</li>
-          </ol>
-
-          <h2>Getting more help</h2>
-
-          <h3>If you have a question on how to use JHipster</h3>
-          <p>
-            Go to Stack Overflow with the
-            <a href="http://stackoverflow.com/tags/jhipster" target="_blank" rel="noopener noreferrer">"jhipster"</a> tag.
-          </p>
-
-          <h3>If you have a bug or a feature request</h3>
-          <p>
-            First read our
-            <a href="https://github.com/jhipster/generator-jhipster/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer"
-              >contributing guidelines</a
-            >.
-          </p>
-          <p>
-            Then, fill a ticket on our
-            <a href="https://github.com/jhipster/generator-jhipster/issues/new/choose" target="_blank" rel="noopener noreferrer"
-              >bug tracker</a
-            >, we'll be happy to resolve your issue!
-          </p>
-
-          <h3>If you want to chat with contributors and other users</h3>
-          <p>
-            Join our chat room on
-            <a href="https://gitter.im/jhipster/generator-jhipster" target="_blank" rel="noopener noreferrer">Gitter.im</a>. Please note
-            that this is a public chat room, and that we expect you to respect other people and write in a correct English language!
-          </p>
-          <!-- end of troubleshooting content -->
-        </div>
-      </div>
     </jhi-app>
     <noscript>
       <h1>You must enable JavaScript to view this page.</h1>
     </noscript>
     <script type="text/javascript">
-      // show an error message if the app loading takes more than 4 sec
       window.onload = function () {
         setTimeout(showError, 4000);
       };

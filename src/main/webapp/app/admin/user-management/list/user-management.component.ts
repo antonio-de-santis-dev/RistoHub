@@ -42,6 +42,14 @@ export default class UserManagementComponent implements OnInit {
     this.userService.update({ ...user, activated: isActivated }).subscribe(() => this.loadAll());
   }
 
+  /**
+   * Approva un account utente in attesa:
+   * chiama POST /api/admin/users/{login}/approve e ricarica la lista.
+   */
+  approveUser(user: User): void {
+    this.userService.approve(user.login!).subscribe(() => this.loadAll());
+  }
+
   trackIdentity(item: User): number {
     return item.id!;
   }
