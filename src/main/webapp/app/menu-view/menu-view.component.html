@@ -733,7 +733,8 @@
   [style.fontFamily]="fontTesto"
   [style.backgroundColor]="coloreSecondario + '18'"
 >
-  <header class="rustico-header" [style.backgroundColor]="coloreSecondario + '40'" [style.borderBottomColor]="colorePrimario + '44'">
+  <!-- Header con colori utente — come classico e moderno -->
+  <header class="rustico-header" [style.backgroundColor]="coloreSecondario" [style.borderBottomColor]="colorePrimario">
     <div class="rustico-header-left">
       <button class="rustico-btn-back" [style.color]="colorePrimario" (click)="tornaAiMieiMenu()">← I miei menu</button>
     </div>
@@ -742,11 +743,15 @@
         <img [src]="logoUrl" class="rustico-logo-img" alt="Logo ristorante" />
       </div>
       <ng-template #rusticoTitleFallback>
+        <div class="rustico-ornament">
+          <div class="rustico-ornament-line"></div>
+          <div class="rustico-ornament-diamond" [style.background]="colorePrimario"></div>
+          <div class="rustico-ornament-line right"></div>
+        </div>
         <h1 class="rustico-title" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{ menu.nome | uppercase }}</h1>
       </ng-template>
     </div>
     <div class="rustico-header-right">
-      <div class="rustico-flag">🇮🇹</div>
       <!-- SELETTORE LINGUA RUSTICO -->
       <div class="lingua-selettore lingua-selettore-rustico" (click)="$event.stopPropagation()">
         <button
@@ -780,26 +785,29 @@
   </header>
 
   <div class="rustico-layout">
-    <aside class="rustico-sidebar" [style.backgroundColor]="coloreSecondario + '35'" [style.borderRightColor]="colorePrimario + '33'">
+    <aside class="rustico-sidebar" [style.borderRightColor]="colorePrimario + '22'">
+      <!-- Label fissa in cima con colore utente -->
+      <div class="rustico-sidebar-label" [style.color]="colorePrimario + '99'">Portate</div>
+      <!-- Bottoni scrollabili -->
       <nav class="rustico-nav">
         <button
           *ngIf="piattiDelGiorno.length > 0"
           class="rustico-nav-btn"
           [class.active]="rusticoTabAttiva === 'piatti-giorno'"
-          [style.borderColor]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario : colorePrimario + '44'"
+          [style.borderColor]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario : colorePrimario + '33'"
           [style.color]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario : colorePrimario + 'aa'"
-          [style.background]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario + '18' : 'white'"
+          [style.background]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario + '14' : 'transparent'"
           (click)="rusticoApriTab('piatti-giorno', null)"
         >
-          ✨ {{ getUI('PIATTI_PAROLA') | titlecase }}<br />del Giorno
+          {{ getUI('PIATTI_PAROLA') | titlecase }}<br />del Giorno
         </button>
         <button
           *ngFor="let portata of portate"
           class="rustico-nav-btn"
           [class.active]="rusticoTabAttiva === portata.id"
-          [style.borderColor]="rusticoTabAttiva === portata.id ? colorePrimario : colorePrimario + '44'"
+          [style.borderColor]="rusticoTabAttiva === portata.id ? colorePrimario : colorePrimario + '33'"
           [style.color]="rusticoTabAttiva === portata.id ? colorePrimario : colorePrimario + 'aa'"
-          [style.background]="rusticoTabAttiva === portata.id ? colorePrimario + '18' : 'white'"
+          [style.background]="rusticoTabAttiva === portata.id ? colorePrimario + '14' : 'transparent'"
           (click)="rusticoApriTab(portata.id, portata)"
         >
           {{ nomePortata(portata) }}
