@@ -1,0 +1,175 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="it">
+  <head>
+    <title th:text="#{email.pendingApproval.title}">RistoHub – Registrazione ricevuta</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="icon" th:href="@{|${baseUrl}/favicon.ico|}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: 'DM Sans', Arial, sans-serif;
+        background-color: #f5f5f5;
+        color: #111111;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .wrapper {
+        width: 100%;
+        padding: 40px 16px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        max-width: 520px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 28px;
+        overflow: hidden;
+        border: 1.5px solid #e5e7eb;
+      }
+
+      /* ── HEADER nero come la navbar dell'app ── */
+      .header {
+        background: #111111;
+        padding: 36px 40px;
+        text-align: center;
+      }
+
+      .header-logo-text {
+        font-family: 'DM Serif Display', Georgia, serif;
+        color: #ffffff;
+        font-size: 26px;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+      }
+
+      .header-tagline {
+        color: #9ca3af;
+        font-size: 13px;
+        font-weight: 300;
+      }
+
+      /* ── BODY ── */
+      .body {
+        padding: 40px;
+      }
+
+      .greeting {
+        font-family: 'DM Serif Display', Georgia, serif;
+        font-size: 22px;
+        color: #111111;
+        margin-bottom: 16px;
+      }
+
+      .body p {
+        font-size: 15px;
+        line-height: 1.7;
+        color: #374151;
+        margin-bottom: 16px;
+      }
+
+      /* Badge giallo/oro — coerente con i colori del brand RistoHub */
+      .badge-pending {
+        display: inline-block;
+        background: #fffbeb;
+        color: #92400e;
+        border: 1.5px solid #fcd34d;
+        border-radius: 20px;
+        padding: 7px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        margin: 4px 0 24px;
+      }
+
+      .divider {
+        border: none;
+        border-top: 1.5px solid #e5e7eb;
+        margin: 28px 0;
+      }
+
+      .info-box {
+        background: #f9fafb;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px 20px;
+        font-size: 14px;
+        color: #6b7280;
+        line-height: 1.6;
+        margin-bottom: 24px;
+      }
+
+      .signature {
+        font-size: 14px;
+        color: #6b7280;
+        line-height: 1.6;
+      }
+
+      /* ── FOOTER ── */
+      .footer {
+        background: #f9fafb;
+        border-top: 1.5px solid #e5e7eb;
+        padding: 24px 40px;
+        text-align: center;
+        font-size: 12px;
+        color: #9ca3af;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="container">
+        <!-- Header -->
+        <div class="header">
+          <div class="header-logo-text">🍽️ RistoHub</div>
+          <div class="header-tagline">Il tuo menu digitale</div>
+        </div>
+
+        <!-- Body -->
+        <div class="body">
+          <p class="greeting">
+            Ciao
+            <span th:text="${user.firstName != null and !#strings.isEmpty(user.firstName) ? user.firstName : user.login}">Utente</span>,
+          </p>
+
+          <p>Grazie per esserti registrato su <strong>RistoHub</strong>!</p>
+
+          <p>La tua richiesta è stata ricevuta correttamente. Il tuo account è ora</p>
+
+          <p>
+            <span class="badge-pending">⏳ In attesa di approvazione</span>
+          </p>
+
+          <p>Un amministratore esaminerà la tua richiesta e riceverai una email di conferma non appena il tuo account verrà abilitato.</p>
+
+          <hr class="divider" />
+
+          <div class="info-box">
+            ⏱ Di solito il processo richiede poche ore.<br />
+            Se non ricevi notizie entro 24 ore, puoi contattarci rispondendo a questa email.
+          </div>
+
+          <p class="signature">
+            Grazie per la pazienza,<br />
+            <strong>Il team di RistoHub</strong>
+          </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+          Hai ricevuto questa email perché ti sei registrato su RistoHub.<br />
+          Se non sei stato tu, ignora questo messaggio.
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
