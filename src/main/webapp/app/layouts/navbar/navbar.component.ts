@@ -13,12 +13,14 @@ import { EntityNavbarItems } from 'app/entities/entity-navbar-items';
 import { environment } from 'environments/environment';
 // BUG-03 FIX (NG8113): ActiveMenuDirective rimossa — non è usata nel template di NavbarComponent.
 import NavbarItem from './navbar-item.model';
+import { TutorialService } from 'app/shared/tutorial/tutorial.service';
+import { TutorialComponent } from 'app/shared/tutorial/tutorial.component';
 
 @Component({
   selector: 'jhi-navbar',
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
-  imports: [RouterModule, SharedModule, HasAnyAuthorityDirective],
+  imports: [RouterModule, SharedModule, HasAnyAuthorityDirective, TutorialComponent],
 })
 export default class NavbarComponent implements OnInit {
   inProduction?: boolean;
@@ -35,6 +37,8 @@ export default class NavbarComponent implements OnInit {
   version = '';
   account = inject(AccountService).trackCurrentAccount();
   entitiesNavbarItems: NavbarItem[] = [];
+
+  readonly tutorialService = inject(TutorialService);
 
   private readonly loginService = inject(LoginService);
   private readonly translateService = inject(TranslateService);
@@ -106,5 +110,10 @@ export default class NavbarComponent implements OnInit {
   // Tenuto per compatibilità (non usato nel drawer)
   toggleNavbar(): void {
     this.toggleSidebar();
+  }
+
+  riavviaTutorial(): void {
+    this.closeSidebar();
+    this.tutorialService.relaunch();
   }
 }

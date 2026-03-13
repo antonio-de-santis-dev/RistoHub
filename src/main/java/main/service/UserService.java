@@ -186,12 +186,6 @@ public class UserService {
 
     /**
      * Approva e attiva l'account di un utente in attesa.
-     *
-     * Usato dall'admin per abilitare un account che si è registrato
-     * ma non è ancora stato approvato.
-     *
-     * @param login il login dell'utente da approvare.
-     * @return l'utente approvato, o empty se non trovato.
      */
     public Optional<User> approveUser(String login) {
         LOG.debug("Approving user account: {}", login);
@@ -208,9 +202,6 @@ public class UserService {
 
     /**
      * Update all information for a specific user, and return the modified user.
-     *
-     * @param userDTO user to update.
-     * @return updated user.
      */
     public Optional<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
         return Optional.of(userRepository.findById(userDTO.getId()))
@@ -256,12 +247,6 @@ public class UserService {
 
     /**
      * Update basic information (first name, last name, email, language) for the current user.
-     *
-     * @param firstName first name of user.
-     * @param lastName  last name of user.
-     * @param email     email id of user.
-     * @param langKey   language key.
-     * @param imageUrl  image URL of user.
      */
     public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
         SecurityUtils.getCurrentUserLogin()
@@ -277,6 +262,20 @@ public class UserService {
                 userRepository.save(user);
                 this.clearUserCaches(user);
                 LOG.debug("Changed Information for User: {}", user);
+            });
+    }
+
+    /**
+     * Segna il tutorial come completato per l'utente corrente.
+     */
+    public void completeTutorial() {
+        SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneByLogin)
+            .ifPresent(user -> {
+                user.setTutorialCompleted(true);
+                userRepository.save(user);
+                this.clearUserCaches(user);
+                LOG.debug("Tutorial completato per l'utente: {}", user.getLogin());
             });
     }
 
@@ -319,8 +318,6 @@ public class UserService {
     /**
      * Persistent Token are used for providing automatic authentication, they should be automatically deleted after
      * 30 days.
-     * <p>
-     * This is scheduled to get fired every day, at midnight.
      */
     @Scheduled(cron = "0 0 0 * * ?")
     public void removeOldPersistentTokens() {
@@ -337,8 +334,6 @@ public class UserService {
 
     /**
      * Not activated users should be automatically deleted after 3 days.
-     * <p>
-     * This is scheduled to get fired every day, at 01:00 (am).
      */
     @Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
@@ -351,10 +346,6 @@ public class UserService {
             });
     }
 
-    /**
-     * Gets a list of all the authorities.
-     * @return a list of all the authorities.
-     */
     @Transactional(readOnly = true)
     public List<String> getAuthorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).toList();

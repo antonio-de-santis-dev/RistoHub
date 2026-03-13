@@ -62,15 +62,6 @@ public class AccountResource {
 
     /**
      * {@code POST  /register} : registra un nuovo utente.
-     *
-     * Il nuovo utente viene salvato come NON attivato.
-     * L'utente riceve una email "in attesa di approvazione".
-     * L'admin dovrà approvare l'account dalla sezione di gestione utenti.
-     *
-     * @param managedUserVM the managed user View Model.
-     * @throws InvalidPasswordException {@code 400 (Bad Request)} se la password non è valida.
-     * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} se l'email è già in uso.
-     * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} se il login è già in uso.
      */
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
@@ -79,16 +70,11 @@ public class AccountResource {
             throw new InvalidPasswordException();
         }
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-        // Invia email "in attesa di approvazione" invece dell'email di attivazione diretta
         mailService.sendPendingApprovalEmail(user);
     }
 
     /**
      * {@code GET  /activate} : attiva l'utente registrato tramite chiave.
-     * (Mantenuto per compatibilità, ma il flusso principale ora usa l'approvazione admin)
-     *
-     * @param key the activation key.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} se l'utente non è trovato.
      */
     @GetMapping("/activate")
     public void activateAccount(@RequestParam(value = "key") String key) {
@@ -100,9 +86,6 @@ public class AccountResource {
 
     /**
      * {@code GET  /authenticate} : controlla se l'utente è autenticato.
-     *
-     * @return {@link ResponseEntity} con status {@code 204 (No Content)},
-     * o {@code 401 (Unauthorized)} se non autenticato.
      */
     @GetMapping("/authenticate")
     public ResponseEntity<Void> isAuthenticated(Principal principal) {
@@ -112,9 +95,6 @@ public class AccountResource {
 
     /**
      * {@code GET  /account} : restituisce l'utente corrente.
-     *
-     * @return l'utente corrente.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} se l'utente non è trovato.
      */
     @GetMapping("/account")
     public AdminUserDTO getAccount() {
@@ -126,10 +106,6 @@ public class AccountResource {
 
     /**
      * {@code POST  /account} : aggiorna le informazioni dell'utente corrente.
-     *
-     * @param userDTO le informazioni aggiornate dell'utente corrente.
-     * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} se l'email è già in uso.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} se il login non è trovato.
      */
     @PostMapping("/account")
     public void saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
@@ -153,10 +129,16 @@ public class AccountResource {
     }
 
     /**
+     * {@code POST  /account/tutorial-completed} : segna il tutorial come completato.
+     */
+    @PostMapping("/account/tutorial-completed")
+    public ResponseEntity<Void> completeTutorial() {
+        userService.completeTutorial();
+        return ResponseEntity.ok().build();
+    }
+
+    /**
      * {@code POST  /account/change-password} : cambia la password dell'utente corrente.
-     *
-     * @param passwordChangeDto la password attuale e la nuova.
-     * @throws InvalidPasswordException {@code 400 (Bad Request)} se la nuova password non è valida.
      */
     @PostMapping(path = "/account/change-password")
     public void changePassword(@RequestBody PasswordChangeDTO passwordChangeDto) {
@@ -168,9 +150,6 @@ public class AccountResource {
 
     /**
      * {@code GET  /account/sessions} : restituisce le sessioni aperte dell'utente corrente.
-     *
-     * @return le sessioni aperte correnti.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} se le sessioni non sono recuperabili.
      */
     @GetMapping("/account/sessions")
     public List<PersistentToken> getCurrentSessions() {
@@ -185,9 +164,6 @@ public class AccountResource {
 
     /**
      * {@code DELETE  /account/sessions?series={series}} : invalida una sessione esistente.
-     *
-     * @param series the series of an existing session.
-     * @throws IllegalArgumentException if the series couldn't be URL decoded.
      */
     @DeleteMapping("/account/sessions/{series}")
     public void invalidateSession(@PathVariable("series") String series) {
@@ -206,8 +182,6 @@ public class AccountResource {
 
     /**
      * {@code POST   /account/reset-password/init} : invia email per il reset della password.
-     *
-     * @param mail l'email dell'utente.
      */
     @PostMapping(path = "/account/reset-password/init")
     public void requestPasswordReset(@RequestBody String mail) {
@@ -221,10 +195,6 @@ public class AccountResource {
 
     /**
      * {@code POST   /account/reset-password/finish} : completa il reset della password.
-     *
-     * @param keyAndPassword la chiave generata e la nuova password.
-     * @throws InvalidPasswordException {@code 400 (Bad Request)} se la password non è valida.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} se la password non può essere reimpostata.
      */
     @PostMapping(path = "/account/reset-password/finish")
     public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {

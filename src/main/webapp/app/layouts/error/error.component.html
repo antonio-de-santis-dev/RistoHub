@@ -1,15 +1,36 @@
-<div>
-  <div class="row">
-    <div class="col-md-4">
-      <span class="hipster img-fluid rounded"></span>
+@if (is404()) {
+  <div class="rh-404-page">
+    <div class="rh-bg-decoration">
+      <span class="rh-particle rh-p1">🍽️</span>
+      <span class="rh-particle rh-p2">🥄</span>
+      <span class="rh-particle rh-p3">🍴</span>
+      <span class="rh-particle rh-p4">🔪</span>
     </div>
 
-    <div class="col-md-8">
-      <h1 jhiTranslate="error.title">Pagina di errore!</h1>
+    <img src="/content/images/LogoBianco.png" alt="RistoHub" class="rh-logo" />
 
-      @if (errorMessage(); as errMessage) {
-        <div class="alert alert-danger">{{ errMessage }}</div>
-      }
-    </div>
+    <div class="rh-404-number">404</div>
+
+    <h1 class="rh-title">Pagina non trovata</h1>
+
+    <p class="rh-subtitle">
+      Sembra che questo piatto non sia nel menu.<br />
+      Torna alla cucina e riprova.
+    </p>
+
+    <a routerLink="/home" class="rh-btn">
+      <span>Torna alla Home</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M5 12h14M12 5l7 7-7 7" />
+      </svg>
+    </a>
   </div>
-</div>
+} @else {
+  <div class="rh-generic-error">
+    <h1>Errore</h1>
+    @if (errorMessage(); as errMessage) {
+      <div class="alert alert-danger">{{ errMessage }}</div>
+    }
+    <a routerLink="/home" class="rh-btn-sm">← Torna alla Home</a>
+  </div>
+}

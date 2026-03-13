@@ -38,6 +38,8 @@ public class AdminUserDTO implements Serializable {
 
     private boolean activated = false;
 
+    private boolean tutorialCompleted = false;
+
     @Size(min = 2, max = 10)
     private String langKey;
 
@@ -68,6 +70,7 @@ public class AdminUserDTO implements Serializable {
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();
         this.lastModifiedDate = user.getLastModifiedDate();
+        this.tutorialCompleted = user.isTutorialCompleted();
         this.authorities = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
     }
 
@@ -125,6 +128,14 @@ public class AdminUserDTO implements Serializable {
 
     public void setActivated(boolean activated) {
         this.activated = activated;
+    }
+
+    public boolean isTutorialCompleted() {
+        return tutorialCompleted;
+    }
+
+    public void setTutorialCompleted(boolean tutorialCompleted) {
+        this.tutorialCompleted = tutorialCompleted;
     }
 
     public String getLangKey() {
@@ -185,6 +196,7 @@ public class AdminUserDTO implements Serializable {
             ", email='" + email + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
             ", activated=" + activated +
+            ", tutorialCompleted=" + tutorialCompleted +
             ", langKey='" + langKey + '\'' +
             ", createdBy=" + createdBy +
             ", createdDate=" + createdDate +

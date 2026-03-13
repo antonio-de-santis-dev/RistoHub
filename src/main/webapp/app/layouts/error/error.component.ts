@@ -1,17 +1,20 @@
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-import SharedModule from 'app/shared/shared.module';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'jhi-error',
   templateUrl: './error.component.html',
-  imports: [SharedModule],
+  styleUrls: ['./error.component.scss'],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
 })
 export default class ErrorComponent implements OnInit, OnDestroy {
   errorMessage = signal<string | undefined>(undefined);
   errorKey?: string;
+  is404 = signal(false);
   langChangeSubscription?: Subscription;
 
   private readonly translateService = inject(TranslateService);
@@ -21,6 +24,7 @@ export default class ErrorComponent implements OnInit, OnDestroy {
     this.route.data.subscribe(routeData => {
       if (routeData.errorMessage) {
         this.errorKey = routeData.errorMessage;
+        this.is404.set(this.errorKey === 'error.http.404');
         this.getErrorMessageTranslation();
         this.langChangeSubscription = this.translateService.onLangChange.subscribe(() => this.getErrorMessageTranslation());
       }

@@ -6,11 +6,13 @@ import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 import { firstValueFrom } from 'rxjs';
 import { MenuDTO, PiattoDelGiornoDTO } from 'app/shared/model/risto.model';
+import { TutorialComponent } from 'app/shared/tutorial/tutorial.component';
+import { TutorialService } from 'app/shared/tutorial/tutorial.service';
 
 @Component({
   selector: 'jhi-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TutorialComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
@@ -18,6 +20,7 @@ export default class HomeComponent implements OnInit {
   private readonly accountService = inject(AccountService);
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly tutorialService = inject(TutorialService);
 
   account: Signal<Account | null> = this.accountService.trackCurrentAccount();
 
@@ -44,45 +47,38 @@ export default class HomeComponent implements OnInit {
   }
 
   async caricaDashboard(): Promise<void> {
-    // Usa il Signal già in cache — nessuna chiamata HTTP a /api/account
     const account = this.account();
     if (!account) return;
     const login = account.login;
-    await Promise.all([this.caricaPiattiAttivi(login), this.caricaMenuAttivi(login)]);
-  }
 
-  async caricaPiattiAttivi(login: string): Promise<void> {
     this.isLoadingPiatti = true;
+    this.isLoadingMenus = true;
+
     try {
-      // Prima ottieni i menu del ristoratore loggato
       const tuttiMenu: MenuDTO[] = (await firstValueFrom(this.http.get<MenuDTO[]>('/api/menus'))) ?? [];
       const meiMenuIds = new Set(tuttiMenu.filter(m => m.ristoratore?.login === login).map(m => m.id));
+      this.menuAttivi = tuttiMenu.filter(m => m.attivo && m.ristoratore?.login === login);
+      this.isLoadingMenus = false;
 
-      // Poi ottieni tutti i piatti del giorno
       const tutti: PiattoDelGiornoDTO[] = (await firstValueFrom(this.http.get<PiattoDelGiornoDTO[]>('/api/piatto-del-giornos'))) ?? [];
-
-      // Filtra: attivi E (non hanno menu collegato OPPURE il menu è del ristoratore)
       this.piattiAttivi = tutti.filter(p => {
         if (!p.attivo) return false;
-        if (!p.menu?.id) return true; // piatto senza menu: includi
+        if (!p.menu?.id) return true;
         return meiMenuIds.has(p.menu.id);
       });
     } catch (err) {
-      console.error('Errore piatti del giorno:', err);
+      console.error('Errore dashboard:', err);
     } finally {
       this.isLoadingPiatti = false;
-    }
-  }
-
-  async caricaMenuAttivi(login: string): Promise<void> {
-    this.isLoadingMenus = true;
-    try {
-      const tutti: MenuDTO[] = (await firstValueFrom(this.http.get<MenuDTO[]>('/api/menus'))) ?? [];
-      this.menuAttivi = tutti.filter(m => m.attivo && m.ristoratore?.login === login);
-    } catch (err) {
-      console.error('Errore menu:', err);
-    } finally {
       this.isLoadingMenus = false;
+
+      // Controlla se mostrare il tutorial dopo il caricamento
+      const acc = this.account();
+      if (acc) {
+        // tutorialCompleted viene letto dall'oggetto account restituito da /api/account
+        const tutorialCompleted = (acc as any).tutorialCompleted ?? false;
+        this.tutorialService.checkAndShow(tutorialCompleted);
+      }
     }
   }
 

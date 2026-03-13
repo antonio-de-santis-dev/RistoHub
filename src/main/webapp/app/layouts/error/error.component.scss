@@ -1,0 +1,233 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+.rh-404-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #060606;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 210, 0, 0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(61, 214, 200, 0.06) 0%, transparent 60%);
+  font-family: 'DM Sans', sans-serif;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem 1rem;
+  gap: 1.6rem;
+  text-align: center;
+}
+
+// ── Particelle di sfondo ───────────────────────────────
+.rh-bg-decoration {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.rh-particle {
+  position: absolute;
+  opacity: 0.04;
+  animation: particleDrift 20s ease-in-out infinite;
+
+  &.rh-p1 {
+    top: 10%;
+    left: 5%;
+    font-size: 3rem;
+    animation-delay: 0s;
+    animation-duration: 22s;
+  }
+  &.rh-p2 {
+    top: 70%;
+    left: 8%;
+    font-size: 1.8rem;
+    animation-delay: 3s;
+    animation-duration: 18s;
+  }
+  &.rh-p3 {
+    top: 20%;
+    right: 6%;
+    font-size: 2.5rem;
+    animation-delay: 6s;
+    animation-duration: 25s;
+  }
+  &.rh-p4 {
+    top: 75%;
+    right: 4%;
+    font-size: 2rem;
+    animation-delay: 1s;
+    animation-duration: 20s;
+  }
+}
+
+@keyframes particleDrift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.04;
+  }
+  33% {
+    transform: translateY(-18px) rotate(8deg);
+    opacity: 0.07;
+  }
+  66% {
+    transform: translateY(12px) rotate(-6deg);
+    opacity: 0.03;
+  }
+}
+
+// ── Logo ───────────────────────────────────────────────
+.rh-logo {
+  width: 110px;
+  opacity: 0.7;
+  animation: fadeUp 0.5s ease both;
+}
+
+// ── NUMERO 404 — grande, lampeggiante ──────────────────
+.rh-404-number {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(8rem, 22vw, 16rem);
+  font-weight: 400;
+  line-height: 1;
+  color: #ffd200;
+  letter-spacing: -4px;
+  animation: blink404 1.5s ease-in-out infinite;
+  text-shadow:
+    0 0 40px rgba(255, 210, 0, 0.8),
+    0 0 80px rgba(255, 210, 0, 0.4),
+    0 0 120px rgba(255, 180, 0, 0.2);
+}
+
+@keyframes blink404 {
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow:
+      0 0 40px rgba(255, 210, 0, 0.9),
+      0 0 80px rgba(255, 210, 0, 0.5),
+      0 0 120px rgba(255, 180, 0, 0.3);
+  }
+  45%,
+  55% {
+    opacity: 0.08;
+    text-shadow: none;
+  }
+}
+
+// ── Titolo ─────────────────────────────────────────────
+.rh-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 400;
+  color: #fff;
+  margin: 0;
+  animation: fadeUp 0.5s ease both;
+  animation-delay: 0.1s;
+}
+
+// ── Sottotitolo ────────────────────────────────────────
+.rh-subtitle {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.7;
+  max-width: 340px;
+  margin: 0;
+  animation: fadeUp 0.5s ease both;
+  animation-delay: 0.2s;
+}
+
+// ── CTA Button ─────────────────────────────────────────
+.rh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.85rem 2rem;
+  background: linear-gradient(135deg, #ffd200, #f5b800);
+  color: #060606;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  border-radius: 50px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: 0 4px 20px rgba(255, 210, 0, 0.35);
+  animation: fadeUp 0.5s ease both;
+  animation-delay: 0.3s;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 210, 0, 0.55);
+    svg {
+      transform: translateX(4px);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ── Entrata ────────────────────────────────────────────
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  Errore generico (403, 500…)
+// ══════════════════════════════════════════════════════
+.rh-generic-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 1rem;
+  font-family: 'DM Sans', sans-serif;
+  background: #060606;
+  color: #fff;
+  padding: 2rem;
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+  }
+
+  .alert-danger {
+    background: rgba(220, 53, 69, 0.15);
+    border: 1px solid rgba(220, 53, 69, 0.4);
+    color: #ff6b7a;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    max-width: 480px;
+    text-align: center;
+  }
+}
+
+.rh-btn-sm {
+  color: #ffd200;
+  text-decoration: none;
+  font-size: 0.9rem;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  &:hover {
+    opacity: 1;
+  }
+}

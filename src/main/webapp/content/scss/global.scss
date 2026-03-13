@@ -309,3 +309,56 @@ $rh-topbar-h: 52px;
     padding-top: $rh-topbar-h;
   }
 }
+
+/* ==========================================================================
+   TUTORIAL — highlight elemento evidenziato dallo spotlight
+   Deve stare qui (global) per bypassare l'encapsulation Angular.
+   L'elemento ottiene z-index sopra l'overlay (10000) + bordo oro + glow.
+========================================================================== */
+
+.rh-tut-highlight {
+  position: relative;
+  z-index: 10001 !important;
+
+  /* Bordo oro pulsante attorno all'elemento */
+  outline: 2px solid #ffd200 !important;
+  outline-offset: 4px;
+  border-radius: 8px;
+
+  /* Glow dorato per staccarlo visivamente dallo sfondo scuro */
+  box-shadow:
+    0 0 0 4px rgba(255, 210, 0, 0.15),
+    0 0 20px 6px rgba(255, 210, 0, 0.35) !important;
+
+  /* Testo e icone completamente visibili */
+  color: #ffffff !important;
+  opacity: 1 !important;
+
+  svg {
+    opacity: 1 !important;
+    color: #ffd200 !important;
+    stroke: #ffd200 !important;
+  }
+
+  span {
+    color: #ffffff !important;
+    opacity: 1 !important;
+  }
+
+  /* Animazione pulsante sul bordo */
+  animation: tutHighlightPulse 1.8s ease-in-out infinite !important;
+}
+
+@keyframes tutHighlightPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 4px rgba(255, 210, 0, 0.15),
+      0 0 20px 6px rgba(255, 210, 0, 0.35);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(255, 210, 0, 0.08),
+      0 0 32px 10px rgba(255, 210, 0, 0.55);
+  }
+}
