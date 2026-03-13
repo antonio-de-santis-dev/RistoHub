@@ -65,7 +65,7 @@ public class PiattoDelGiorno implements Serializable {
     @JoinTable(
         name = "piatto_del_giorno_allergenis",
         joinColumns = @JoinColumn(name = "piatto_del_giorno_id"),
-        inverseJoinColumns = @JoinColumn(name = "allegene_id")
+        inverseJoinColumns = @JoinColumn(name = "allergene_id")
     )
     @JsonIgnoreProperties(value = { "prodottos" }, allowSetters = true)
     private Set<Allergene> allergenis = new HashSet<>();

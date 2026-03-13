@@ -9,6 +9,12 @@
 
   <changeSet id="20240101-add-piatto-del-giorno-allergenis" author="migration">
 
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="piatto_del_giorno_allergenis"/>
+      </not>
+    </preConditions>
+
     <createTable tableName="piatto_del_giorno_allergenis">
       <column name="piatto_del_giorno_id" type="${uuidType}">
         <constraints nullable="false"/>

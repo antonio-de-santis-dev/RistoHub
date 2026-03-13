@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <!--
+    Rinomina la colonna "allegene_id" (typo senza 'n') in "allergene_id" (corretto)
+    nella tabella piatto_del_giorno_allergenis.
+
+    La colonna fu creata da Hibernate con il nome sbagliato "allegene_id" prima
+    che il changelog 20240101_add_piatto_del_giorno_allergenis.xml venisse aggiunto.
+    Il changeset 20240101 viene ora saltato (MARK_RAN) perché la tabella esiste già,
+    ma con il vecchio nome colonna. Questo changeset allinea il DB con il mapping
+    JPA che ora usa "allergene_id".
+  -->
+  <changeSet id="20260313000000-fix-typo-allegene-id" author="migration">
+
+    <preConditions onFail="MARK_RAN">
+      <columnExists tableName="piatto_del_giorno_allergenis" columnName="allegene_id"/>
+    </preConditions>
+
+    <renameColumn
+      tableName="piatto_del_giorno_allergenis"
+      oldColumnName="allegene_id"
+      newColumnName="allergene_id"
+      columnDataType="${uuidType}"/>
+
+  </changeSet>
+
+</databaseChangeLog>

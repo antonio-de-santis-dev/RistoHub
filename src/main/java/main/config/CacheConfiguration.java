@@ -100,6 +100,10 @@ public class CacheConfiguration {
             createCache(cm, main.domain.ImmagineMenu.class.getName());
             createCache(cm, main.domain.Prodotto.class.getName());
             createCache(cm, main.domain.Prodotto.class.getName() + ".allergenis");
+            createCacheWithConfig(cm, main.domain.PiattoDelGiorno.class.getName() + ".allergenis", hotCacheConfiguration);
+            createCache(cm, main.domain.ListaContatti.class.getName());
+            createCache(cm, main.domain.ListaContatti.class.getName() + ".items");
+            createCache(cm, main.domain.ContattoItem.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }
