@@ -137,5 +137,11 @@ module.exports = async (config, options, targetOptions) => {
     // jhipster-needle-add-webpack-config - JHipster will add custom config
   );
 
+  // Sopprime il warning CommonJS per 'buffer' (usato da data-util.service.ts)
+  config.ignoreWarnings = [
+    ...(config.ignoreWarnings || []),
+    warning => warning.module?.resource?.includes('buffer') || warning.message?.includes("'buffer'"),
+  ];
+
   return config;
 };
