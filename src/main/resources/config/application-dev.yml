@@ -37,6 +37,11 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
+    # H2 su file: i dati persistono tra i riavvii. Liquibase gestisce lo schema
+    # con preConditions(MARK_RAN), quindi le tabelle non vengono ricreate.
+    # Se uno schema cambia in modo incompatibile (colonna rinominata, tipo cambiato,
+    # vincolo aggiunto non-nullable senza default), eliminare manualmente la cartella
+    # target/h2db/ prima di riavviare: rm -rf target/h2db/
     url: jdbc:h2:file:./target/h2db/db/ristoHub;DB_CLOSE_DELAY=-1
     username: ristoHub
     password:
