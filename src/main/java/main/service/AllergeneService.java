@@ -3,7 +3,6 @@ package main.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import main.domain.Allergene;
 import main.repository.AllergeneRepository;
 import main.service.dto.AllergeneDTO;
@@ -88,7 +87,7 @@ public class AllergeneService {
     @Transactional(readOnly = true)
     public List<AllergeneDTO> findAll() {
         LOG.debug("Request to get all Allergenes");
-        return allergeneRepository.findAll().stream().map(allergeneMapper::toDto).collect(Collectors.toList());
+        return allergeneRepository.findAll().stream().map(allergeneMapper::toDto).toList();
     }
 
     /**

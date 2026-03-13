@@ -1,7 +1,6 @@
 package main.service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import main.domain.ContattoItem;
 import main.domain.ListaContatti;
 import main.repository.ListaContattiRepository;
@@ -113,7 +112,7 @@ public class ListaContattiService {
      */
     @Transactional(readOnly = true)
     public List<ListaContattiDTO> findAllByCurrentUser() {
-        return listaContattiRepository.findByRistoratoreIsCurrentUser().stream().map(this::toDto).collect(Collectors.toList());
+        return listaContattiRepository.findByRistoratoreIsCurrentUser().stream().map(this::toDto).toList();
     }
 
     /**
@@ -129,7 +128,7 @@ public class ListaContattiService {
      */
     @Transactional(readOnly = true)
     public List<ListaContattiDTO> findByMenuId(UUID menuId) {
-        return listaContattiRepository.findByMenuId(menuId).stream().map(this::toDto).collect(Collectors.toList());
+        return listaContattiRepository.findByMenuId(menuId).stream().map(this::toDto).toList();
     }
 
     // ── Conversione Entity ↔ DTO ──────────────────────────────────
@@ -151,7 +150,7 @@ public class ListaContattiService {
             (e.getItems() != null ? e.getItems() : List.<ContattoItem>of()).stream()
                 .sorted(Comparator.comparingInt(i -> (i.getOrdine() != null ? i.getOrdine() : 0)))
                 .map(this::toItemDto)
-                .collect(Collectors.toList());
+                .toList();
         dto.setItems(itemDtos);
         return dto;
     }

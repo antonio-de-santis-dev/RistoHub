@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import main.domain.PiattoDelGiorno;
 import main.repository.PiattoDelGiornoRepository;
 import main.service.dto.PiattoDelGiornoDTO;
@@ -95,7 +94,7 @@ public class PiattoDelGiornoService {
         // Query 3: inizializza p.allergenis (piatti personalizzati) sulle istanze già in sessione
         piattoDelGiornoRepository.findAllConAllergeniDiretti();
 
-        return baseList.stream().map(piattoDelGiornoMapper::toDto).collect(Collectors.toList());
+        return baseList.stream().map(piattoDelGiornoMapper::toDto).toList();
     }
 
     /**

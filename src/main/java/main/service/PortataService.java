@@ -1,7 +1,6 @@
 package main.service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import main.domain.Portata;
 import main.domain.enumeration.NomePortataDefault;
 import main.domain.enumeration.TipoPortata;
@@ -88,7 +87,7 @@ public class PortataService {
     @Transactional(readOnly = true)
     public List<PortataDTO> findAll() {
         LOG.debug("Request to get all Portatas");
-        return portataRepository.findAll().stream().map(portataMapper::toDto).collect(Collectors.toList());
+        return portataRepository.findAll().stream().map(portataMapper::toDto).toList();
     }
 
     /**
@@ -129,6 +128,6 @@ public class PortataService {
                     return NomePortataDefault.CONTORNO.ordinal() * 10 + 5;
                 })
             )
-            .collect(Collectors.toList());
+            .toList();
     }
 }

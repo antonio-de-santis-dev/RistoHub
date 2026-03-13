@@ -3,7 +3,6 @@ package main.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import main.domain.ImmagineMenu;
 import main.domain.Menu;
 import main.domain.enumeration.TipoImmagine;
@@ -73,7 +72,7 @@ public class ImmagineMenuService {
     @Transactional(readOnly = true)
     public List<ImmagineMenuDTO> findAll() {
         LOG.debug("Request to get all ImmagineMenus");
-        return immagineMenuRepository.findAll().stream().map(immagineMenuMapper::toDto).collect(Collectors.toList());
+        return immagineMenuRepository.findAll().stream().map(immagineMenuMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
@@ -89,11 +88,7 @@ public class ImmagineMenuService {
 
     @Transactional(readOnly = true)
     public List<ImmagineMenuDTO> findByMenuId(UUID menuId) {
-        return immagineMenuRepository
-            .findByMenuIdOrderByOrdine(menuId)
-            .stream()
-            .map(immagineMenuMapper::toDto)
-            .collect(Collectors.toList());
+        return immagineMenuRepository.findByMenuIdOrderByOrdine(menuId).stream().map(immagineMenuMapper::toDto).toList();
     }
 
     /**
@@ -166,6 +161,6 @@ public class ImmagineMenuService {
                     m.getVisibile()
                 )
             )
-            .collect(java.util.stream.Collectors.toList());
+            .toList();
     }
 }

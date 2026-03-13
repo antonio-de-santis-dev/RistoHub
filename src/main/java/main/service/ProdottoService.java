@@ -3,7 +3,6 @@ package main.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import main.domain.Prodotto;
 import main.repository.ProdottoRepository;
 import main.service.dto.ProdottoDTO;
@@ -90,7 +89,7 @@ public class ProdottoService {
     @Transactional(readOnly = true)
     public List<ProdottoDTO> findAll() {
         LOG.debug("Request to get all Prodottos");
-        return prodottoRepository.findAll().stream().map(prodottoMapper::toDto).collect(Collectors.toList());
+        return prodottoRepository.findAll().stream().map(prodottoMapper::toDto).toList();
     }
 
     /**
@@ -125,7 +124,7 @@ public class ProdottoService {
     }
 
     public List<ProdottoDTO> findByPortataId(UUID portataId) {
-        return prodottoRepository.findByPortataId(portataId).stream().map(prodottoMapper::toDto).collect(Collectors.toList());
+        return prodottoRepository.findByPortataId(portataId).stream().map(prodottoMapper::toDto).toList();
     }
 
     /**

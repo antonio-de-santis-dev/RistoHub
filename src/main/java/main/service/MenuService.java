@@ -3,7 +3,6 @@ package main.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import main.domain.Menu;
 import main.domain.PiattoDelGiorno;
 import main.repository.MenuRepository;
@@ -114,7 +113,7 @@ public class MenuService {
     @Transactional(readOnly = true)
     public List<MenuDTO> findAll() {
         LOG.debug("Request to get all Menus");
-        return menuRepository.findAll().stream().map(menuMapper::toDto).collect(Collectors.toList());
+        return menuRepository.findAll().stream().map(menuMapper::toDto).toList();
     }
 
     /**
@@ -189,7 +188,7 @@ public class MenuService {
         // Query 3: inizializza p.allergenis (piatti personalizzati) sulle stesse istanze
         menuRepository.findPiattiDelGiornoAttiviByMenuIdConAllergeniDiretti(menuId);
 
-        return baseList.stream().map(piattoDelGiornoMapper::toDto).collect(Collectors.toList());
+        return baseList.stream().map(piattoDelGiornoMapper::toDto).toList();
     }
 
     /**
@@ -230,7 +229,7 @@ public class MenuService {
                     prodotti
                 );
             })
-            .collect(Collectors.toList());
+            .toList();
 
         // Piatti del giorno attivi (già con allergeni — vedi findPiattiDelGiornoAttiviByMenuId)
         List<PiattoDelGiornoDTO> piattiDelGiorno = findPiattiDelGiornoAttiviByMenuId(id);
