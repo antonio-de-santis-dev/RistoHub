@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 import main.repository.MenuRepository;
 import main.service.ImmagineMenuService;
+import main.service.MenuCompletoService;
 import main.service.MenuService;
 import main.service.PortataService;
 import main.service.ProdottoService;
@@ -46,6 +47,7 @@ public class MenuResource {
     private String applicationName;
 
     private final MenuService menuService;
+    private final MenuCompletoService menuCompletoService;
     private final PortataService portataService;
     private final ImmagineMenuService immagineMenuService;
     private final MenuRepository menuRepository;
@@ -53,12 +55,14 @@ public class MenuResource {
 
     public MenuResource(
         MenuService menuService,
+        MenuCompletoService menuCompletoService,
         MenuRepository menuRepository,
         PortataService portataService,
         ImmagineMenuService immagineMenuService,
         ProdottoService prodottoService
     ) {
         this.menuService = menuService;
+        this.menuCompletoService = menuCompletoService;
         this.menuRepository = menuRepository;
         this.portataService = portataService;
         this.immagineMenuService = immagineMenuService;
@@ -154,7 +158,7 @@ public class MenuResource {
     @GetMapping("/{id}/piatti-del-giorno")
     public List<PiattoDelGiornoDTO> getPiattiDelGiornoByMenu(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get active PiattiDelGiorno for Menu : {}", id);
-        return menuService.findPiattiDelGiornoAttiviByMenuId(id);
+        return menuCompletoService.findPiattiDelGiornoAttiviByMenuId(id);
     }
 
     // ── Immagini carosello copertina ──────────────────────
@@ -239,6 +243,6 @@ public class MenuResource {
     @GetMapping("/menus/{id}/full")
     public ResponseEntity<MenuCompletoDTO> getMenuCompleto(@PathVariable("id") UUID id) {
         LOG.debug("PUBLIC request to get MenuCompleto (aggregato) : {}", id);
-        return menuService.findMenuCompleto(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return menuCompletoService.findMenuCompleto(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 }

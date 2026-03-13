@@ -66,7 +66,7 @@ export class AccountService {
 
           this.navigateToStoredUrl();
         }),
-        shareReplay(),
+        shareReplay({ bufferSize: 1, refCount: true }),
       );
     }
     return this.accountCache$.pipe(

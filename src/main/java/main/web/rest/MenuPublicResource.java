@@ -5,6 +5,7 @@ import java.util.UUID;
 import main.service.AllergeneService;
 import main.service.ImmagineMenuService;
 import main.service.ListaContattiService;
+import main.service.MenuCompletoService;
 import main.service.MenuService;
 import main.service.PortataService;
 import main.service.ProdottoService;
@@ -35,6 +36,7 @@ public class MenuPublicResource {
     private static final Logger LOG = LoggerFactory.getLogger(MenuPublicResource.class);
 
     private final MenuService menuService;
+    private final MenuCompletoService menuCompletoService;
     private final PortataService portataService;
     private final ProdottoService prodottoService;
     private final ImmagineMenuService immagineMenuService;
@@ -43,6 +45,7 @@ public class MenuPublicResource {
 
     public MenuPublicResource(
         MenuService menuService,
+        MenuCompletoService menuCompletoService,
         PortataService portataService,
         ProdottoService prodottoService,
         ImmagineMenuService immagineMenuService,
@@ -50,6 +53,7 @@ public class MenuPublicResource {
         ListaContattiService listaContattiService
     ) {
         this.menuService = menuService;
+        this.menuCompletoService = menuCompletoService;
         this.portataService = portataService;
         this.prodottoService = prodottoService;
         this.immagineMenuService = immagineMenuService;
@@ -84,7 +88,7 @@ public class MenuPublicResource {
     @GetMapping("/menus/{id}/piatti-del-giorno")
     public List<PiattoDelGiornoDTO> getPiattiDelGiorno(@PathVariable("id") UUID id) {
         LOG.debug("PUBLIC request to get piatti del giorno for Menu : {}", id);
-        return menuService.findPiattiDelGiornoAttiviByMenuId(id);
+        return menuCompletoService.findPiattiDelGiornoAttiviByMenuId(id);
     }
 
     /**
@@ -135,6 +139,6 @@ public class MenuPublicResource {
     @GetMapping("/menus/{id}/full")
     public ResponseEntity<MenuCompletoDTO> getMenuCompleto(@PathVariable("id") UUID id) {
         LOG.debug("PUBLIC request to get MenuCompleto (aggregato) : {}", id);
-        return menuService.findMenuCompleto(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return menuCompletoService.findMenuCompleto(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 }
