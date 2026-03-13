@@ -12,12 +12,14 @@ import main.repository.MenuRepository;
 import main.service.ImmagineMenuService;
 import main.service.MenuService;
 import main.service.PortataService;
+import main.service.ProdottoService;
 import main.service.dto.ImmagineMenuDTO;
 import main.service.dto.ImmagineMenuMetaDTO;
 import main.service.dto.MenuCompletoDTO;
 import main.service.dto.MenuDTO;
 import main.service.dto.PiattoDelGiornoDTO;
 import main.service.dto.PortataDTO;
+import main.service.dto.ProdottoDTO;
 import main.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,17 +49,20 @@ public class MenuResource {
     private final PortataService portataService;
     private final ImmagineMenuService immagineMenuService;
     private final MenuRepository menuRepository;
+    private final ProdottoService prodottoService;
 
     public MenuResource(
         MenuService menuService,
         MenuRepository menuRepository,
         PortataService portataService,
-        ImmagineMenuService immagineMenuService
+        ImmagineMenuService immagineMenuService,
+        ProdottoService prodottoService
     ) {
         this.menuService = menuService;
         this.menuRepository = menuRepository;
         this.portataService = portataService;
         this.immagineMenuService = immagineMenuService;
+        this.prodottoService = prodottoService;
     }
 
     // ── CRUD Menu standard ────────────────────────────────
@@ -133,6 +138,17 @@ public class MenuResource {
     public List<PortataDTO> getMenuPortatas(@PathVariable("id") UUID id) {
         LOG.debug("REST request to get Portatas for Menu : {}", id);
         return portataService.findByMenuId(id);
+    }
+
+    /**
+     * GET /api/menus/{id}/prodotti-completi
+     * Restituisce tutti i prodotti di tutte le portate del menu con allergeni già caricati.
+     * Sostituisce il loop N+1 (menu→portatas→prodotti) del frontend con una singola chiamata.
+     */
+    @GetMapping("/{id}/prodotti-completi")
+    public List<ProdottoDTO> getProdottiCompletiByMenu(@PathVariable("id") UUID id) {
+        LOG.debug("REST request to get all Prodotti with allergeni for Menu : {}", id);
+        return prodottoService.findProdottiCompletiByMenuId(id);
     }
 
     @GetMapping("/{id}/piatti-del-giorno")

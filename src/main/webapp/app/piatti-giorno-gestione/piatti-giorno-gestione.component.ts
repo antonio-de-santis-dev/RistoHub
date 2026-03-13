@@ -107,13 +107,13 @@ export class PiattiGiornoGestioneComponent implements OnInit {
 
   private async costruisciProdottiMap(): Promise<void> {
     try {
-      for (const menu of this.menus) {
-        const portate: any[] = (await firstValueFrom(this.http.get<any[]>(`/api/menus/${menu.id}/portatas`))) ?? [];
-        for (const portata of portate) {
-          const prods: any[] = (await firstValueFrom(this.http.get<any[]>(`/api/prodottos/by-portata/${portata.id}`))) ?? [];
-          prods.forEach(p => this.prodottiMap.set(String(p.id), p));
-        }
-      }
+      // Passo B: un solo endpoint aggregato per menu → nessun loop multi-livello.
+      // GET /api/menus/{id}/prodotti-completi restituisce tutti i prodotti
+      // con allergeni già caricati, tramite una singola query JOIN FETCH sul backend.
+      const tuttiIProdotti: any[][] = await Promise.all(
+        this.menus.map(menu => firstValueFrom(this.http.get<any[]>(`/api/menus/${menu.id}/prodotti-completi`)).then(r => r ?? [])),
+      );
+      tuttiIProdotti.flat().forEach(p => this.prodottiMap.set(String(p.id), p));
     } catch (err) {
       console.warn('Errore costruzione mappa prodotti:', err);
     }

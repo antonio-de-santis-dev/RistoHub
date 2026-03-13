@@ -127,4 +127,14 @@ public class ProdottoService {
     public List<ProdottoDTO> findByPortataId(UUID portataId) {
         return prodottoRepository.findByPortataId(portataId).stream().map(prodottoMapper::toDto).collect(Collectors.toList());
     }
+
+    /**
+     * Restituisce tutti i prodotti delle portate di un menu con allergeni già caricati.
+     * Usato da GET /api/menus/{id}/prodotti-completi — elimina il loop N+1 lato frontend.
+     */
+    @Transactional(readOnly = true)
+    public List<ProdottoDTO> findProdottiCompletiByMenuId(UUID menuId) {
+        LOG.debug("Request to get all Prodotti with allergeni for Menu : {}", menuId);
+        return prodottoRepository.findByPortataMenuIdWithAllergeni(menuId).stream().map(prodottoMapper::toDto).toList();
+    }
 }
