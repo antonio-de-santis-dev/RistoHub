@@ -36,7 +36,7 @@ public class ListaContatti implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "listaContatti", cascade = CascadeType.ALL, orphanRemoval = true)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "listaContatti" }, allowSetters = true)
-    private List<ContattoItem> items = new ArrayList<>();
+    private Set<ContattoItem> items = new LinkedHashSet<>();
 
     /**
      * Utente proprietario della lista.
@@ -70,11 +70,11 @@ public class ListaContatti implements Serializable {
         this.menuIds = menuIds;
     }
 
-    public List<ContattoItem> getItems() {
+    public Set<ContattoItem> getItems() {
         return items;
     }
 
-    public void setItems(List<ContattoItem> items) {
+    public void setItems(Set<ContattoItem> items) {
         if (this.items != null) this.items.forEach(i -> i.setListaContatti(null));
         if (items != null) items.forEach(i -> i.setListaContatti(this));
         this.items = items;

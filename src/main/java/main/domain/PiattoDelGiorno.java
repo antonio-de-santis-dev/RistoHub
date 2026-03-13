@@ -55,10 +55,7 @@ public class PiattoDelGiorno implements Serializable {
 
     /**
      * Allergeni diretti per piatti personalizzati (senza prodotto collegato).
-     *
-     * FIX: inverseJoinColumns usa "allegene_id" (senza 'n') per corrispondere
-     * alla colonna reale nella tabella piatto_del_giorno_allergenis creata
-     * dalla migration 20240101_add_piatto_del_giorno_allergenis.xml
+     * Colonna join: "allergene_id" — definita in 20240101_add_piatto_del_giorno_allergenis.xml
      */
     @ManyToMany(fetch = FetchType.LAZY)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
