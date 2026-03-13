@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { firstValueFrom } from 'rxjs';
 
 // ─── Tipi ──────────────────────────────────────────────────────────────────
 
@@ -130,7 +131,7 @@ export class ContattiGestioneComponent implements OnInit {
 
   async caricaListe(): Promise<void> {
     try {
-      this.liste = (await this.http.get<any[]>('/api/lista-contattis').toPromise()) ?? [];
+      this.liste = (await firstValueFrom(this.http.get<any[]>('/api/lista-contattis'))) ?? [];
     } catch (e) {
       console.error('Errore caricamento liste:', e);
     }
@@ -138,7 +139,7 @@ export class ContattiGestioneComponent implements OnInit {
 
   async caricaMenu(): Promise<void> {
     try {
-      this.menu = (await this.http.get<Menu[]>('/api/menus').toPromise()) ?? [];
+      this.menu = (await firstValueFrom(this.http.get<Menu[]>('/api/menus'))) ?? [];
     } catch (e) {
       console.error('Errore caricamento menu:', e);
     }
@@ -262,9 +263,9 @@ export class ContattiGestioneComponent implements OnInit {
 
     try {
       if (this.isEdit && this.form.id) {
-        await this.http.put(`/api/lista-contattis/${this.form.id}`, payload).toPromise();
+        await firstValueFrom(this.http.put(`/api/lista-contattis/${this.form.id}`, payload));
       } else {
-        await this.http.post('/api/lista-contattis', payload).toPromise();
+        await firstValueFrom(this.http.post('/api/lista-contattis', payload));
       }
       await this.caricaListe();
       this.chiudiModal();
@@ -290,7 +291,7 @@ export class ContattiGestioneComponent implements OnInit {
     if (!this.listaInEliminazione) return;
     this.isDeleting = true;
     try {
-      await this.http.delete(`/api/lista-contattis/${this.listaInEliminazione.id}`).toPromise();
+      await firstValueFrom(this.http.delete(`/api/lista-contattis/${this.listaInEliminazione.id}`));
       this.liste = this.liste.filter(l => l.id !== this.listaInEliminazione!.id);
       this.chiudiEliminazione();
     } catch (e) {

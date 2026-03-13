@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 // Percorso immagine fallback per allergeni senza icona (inseriti manualmente).
 // Posizionare il file in: src/main/webapp/content/images/allergene-manuale.png
@@ -88,7 +89,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
 
   async caricaAllergeni(): Promise<void> {
     try {
-      this.allergeniDisponibili = (await this.http.get<any[]>('/api/allergenes').toPromise()) ?? [];
+      this.allergeniDisponibili = (await firstValueFrom(this.http.get<any[]>('/api/allergenes'))) ?? [];
     } catch (err) {
       console.error('Errore allergeni:', err);
     }
@@ -96,8 +97,8 @@ export class PiattiGiornoGestioneComponent implements OnInit {
 
   async caricaMenus(): Promise<void> {
     try {
-      const currentUser: any = await this.http.get('/api/account').toPromise();
-      const tutti: any[] = (await this.http.get<any[]>('/api/menus').toPromise()) ?? [];
+      const currentUser: any = await firstValueFrom(this.http.get('/api/account'));
+      const tutti: any[] = (await firstValueFrom(this.http.get<any[]>('/api/menus'))) ?? [];
       this.menus = tutti.filter(m => m.ristoratore?.login === currentUser.login);
     } catch (err) {
       console.error('Errore menu:', err);
@@ -107,9 +108,9 @@ export class PiattiGiornoGestioneComponent implements OnInit {
   private async costruisciProdottiMap(): Promise<void> {
     try {
       for (const menu of this.menus) {
-        const portate: any[] = (await this.http.get<any[]>(`/api/menus/${menu.id}/portatas`).toPromise()) ?? [];
+        const portate: any[] = (await firstValueFrom(this.http.get<any[]>(`/api/menus/${menu.id}/portatas`))) ?? [];
         for (const portata of portate) {
-          const prods: any[] = (await this.http.get<any[]>(`/api/prodottos/by-portata/${portata.id}`).toPromise()) ?? [];
+          const prods: any[] = (await firstValueFrom(this.http.get<any[]>(`/api/prodottos/by-portata/${portata.id}`))) ?? [];
           prods.forEach(p => this.prodottiMap.set(String(p.id), p));
         }
       }
@@ -120,7 +121,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
 
   async caricaPiattiGiorno(): Promise<void> {
     try {
-      const piatti = (await this.http.get<PiattoDelGiorno[]>('/api/piatto-del-giornos').toPromise()) ?? [];
+      const piatti = (await firstValueFrom(this.http.get<PiattoDelGiorno[]>('/api/piatto-del-giornos'))) ?? [];
       this.piattiGiorno = piatti.map(p => this.arricchisciPiatto(p));
     } catch (err) {
       console.error('Errore piatti del giorno:', err);
@@ -214,12 +215,12 @@ export class PiattiGiornoGestioneComponent implements OnInit {
         const locale = this.allergeniDisponibili.find(a => String(a.id) === id);
         if (!locale) continue;
         try {
-          const creato: any = await this.http
-            .post('/api/allergenes', {
+          const creato: any = await firstValueFrom(
+            this.http.post('/api/allergenes', {
               nome: locale.nome,
               colore: locale.colore ?? '#607D8B',
-            })
-            .toPromise();
+            }),
+          );
           // Aggiorna l'ID temporaneo con quello reale nell'elenco locale
           const idx = this.allergeniDisponibili.findIndex(a => String(a.id) === id);
           if (idx !== -1) {
@@ -318,7 +319,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
         body.allergenis = allergeni;
       }
 
-      await this.http.put(`/api/piatto-del-giornos/${this.piattoInModifica.id}`, body).toPromise();
+      await firstValueFrom(this.http.put(`/api/piatto-del-giornos/${this.piattoInModifica.id}`, body));
 
       const menuInfo = this.menus.find(m => m.id === this.editMenuId);
       this.piattiGiorno = this.piattiGiorno.map(p => {
@@ -365,7 +366,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     if (!this.piattoInEliminazione?.id) return;
     this.isDeleting = true;
     try {
-      await this.http.delete(`/api/piatto-del-giornos/${this.piattoInEliminazione.id}`).toPromise();
+      await firstValueFrom(this.http.delete(`/api/piatto-del-giornos/${this.piattoInEliminazione.id}`));
       this.piattiGiorno = this.piattiGiorno.filter(p => p.id !== this.piattoInEliminazione!.id);
       this.isDeleting = false; // ✅ reset PRIMA di chiudere
       this.chiudiModaleEliminazione();
@@ -388,7 +389,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     this._prodottoDettaglio = null;
     this._menuDettaglio = this.menus.find(m => m.id === this.menuSelezionato) ?? null;
     try {
-      this.portate = (await this.http.get<any[]>(`/api/menus/${this.menuSelezionato}/portatas`).toPromise()) ?? [];
+      this.portate = (await firstValueFrom(this.http.get<any[]>(`/api/menus/${this.menuSelezionato}/portatas`))) ?? [];
     } catch (err) {
       console.error('Errore portate:', err);
     }
@@ -400,7 +401,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     this.prodottoSelezionato = null;
     this._prodottoDettaglio = null;
     try {
-      const prods: any[] = (await this.http.get<any[]>(`/api/prodottos/by-portata/${this.portataSelezionata}`).toPromise()) ?? [];
+      const prods: any[] = (await firstValueFrom(this.http.get<any[]>(`/api/prodottos/by-portata/${this.portataSelezionata}`))) ?? [];
       prods.forEach(p => this.prodottiMap.set(String(p.id), p));
       this.prodotti = prods;
     } catch (err) {
@@ -497,7 +498,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
         body.allergenis = allergeni;
       }
 
-      const piattoRisposta: any = await this.http.post('/api/piatto-del-giornos', body).toPromise();
+      const piattoRisposta: any = await firstValueFrom(this.http.post('/api/piatto-del-giornos', body));
 
       let piattoArricchito: PiattoDelGiorno;
       if (this.modalitaSelezioneProdotto && this._prodottoDettaglio) {
@@ -541,9 +542,9 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     piatto.attivo = nuovoStato;
     try {
       try {
-        await this.http.patch(`/api/piatto-del-giornos/${piatto.id}`, { id: piatto.id, attivo: nuovoStato }).toPromise();
+        await firstValueFrom(this.http.patch(`/api/piatto-del-giornos/${piatto.id}`, { id: piatto.id, attivo: nuovoStato }));
       } catch {
-        await this.http.put(`/api/piatto-del-giornos/${piatto.id}`, { ...piatto }).toPromise();
+        await firstValueFrom(this.http.put(`/api/piatto-del-giornos/${piatto.id}`, { ...piatto }));
       }
     } catch (err) {
       console.error('Errore toggle:', err);

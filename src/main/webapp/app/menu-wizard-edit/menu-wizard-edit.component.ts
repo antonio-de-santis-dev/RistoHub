@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'jhi-menu-wizard-edit',
@@ -99,7 +100,7 @@ export class MenuWizardEditComponent implements OnInit {
 
   async caricaDatiEsistenti(id: string): Promise<void> {
     try {
-      const menu: any = await this.http.get(`/api/menus/${id}`).toPromise();
+      const menu: any = await firstValueFrom(this.http.get(`/api/menus/${id}`));
       this.nomeMenu = menu.nome ?? '';
       this.descrizioneMenu = menu.descrizione ?? '';
       this.selectedTemplate = menu.templateStyle ?? null;
@@ -108,7 +109,7 @@ export class MenuWizardEditComponent implements OnInit {
       this.fontSelezionato = menu.fontMenu ?? 'Playfair Display';
 
       // Logo esistente
-      const immagini: any[] = (await this.http.get<any[]>(`/api/menus/${id}/immagini`).toPromise()) ?? [];
+      const immagini: any[] = (await firstValueFrom(this.http.get<any[]>(`/api/menus/${id}/immagini`))) ?? [];
       const logo = immagini.find(i => i.tipo === 'LOGO');
       if (logo) {
         this.logoEsistenteId = logo.id;
@@ -117,7 +118,7 @@ export class MenuWizardEditComponent implements OnInit {
       }
 
       // Portate esistenti
-      const portate: any[] = (await this.http.get<any[]>(`/api/menus/${id}/portatas`).toPromise()) ?? [];
+      const portate: any[] = (await firstValueFrom(this.http.get<any[]>(`/api/menus/${id}/portatas`))) ?? [];
       this.portateEsistentiIds = portate.map(p => ({
         id: p.id,
         tipo: p.tipo,
@@ -229,7 +230,7 @@ export class MenuWizardEditComponent implements OnInit {
         fontMenu: this.fontSelezionato,
       };
 
-      await this.http.patch(`/api/menus/${this.menuId}`, menuPayload).toPromise();
+      await firstValueFrom(this.http.patch(`/api/menus/${this.menuId}`, menuPayload));
 
       // Ritorna al view a fine modifica
       this.router.navigate(['/menu-view', this.menuId]);

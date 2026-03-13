@@ -3,6 +3,7 @@ import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'jhi-menu-wizard',
@@ -158,10 +159,10 @@ export class MenuWizardComponent implements OnInit {
     if (!this.validaStep()) return;
     this.isLoading = true;
     try {
-      const currentUser: any = await this.http.get('/api/account').toPromise();
+      const currentUser: any = await firstValueFrom(this.http.get('/api/account'));
 
-      const menu: any = await this.http
-        .post('/api/menus', {
+      const menu: any = await firstValueFrom(
+        this.http.post('/api/menus', {
           nome: this.nomeMenu,
           descrizione: this.descrizioneMenu,
           attivo: true,
@@ -170,14 +171,14 @@ export class MenuWizardComponent implements OnInit {
           coloreSecondario: this.coloreSecondario,
           fontMenu: this.fontSelezionato,
           ristoratore: { id: currentUser.id, login: currentUser.login },
-        })
-        .toPromise();
+        }),
+      );
 
       const p1 = Array.from(this.portateSelezionate).map(p =>
-        this.http.post('/api/portatas', { tipo: 'DEFAULT', nomeDefault: p, menu: { id: menu.id } }).toPromise(),
+        firstValueFrom(this.http.post('/api/portatas', { tipo: 'DEFAULT', nomeDefault: p, menu: { id: menu.id } })),
       );
       const p2 = this.portatePersonalizzate.map(n =>
-        this.http.post('/api/portatas', { tipo: 'PERSONALIZZATA', nomePersonalizzato: n, menu: { id: menu.id } }).toPromise(),
+        firstValueFrom(this.http.post('/api/portatas', { tipo: 'PERSONALIZZATA', nomePersonalizzato: n, menu: { id: menu.id } })),
       );
       await Promise.all([...p1, ...p2]);
 
@@ -186,15 +187,13 @@ export class MenuWizardComponent implements OnInit {
         reader.readAsDataURL(this.logoFile);
         reader.onload = async () => {
           const base64 = (reader.result as string).split(',')[1];
-          await this.http
-            .post('/api/immagine-menus', {
-              nome: 'logo',
-              immagine: base64,
-              immagineContentType: this.logoFile!.type,
-              tipo: 'LOGO',
-              menu: { id: menu.id },
-            })
-            .toPromise();
+          await this.http.post('/api/immagine-menus', {
+            nome: 'logo',
+            immagine: base64,
+            immagineContentType: this.logoFile!.type,
+            tipo: 'LOGO',
+            menu: { id: menu.id },
+          });
           this.router.navigate(['/menu-view', menu.id]);
         };
       } else {

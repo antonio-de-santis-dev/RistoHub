@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'jhi-menu-list',
@@ -35,8 +36,8 @@ export class MenuListComponent implements OnInit {
 
   async caricaMenus(): Promise<void> {
     try {
-      const currentUser: any = await this.http.get('/api/account').toPromise();
-      const tutti: any[] = (await this.http.get<any[]>('/api/menus').toPromise()) ?? [];
+      const currentUser: any = await firstValueFrom(this.http.get('/api/account'));
+      const tutti: any[] = (await firstValueFrom(this.http.get<any[]>('/api/menus'))) ?? [];
       this.menus = tutti.filter(m => m.ristoratore?.login === currentUser.login);
     } catch (err) {
       console.error('Errore caricamento menu:', err);
@@ -51,9 +52,9 @@ export class MenuListComponent implements OnInit {
     const nuovoStato = !menu.attivo;
     try {
       try {
-        await this.http.patch(`/api/menus/${menu.id}`, { id: menu.id, attivo: nuovoStato }).toPromise();
+        await firstValueFrom(this.http.patch(`/api/menus/${menu.id}`, { id: menu.id, attivo: nuovoStato }));
       } catch {
-        await this.http.put(`/api/menus/${menu.id}`, { ...menu, attivo: nuovoStato }).toPromise();
+        await firstValueFrom(this.http.put(`/api/menus/${menu.id}`, { ...menu, attivo: nuovoStato }));
       }
       menu.attivo = nuovoStato;
       this.mostraToast(
@@ -99,7 +100,7 @@ export class MenuListComponent implements OnInit {
     if (!this.menuDaEliminare) return;
     const idDaEliminare = this.menuDaEliminare.id;
     try {
-      await this.http.delete(`/api/menus/${idDaEliminare}`).toPromise();
+      await firstValueFrom(this.http.delete(`/api/menus/${idDaEliminare}`));
       this.menus = this.menus.filter(m => m.id !== idDaEliminare);
       this.mostraToast('🗑️ Menu eliminato con successo', 'success');
     } catch (err) {

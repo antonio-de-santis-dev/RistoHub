@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'jhi-home',
@@ -42,21 +43,22 @@ export default class HomeComponent implements OnInit {
   }
 
   async caricaDashboard(): Promise<void> {
-    await Promise.all([this.caricaPiattiAttivi(), this.caricaMenuAttivi()]);
+    // Usa il Signal già in cache — nessuna chiamata HTTP a /api/account
+    const account = this.account();
+    if (!account) return;
+    const login = account.login;
+    await Promise.all([this.caricaPiattiAttivi(login), this.caricaMenuAttivi(login)]);
   }
 
-  async caricaPiattiAttivi(): Promise<void> {
+  async caricaPiattiAttivi(login: string): Promise<void> {
     this.isLoadingPiatti = true;
     try {
-      const currentUser: any = await this.http.get('/api/account').toPromise();
-      const login = currentUser?.login;
-
       // Prima ottieni i menu del ristoratore loggato
-      const tuttiMenu: any[] = (await this.http.get<any[]>('/api/menus').toPromise()) ?? [];
+      const tuttiMenu: any[] = (await firstValueFrom(this.http.get<any[]>('/api/menus'))) ?? [];
       const meiMenuIds = new Set(tuttiMenu.filter(m => m.ristoratore?.login === login).map(m => m.id));
 
       // Poi ottieni tutti i piatti del giorno
-      const tutti: any[] = (await this.http.get<any[]>('/api/piatto-del-giornos').toPromise()) ?? [];
+      const tutti: any[] = (await firstValueFrom(this.http.get<any[]>('/api/piatto-del-giornos'))) ?? [];
 
       // Filtra: attivi E (non hanno menu collegato OPPURE il menu è del ristoratore)
       this.piattiAttivi = tutti.filter(p => {
@@ -71,12 +73,11 @@ export default class HomeComponent implements OnInit {
     }
   }
 
-  async caricaMenuAttivi(): Promise<void> {
+  async caricaMenuAttivi(login: string): Promise<void> {
     this.isLoadingMenus = true;
     try {
-      const currentUser: any = await this.http.get('/api/account').toPromise();
-      const tutti: any[] = (await this.http.get<any[]>('/api/menus').toPromise()) ?? [];
-      this.menuAttivi = tutti.filter(m => m.attivo && m.ristoratore?.login === currentUser.login);
+      const tutti: any[] = (await firstValueFrom(this.http.get<any[]>('/api/menus'))) ?? [];
+      this.menuAttivi = tutti.filter(m => m.attivo && m.ristoratore?.login === login);
     } catch (err) {
       console.error('Errore menu:', err);
     } finally {

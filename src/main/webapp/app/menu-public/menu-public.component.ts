@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeUrl, SafeHtml } from '@angular/platform-browser';
+import { firstValueFrom } from 'rxjs';
 
 // ── COSTANTE PER L'IMMAGINE DEGLI ALLERGENI PERSONALIZZATI ──
 const ALLERGENE_MANUALE_ICONA = '/content/images/allergene-manuale.png';
@@ -369,7 +370,7 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
     const BASE = '/api/public';
     try {
       // ── UNICA CHIAMATA HTTP: sostituisce le precedenti N+6 chiamate separate ──
-      const dati = (await this.http.get<MenuCompleto>(`${BASE}/menus/${id}/full`).toPromise())!;
+      const dati = (await firstValueFrom(this.http.get<MenuCompleto>(`${BASE}/menus/${id}/full`)))!;
 
       // ── menu: caricato, applicare font ────────────────────────────────────
       this.menu = dati.menu ?? null;

@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeUrl, SafeHtml } from '@angular/platform-browser';
+import { firstValueFrom } from 'rxjs';
 
 // ── COSTANTE PER L'IMMAGINE DEGLI ALLERGENI PERSONALIZZATI ──
 const ALLERGENE_MANUALE_ICONA = '/content/images/allergene-manuale.png';
@@ -445,7 +446,7 @@ export class MenuViewComponent implements OnInit {
       // Prima: 1 (menu) + 1 (allergeni) + 1 (immagini) + 1 (portate) + N (prodotti per portata)
       //        + 1 (piatti giorno) + 1 (contatti) = 6 + N richieste serializzate.
       // Dopo:  1 sola richiesta.
-      const dati: any = await this.http.get<any>(`/api/public/menus/${id}/full`).toPromise();
+      const dati: any = await firstValueFrom(this.http.get<any>(`/api/public/menus/${id}/full`));
 
       if (!dati) {
         this.errore = true;
@@ -603,7 +604,7 @@ export class MenuViewComponent implements OnInit {
         portata: this.prodottoInModifica.portata ?? { id: this.trovaProdottoPortataId(this.prodottoInModifica.id) },
         allergenis,
       };
-      const aggiornato: any = await this.http.put(`/api/prodottos/${this.prodottoInModifica.id}`, body).toPromise();
+      const aggiornato: any = await firstValueFrom(this.http.put(`/api/prodottos/${this.prodottoInModifica.id}`, body));
 
       aggiornato.allergenis = allergenis.map(a => this.allergeniMap.get(String(a.id))).filter(Boolean);
       this.portate = this.portate.map(portata => ({
@@ -638,7 +639,7 @@ export class MenuViewComponent implements OnInit {
     if (!this.prodottoInEliminazione) return;
     this.isDeleting = true;
     try {
-      await this.http.delete(`/api/prodottos/${this.prodottoInEliminazione.id}`).toPromise();
+      await firstValueFrom(this.http.delete(`/api/prodottos/${this.prodottoInEliminazione.id}`));
       const idEliminato = this.prodottoInEliminazione.id;
       this.portate = this.portate.map(portata => ({
         ...portata,

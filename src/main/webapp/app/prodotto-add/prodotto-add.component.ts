@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 
 // Percorso immagine fallback per allergeni senza icona (inseriti manualmente).
 // Posizionare il file in: src/main/webapp/content/images/allergene-manuale.png
@@ -81,7 +82,7 @@ export class ProdottoAddComponent implements OnInit {
 
   async caricaMenuIdDaPortata(portataId: string): Promise<void> {
     try {
-      const portata: any = await this.http.get(`/api/portatas/${portataId}`).toPromise();
+      const portata: any = await firstValueFrom(this.http.get(`/api/portatas/${portataId}`));
       this.menuIdPerBack = portata?.menu?.id ?? null;
     } catch (err) {
       console.warn('Impossibile caricare portata per back-nav:', err);
@@ -90,8 +91,8 @@ export class ProdottoAddComponent implements OnInit {
 
   async caricaMenus(): Promise<void> {
     try {
-      const currentUser: any = await this.http.get('/api/account').toPromise();
-      const tutti: any[] = (await this.http.get<any[]>('/api/menus').toPromise()) ?? [];
+      const currentUser: any = await firstValueFrom(this.http.get('/api/account'));
+      const tutti: any[] = (await firstValueFrom(this.http.get<any[]>('/api/menus'))) ?? [];
       this.menus = tutti.filter(m => m.ristoratore?.login === currentUser.login);
       await this.caricaAllergeni();
     } catch (err) {
@@ -114,7 +115,7 @@ export class ProdottoAddComponent implements OnInit {
     this.portate = [];
     this.portataSelezionataId = null;
     try {
-      this.portate = (await this.http.get<any[]>(`/api/menus/${this.menuSelezionatoId}/portatas`).toPromise()) ?? [];
+      this.portate = (await firstValueFrom(this.http.get<any[]>(`/api/menus/${this.menuSelezionatoId}/portatas`))) ?? [];
     } catch (err) {
       console.error('Errore caricamento portate:', err);
     }
@@ -129,7 +130,7 @@ export class ProdottoAddComponent implements OnInit {
 
   async caricaAllergeni(): Promise<void> {
     try {
-      this.allergeniDisponibili = (await this.http.get<any[]>('/api/allergenes').toPromise()) ?? [];
+      this.allergeniDisponibili = (await firstValueFrom(this.http.get<any[]>('/api/allergenes'))) ?? [];
     } catch (err) {
       console.error('Errore caricamento allergeni:', err);
     }
@@ -137,7 +138,7 @@ export class ProdottoAddComponent implements OnInit {
 
   async caricaProdottiEsistenti(portataId: string): Promise<void> {
     try {
-      const prodotti: any[] = (await this.http.get<any[]>(`/api/prodottos/by-portata/${portataId}`).toPromise()) ?? [];
+      const prodotti: any[] = (await firstValueFrom(this.http.get<any[]>(`/api/prodottos/by-portata/${portataId}`))) ?? [];
       this.prodottiAggiunti = prodotti;
     } catch (err) {
       console.error('Errore caricamento prodotti:', err);
@@ -195,12 +196,12 @@ export class ProdottoAddComponent implements OnInit {
         const locale = this.allergeniDisponibili.find(a => String(a.id) === id);
         if (!locale) continue;
         try {
-          const creato: any = await this.http
-            .post('/api/allergenes', {
+          const creato: any = await firstValueFrom(
+            this.http.post('/api/allergenes', {
               nome: locale.nome,
               colore: locale.colore ?? '#607D8B',
-            })
-            .toPromise();
+            }),
+          );
           // Aggiorna l'ID temporaneo con quello reale nell'elenco locale
           const idx = this.allergeniDisponibili.findIndex(a => String(a.id) === id);
           if (idx !== -1) {
@@ -325,7 +326,7 @@ export class ProdottoAddComponent implements OnInit {
         allergenis: allergeni,
       };
 
-      await this.http.put(`/api/prodottos/${this.prodottoInModifica.id}`, body).toPromise();
+      await firstValueFrom(this.http.put(`/api/prodottos/${this.prodottoInModifica.id}`, body));
 
       this.prodottiAggiunti = this.prodottiAggiunti.map(p => {
         if (p.id !== this.prodottoInModifica!.id) return p;
@@ -367,7 +368,7 @@ export class ProdottoAddComponent implements OnInit {
     if (!this.prodottoInEliminazione?.id) return;
     this.isDeleting = true;
     try {
-      await this.http.delete(`/api/prodottos/${this.prodottoInEliminazione.id}`).toPromise();
+      await firstValueFrom(this.http.delete(`/api/prodottos/${this.prodottoInEliminazione.id}`));
       if (this.prodottoInModifica?.id === this.prodottoInEliminazione.id) {
         this.annullaModifica();
       }
@@ -412,15 +413,15 @@ export class ProdottoAddComponent implements OnInit {
       // ✅ Crea nel DB gli eventuali allergeni custom prima del salvataggio
       const allergeni = await this.assicuraAllergeniNelDb(this.allergeniSelezionati);
 
-      const prodotto: any = await this.http
-        .post('/api/prodottos', {
+      const prodotto: any = await firstValueFrom(
+        this.http.post('/api/prodottos', {
           nome: this.nome.trim(),
           descrizione: this.descrizione.trim() || null,
           prezzo: this.prezzo,
           portata: { id: this.portataSelezionataId },
           allergenis: allergeni,
-        })
-        .toPromise();
+        }),
+      );
 
       // ✅ IDs reali post-creazione allergeni
       prodotto.allergenis = allergeni.map(a => this.getAllergeneById(a.id)).filter(Boolean);
