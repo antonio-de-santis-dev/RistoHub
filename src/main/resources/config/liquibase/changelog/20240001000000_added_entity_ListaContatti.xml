@@ -7,6 +7,9 @@
 
   <!-- ── Tabella principale lista_contatti ── -->
   <changeSet id="20240001000000-1" author="auto">
+    <preConditions onFail="MARK_RAN">
+      <not><tableExists tableName="lista_contatti"/></not>
+    </preConditions>
     <createTable tableName="lista_contatti">
       <column name="id" type="uuid">
         <constraints primaryKey="true" nullable="false"/>
@@ -22,6 +25,9 @@
 
   <!-- ── Tabella join lista_contatti_menu (Set<UUID> menuIds) ── -->
   <changeSet id="20240001000000-2" author="auto">
+    <preConditions onFail="MARK_RAN">
+      <not><tableExists tableName="lista_contatti_menu"/></not>
+    </preConditions>
     <createTable tableName="lista_contatti_menu">
       <column name="lista_contatti_id" type="uuid">
         <constraints nullable="false"/>
@@ -42,6 +48,9 @@
 
   <!-- ── Tabella contatto_item ── -->
   <changeSet id="20240001000000-3" author="auto">
+    <preConditions onFail="MARK_RAN">
+      <not><tableExists tableName="contatto_item"/></not>
+    </preConditions>
     <createTable tableName="contatto_item">
       <column name="id" type="uuid">
         <constraints primaryKey="true" nullable="false"/>
@@ -69,6 +78,9 @@
 
   <!-- ── FK verso la tabella jhi_user ── -->
   <changeSet id="20240001000000-4" author="auto">
+    <preConditions onFail="MARK_RAN">
+      <not><foreignKeyConstraintExists foreignKeyName="fk_lista_contatti_ristoratore"/></not>
+    </preConditions>
     <addForeignKeyConstraint
       baseTableName="lista_contatti"
       baseColumnNames="ristoratore_id"
