@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { firstValueFrom } from 'rxjs';
+import { ListaContattiDTO, MenuDTO } from 'app/shared/model/risto.model';
 
 // ─── Tipi ──────────────────────────────────────────────────────────────────
 
@@ -49,12 +50,6 @@ interface ListaContattiForm {
   items: ContattoItemForm[];
 }
 
-interface Menu {
-  id: string;
-  nome: string;
-  attivo: boolean;
-}
-
 // ─── SVG icone social ──────────────────────────────────────────────────────
 
 export const SOCIAL_ICONS: Record<string, string> = {
@@ -81,8 +76,8 @@ export const SOCIAL_ICONS: Record<string, string> = {
 })
 export class ContattiGestioneComponent implements OnInit {
   // ── Dati ────────────────────────────────────────────────────────
-  liste: any[] = [];
-  menu: Menu[] = [];
+  liste: ListaContattiDTO[] = [];
+  menu: MenuDTO[] = [];
   isLoading = true;
 
   // ── Modal form ──────────────────────────────────────────────────
@@ -94,7 +89,7 @@ export class ContattiGestioneComponent implements OnInit {
   form: ListaContattiForm = this.formVuoto();
 
   // ── Conferma eliminazione ───────────────────────────────────────
-  listaInEliminazione: any | null = null;
+  listaInEliminazione: ListaContattiDTO | null = null;
   isDeleting = false;
 
   // ── Costanti ────────────────────────────────────────────────────
@@ -131,7 +126,7 @@ export class ContattiGestioneComponent implements OnInit {
 
   async caricaListe(): Promise<void> {
     try {
-      this.liste = (await firstValueFrom(this.http.get<any[]>('/api/lista-contattis'))) ?? [];
+      this.liste = (await firstValueFrom(this.http.get<ListaContattiDTO[]>('/api/lista-contattis'))) ?? [];
     } catch (e) {
       console.error('Errore caricamento liste:', e);
     }
@@ -139,7 +134,7 @@ export class ContattiGestioneComponent implements OnInit {
 
   async caricaMenu(): Promise<void> {
     try {
-      this.menu = (await firstValueFrom(this.http.get<Menu[]>('/api/menus'))) ?? [];
+      this.menu = (await firstValueFrom(this.http.get<MenuDTO[]>('/api/menus'))) ?? [];
     } catch (e) {
       console.error('Errore caricamento menu:', e);
     }
@@ -154,12 +149,12 @@ export class ContattiGestioneComponent implements OnInit {
     this.modalAperta = true;
   }
 
-  apriModifica(lista: any): void {
+  apriModifica(lista: ListaContattiDTO): void {
     this.form = {
       id: lista.id,
       nome: lista.nome,
       menuIds: new Set<string>(lista.menuIds ?? []),
-      items: (lista.items ?? []).map((it: any) => ({ ...it })),
+      items: (lista.items ?? []).map(it => ({ ...it, reteSociale: it.reteSociale as ReteSociale | undefined })),
     };
     this.isEdit = true;
     this.erroreForm = null;
@@ -269,7 +264,7 @@ export class ContattiGestioneComponent implements OnInit {
       }
       await this.caricaListe();
       this.chiudiModal();
-    } catch (e: any) {
+    } catch (e: unknown) {
       this.erroreForm = 'Errore durante il salvataggio. Riprova.';
       console.error(e);
     } finally {
@@ -279,7 +274,7 @@ export class ContattiGestioneComponent implements OnInit {
 
   // ── Elimina ─────────────────────────────────────────────────────
 
-  apriEliminazione(lista: any): void {
+  apriEliminazione(lista: ListaContattiDTO): void {
     this.listaInEliminazione = lista;
   }
 
@@ -343,18 +338,18 @@ export class ContattiGestioneComponent implements OnInit {
     return this.menu.find(m => m.id === id)?.nome ?? id;
   }
 
-  menuSelezionati(lista: any): string {
+  menuSelezionati(lista: ListaContattiDTO): string {
     const ids: string[] = lista.menuIds ?? [];
     if (!ids.length) return 'Nessun menu';
     return ids.map(id => this.nomeMenu(id)).join(', ');
   }
 
-  getLabelItem(it: any): string {
+  getLabelItem(it: { tipo: TipoContatto; reteSociale?: string; etichetta?: string; valore: string }): string {
     if (it.tipo === 'SOCIAL') {
       if (it.reteSociale === 'ALTRO') return it.etichetta || 'Altro';
       return this.RETI_SOCIALI.find(r => r.value === it.reteSociale)?.label ?? it.reteSociale ?? '';
     }
-    return this.nomeTipo(it.tipo);
+    return this.nomeTipo(it.tipo as TipoContatto);
   }
 
   private formVuoto(): ListaContattiForm {

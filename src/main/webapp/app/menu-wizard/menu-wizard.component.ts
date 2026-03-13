@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
+import { AccountDTO, MenuDTO } from 'app/shared/model/risto.model';
 
 @Component({
   selector: 'jhi-menu-wizard',
@@ -159,10 +160,10 @@ export class MenuWizardComponent implements OnInit {
     if (!this.validaStep()) return;
     this.isLoading = true;
     try {
-      const currentUser: any = await firstValueFrom(this.http.get('/api/account'));
+      const currentUser: AccountDTO = await firstValueFrom(this.http.get<AccountDTO>('/api/account'));
 
-      const menu: any = await firstValueFrom(
-        this.http.post('/api/menus', {
+      const menu = await firstValueFrom(
+        this.http.post<MenuDTO>('/api/menus', {
           nome: this.nomeMenu,
           descrizione: this.descrizioneMenu,
           attivo: true,

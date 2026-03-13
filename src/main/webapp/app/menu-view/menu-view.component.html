@@ -553,7 +553,7 @@
       <button class="moderno-back-btn" [style.color]="colorePrimario" (click)="modernoTornaHome()">{{ getUI('TORNA_HOME') }}</button>
       <div class="moderno-lista-header" [style.borderBottomColor]="colorePrimario">
         <span class="moderno-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{ nomePortata(portata) }}</span>
-        <span class="moderno-lista-count">{{ portata.prodotti?.length ?? 0 }} {{ getUI('PIATTI_PAROLA') }}</span>
+        <span class="moderno-lista-count">{{ portata.prodotti.length }} {{ getUI('PIATTI_PAROLA') }}</span>
       </div>
       <div class="moderno-prodotti">
         <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="moderno-empty">
@@ -921,7 +921,7 @@
             <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{
               nomePortata(rusticoPortataAttiva)
             }}</span>
-            <span class="rustico-lista-count">{{ rusticoPortataAttiva.prodotti?.length ?? 0 }} {{ getUI('PIATTI_PAROLA') }}</span>
+            <span class="rustico-lista-count">{{ rusticoPortataAttiva.prodotti.length }} {{ getUI('PIATTI_PAROLA') }}</span>
           </div>
           <div class="rustico-prodotti">
             <div *ngIf="rusticoPortataAttiva.prodotti && rusticoPortataAttiva.prodotti.length === 0" class="rustico-empty">

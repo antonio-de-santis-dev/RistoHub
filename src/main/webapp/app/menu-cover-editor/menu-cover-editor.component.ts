@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
+import { MenuDTO, ImmagineMenuDTO } from 'app/shared/model/risto.model';
 
 export interface CopertinaImmagine {
   id?: string;
@@ -37,7 +39,7 @@ export class MenuCoverEditorComponent implements OnInit {
 
   toastMsg: string | null = null;
   toastType: 'success' | 'error' = 'success';
-  private toastTimer: any = null;
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
   eliminaIndex: number | null = null;
   confermaEliminaVisible = false;
@@ -59,13 +61,13 @@ export class MenuCoverEditorComponent implements OnInit {
 
   async caricaDati(): Promise<void> {
     try {
-      const menu: any = await this.http.get(`/api/menus/${this.menuId}`).toPromise();
+      const menu: MenuDTO = await firstValueFrom(this.http.get<MenuDTO>(`/api/menus/${this.menuId}`));
       this.menuNome = menu.nome ?? 'Menu';
 
-      const imgs: any[] = (await this.http.get<any[]>(`/api/menus/${this.menuId}/immagini`).toPromise()) ?? [];
+      const imgs: ImmagineMenuDTO[] = (await firstValueFrom(this.http.get<ImmagineMenuDTO[]>(`/api/menus/${this.menuId}/immagini`))) ?? [];
       this.immagini = imgs
-        .filter((img: any) => img.tipo === 'COPERTINA') // ← esclude LOGO e altri tipi
-        .map((img: any, i: number) => ({
+        .filter((img: ImmagineMenuDTO) => img.tipo === 'COPERTINA') // ← esclude LOGO e altri tipi
+        .map((img: ImmagineMenuDTO, i: number) => ({
           id: img.id,
           immagine: img.immagine,
           immagineContentType: img.immagineContentType,
@@ -146,7 +148,7 @@ export class MenuCoverEditorComponent implements OnInit {
 
     if (img.id && !img.isNew) {
       try {
-        await this.http.delete(`/api/menus/${this.menuId}/immagini-copertina/${img.id}`).toPromise();
+        await firstValueFrom(this.http.delete(`/api/menus/${this.menuId}/immagini-copertina/${img.id}`));
       } catch (err) {
         console.error('Errore eliminazione server:', err);
         this.mostraToast("❌ Errore durante l'eliminazione. Riprova.", 'error');
@@ -211,7 +213,9 @@ export class MenuCoverEditorComponent implements OnInit {
         img.uploading = true;
         const formData = new FormData();
         formData.append('file', img.file!);
-        const risposta: any = await this.http.post(`/api/menus/${this.menuId}/immagini-copertina/upload`, formData).toPromise();
+        const risposta: ImmagineMenuDTO = await firstValueFrom(
+          this.http.post<ImmagineMenuDTO>(`/api/menus/${this.menuId}/immagini-copertina/upload`, formData),
+        );
         img.id = risposta.id;
         img.immagine = risposta.immagine;
         img.immagineContentType = risposta.immagineContentType;
@@ -229,7 +233,7 @@ export class MenuCoverEditorComponent implements OnInit {
         .map(img => ({ id: img.id, ordine: img.ordine, visibile: img.visibile }));
 
       if (payload.length > 0) {
-        await this.http.put(`/api/menus/${this.menuId}/immagini-copertina`, payload).toPromise();
+        await firstValueFrom(this.http.put(`/api/menus/${this.menuId}/immagini-copertina`, payload));
       }
 
       this.mostraToast('✅ Immagini salvate con successo', 'success');

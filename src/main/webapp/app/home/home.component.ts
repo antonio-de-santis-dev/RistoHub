@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 import { firstValueFrom } from 'rxjs';
+import { MenuDTO, PiattoDelGiornoDTO } from 'app/shared/model/risto.model';
 
 @Component({
   selector: 'jhi-home',
@@ -21,11 +22,11 @@ export default class HomeComponent implements OnInit {
   account: Signal<Account | null> = this.accountService.trackCurrentAccount();
 
   // Piatti del giorno
-  piattiAttivi: any[] = [];
+  piattiAttivi: PiattoDelGiornoDTO[] = [];
   isLoadingPiatti = true;
 
   // Menu attivi
-  menuAttivi: any[] = [];
+  menuAttivi: MenuDTO[] = [];
   isLoadingMenus = true;
 
   // QR Modal
@@ -54,11 +55,11 @@ export default class HomeComponent implements OnInit {
     this.isLoadingPiatti = true;
     try {
       // Prima ottieni i menu del ristoratore loggato
-      const tuttiMenu: any[] = (await firstValueFrom(this.http.get<any[]>('/api/menus'))) ?? [];
+      const tuttiMenu: MenuDTO[] = (await firstValueFrom(this.http.get<MenuDTO[]>('/api/menus'))) ?? [];
       const meiMenuIds = new Set(tuttiMenu.filter(m => m.ristoratore?.login === login).map(m => m.id));
 
       // Poi ottieni tutti i piatti del giorno
-      const tutti: any[] = (await firstValueFrom(this.http.get<any[]>('/api/piatto-del-giornos'))) ?? [];
+      const tutti: PiattoDelGiornoDTO[] = (await firstValueFrom(this.http.get<PiattoDelGiornoDTO[]>('/api/piatto-del-giornos'))) ?? [];
 
       // Filtra: attivi E (non hanno menu collegato OPPURE il menu è del ristoratore)
       this.piattiAttivi = tutti.filter(p => {
@@ -76,7 +77,7 @@ export default class HomeComponent implements OnInit {
   async caricaMenuAttivi(login: string): Promise<void> {
     this.isLoadingMenus = true;
     try {
-      const tutti: any[] = (await firstValueFrom(this.http.get<any[]>('/api/menus'))) ?? [];
+      const tutti: MenuDTO[] = (await firstValueFrom(this.http.get<MenuDTO[]>('/api/menus'))) ?? [];
       this.menuAttivi = tutti.filter(m => m.attivo && m.ristoratore?.login === login);
     } catch (err) {
       console.error('Errore menu:', err);

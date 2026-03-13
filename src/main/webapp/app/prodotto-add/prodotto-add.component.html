@@ -286,7 +286,7 @@
             {{ prodottoInEliminazione.descrizione }}
           </span>
         </div>
-        <div class="pa-modal-preview-allergeni" *ngIf="prodottoInEliminazione.allergenis?.length > 0">
+        <div class="pa-modal-preview-allergeni" *ngIf="(prodottoInEliminazione?.allergenis?.length ?? 0) > 0">
           <ng-container *ngFor="let a of prodottoInEliminazione.allergenis">
             <div
               class="pa-lista-cerchio"

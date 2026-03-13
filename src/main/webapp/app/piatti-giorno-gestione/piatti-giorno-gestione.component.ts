@@ -4,21 +4,20 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import {
+  AccountDTO,
+  AllergeneDTO,
+  AllergeneUI,
+  MenuDTO,
+  PiattoDelGiornoDTO,
+  PiattoDelGiornoBody,
+  PortataDTO,
+  ProdottoDTO,
+} from 'app/shared/model/risto.model';
 
 // Percorso immagine fallback per allergeni senza icona (inseriti manualmente).
 // Posizionare il file in: src/main/webapp/content/images/allergene-manuale.png
 const ALLERGENE_MANUALE_ICONA = 'content/images/allergene-manuale.png';
-
-interface PiattoDelGiorno {
-  id?: string;
-  nome: string;
-  descrizione?: string;
-  prezzo: number;
-  attivo: boolean;
-  prodotto?: { id: string; nome: string; descrizione?: string; prezzo: number; allergenis?: any[] };
-  allergenis?: any[];
-  menu?: { id: string; nome?: string };
-}
 
 @Component({
   selector: 'jhi-piatti-giorno-gestione',
@@ -33,7 +32,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
-  piattiGiorno: PiattoDelGiorno[] = [];
+  piattiGiorno: PiattoDelGiornoDTO[] = [];
   modaleCreazioneAperto = false;
   modalitaSelezioneProdotto = false;
 
@@ -42,28 +41,28 @@ export class PiattiGiornoGestioneComponent implements OnInit {
   prezzo: number | null = null;
   prodottoSelezionato: string | null = null;
 
-  menus: any[] = [];
-  portate: any[] = [];
-  prodotti: any[] = [];
+  menus: MenuDTO[] = [];
+  portate: PortataDTO[] = [];
+  prodotti: ProdottoDTO[] = [];
   menuSelezionato: string | null = null;
   menuNuovoPiatto: string | null = null;
   portataSelezionata: string | null = null;
 
-  private _prodottoDettaglio: any | null = null;
-  private _menuDettaglio: any | null = null;
+  private _prodottoDettaglio: ProdottoDTO | null = null;
+  private _menuDettaglio: MenuDTO | null = null;
 
-  allergeniDisponibili: any[] = [];
+  allergeniDisponibili: AllergeneUI[] = [];
   allergeniSelezionati: Set<string> = new Set();
   nomeAllergeneCustom = '';
 
   // ── Eliminazione ──
   modaleEliminazioneAperto = false;
-  piattoInEliminazione: PiattoDelGiorno | null = null;
+  piattoInEliminazione: PiattoDelGiornoDTO | null = null;
   isDeleting = false;
 
   // ── Modifica ──
   modaleModificaAperto = false;
-  piattoInModifica: PiattoDelGiorno | null = null;
+  piattoInModifica: PiattoDelGiornoDTO | null = null;
   editNome = '';
   editDescrizione = '';
   editPrezzo: number | null = null;
@@ -73,7 +72,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
   isSavingEdit = false;
   editErrore: string | null = null;
 
-  private prodottiMap: Map<string, any> = new Map();
+  private prodottiMap: Map<string, ProdottoDTO> = new Map();
 
   constructor(private http: HttpClient) {}
 
@@ -89,7 +88,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
 
   async caricaAllergeni(): Promise<void> {
     try {
-      this.allergeniDisponibili = (await firstValueFrom(this.http.get<any[]>('/api/allergenes'))) ?? [];
+      this.allergeniDisponibili = (await firstValueFrom(this.http.get<AllergeneUI[]>('/api/allergenes'))) ?? [];
     } catch (err) {
       console.error('Errore allergeni:', err);
     }
@@ -97,8 +96,8 @@ export class PiattiGiornoGestioneComponent implements OnInit {
 
   async caricaMenus(): Promise<void> {
     try {
-      const currentUser: any = await firstValueFrom(this.http.get('/api/account'));
-      const tutti: any[] = (await firstValueFrom(this.http.get<any[]>('/api/menus'))) ?? [];
+      const currentUser: AccountDTO = await firstValueFrom(this.http.get<AccountDTO>('/api/account'));
+      const tutti: MenuDTO[] = (await firstValueFrom(this.http.get<MenuDTO[]>('/api/menus'))) ?? [];
       this.menus = tutti.filter(m => m.ristoratore?.login === currentUser.login);
     } catch (err) {
       console.error('Errore menu:', err);
@@ -110,8 +109,8 @@ export class PiattiGiornoGestioneComponent implements OnInit {
       // Passo B: un solo endpoint aggregato per menu → nessun loop multi-livello.
       // GET /api/menus/{id}/prodotti-completi restituisce tutti i prodotti
       // con allergeni già caricati, tramite una singola query JOIN FETCH sul backend.
-      const tuttiIProdotti: any[][] = await Promise.all(
-        this.menus.map(menu => firstValueFrom(this.http.get<any[]>(`/api/menus/${menu.id}/prodotti-completi`)).then(r => r ?? [])),
+      const tuttiIProdotti: ProdottoDTO[][] = await Promise.all(
+        this.menus.map(menu => firstValueFrom(this.http.get<ProdottoDTO[]>(`/api/menus/${menu.id}/prodotti-completi`)).then(r => r ?? [])),
       );
       tuttiIProdotti.flat().forEach(p => this.prodottiMap.set(String(p.id), p));
     } catch (err) {
@@ -121,7 +120,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
 
   async caricaPiattiGiorno(): Promise<void> {
     try {
-      const piatti = (await firstValueFrom(this.http.get<PiattoDelGiorno[]>('/api/piatto-del-giornos'))) ?? [];
+      const piatti = (await firstValueFrom(this.http.get<PiattoDelGiornoDTO[]>('/api/piatto-del-giornos'))) ?? [];
       this.piattiGiorno = piatti.map(p => this.arricchisciPiatto(p));
     } catch (err) {
       console.error('Errore piatti del giorno:', err);
@@ -130,7 +129,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     }
   }
 
-  private arricchisciPiatto(piatto: PiattoDelGiorno): PiattoDelGiorno {
+  private arricchisciPiatto(piatto: PiattoDelGiornoDTO): PiattoDelGiornoDTO {
     if (piatto.prodotto?.id) {
       const prodCompleto = this.prodottiMap.get(String(piatto.prodotto.id));
       if (prodCompleto) {
@@ -144,7 +143,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     return { ...piatto, allergenis: this.arricchisciAllergeni(piatto.allergenis ?? []) };
   }
 
-  private arricchisciAllergeni(lista: any[]): any[] {
+  private arricchisciAllergeni(lista: AllergeneDTO[]): AllergeneUI[] {
     return lista.map(a => {
       if (a.icona && a.iconaContentType) return a;
       if (a.id != null) {
@@ -159,12 +158,12 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     });
   }
 
-  getAllergeneById(id: string): any {
-    return this.allergeniDisponibili.find(a => String(a.id) === String(id)) ?? null;
+  getAllergeneById(id: string): AllergeneUI | undefined {
+    return this.allergeniDisponibili.find(a => String(a.id) === String(id));
   }
 
-  getAllergeniPiatto(piatto: PiattoDelGiorno): any[] {
-    const lista: any[] = piatto.prodotto?.allergenis ?? piatto.allergenis ?? [];
+  getAllergeniPiatto(piatto: PiattoDelGiornoDTO): AllergeneDTO[] {
+    const lista: AllergeneDTO[] = piatto.prodotto?.allergenis ?? piatto.allergenis ?? [];
     return this.arricchisciAllergeni(lista);
   }
 
@@ -172,7 +171,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
    * Restituisce l'URL dell'icona di un allergene.
    * Per gli allergeni senza icona (inseriti manualmente) usa l'immagine di fallback.
    */
-  getAllergeneIcona(a: any): string {
+  getAllergeneIcona(a: AllergeneDTO): string {
     if (!a) return ALLERGENE_MANUALE_ICONA;
     // Icona diretta sull'oggetto
     if (a.icona && a.iconaContentType) {
@@ -215,8 +214,8 @@ export class PiattiGiornoGestioneComponent implements OnInit {
         const locale = this.allergeniDisponibili.find(a => String(a.id) === id);
         if (!locale) continue;
         try {
-          const creato: any = await firstValueFrom(
-            this.http.post('/api/allergenes', {
+          const creato: AllergeneUI = await firstValueFrom(
+            this.http.post<AllergeneUI>('/api/allergenes', {
               nome: locale.nome,
               colore: locale.colore ?? '#607D8B',
             }),
@@ -224,7 +223,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
           // Aggiorna l'ID temporaneo con quello reale nell'elenco locale
           const idx = this.allergeniDisponibili.findIndex(a => String(a.id) === id);
           if (idx !== -1) {
-            this.allergeniDisponibili[idx] = { ...this.allergeniDisponibili[idx], id: creato.id, isCustom: false };
+            this.allergeniDisponibili[idx] = { ...this.allergeniDisponibili[idx], id: creato.id };
           }
           risultato.push({ id: String(creato.id) });
         } catch (err) {
@@ -240,7 +239,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
   //  MODIFICA
   // ══════════════════════════════════════════════════
 
-  apriModaleModifica(piatto: PiattoDelGiorno): void {
+  apriModaleModifica(piatto: PiattoDelGiornoDTO): void {
     this.piattoInModifica = piatto;
     this.editErrore = null;
     this.editMenuId = piatto.menu?.id ?? null;
@@ -249,12 +248,12 @@ export class PiattiGiornoGestioneComponent implements OnInit {
       this.editNome = piatto.prodotto.nome;
       this.editDescrizione = piatto.prodotto.descrizione ?? '';
       this.editPrezzo = piatto.prodotto.prezzo;
-      this.editAllergeniSelezionati = new Set((piatto.prodotto.allergenis ?? []).map((a: any) => String(a.id)));
+      this.editAllergeniSelezionati = new Set((piatto.prodotto.allergenis ?? []).map(a => String(a.id)));
     } else {
-      this.editNome = piatto.nome;
+      this.editNome = piatto.nome ?? '';
       this.editDescrizione = piatto.descrizione ?? '';
-      this.editPrezzo = piatto.prezzo;
-      this.editAllergeniSelezionati = new Set((piatto.allergenis ?? []).map((a: any) => String(a.id)));
+      this.editPrezzo = piatto.prezzo ?? null;
+      this.editAllergeniSelezionati = new Set((piatto.allergenis ?? []).map(a => String(a.id)));
     }
 
     this.editNomeAllergeneCustom = '';
@@ -278,7 +277,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     const nome = this.editNomeAllergeneCustom.trim();
     if (!nome) return;
     const idTemp = 'custom_' + Date.now();
-    const custom = { id: idTemp, nome, icona: null, iconaContentType: null, colore: '#607D8B', isCustom: true };
+    const custom: AllergeneUI = { id: idTemp, nome, icona: undefined, iconaContentType: undefined, colore: '#607D8B', isCustom: true };
     this.allergeniDisponibili = [...this.allergeniDisponibili, custom];
     this.editAllergeniSelezionati = new Set([...this.editAllergeniSelezionati, idTemp]);
     this.editNomeAllergeneCustom = '';
@@ -299,10 +298,10 @@ export class PiattiGiornoGestioneComponent implements OnInit {
       // ✅ Crea nel DB gli eventuali allergeni custom prima del salvataggio
       const allergeni = await this.assicuraAllergeniNelDb(this.editAllergeniSelezionati);
 
-      const body: any = {
+      const body: PiattoDelGiornoBody = {
         id: this.piattoInModifica.id,
         attivo: this.piattoInModifica.attivo,
-        menu: { id: this.editMenuId },
+        menu: { id: this.editMenuId! },
       };
 
       if (this.piattoInModifica.prodotto) {
@@ -324,7 +323,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
       const menuInfo = this.menus.find(m => m.id === this.editMenuId);
       this.piattiGiorno = this.piattiGiorno.map(p => {
         if (p.id !== this.piattoInModifica!.id) return p;
-        const aggiornato: PiattoDelGiorno = {
+        const aggiornato: PiattoDelGiornoDTO = {
           ...p,
           menu: menuInfo ? { id: menuInfo.id, nome: menuInfo.nome } : { id: this.editMenuId! },
         };
@@ -333,7 +332,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
           aggiornato.descrizione = this.editDescrizione.trim() || undefined;
           aggiornato.prezzo = this.editPrezzo!;
           // ✅ IDs reali post-creazione allergeni
-          aggiornato.allergenis = allergeni.map(a => this.getAllergeneById(a.id)).filter(Boolean);
+          aggiornato.allergenis = allergeni.map(a => this.getAllergeneById(a.id)).filter((a): a is AllergeneUI => a !== undefined);
         }
         return aggiornato;
       });
@@ -351,7 +350,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
   //  ELIMINAZIONE
   // ══════════════════════════════════════════════════
 
-  apriModaleEliminazione(piatto: PiattoDelGiorno): void {
+  apriModaleEliminazione(piatto: PiattoDelGiornoDTO): void {
     this.piattoInEliminazione = piatto;
     this.modaleEliminazioneAperto = true;
   }
@@ -389,7 +388,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     this._prodottoDettaglio = null;
     this._menuDettaglio = this.menus.find(m => m.id === this.menuSelezionato) ?? null;
     try {
-      this.portate = (await firstValueFrom(this.http.get<any[]>(`/api/menus/${this.menuSelezionato}/portatas`))) ?? [];
+      this.portate = (await firstValueFrom(this.http.get<PortataDTO[]>(`/api/menus/${this.menuSelezionato}/portatas`))) ?? [];
     } catch (err) {
       console.error('Errore portate:', err);
     }
@@ -401,7 +400,8 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     this.prodottoSelezionato = null;
     this._prodottoDettaglio = null;
     try {
-      const prods: any[] = (await firstValueFrom(this.http.get<any[]>(`/api/prodottos/by-portata/${this.portataSelezionata}`))) ?? [];
+      const prods: ProdottoDTO[] =
+        (await firstValueFrom(this.http.get<ProdottoDTO[]>(`/api/prodottos/by-portata/${this.portataSelezionata}`))) ?? [];
       prods.forEach(p => this.prodottiMap.set(String(p.id), p));
       this.prodotti = prods;
     } catch (err) {
@@ -457,13 +457,13 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     const nome = this.nomeAllergeneCustom.trim();
     if (!nome) return;
     const idTemp = 'custom_' + Date.now();
-    const custom = { id: idTemp, nome, icona: null, iconaContentType: null, colore: '#607D8B', isCustom: true };
+    const custom: AllergeneUI = { id: idTemp, nome, icona: undefined, iconaContentType: undefined, colore: '#607D8B', isCustom: true };
     this.allergeniDisponibili = [...this.allergeniDisponibili, custom];
     this.allergeniSelezionati = new Set([...this.allergeniSelezionati, idTemp]);
     this.nomeAllergeneCustom = '';
   }
 
-  selezionaESalvaProdotto(prod: any): void {
+  selezionaESalvaProdotto(prod: ProdottoDTO): void {
     this._prodottoDettaglio = prod;
     this.prodottoSelezionato = prod.id;
     this.salvaPiatto();
@@ -482,10 +482,10 @@ export class PiattiGiornoGestioneComponent implements OnInit {
         allergeni = await this.assicuraAllergeniNelDb(this.allergeniSelezionati);
       }
 
-      let body: any = { attivo: true };
+      const body: PiattoDelGiornoBody = { attivo: true };
       if (this.modalitaSelezioneProdotto && this.prodottoSelezionato) {
         body.prodotto = { id: this.prodottoSelezionato };
-        body.menu = { id: this.menuSelezionato };
+        body.menu = { id: this.menuSelezionato! };
         body.nome = null;
         body.descrizione = null;
         body.prezzo = null;
@@ -494,13 +494,13 @@ export class PiattiGiornoGestioneComponent implements OnInit {
         body.descrizione = this.descrizione.trim() || null;
         body.prezzo = this.prezzo;
         body.prodotto = null;
-        body.menu = { id: this.menuNuovoPiatto };
+        body.menu = { id: this.menuNuovoPiatto! };
         body.allergenis = allergeni;
       }
 
-      const piattoRisposta: any = await firstValueFrom(this.http.post('/api/piatto-del-giornos', body));
+      const piattoRisposta: PiattoDelGiornoDTO = await firstValueFrom(this.http.post<PiattoDelGiornoDTO>('/api/piatto-del-giornos', body));
 
-      let piattoArricchito: PiattoDelGiorno;
+      let piattoArricchito: PiattoDelGiornoDTO;
       if (this.modalitaSelezioneProdotto && this._prodottoDettaglio) {
         const menuInfo = this._menuDettaglio ?? this.menus.find(m => m.id === this.menuSelezionato);
         piattoArricchito = {
@@ -522,7 +522,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
           attivo: true,
           menu: menuInfo ? { id: menuInfo.id, nome: menuInfo.nome } : piattoRisposta.menu,
           // ✅ IDs reali post-creazione allergeni
-          allergenis: allergeni.map(a => this.getAllergeneById(a.id)).filter(Boolean),
+          allergenis: allergeni.map(a => this.getAllergeneById(a.id)).filter((a): a is AllergeneUI => a !== undefined),
         };
       }
 
@@ -536,7 +536,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     }
   }
 
-  async toggleAttivo(piatto: PiattoDelGiorno): Promise<void> {
+  async toggleAttivo(piatto: PiattoDelGiornoDTO): Promise<void> {
     if (!piatto.id) return;
     const nuovoStato = !piatto.attivo;
     piatto.attivo = nuovoStato;
@@ -552,19 +552,19 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     }
   }
 
-  nomePiatto(p: PiattoDelGiorno): string {
-    return p.prodotto?.nome ?? p.nome;
+  nomePiatto(p: PiattoDelGiornoDTO): string {
+    return p.prodotto?.nome ?? p.nome ?? '';
   }
-  descrizionePiatto(p: PiattoDelGiorno): string | undefined {
+  descrizionePiatto(p: PiattoDelGiornoDTO): string | undefined {
     return p.prodotto?.descrizione ?? p.descrizione;
   }
-  prezzoPiatto(p: PiattoDelGiorno): number {
-    return p.prodotto?.prezzo ?? p.prezzo;
+  prezzoPiatto(p: PiattoDelGiornoDTO): number {
+    return p.prodotto?.prezzo ?? p.prezzo ?? 0;
   }
   formatPrezzo(p: number): string {
     return `€ ${Number(p).toFixed(2).replace('.', ',')}`;
   }
-  nomePortata(p: any): string {
+  nomePortata(p: PortataDTO): string {
     if (p.tipo === 'PERSONALIZZATA' && p.nomePersonalizzato) return p.nomePersonalizzato;
     return (p.nomeDefault ?? '').replace(/_/g, ' ');
   }

@@ -30,7 +30,7 @@ const routes: Routes = [
   // ── HOME ─────────────────────────────────────────────────────────
   {
     path: 'home',
-    loadComponent: () => import('./home/home.component'),
+    loadComponent: () => import('./home/home.component').then(m => m.default),
     title: 'home.title',
   },
 

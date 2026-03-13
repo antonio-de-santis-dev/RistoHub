@@ -82,17 +82,17 @@
           </div>
 
           <div class="cg-card-items">
-            @for (it of lista.items?.slice(0, 4); track it.id) {
+            @for (it of lista.items.slice(0, 4); track it.id) {
               <div class="cg-item-preview">
                 <span class="cg-item-emoji" [innerHTML]="iconaTipo(it.tipo)"></span>
                 <span class="cg-item-label">{{ getLabelItem(it) }}</span>
                 <span class="cg-item-valore">{{ it.valore }}</span>
               </div>
             }
-            @if ((lista.items?.length ?? 0) > 4) {
+            @if (lista.items.length > 4) {
               <p class="cg-item-altri">+ altri {{ lista.items.length - 4 }} campi</p>
             }
-            @if ((lista.items?.length ?? 0) === 0) {
+            @if (lista.items.length === 0) {
               <p class="cg-item-vuoto">Nessun campo aggiunto</p>
             }
           </div>

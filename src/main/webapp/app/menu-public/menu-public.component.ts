@@ -4,59 +4,28 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeUrl, SafeHtml } from '@angular/platform-browser';
 import { firstValueFrom } from 'rxjs';
+import {
+  AllergeneDTO,
+  ContattoItemDTO,
+  ImmagineMenuDTO,
+  ListaContattiDTO,
+  MenuCompletoDTO,
+  MenuDTO,
+  PiattoDelGiornoDTO,
+  PortataConProdottiDTO,
+  ProdottoDTO,
+} from 'app/shared/model/risto.model';
 
 // ── COSTANTE PER L'IMMAGINE DEGLI ALLERGENI PERSONALIZZATI ──
 const ALLERGENE_MANUALE_ICONA = '/content/images/allergene-manuale.png';
-
-interface Allergene {
-  id: string;
-  nome: string;
-  icona?: string;
-  iconaContentType?: string;
-  colore?: string;
-}
 
 interface Prodotto {
   id: string;
   nome: string;
   descrizione?: string;
   prezzo: number;
-  allergenis?: Allergene[];
+  allergenis?: AllergeneDTO[];
   portata?: { id: string };
-}
-
-interface Portata {
-  id: string;
-  tipo: string;
-  nomeDefault?: string;
-  nomePersonalizzato?: string;
-  prodotti?: Prodotto[];
-  aperta?: boolean;
-}
-
-interface Menu {
-  id: string;
-  nome: string;
-  descrizione?: string;
-  colorePrimario?: string;
-  coloreSecondario?: string;
-  fontMenu?: string;
-  templateStyle?: string;
-}
-
-interface ContattoItem {
-  id: string;
-  tipo: 'TELEFONO' | 'EMAIL' | 'SOCIAL' | 'INDIRIZZO';
-  valore: string;
-  reteSociale?: string;
-  etichetta?: string;
-  ordine: number;
-}
-
-interface ListaContatti {
-  id: string;
-  nome: string;
-  items: ContattoItem[];
 }
 
 const SOCIAL_ICONS_SVG: Record<string, string> = {
@@ -68,23 +37,6 @@ const SOCIAL_ICONS_SVG: Record<string, string> = {
 };
 
 // DTO aggregato restituito dall'endpoint /api/public/menus/{id}/full
-interface PortataConProdotti {
-  id: string;
-  tipo: string;
-  nomeDefault?: string;
-  nomePersonalizzato?: string;
-  prodotti: Prodotto[];
-}
-
-interface MenuCompleto {
-  menu: Menu;
-  portate: PortataConProdotti[];
-  piattiDelGiorno: any[];
-  immagini: any[];
-  allergeni: Allergene[];
-  contatti: ListaContatti[];
-}
-
 interface Lingua {
   codice: string;
   nome: string;
@@ -99,19 +51,19 @@ interface Lingua {
   styleUrls: ['./menu-public.component.scss'],
 })
 export class MenuPublicComponent implements OnInit, OnDestroy {
-  menu: Menu | null = null;
-  portate: Portata[] = [];
+  menu: MenuDTO | null = null;
+  portate: PortataConProdottiDTO[] = [];
   logoUrl: SafeUrl | null = null;
   isLoading = true;
   errore = false;
-  piattiDelGiorno: any[] = [];
+  piattiDelGiorno: PiattoDelGiornoDTO[] = [];
   piattiGiornoAperti = false;
-  listeContatti: ListaContatti[] = [];
+  listeContatti: ListaContattiDTO[] = [];
 
-  allergeniMap: Map<string, Allergene> = new Map();
-  private allergeniByNome: Map<string, Allergene> = new Map();
-  private prodottiMap: Map<string, Prodotto> = new Map();
-  private _tuttiAllergeniMenu: Allergene[] = []; // OPT-06: cache memoizzata, aggiornata una volta al caricamento
+  allergeniMap: Map<string, AllergeneDTO> = new Map();
+  private allergeniByNome: Map<string, AllergeneDTO> = new Map();
+  private prodottiMap: Map<string, ProdottoDTO> = new Map();
+  private _tuttiAllergeniMenu: AllergeneDTO[] = []; // OPT-06: cache memoizzata, aggiornata una volta al caricamento
 
   // ══ MULTILINGUA ════════════════════════════════════════════
   readonly LINGUE: Lingua[] = [
@@ -226,16 +178,16 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
 
   // Template moderno / rustico
   modernoTabAttiva: string | null = null;
-  modernoPortataAttiva: Portata | null = null;
+  modernoPortataAttiva: PortataConProdottiDTO | null = null;
   modernoCarouselIndex = 0;
-  modernoAutoplayTimer: any = null;
+  modernoAutoplayTimer: ReturnType<typeof setInterval> | null = null;
   modernoImmagini: string[] = [];
   modernoImmaginiCaricate: boolean[] = [];
 
   rusticoTabAttiva: string | null = null;
-  rusticoPortataAttiva: Portata | null = null;
+  rusticoPortataAttiva: PortataConProdottiDTO | null = null;
   rusticoCarouselIndex = 0;
-  rusticoAutoplayTimer: any = null;
+  rusticoAutoplayTimer: ReturnType<typeof setInterval> | null = null;
   rusticoImmagini: string[] = [];
   rusticoImmaginiCaricate: boolean[] = [];
 
@@ -314,7 +266,7 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
     const stringhe = new Set<string>();
     this.portate.forEach(p => {
       if (p.tipo === 'PERSONALIZZATA' && p.nomePersonalizzato) stringhe.add(p.nomePersonalizzato);
-      (p.prodotti ?? []).forEach(prod => {
+      (p.prodotti ?? []).forEach((prod: ProdottoDTO) => {
         if (prod.nome) stringhe.add(prod.nome);
         if (prod.descrizione) stringhe.add(prod.descrizione);
       });
@@ -370,7 +322,7 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
     const BASE = '/api/public';
     try {
       // ── UNICA CHIAMATA HTTP: sostituisce le precedenti N+6 chiamate separate ──
-      const dati = (await firstValueFrom(this.http.get<MenuCompleto>(`${BASE}/menus/${id}/full`)))!;
+      const dati = (await firstValueFrom(this.http.get<MenuCompletoDTO>(`${BASE}/menus/${id}/full`)))!;
 
       // ── menu: caricato, applicare font ────────────────────────────────────
       this.menu = dati.menu ?? null;
@@ -392,35 +344,35 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
 
       // ── allergeni ─────────────────────────────────────────────────────────
       const allergeni = dati.allergeni ?? [];
-      this.allergeniMap = new Map(allergeni.map(a => [String(a.id), a]));
-      this.allergeniByNome = new Map(allergeni.map(a => [a.nome.toLowerCase().trim(), a]));
+      this.allergeniMap = new Map(allergeni.map((a: AllergeneDTO) => [String(a.id), a] as [string, AllergeneDTO]));
+      this.allergeniByNome = new Map(allergeni.map((a: AllergeneDTO) => [a.nome.toLowerCase().trim(), a] as [string, AllergeneDTO]));
 
       // ── immagini ──────────────────────────────────────────────────────────
       const immaginiList = dati.immagini ?? [];
-      const logo = immaginiList.find(i => i.tipo === 'LOGO');
+      const logo = immaginiList.find((i: ImmagineMenuDTO) => i.tipo === 'LOGO');
       if (logo?.immagine) {
-        const blob = this.base64ToBlob(logo.immagine, logo.immagineContentType);
+        const blob = this.base64ToBlob(logo.immagine ?? '', logo.immagineContentType ?? 'image/jpeg');
         this.logoUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob));
       }
 
       const copertine = immaginiList
-        .filter(i => i.tipo === 'COPERTINA' && i.visibile !== false)
-        .sort((a, b) => (a.ordine ?? 0) - (b.ordine ?? 0))
-        .map(i => `data:${i.immagineContentType};base64,${i.immagine}`);
+        .filter((i: ImmagineMenuDTO) => i.tipo === 'COPERTINA' && i.visibile !== false)
+        .sort((a: ImmagineMenuDTO, b: ImmagineMenuDTO) => (a.ordine ?? 0) - (b.ordine ?? 0))
+        .map((i: ImmagineMenuDTO) => `data:${i.immagineContentType};base64,${i.immagine}`);
       this.modernoImmagini = copertine;
       this.rusticoImmagini = copertine;
       this.modernoImmaginiCaricate = new Array(copertine.length).fill(false);
       this.rusticoImmaginiCaricate = new Array(copertine.length).fill(false);
 
       // ── portate con prodotti già annidati (nessuna chiamata extra) ────────
-      const portateCaricate = (dati.portate ?? []).map(p => {
-        (p.prodotti ?? []).forEach(prod => this.prodottiMap.set(String(prod.id), prod));
+      const portateCaricate = (dati.portate ?? []).map((p: PortataConProdottiDTO) => {
+        (p.prodotti ?? []).forEach((prod: ProdottoDTO) => this.prodottiMap.set(String(prod.id), prod));
         return { ...p, aperta: false };
       });
       this.portate = this.ordinaPortate(portateCaricate);
 
       // ── piatti del giorno e contatti ──────────────────────────────────────
-      this.piattiDelGiorno = (dati.piattiDelGiorno ?? []).map(p => this.arricchisciPiatto(p));
+      this.piattiDelGiorno = (dati.piattiDelGiorno ?? []).map((p: PiattoDelGiornoDTO) => this.arricchisciPiatto(p));
       this.listeContatti = dati.contatti ?? [];
 
       // OPT-06: calcola una volta sola dopo che portate e piatti del giorno sono pronti
@@ -447,7 +399,7 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
     return svg ? this.sanitizer.bypassSecurityTrustHtml(svg) : '';
   }
 
-  getContattoLink(item: ContattoItem): string | null {
+  getContattoLink(item: ContattoItemDTO): string | null {
     if (item.tipo === 'TELEFONO') return `tel:${item.valore}`;
     if (item.tipo === 'EMAIL') return `mailto:${item.valore}`;
     if (item.tipo === 'SOCIAL') {
@@ -457,7 +409,7 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  getContattoLabel(item: ContattoItem): string {
+  getContattoLabel(item: ContattoItemDTO): string {
     if (item.tipo === 'SOCIAL') {
       if (item.etichetta?.trim()) return item.etichetta.trim();
       if (item.reteSociale && item.reteSociale !== 'ALTRO') {
@@ -469,7 +421,7 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
   }
 
   // ── Template helpers ─────────────────────────────────────────────
-  private arricchisciPiatto(piatto: any): any {
+  private arricchisciPiatto(piatto: PiattoDelGiornoDTO): PiattoDelGiornoDTO {
     if (piatto.prodotto?.id) {
       const prodottoCompleto = this.prodottiMap.get(String(piatto.prodotto.id));
       if (prodottoCompleto) {
@@ -482,7 +434,7 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
     return piatto;
   }
 
-  private ordinaPortate(portate: Portata[]): Portata[] {
+  private ordinaPortate(portate: PortataConProdottiDTO[]): PortataConProdottiDTO[] {
     return [...portate].sort((a, b) => {
       const ordA = a.tipo === 'PERSONALIZZATA' ? 4 : (this.ORDINE_PORTATE[a.nomeDefault ?? ''] ?? 99);
       const ordB = b.tipo === 'PERSONALIZZATA' ? 4 : (this.ORDINE_PORTATE[b.nomeDefault ?? ''] ?? 99);
@@ -490,14 +442,14 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
     });
   }
 
-  togglePortata(portata: Portata): void {
+  togglePortata(portata: PortataConProdottiDTO): void {
     portata.aperta = !portata.aperta;
   }
   togglePiattiGiorno(): void {
     this.piattiGiornoAperti = !this.piattiGiornoAperti;
   }
 
-  modernoApriPortata(portata: Portata): void {
+  modernoApriPortata(portata: PortataConProdottiDTO): void {
     this.modernoTabAttiva = portata.id;
     this.modernoPortataAttiva = portata;
     this.fermaAutoplay();
@@ -523,7 +475,7 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
     }
   }
 
-  rusticoApriTab(tabId: string, portata: Portata | null): void {
+  rusticoApriTab(tabId: string, portata: PortataConProdottiDTO | null): void {
     this.rusticoTabAttiva = tabId;
     this.rusticoPortataAttiva = portata;
     this.fermaAutoplayRustico();
@@ -589,7 +541,7 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
     this.onImmagineCaricata(template, index);
   }
 
-  getAllergeneIcona(a: Allergene): string {
+  getAllergeneIcona(a: AllergeneDTO): string {
     if (!a) return '';
     if (a.icona && a.iconaContentType) return `data:${a.iconaContentType};base64,${a.icona}`;
     const completo = this.allergeniMap.get(String(a.id ?? '')) ?? this.allergeniByNome.get((a.nome ?? '').toLowerCase().trim());
@@ -599,33 +551,33 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
 
   // OPT-06: getter ora restituisce la cache pre-calcolata invece di rieseguire
   // le iterazioni ad ogni ciclo di change detection Angular.
-  get tuttiAllergeniMenu(): Allergene[] {
+  get tuttiAllergeniMenu(): AllergeneDTO[] {
     return this._tuttiAllergeniMenu;
   }
 
   // Calcola e memorizza tutti gli allergeni distinti del menu.
   // Va chiamata una sola volta dopo che portate e piattiDelGiorno sono stati popolati.
   private calcolaTuttiAllergeni(): void {
-    const map = new Map<string, Allergene>();
+    const map = new Map<string, AllergeneDTO>();
     this.portate.forEach(portata => {
-      (portata.prodotti ?? []).forEach((p: Prodotto) => {
-        (p.allergenis ?? []).forEach(a => {
+      (portata.prodotti ?? []).forEach((p: ProdottoDTO) => {
+        (p.allergenis ?? []).forEach((a: AllergeneDTO) => {
           const key = String(a.id ?? a.nome ?? '');
           if (key) map.set(key, a);
         });
       });
     });
     this.piattiDelGiorno.forEach(piatto => {
-      const lista: any[] = piatto.prodotto?.allergenis ?? piatto.allergenis ?? [];
+      const lista: AllergeneDTO[] = piatto.prodotto?.allergenis ?? piatto.allergenis ?? [];
       lista.forEach(a => {
         const key = String(a.id ?? a.nome ?? '');
         if (key) map.set(key, a);
       });
     });
-    this._tuttiAllergeniMenu = Array.from(map.values());
+    this._tuttiAllergeniMenu = Array.from(map.values()) as AllergeneDTO[];
   }
 
-  nomePortata(p: Portata): string {
+  nomePortata(p: PortataConProdottiDTO): string {
     if (p.tipo === 'PERSONALIZZATA' && p.nomePersonalizzato) return this.getT(p.nomePersonalizzato);
     const chiave = p.nomeDefault ?? '';
     const trad = this.NOMI_PORTATE[chiave];

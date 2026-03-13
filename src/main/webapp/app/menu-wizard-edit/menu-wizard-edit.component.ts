@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
+import { AccountDTO, MenuDTO, PortataDTO, ImmagineMenuDTO } from 'app/shared/model/risto.model';
 
 @Component({
   selector: 'jhi-menu-wizard-edit',
@@ -100,7 +101,7 @@ export class MenuWizardEditComponent implements OnInit {
 
   async caricaDatiEsistenti(id: string): Promise<void> {
     try {
-      const menu: any = await firstValueFrom(this.http.get(`/api/menus/${id}`));
+      const menu: MenuDTO = await firstValueFrom(this.http.get<MenuDTO>(`/api/menus/${id}`));
       this.nomeMenu = menu.nome ?? '';
       this.descrizioneMenu = menu.descrizione ?? '';
       this.selectedTemplate = menu.templateStyle ?? null;
@@ -109,16 +110,16 @@ export class MenuWizardEditComponent implements OnInit {
       this.fontSelezionato = menu.fontMenu ?? 'Playfair Display';
 
       // Logo esistente
-      const immagini: any[] = (await firstValueFrom(this.http.get<any[]>(`/api/menus/${id}/immagini`))) ?? [];
+      const immagini: ImmagineMenuDTO[] = (await firstValueFrom(this.http.get<ImmagineMenuDTO[]>(`/api/menus/${id}/immagini`))) ?? [];
       const logo = immagini.find(i => i.tipo === 'LOGO');
       if (logo) {
-        this.logoEsistenteId = logo.id;
+        this.logoEsistenteId = logo.id ?? null;
         this.logoEsistenteUrl = `data:${logo.immagineContentType};base64,${logo.immagine}`;
         this.logoPreview = this.logoEsistenteUrl;
       }
 
       // Portate esistenti
-      const portate: any[] = (await firstValueFrom(this.http.get<any[]>(`/api/menus/${id}/portatas`))) ?? [];
+      const portate: PortataDTO[] = (await firstValueFrom(this.http.get<PortataDTO[]>(`/api/menus/${id}/portatas`))) ?? [];
       this.portateEsistentiIds = portate.map(p => ({
         id: p.id,
         tipo: p.tipo,

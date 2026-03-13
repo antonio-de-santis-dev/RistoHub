@@ -53,7 +53,7 @@
                   <div class="rh-piatto-info">
                     <span class="rh-piatto-nome">{{ piatto.nome ?? piatto.prodotto?.nome ?? '—' }}</span>
                     @if (piatto.menu?.nome) {
-                      <span class="rh-piatto-menu">{{ piatto.menu.nome }}</span>
+                      <span class="rh-piatto-menu">{{ piatto.menu?.nome }}</span>
                     }
                   </div>
                   <span class="rh-piatto-prezzo">{{ formatPrezzo(piatto.prezzo ?? piatto.prodotto?.prezzo) }}</span>

@@ -3,6 +3,7 @@ import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
+import { AccountDTO, MenuDTO } from 'app/shared/model/risto.model';
 
 @Component({
   selector: 'jhi-menu-list',
@@ -12,9 +13,9 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./menu-list.component.scss'],
 })
 export class MenuListComponent implements OnInit {
-  menus: any[] = [];
+  menus: MenuDTO[] = [];
   isLoading = true;
-  menuDaEliminare: any = null;
+  menuDaEliminare: MenuDTO | null = null;
   confermaEliminazioneVisibile = false;
   qrMenuId: string | null = null;
   qrVisible = false;
@@ -23,7 +24,7 @@ export class MenuListComponent implements OnInit {
 
   toastMsg: string | null = null;
   toastType: 'success' | 'error' = 'success';
-  private toastTimer: any = null;
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private http: HttpClient,
@@ -36,8 +37,8 @@ export class MenuListComponent implements OnInit {
 
   async caricaMenus(): Promise<void> {
     try {
-      const currentUser: any = await firstValueFrom(this.http.get('/api/account'));
-      const tutti: any[] = (await firstValueFrom(this.http.get<any[]>('/api/menus'))) ?? [];
+      const currentUser: AccountDTO = await firstValueFrom(this.http.get<AccountDTO>('/api/account'));
+      const tutti: MenuDTO[] = (await firstValueFrom(this.http.get<MenuDTO[]>('/api/menus'))) ?? [];
       this.menus = tutti.filter(m => m.ristoratore?.login === currentUser.login);
     } catch (err) {
       console.error('Errore caricamento menu:', err);
@@ -46,7 +47,7 @@ export class MenuListComponent implements OnInit {
     }
   }
 
-  async toggleAttivo(menu: any): Promise<void> {
+  async toggleAttivo(menu: MenuDTO): Promise<void> {
     if (this.toggling === menu.id) return;
     this.toggling = menu.id;
     const nuovoStato = !menu.attivo;
@@ -86,7 +87,7 @@ export class MenuListComponent implements OnInit {
     this.router.navigate(['/menu-wizard-edit', id]);
   }
 
-  chiediConfermaElimina(menu: any): void {
+  chiediConfermaElimina(menu: MenuDTO): void {
     this.menuDaEliminare = menu;
     this.confermaEliminazioneVisibile = true;
   }
@@ -144,7 +145,7 @@ export class MenuListComponent implements OnInit {
    * Restituisce true per i template che hanno il carosello immagini.
    * Moderno e Rustico = carosello attivo.
    */
-  haCarosello(menu: any): boolean {
+  haCarosello(menu: MenuDTO): boolean {
     return menu.templateStyle === 'MODERNO' || menu.templateStyle === 'RUSTICO';
   }
 
