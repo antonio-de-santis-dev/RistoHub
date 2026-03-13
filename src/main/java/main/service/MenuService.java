@@ -8,6 +8,7 @@ import main.domain.Menu;
 import main.domain.PiattoDelGiorno;
 import main.repository.MenuRepository;
 import main.repository.PiattoDelGiornoRepository;
+import main.security.SecurityUtils;
 import main.service.dto.AllergeneDTO;
 import main.service.dto.ImmagineMenuDTO;
 import main.service.dto.ListaContattiDTO;
@@ -18,6 +19,7 @@ import main.service.dto.PortataConProdottiDTO;
 import main.service.dto.ProdottoDTO;
 import main.service.mapper.MenuMapper;
 import main.service.mapper.PiattoDelGiornoMapper;
+import main.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -80,6 +82,7 @@ public class MenuService {
 
     public MenuDTO update(MenuDTO menuDTO) {
         LOG.debug("Request to update Menu : {}", menuDTO);
+        checkOwnership(menuDTO.getId());
         return persistMenu(menuDTO);
     }
 
@@ -94,6 +97,7 @@ public class MenuService {
      */
     public Optional<MenuDTO> partialUpdate(MenuDTO menuDTO) {
         LOG.debug("Request to partially update Menu : {}", menuDTO);
+        checkOwnership(menuDTO.getId());
         return menuRepository
             .findById(menuDTO.getId())
             .map(existingMenu -> {
@@ -105,12 +109,34 @@ public class MenuService {
     }
 
     /**
-     * Get all the menus.
+     * Get all the menus (admin use — nessun filtro ownership).
      */
     @Transactional(readOnly = true)
     public List<MenuDTO> findAll() {
         LOG.debug("Request to get all Menus");
         return menuRepository.findAll().stream().map(menuMapper::toDto).collect(Collectors.toList());
+    }
+
+    /**
+     * Get only the menus belonging to the currently authenticated user.
+     */
+    @Transactional(readOnly = true)
+    public List<MenuDTO> findAllByCurrentUser() {
+        LOG.debug("Request to get Menus for current user");
+        return menuRepository.findByRistoratoreIsCurrentUser().stream().map(menuMapper::toDto).toList();
+    }
+
+    /**
+     * Verifica che il menu con l'id dato appartenga all'utente corrente.
+     * Lancia BadRequestAlertException se il menu non esiste o appartiene ad un altro utente.
+     */
+    private void checkOwnership(UUID id) {
+        String currentLogin = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new BadRequestAlertException("Utente non autenticato", "menu", "unauthenticated"));
+        Menu menu = menuRepository.findById(id).orElseThrow(() -> new BadRequestAlertException("Menu non trovato", "menu", "idnotfound"));
+        if (menu.getRistoratore() == null || !menu.getRistoratore().getLogin().equals(currentLogin)) {
+            throw new BadRequestAlertException("Accesso negato", "menu", "forbidden");
+        }
     }
 
     public Page<MenuDTO> findAllWithEagerRelationships(Pageable pageable) {
@@ -131,6 +157,7 @@ public class MenuService {
      */
     public void delete(UUID id) {
         LOG.debug("Request to delete Menu : {}", id);
+        checkOwnership(id);
         piattoDelGiornoRepository.deleteByMenuId(id);
         piattoDelGiornoRepository.flush();
         menuRepository.deleteById(id);

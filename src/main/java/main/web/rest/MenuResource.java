@@ -107,8 +107,8 @@ public class MenuResource {
 
     @GetMapping("")
     public List<MenuDTO> getAllMenus(@RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload) {
-        LOG.debug("REST request to get all Menus");
-        return menuService.findAll();
+        LOG.debug("REST request to get all Menus for current user");
+        return menuService.findAllByCurrentUser();
     }
 
     @GetMapping("/{id}")
