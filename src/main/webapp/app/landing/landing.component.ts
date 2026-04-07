@@ -18,10 +18,11 @@ import { PasswordResetInitService } from 'app/account/password-reset/init/passwo
 export class LandingComponent implements OnInit, OnDestroy {
   private styleTag: HTMLStyleElement | null = null;
 
-  // ── Stato UI ───────────────────────────────────────────────────
+  // ── Stato UI ────────────────────────────────────────────────────
+  /** true → split screen con form login */
   showLogin = false;
 
-  // ── Stato login ────────────────────────────────────────────────
+  // ── Stato login ─────────────────────────────────────────────────
   authenticationError = signal(false);
 
   loginForm = new FormGroup({
@@ -30,7 +31,7 @@ export class LandingComponent implements OnInit, OnDestroy {
     rememberMe: new FormControl(false, { nonNullable: true, validators: [Validators.required] }),
   });
 
-  // ── Stato modal recupero password ──────────────────────────────
+  // ── Stato modal recupero password ───────────────────────────────
   mostraModalRecupero = signal(false);
   recuperoSuccess = signal(false);
 
@@ -41,26 +42,26 @@ export class LandingComponent implements OnInit, OnDestroy {
     }),
   });
 
-  // ── Servizi ────────────────────────────────────────────────────
+  // ── Servizi ─────────────────────────────────────────────────────
   private readonly accountService = inject(AccountService);
   private readonly loginService = inject(LoginService);
   private readonly router = inject(Router);
   private readonly passwordResetInitService = inject(PasswordResetInitService);
 
   ngOnInit(): void {
-    // Nasconde la navbar sulla landing
+    // Nasconde navbar e footer sulla landing
     this.styleTag = document.createElement('style');
     this.styleTag.id = 'landing-hide-navbar';
     this.styleTag.textContent = `
-      jhi-navbar,
-      nav.navbar,
+      jhi-navbar, nav.navbar,
+      jhi-footer, footer,
       router-outlet[name="navbar"] ~ * {
         display: none !important;
       }
     `;
     document.head.appendChild(this.styleTag);
 
-    // Se già autenticato → vai direttamente a /home
+    // Se già autenticato → home
     this.accountService.identity().subscribe(() => {
       if (this.accountService.isAuthenticated()) {
         this.router.navigate(['/home']);
@@ -76,24 +77,23 @@ export class LandingComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Al click su "Get started":
-   * - se già autenticato → naviga a /home
-   * - altrimenti → mostra il form di login inline con transizione
+   * Click su "Get started":
+   * — già autenticato  → /home
+   * — non autenticato  → attiva split screen con form
    */
   mostraLogin(): void {
     if (this.accountService.isAuthenticated()) {
       this.router.navigate(['/home']);
     } else {
       this.showLogin = true;
-      // Focus sull'input username dopo la transizione
       setTimeout(() => {
         const el = document.getElementById('username');
-        if (el) el.focus();
-      }, 700);
+        if (el) (el as HTMLInputElement).focus();
+      }, 800);
     }
   }
 
-  // ── Metodi login ───────────────────────────────────────────────
+  // ── Login ────────────────────────────────────────────────────────
   login(): void {
     this.loginService.login(this.loginForm.getRawValue()).subscribe({
       next: () => {
@@ -104,29 +104,24 @@ export class LandingComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Metodi modal recupero password ─────────────────────────────
-
-  /** Apre il modal */
+  // ── Modal recupero password ──────────────────────────────────────
   apriRecuperoPassword(): void {
     this.resetRequestForm.reset();
     this.recuperoSuccess.set(false);
     this.mostraModalRecupero.set(true);
   }
 
-  /** Chiude il modal */
   chiudiRecuperoPassword(): void {
     this.mostraModalRecupero.set(false);
     this.recuperoSuccess.set(false);
   }
 
-  /** Chiude cliccando sull'overlay fuori dalla card */
   chiudiSuOverlay(event: MouseEvent): void {
     if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
       this.chiudiRecuperoPassword();
     }
   }
 
-  /** Invia la richiesta di reset password */
   requestReset(): void {
     this.passwordResetInitService.save(this.resetRequestForm.get(['email'])!.value).subscribe(() => {
       this.recuperoSuccess.set(true);
