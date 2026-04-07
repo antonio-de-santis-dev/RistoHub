@@ -68,7 +68,6 @@
     0 24px 70px rgba(0, 0, 0, 0.5),
     0 4px 18px rgba(0, 0, 0, 0.28);
 
-  /* inline-flex = la card abbraccia solo il suo contenuto, zero spazio vuoto */
   display: inline-flex;
   flex-direction: row;
   align-items: center;
@@ -77,17 +76,22 @@
   /* Animazione ingresso */
   animation: card-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 
+  transform-origin: center center;
   transition:
-    padding 0.55s cubic-bezier(0.4, 0, 0.2, 1),
-    border-radius 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    padding 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.5s ease;
 }
 
-/* STATO 2: card abbraccia solo il logo */
+/* STATO 2: card si restringe scalando verso il centro */
 .logo-card.card-shrink {
   padding: 2rem;
   border-radius: 20px;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  transform: scale(0.85);
 }
 
 @keyframes card-in {
@@ -158,17 +162,17 @@
   max-width: 500px;
   overflow: hidden;
   transition:
-    opacity 0.25s ease,
-    max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity 0.2s ease,
+    max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.15s;
 }
 
-/* Sparisce al click — prima opacity poi collassa la larghezza */
+/* Sparisce subito (0.15s), poi la card scala (da .card-shrink) */
 .card-right.card-right-out {
   opacity: 0;
   max-width: 0;
   transition:
-    opacity 0.2s ease 0s,
-    max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+    opacity 0.15s ease 0s,
+    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
 }
 
 /* Divisore verticale */
@@ -691,4 +695,88 @@
   justify-content: center;
   color: #16a34a;
   margin-bottom: 0.4rem;
+}
+
+/* ================================================================
+   MOBILE (< 768px)
+   Layout completamente diverso:
+   - Card centrata su sfondo food (logo + testo + btn)
+   - Niente split screen, niente pannello bianco inline
+   - Click sul pulsante → naviga a /login (pagina separata)
+   ================================================================ */
+@media (max-width: 767px) {
+  /* Forza sempre la visualizzazione centrata, anche se showLogin è true */
+  .page-wrap,
+  .page-wrap.split-active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+  }
+
+  /* left-half: sempre centrata, mai posizionata assoluta */
+  .left-half,
+  .split-active .left-half {
+    position: relative !important;
+    width: auto !important;
+    height: auto !important;
+    left: unset !important;
+    top: unset !important;
+  }
+
+  /* card: verticale, testo centrato */
+  .logo-card,
+  .logo-card.card-shrink {
+    flex-direction: column;
+    align-items: center;
+    padding: 2.4rem 2rem 2.2rem;
+    border-radius: 20px;
+    width: min(320px, 86vw);
+    text-align: center;
+  }
+
+  /* logo dimensionato per mobile */
+  .logo-img,
+  .card-shrink .logo-img {
+    width: clamp(100px, 30vw, 140px) !important;
+    height: clamp(100px, 30vw, 140px) !important;
+  }
+
+  /* nasconde il divisore verticale */
+  .card-divider {
+    display: none;
+  }
+
+  /* card-right: sempre visibile, layout verticale centrato */
+  .card-right,
+  .card-right.card-right-out {
+    opacity: 1 !important;
+    max-width: unset !important;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1.4rem;
+    transition: none !important;
+  }
+
+  .card-text-wrap {
+    align-items: center;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .headline {
+    font-size: clamp(1.4rem, 5vw, 1.7rem);
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-start {
+    min-width: 200px;
+  }
+
+  /* pannello bianco: mai visibile su mobile */
+  .right-half,
+  .right-half.right-visible {
+    display: none !important;
+  }
 }
