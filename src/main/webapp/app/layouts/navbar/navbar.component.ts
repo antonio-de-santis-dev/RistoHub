@@ -103,8 +103,13 @@ export default class NavbarComponent implements OnInit {
 
   logout(): void {
     this.closeSidebar();
+    // BUG-2 FIX (logout → landing): svuotiamo subito lo stato auth lato client
+    // così la landing non vede più l'utente autenticato quando ngOnInit chiama
+    // accountService.identity() e non redirige a /home.
+    // Il logout server-side (asincrono) viene comunque completato dopo.
+    this.loginService.logoutInClient();
     this.loginService.logout();
-    this.router.navigate(['']);
+    this.router.navigate(['/']);
   }
 
   // Tenuto per compatibilità (non usato nel drawer)

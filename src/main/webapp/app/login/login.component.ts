@@ -1,4 +1,5 @@
-import { AfterViewInit, Component, ElementRef, OnInit, OnDestroy, inject, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, ElementRef, OnInit, OnDestroy, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
@@ -43,6 +44,10 @@ export default class LoginComponent implements OnInit, AfterViewInit, OnDestroy 
   private readonly passwordResetInitService = inject(PasswordResetInitService);
   private styleTag: HTMLStyleElement | null = null;
 
+  // BUG-2 FIX: DestroyRef per cancellare automaticamente la subscription
+  // quando il componente viene distrutto, evitando redirect indesiderati
+  private readonly destroyRef = inject(DestroyRef);
+
   ngOnInit(): void {
     // Nasconde la navbar sulla pagina di login
     this.styleTag = document.createElement('style');
@@ -52,12 +57,18 @@ export default class LoginComponent implements OnInit, AfterViewInit, OnDestroy 
     `;
     document.head.appendChild(this.styleTag);
 
-    // Se già autenticato → home
-    this.accountService.identity().subscribe(() => {
-      if (this.accountService.isAuthenticated()) {
-        this.router.navigate(['/home']);
-      }
-    });
+    // BUG-2 FIX: takeUntilDestroyed garantisce che il subscribe venga
+    // cancellato non appena LoginComponent viene distrutto. Senza questo,
+    // se identity() risolve dopo la navigazione verso /account/register,
+    // il callback potrebbe ancora scattare e reindirizzare a /home.
+    this.accountService
+      .identity()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.accountService.isAuthenticated()) {
+          this.router.navigate(['/home']);
+        }
+      });
   }
 
   ngAfterViewInit(): void {

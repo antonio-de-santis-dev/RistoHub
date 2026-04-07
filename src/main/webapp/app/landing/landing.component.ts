@@ -16,6 +16,9 @@ import { PasswordResetInitService } from 'app/account/password-reset/init/passwo
 export class LandingComponent implements OnInit, OnDestroy {
   private styleTag: HTMLStyleElement | null = null;
 
+  // BUG-1 FIX: salviamo l'ID del timeout per poterlo cancellare in ngOnDestroy
+  private timeoutId: ReturnType<typeof setTimeout> | null = null;
+
   /** true = pannello login visibile */
   showLogin = false;
 
@@ -65,6 +68,12 @@ export class LandingComponent implements OnInit, OnDestroy {
       this.styleTag.remove();
       this.styleTag = null;
     }
+    // BUG-1 FIX: cancella il timeout zombie se il componente viene distrutto
+    // prima che i 650 ms scadano (es. utente naviga a /account/register)
+    if (this.timeoutId !== null) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = null;
+    }
   }
 
   /** Click Get started — su mobile naviga a /login, su desktop mostra form inline */
@@ -75,7 +84,9 @@ export class LandingComponent implements OnInit, OnDestroy {
       this.router.navigate(['/login']);
     } else {
       this.showLogin = true;
-      setTimeout(() => {
+      // BUG-1 FIX: salviamo il riferimento al timeout
+      this.timeoutId = setTimeout(() => {
+        this.timeoutId = null;
         const el = document.getElementById('username');
         if (el) (el as HTMLInputElement).focus();
       }, 650);
