@@ -1,97 +1,82 @@
-/* ================================================================
-   LANDING PAGE v4 — RistoHub
-   STATO 1: card centrata su sfondo food (logo + testo + btn)
-   STATO 2: split screen — sfondo food + card logo | bianco + form
-   ================================================================ */
-
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-/* ── WRAPPER PAGINA ─────────────────────────────────────────────── */
-.page-wrap {
+/* ══ HOST: esce dal jh-card wrapper, occupa tutto lo schermo ══════ */
+:host {
+  display: block;
   position: fixed;
   inset: 0;
   z-index: 900;
   overflow: hidden;
 
-  /* STATO 1: sfondo food a tutto schermo, card centrata */
   background-image: url('/content/images/unnamed.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   background-color: #1c1c1c;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 4, 2, 0.58);
+    z-index: 0;
+    pointer-events: none;
+  }
 }
 
-/* overlay scuro su sfondo food */
-.page-wrap::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(8, 4, 2, 0.58);
-  z-index: 0;
-  pointer-events: none;
-  transition: opacity 0.6s ease;
+jhi-footer,
+footer,
+jhi-navbar,
+nav.navbar,
+router-outlet[name='navbar'] ~ * {
+  display: none !important;
 }
 
-/* ── METÀ SINISTRA ──────────────────────────────────────────────── */
-.left-half {
+/* ══ CONTENITORE PRINCIPALE ═══════════════════════════════════════ */
+.landing-page {
   position: relative;
   z-index: 1;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* STATO 1: non occupa metà — è solo lo sfondo con la card centrata */
-  width: auto;
-  height: auto;
-  transition: width 0.65s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* STATO 2: left-half diventa metà schermo */
-.split-active .left-half {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 50%;
+/* ══ METÀ SINISTRA ════════════════════════════════════════════════ */
+.left-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  transition: flex 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.show-login .left-panel {
+  flex: 0 0 50%;
   height: 100%;
 }
 
-/* ── CARD LOGO ──────────────────────────────────────────────────── */
+/* ══ CARD LOGO ════════════════════════════════════════════════════ */
 .logo-card {
-  background: #ffffff;
+  background: #fff;
   border-radius: 24px;
   padding: 2.2rem 2.8rem 2.2rem 2.2rem;
   box-shadow:
     0 24px 70px rgba(0, 0, 0, 0.5),
     0 4px 18px rgba(0, 0, 0, 0.28);
-
   display: inline-flex;
   flex-direction: row;
   align-items: center;
-  gap: 0;
-
-  /* Animazione ingresso */
   animation: card-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-
-  transform-origin: center center;
   transition:
-    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     padding 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.5s ease;
+    border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* STATO 2: card si restringe scalando verso il centro */
-.logo-card.card-shrink {
+.show-login .logo-card {
   padding: 2rem;
   border-radius: 20px;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transform: scale(0.85);
 }
 
 @keyframes card-in {
@@ -105,24 +90,21 @@
   }
 }
 
-/* ── LOGO IMG ───────────────────────────────────────────────────── */
+/* ══ LOGO ═════════════════════════════════════════════════════════ */
 .logo-img {
   width: clamp(120px, 12vw, 180px);
   height: clamp(120px, 12vw, 180px);
   object-fit: contain;
   flex-shrink: 0;
-
+  animation: logo-pop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
   transition:
     width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-
-  animation: logo-pop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
 }
 
-/* STATO 2: logo più grande e centrato */
-.card-shrink .logo-img {
-  width: clamp(150px, 15vw, 220px);
-  height: clamp(150px, 15vw, 220px);
+.show-login .logo-img {
+  width: clamp(140px, 14vw, 200px);
+  height: clamp(140px, 14vw, 200px);
 }
 
 @keyframes logo-pop {
@@ -150,32 +132,27 @@
   color: #111;
 }
 
-/* ── BLOCCO DESTRA CARD (divisore + testo + btn) ────────────────── */
-.card-right {
+/* ══ CONTENUTO CARD (testo + btn) ════════════════════════════════ */
+.card-content {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 0;
-
-  /* Stato visibile */
-  opacity: 1;
-  max-width: 500px;
   overflow: hidden;
+  max-width: 500px;
+  opacity: 1;
   transition:
     opacity 0.2s ease,
-    max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.15s;
+    max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
 }
 
-/* Sparisce subito (0.15s), poi la card scala (da .card-shrink) */
-.card-right.card-right-out {
+.card-content.content-out {
   opacity: 0;
   max-width: 0;
   transition:
-    opacity 0.15s ease 0s,
-    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+    opacity 0.15s ease,
+    max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1) 0.05s;
 }
 
-/* Divisore verticale */
 .card-divider {
   width: 1px;
   height: 140px;
@@ -184,31 +161,30 @@
   flex-shrink: 0;
 }
 
-.card-text-wrap {
+.card-text {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   white-space: nowrap;
 }
 
-/* ── HEADLINE ───────────────────────────────────────────────────── */
 .headline {
   font-family: 'Nunito', sans-serif;
   font-size: clamp(1.5rem, 2vw, 2rem);
   font-weight: 900;
-  color: #111111;
+  color: #111;
   line-height: 1.22;
   margin: 0 0 1.8rem;
   letter-spacing: -0.02em;
 }
 
-/* ── PULSANTE GET STARTED ───────────────────────────────────────── */
+/* ══ BTN GET STARTED ══════════════════════════════════════════════ */
 .btn-start {
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
-  background: #111111;
-  color: #ffffff;
+  background: #111;
+  color: #fff;
   border: none;
   border-radius: 999px;
   padding: 0.85rem 1.8rem;
@@ -223,13 +199,11 @@
     box-shadow 0.18s ease,
     background 0.18s ease;
 }
-
 .btn-start:hover {
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
   background: #222;
 }
-
 .btn-start:active {
   transform: scale(0.98);
 }
@@ -246,71 +220,56 @@
   flex-shrink: 0;
   transition: transform 0.18s ease;
 }
-
 .btn-start:hover .btn-icon {
   transform: translateX(3px);
 }
 
-/* ── METÀ DESTRA: PANNELLO BIANCO ───────────────────────────────── */
-.right-half {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 50%;
+/* ══ PANNELLO DESTRO (bianco con form) ════════════════════════════ */
+.right-panel {
+  flex: 0 0 0%;
   height: 100%;
-  background: #ffffff;
-  z-index: 2;
-
-  /* Centra il form sia verticalmente che orizzontalmente */
+  background: #fff;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 6vw;
-  overflow-y: auto;
-  box-sizing: border-box;
-
-  /* Nascosto: fuori dallo schermo a destra */
-  transform: translateX(100%);
   opacity: 0;
+  transform: translateX(60px);
   pointer-events: none;
   transition:
-    transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1) 0.25s,
-    opacity 0.45s ease 0.25s;
+    flex 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.5s ease 0.25s,
+    transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) 0.25s;
 }
 
-/* Visibile */
-.right-half.right-visible {
-  transform: translateX(0);
+.show-login .right-panel {
+  flex: 0 0 50%;
   opacity: 1;
+  transform: translateX(0);
   pointer-events: all;
 }
 
-/* ── AREA FORM — centrata, larghezza fissa ───────────────────────── */
-.form-area {
-  width: 100%;
-  max-width: 360px;
+/* ══ FORM ═════════════════════════════════════════════════════════ */
+.form-wrap {
+  width: min(360px, 85%);
   font-family: 'DM Sans', sans-serif;
 }
 
-/* ── TITOLI ─────────────────────────────────────────────────────── */
 .form-title {
   font-family: 'DM Serif Display', serif;
-  font-size: 2rem;
+  font-size: 1.9rem;
   font-weight: 400;
-  color: #111111;
+  color: #111;
   margin: 0 0 0.25rem;
   letter-spacing: -0.01em;
-  line-height: 1.2;
 }
-
 .form-subtitle {
   font-size: 0.87rem;
   color: #9ca3af;
-  margin: 0 0 2rem;
+  margin: 0 0 1.8rem;
   line-height: 1.5;
 }
 
-/* ── ALERT ERRORE ───────────────────────────────────────────────── */
 .alert-error {
   display: flex;
   align-items: flex-start;
@@ -322,32 +281,27 @@
   color: #dc2626;
   font-size: 0.82rem;
   margin-bottom: 1.2rem;
-  line-height: 1.4;
 }
 .alert-error svg {
   flex-shrink: 0;
   margin-top: 1px;
 }
 
-/* ── FORM ───────────────────────────────────────────────────────── */
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 1rem;
 }
-
 .field-group {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
 }
-
 .field-label-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-
 .field-label {
   font-size: 0.72rem;
   font-weight: 600;
@@ -355,11 +309,9 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-
 .field-input-wrap {
   position: relative;
 }
-
 .field-icon {
   position: absolute;
   left: 0.85rem;
@@ -367,12 +319,11 @@
   transform: translateY(-50%);
   color: #d1d5db;
   pointer-events: none;
-  transition: color 0.15s ease;
+  transition: color 0.15s;
 }
-
 .field-input {
   width: 100%;
-  padding: 0.8rem 0.85rem 0.8rem 2.5rem;
+  padding: 0.78rem 0.85rem 0.78rem 2.5rem;
   border: 1.5px solid #e5e7eb;
   border-radius: 10px;
   font-family: 'DM Sans', sans-serif;
@@ -380,24 +331,21 @@
   color: #111;
   background: #f9fafb;
   outline: none;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background 0.18s ease;
   box-sizing: border-box;
   -webkit-appearance: none;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s,
+    background 0.18s;
 }
-
 .field-input::placeholder {
   color: #d1d5db;
 }
-
 .field-input:focus {
   border-color: #111;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.07);
 }
-
 .field-input-wrap:focus-within .field-icon {
   color: #6b7280;
 }
@@ -410,13 +358,12 @@
   padding: 0;
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
-  transition: color 0.15s ease;
+  transition: color 0.15s;
 }
 .link-forgot:hover {
   color: #111;
 }
 
-/* ── CHECKBOX ───────────────────────────────────────────────────── */
 .checkbox-label {
   display: flex;
   align-items: center;
@@ -426,11 +373,9 @@
   cursor: pointer;
   user-select: none;
 }
-
 .checkbox-input {
   display: none;
 }
-
 .checkbox-custom {
   width: 18px;
   height: 18px;
@@ -438,15 +383,13 @@
   border-radius: 5px;
   background: #fff;
   flex-shrink: 0;
-  transition: all 0.15s ease;
+  transition: all 0.15s;
   position: relative;
 }
-
 .checkbox-input:checked + .checkbox-custom {
   background: #111;
   border-color: #111;
 }
-
 .checkbox-input:checked + .checkbox-custom::after {
   content: '';
   position: absolute;
@@ -460,7 +403,6 @@
   transform: rotate(45deg);
 }
 
-/* ── PULSANTE ACCEDI ────────────────────────────────────────────── */
 .btn-login {
   display: flex;
   align-items: center;
@@ -468,7 +410,7 @@
   gap: 0.55rem;
   width: 100%;
   padding: 0.95rem;
-  background: #111111;
+  background: #111;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -477,52 +419,106 @@
   font-weight: 600;
   cursor: pointer;
   margin-top: 0.2rem;
-  letter-spacing: 0.01em;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
   transition:
-    background 0.18s ease,
-    transform 0.15s ease,
-    box-shadow 0.18s ease;
+    background 0.18s,
+    transform 0.15s,
+    box-shadow 0.18s;
 }
-
 .btn-login:hover {
   background: #1f1f1f;
   transform: translateY(-1px);
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28);
 }
-
 .btn-login:active {
   transform: scale(0.97);
 }
 
-/* ── RIGA REGISTRAZIONE ─────────────────────────────────────────── */
 .register-row {
-  margin-top: 1.5rem;
+  margin-top: 1.4rem;
   font-size: 0.85rem;
   color: #9ca3af;
   display: flex;
   gap: 0.35rem;
 }
-
 .link-register {
   font-weight: 600;
   color: #111;
   text-decoration: none;
   border-bottom: 1.5px solid #111;
   padding-bottom: 1px;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.15s;
 }
 .link-register:hover {
   opacity: 0.55;
 }
 
-/* ================================================================
-   MODAL RECUPERO PASSWORD
-   ================================================================ */
+/* ══ MOBILE ═══════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  :host {
+    overflow-y: auto;
+  }
 
+  .landing-page {
+    min-height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+
+  .left-panel,
+  .show-login .left-panel {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    height: auto !important;
+  }
+  .logo-card,
+  .show-login .logo-card {
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1.8rem;
+    width: min(300px, 86vw);
+    text-align: center;
+  }
+  .card-divider {
+    display: none;
+  }
+  .card-content,
+  .card-content.content-out {
+    opacity: 1 !important;
+    max-width: none !important;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1.2rem;
+    transition: none !important;
+  }
+  .card-text {
+    align-items: center;
+    white-space: normal;
+    text-align: center;
+  }
+  .headline {
+    font-size: clamp(1.3rem, 5vw, 1.6rem);
+    text-align: center;
+    margin-bottom: 1.4rem;
+  }
+  .logo-img,
+  .show-login .logo-img {
+    width: clamp(90px, 28vw, 130px) !important;
+    height: clamp(90px, 28vw, 130px) !important;
+  }
+  .right-panel,
+  .show-login .right-panel {
+    display: none !important;
+  }
+}
+
+/* ══ MODAL RECUPERO PASSWORD ══════════════════════════════════════ */
 .modal-overlay {
   position: fixed;
   inset: 0;
+  z-index: 1100;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -530,10 +526,8 @@
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
-  z-index: 1100;
   animation: overlay-in 0.2s ease both;
 }
-
 @keyframes overlay-in {
   from {
     opacity: 0;
@@ -556,7 +550,6 @@
   animation: modal-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   font-family: 'DM Sans', sans-serif;
 }
-
 @keyframes modal-in {
   from {
     opacity: 0;
@@ -583,8 +576,8 @@
   align-items: center;
   justify-content: center;
   transition:
-    background 0.15s ease,
-    color 0.15s ease;
+    background 0.15s,
+    color 0.15s;
 }
 .btn-close-modal:hover {
   background: #e5e7eb;
@@ -602,7 +595,6 @@
   margin: 0 auto 1.4rem;
   color: #374151;
 }
-
 .modal-title {
   font-family: 'DM Serif Display', serif;
   font-size: 1.4rem;
@@ -610,14 +602,12 @@
   color: #111;
   margin: 0 0 0.5rem;
 }
-
 .modal-subtitle {
   font-size: 0.87rem;
   color: #6b7280;
   line-height: 1.6;
   margin: 0 0 1.6rem;
 }
-
 .modal-form {
   display: flex;
   flex-direction: column;
@@ -625,7 +615,6 @@
   text-align: left;
   margin-bottom: 0.8rem;
 }
-
 .field-error {
   font-size: 0.76rem;
   color: #dc2626;
@@ -649,8 +638,8 @@
   font-weight: 600;
   cursor: pointer;
   transition:
-    background 0.15s ease,
-    transform 0.15s ease;
+    background 0.15s,
+    transform 0.15s;
 }
 .btn-invia:hover:not(:disabled) {
   background: #1f1f1f;
@@ -671,7 +660,7 @@
   font-family: 'DM Sans', sans-serif;
   font-size: 0.84rem;
   cursor: pointer;
-  transition: color 0.15s ease;
+  transition: color 0.15s;
 }
 .btn-annulla:hover {
   color: #111;
@@ -683,7 +672,6 @@
   align-items: center;
   gap: 0.75rem;
 }
-
 .success-icon {
   width: 64px;
   height: 64px;
@@ -695,88 +683,4 @@
   justify-content: center;
   color: #16a34a;
   margin-bottom: 0.4rem;
-}
-
-/* ================================================================
-   MOBILE (< 768px)
-   Layout completamente diverso:
-   - Card centrata su sfondo food (logo + testo + btn)
-   - Niente split screen, niente pannello bianco inline
-   - Click sul pulsante → naviga a /login (pagina separata)
-   ================================================================ */
-@media (max-width: 767px) {
-  /* Forza sempre la visualizzazione centrata, anche se showLogin è true */
-  .page-wrap,
-  .page-wrap.split-active {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow-y: auto;
-  }
-
-  /* left-half: sempre centrata, mai posizionata assoluta */
-  .left-half,
-  .split-active .left-half {
-    position: relative !important;
-    width: auto !important;
-    height: auto !important;
-    left: unset !important;
-    top: unset !important;
-  }
-
-  /* card: verticale, testo centrato */
-  .logo-card,
-  .logo-card.card-shrink {
-    flex-direction: column;
-    align-items: center;
-    padding: 2.4rem 2rem 2.2rem;
-    border-radius: 20px;
-    width: min(320px, 86vw);
-    text-align: center;
-  }
-
-  /* logo dimensionato per mobile */
-  .logo-img,
-  .card-shrink .logo-img {
-    width: clamp(100px, 30vw, 140px) !important;
-    height: clamp(100px, 30vw, 140px) !important;
-  }
-
-  /* nasconde il divisore verticale */
-  .card-divider {
-    display: none;
-  }
-
-  /* card-right: sempre visibile, layout verticale centrato */
-  .card-right,
-  .card-right.card-right-out {
-    opacity: 1 !important;
-    max-width: unset !important;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 1.4rem;
-    transition: none !important;
-  }
-
-  .card-text-wrap {
-    align-items: center;
-    text-align: center;
-    white-space: normal;
-  }
-
-  .headline {
-    font-size: clamp(1.4rem, 5vw, 1.7rem);
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .btn-start {
-    min-width: 200px;
-  }
-
-  /* pannello bianco: mai visibile su mobile */
-  .right-half,
-  .right-half.right-visible {
-    display: none !important;
-  }
 }

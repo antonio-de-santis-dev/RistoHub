@@ -11,7 +11,9 @@
 
 <div class="rh-main-wrapper">
   <div class="card jh-card">
-    <router-outlet />
+    <div [@routeAnimations]="getRouteAnimationData(outlet)" style="position: relative">
+      <router-outlet #outlet="outlet" />
+    </div>
   </div>
 </div>
 
