@@ -4,27 +4,30 @@
 //  RistoHub — Tutorial Guidato
 // ══════════════════════════════════════════════════════
 
-// Overlay scuro su tutto (welcome, slides, spotlight)
-// L'elemento evidenziato si "buca" da solo tramite z-index + .rh-tut-highlight in global.scss
-.rh-tutorial-overlay,
-.rh-spotlight-overlay {
+// ── Overlay welcome / slides ───────────────────────────
+.rh-tutorial-overlay {
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background: rgba(6, 6, 6, 0.8);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  pointer-events: none; // lascia interagire con l'elemento evidenziato
-  animation: overlayIn 0.3s ease;
-}
-
-// Welcome e slide: l'overlay è cliccabile per chiudere
-.rh-tutorial-overlay {
-  pointer-events: all;
+  background: rgba(6, 6, 6, 0.55); // più chiaro rispetto a 0.82
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  animation: overlayIn 0.3s ease;
+}
+
+// ── SVG overlay spotlight ─────────────────────────────
+// L'opacità del riempimento è già nel fill inline (rgba 0.55)
+.rh-svg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: all;
+  cursor: default;
+  animation: overlayIn 0.3s ease;
 }
 
 @keyframes overlayIn {
@@ -36,10 +39,28 @@
   }
 }
 
+// ── Bordo dorato pulsante sull'elemento evidenziato ───
+.rh-spot-border {
+  animation: borderPulse 1.8s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 210, 0, 0.7));
+}
+
+@keyframes borderPulse {
+  0%,
+  100% {
+    stroke-opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(255, 210, 0, 0.6));
+  }
+  50% {
+    stroke-opacity: 0.75;
+    filter: drop-shadow(0 0 16px rgba(255, 210, 0, 1));
+  }
+}
+
 // ── Card base ──────────────────────────────────────────
 .rh-tutorial-card {
-  background: #111;
-  border: 1px solid rgba(255, 210, 0, 0.15);
+  background: #1a1a1a; // leggermente più chiaro di #111
+  border: 1px solid rgba(255, 210, 0, 0.25);
   border-radius: 20px;
   padding: 2.5rem 2rem;
   max-width: 480px;
@@ -53,8 +74,8 @@
   color: #fff;
   animation: cardIn 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
   box-shadow:
-    0 0 60px rgba(255, 210, 0, 0.08),
-    0 24px 64px rgba(0, 0, 0, 0.6);
+    0 0 60px rgba(255, 210, 0, 0.1),
+    0 24px 64px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes cardIn {
@@ -71,7 +92,7 @@
 // ── Welcome ────────────────────────────────────────────
 .rh-tut-logo {
   width: 100px;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 .rh-tut-emoji {
   font-size: 3.5rem;
@@ -88,7 +109,7 @@
 
 .rh-tut-desc {
   font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.7); // più leggibile: da 0.55 a 0.70
   line-height: 1.7;
   margin: 0;
   max-width: 360px;
@@ -118,7 +139,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
 
   &.active {
@@ -128,7 +149,7 @@
     box-shadow: 0 0 8px rgba(255, 210, 0, 0.6);
   }
   &.done {
-    background: rgba(255, 210, 0, 0.4);
+    background: rgba(255, 210, 0, 0.5);
   }
 }
 
@@ -157,17 +178,15 @@
   font-size: 3rem;
   line-height: 1;
 }
-
 .rh-slide-title {
   font-family: 'DM Serif Display', serif;
   font-size: 1.4rem;
   color: #ffd200;
   margin: 0;
 }
-
 .rh-slide-desc {
   font-size: 0.92rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.72);
   line-height: 1.75;
   margin: 0;
   max-width: 400px;
@@ -175,7 +194,7 @@
 
 .rh-tut-counter {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.35);
   letter-spacing: 0.1em;
 }
 
@@ -219,19 +238,19 @@
 .rh-tut-btn-primary {
   background: linear-gradient(135deg, #ffd200, #f5b800);
   color: #060606;
-  box-shadow: 0 4px 16px rgba(255, 210, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(255, 210, 0, 0.35);
   &:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(255, 210, 0, 0.5);
+    box-shadow: 0 8px 24px rgba(255, 210, 0, 0.55);
   }
 }
 
 .rh-tut-btn-ghost {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.75); // più visibile: da 0.6 a 0.75
+  border: 1px solid rgba(255, 255, 255, 0.15);
   &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     color: #fff;
   }
 }
@@ -246,27 +265,34 @@
 }
 
 // ══════════════════════════════════════════════════════
-//  SPOTLIGHT — card tooltip fissa in alto a destra
+//  SPOTLIGHT — card tooltip
 // ══════════════════════════════════════════════════════
 .rh-spotlight-card {
   position: fixed;
   top: 16px;
   right: 16px;
   z-index: 10002;
-  width: 270px;
-  background: #111;
-  border: 1px solid rgba(255, 210, 0, 0.3);
+  width: 280px;
+  background: #1c1c1c; // più chiaro di #111
+  border: 1px solid rgba(255, 210, 0, 0.35);
   border-radius: 16px;
   padding: 1.1rem 1.2rem 1rem;
   font-family: 'DM Sans', sans-serif;
   color: #fff;
   box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.7),
-    0 0 30px rgba(255, 210, 0, 0.1);
+    0 16px 48px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(255, 210, 0, 0.12);
   animation: cardIn 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
+  pointer-events: all;
+
+  // Se l'elemento è in alto nel viewport, sposta la card in basso
+  &.rh-spot-bottom {
+    top: auto;
+    bottom: 16px;
+  }
 }
 
 .rh-spot-header {
@@ -280,45 +306,45 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #ffd200;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .rh-spot-close {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.45);
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   padding: 0 4px;
   pointer-events: all;
   transition: color 0.2s;
   &:hover {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.85);
   }
 }
 
 .rh-spot-title {
   font-family: 'DM Serif Display', serif;
-  font-size: 1rem;
+  font-size: 1.05rem;
   margin: 0;
   color: #fff;
   line-height: 1.3;
 }
 
 .rh-spot-desc {
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.6;
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.72); // da 0.6 a 0.72 — più leggibile
+  line-height: 1.65;
   margin: 0;
 }
 
 .rh-spot-click-hint {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: #ffd200;
   padding: 0.5rem 0.75rem;
-  background: rgba(255, 210, 0, 0.08);
+  background: rgba(255, 210, 0, 0.1);
   border-radius: 8px;
-  border: 1px solid rgba(255, 210, 0, 0.2);
+  border: 1px solid rgba(255, 210, 0, 0.25);
   text-align: center;
   animation: hintPulse 1.8s ease-in-out infinite;
 }
@@ -326,14 +352,14 @@
 .rh-spot-arrow-hint {
   font-size: 0.75rem;
   color: #3dd6c8;
-  opacity: 0.8;
+  opacity: 0.85;
   animation: hintPulse 2s ease-in-out infinite;
 }
 
 @keyframes hintPulse {
   0%,
   100% {
-    opacity: 0.65;
+    opacity: 0.7;
   }
   50% {
     opacity: 1;

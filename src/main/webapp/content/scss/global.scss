@@ -6,8 +6,6 @@
 Bootstrap tweaks
 ===============================================================*/
 
-/* Reset fondamentale — evita che Bootstrap aggiunga padding al body
-   per la scrollbar, che rompe i layout a larghezza piena */
 html,
 body {
   margin: 0;
@@ -24,25 +22,21 @@ h4 {
   font-weight: 300;
 }
 
-/* Increase contrast of links to get 100% on Lighthouse Accessibility Audit. Override this color if you want to change the link color, or use a Bootswatch theme */
 a {
   color: #533f03;
   font-weight: bold;
 }
 
-/* override hover color for dropdown-item forced by bootstrap to all a:not([href]):not([tabindex]) elements in _reboot.scss */
 a:not([href]):not([tabindex]):hover.dropdown-item {
   color: $dropdown-link-hover-color;
 }
 
-/* override .dropdown-item.active background-color on hover */
 .dropdown-item.active:hover {
   background-color: mix($dropdown-link-hover-bg, $dropdown-link-active-bg, 50%);
 }
 
 a:hover {
   color: #533f03;
-  /* make sure browsers use the pointer cursor for anchors, even with no href */
   cursor: pointer;
 }
 
@@ -64,7 +58,6 @@ Browser Upgrade Prompt
 Generic styles
 ========================================================================== */
 
-/* Error highlight on input fields */
 .ng-valid[required],
 .ng-valid.required {
   border-left: 5px solid green;
@@ -73,8 +66,6 @@ Generic styles
 .ng-invalid:not(form) {
   border-left: 5px solid red;
 }
-
-/* other generic styles */
 
 .jh-card {
   padding: 1.5%;
@@ -90,24 +81,19 @@ Generic styles
 .pad {
   padding: 10px;
 }
-
 .w-40 {
   width: 40% !important;
 }
-
 .w-60 {
   width: 60% !important;
 }
-
 .break {
   white-space: normal;
   word-break: break-all;
 }
-
 .form-control {
   background-color: #fff;
 }
-
 .readonly {
   background-color: #eee;
   opacity: 1;
@@ -117,14 +103,12 @@ Generic styles
   border-top: 1px solid rgba(0, 0, 0, 0.125);
   width: 100%;
   box-sizing: border-box;
-  /* Annulla eventuali margin/padding ereditati da Bootstrap */
   margin-left: 0 !important;
   margin-right: 0 !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
 
-/* Wrapper principale del contenuto — senza padding Bootstrap */
 .rh-main-wrapper {
   width: 100%;
   padding: 0;
@@ -181,7 +165,6 @@ Custom alerts for notification
 /* ==========================================================================
 entity list page css
 ========================================================================== */
-
 .table-entities thead th .d-flex > * {
   margin: auto 0;
 }
@@ -236,9 +219,6 @@ ui bootstrap tweaks
   padding-left: 0;
 }
 
-/* ==========================================================================
-angular-cli removes postcss-rtl processed inline css, processed rules must be added here instead
-========================================================================== */
 /* page-ribbon.component.scss */
 .ribbon {
   left: -3.5em;
@@ -262,10 +242,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 
 /* ==========================================================================
    HOME PAGE — rimuovi padding/bordi del .jh-card wrapper
-   In questo modo jhi-home può estendersi a tutto schermo
 ========================================================================== */
-
-/* Quando il card wrapper contiene jhi-home, azzera tutto */
 .card.jh-card:has(jhi-home),
 .card.jh-card:has(jhi-menu-list),
 .card.jh-card:has(jhi-menu-wizard),
@@ -284,21 +261,16 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   border-radius: 0 !important;
 }
 
-/* Fallback per browser che non supportano :has() */
 jhi-home {
   display: block;
-  /* Il margin negativo nel :host del componente si occupa del resto */
 }
 
 /* ==========================================================================
-   NAVBAR FIXED — il contenuto interno parte SOTTO la topbar (52px)
-   Lo sfondo copre tutto dall'alto, solo il contenuto è rientrato.
+   NAVBAR FIXED — contenuto parte sotto la topbar (52px)
 ========================================================================== */
-
 $rh-topbar-h: 52px;
 
 @media (max-width: 992px) {
-  /* Lo sfondo deve partire da top:0, solo il contenuto scende di 52px */
   jhi-home .rh-hero,
   jhi-menu-wizard .wiz-inner,
   jhi-menu-wizard-edit .wiz-inner,
@@ -311,54 +283,11 @@ $rh-topbar-h: 52px;
 }
 
 /* ==========================================================================
-   TUTORIAL — highlight elemento evidenziato dallo spotlight
-   Deve stare qui (global) per bypassare l'encapsulation Angular.
-   L'elemento ottiene z-index sopra l'overlay (10000) + bordo oro + glow.
+   TUTORIAL — .rh-tut-highlight non è più necessaria.
+   Il "buco" nell'overlay viene creato tramite path SVG con fill-rule="evenodd"
+   in tutorial.component.html, indipendentemente dallo stacking context.
+   Classe mantenuta vuota per retrocompatibilità.
 ========================================================================== */
-
 .rh-tut-highlight {
-  position: relative;
-  z-index: 10001 !important;
-
-  /* Bordo oro pulsante attorno all'elemento */
-  outline: 2px solid #ffd200 !important;
-  outline-offset: 4px;
-  border-radius: 8px;
-
-  /* Glow dorato per staccarlo visivamente dallo sfondo scuro */
-  box-shadow:
-    0 0 0 4px rgba(255, 210, 0, 0.15),
-    0 0 20px 6px rgba(255, 210, 0, 0.35) !important;
-
-  /* Testo e icone completamente visibili */
-  color: #ffffff !important;
-  opacity: 1 !important;
-
-  svg {
-    opacity: 1 !important;
-    color: #ffd200 !important;
-    stroke: #ffd200 !important;
-  }
-
-  span {
-    color: #ffffff !important;
-    opacity: 1 !important;
-  }
-
-  /* Animazione pulsante sul bordo */
-  animation: tutHighlightPulse 1.8s ease-in-out infinite !important;
-}
-
-@keyframes tutHighlightPulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 4px rgba(255, 210, 0, 0.15),
-      0 0 20px 6px rgba(255, 210, 0, 0.35);
-  }
-  50% {
-    box-shadow:
-      0 0 0 6px rgba(255, 210, 0, 0.08),
-      0 0 32px 10px rgba(255, 210, 0, 0.55);
-  }
+  /* non più usata — il buco SVG sostituisce questa tecnica */
 }

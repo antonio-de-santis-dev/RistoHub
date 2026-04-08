@@ -103,12 +103,20 @@ export class AccountService {
   }
 
   private navigateToStoredUrl(): void {
-    // previousState può essere impostato in authExpiredInterceptor e in userRouteAccessService
-    // se il login ha successo, vai all'URL salvato e cancellalo
+    // previousState può essere impostato in authExpiredInterceptor e in userRouteAccessService.
+    // Se il login ha successo, vai all'URL salvato e cancellalo.
+    // FIX: non reindirizzare mai verso pagine pubbliche/di autenticazione —
+    // se in sessionStorage è rimasto '/login' o '/' da una visita precedente,
+    // navigarci dopo il login causerebbe un loop (landing → login → landing…).
+    // In questi casi lasciamo che il componente chiamante (LandingComponent o
+    // LoginComponent) gestisca autonomamente il redirect verso /home.
     const previousUrl = this.stateStorageService.getUrl();
     if (previousUrl) {
       this.stateStorageService.clearUrl();
-      this.router.navigateByUrl(previousUrl);
+      const isPublicOrAuth = PUBLIC_PAGES.some(page => previousUrl === page || previousUrl.startsWith(page + '/'));
+      if (!isPublicOrAuth) {
+        this.router.navigateByUrl(previousUrl);
+      }
     }
   }
 }

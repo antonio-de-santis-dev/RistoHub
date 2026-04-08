@@ -7,6 +7,15 @@ import { Router } from '@angular/router';
 import { LoginService } from 'app/login/login.service';
 import { StateStorageService } from 'app/core/auth/state-storage.service';
 
+// URL che generano 401 per natura propria e NON devono mai triggerare
+// il redirect a /login: api/account (check utente anonimo all'avvio),
+// api/authentication (risposta a credenziali sbagliate).
+const EXCLUDED_URLS = ['api/account', 'api/authentication'];
+
+// Route già pubbliche/di autenticazione: se ci siamo già non ha senso
+// salvarle come "URL precedente" e redirigere a /login.
+const PUBLIC_ROUTES = ['/', '/login', '/account/register', '/account/activate', '/account/reset'];
+
 @Injectable()
 export class AuthExpiredInterceptor implements HttpInterceptor {
   private readonly loginService = inject(LoginService);
@@ -17,15 +26,35 @@ export class AuthExpiredInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       tap({
         error: (err: HttpErrorResponse) => {
-          if (err.status === 401 && err.url && !err.url.includes('api/account')) {
-            if (err.url.includes(this.loginService.logoutUrl())) {
-              this.loginService.logoutInClient();
-              return;
-            }
-            this.stateStorageService.storeUrl(this.router.routerState.snapshot.url);
-            this.loginService.logout();
-            this.router.navigate(['/login']);
+          if (err.status !== 401 || !err.url) {
+            return;
           }
+
+          // Ignora le chiamate che producono 401 per natura:
+          // api/account → check iniziale utente anonimo (normale)
+          // api/authentication → login fallito con credenziali errate (normale)
+          const isExcluded = EXCLUDED_URLS.some(u => err.url!.includes(u));
+          if (isExcluded) {
+            return;
+          }
+
+          // Se è il logout, esci senza redirect
+          if (err.url.includes(this.loginService.logoutUrl())) {
+            this.loginService.logoutInClient();
+            return;
+          }
+
+          // Sessione scaduta su una route protetta: salva l'URL corrente
+          // solo se non è già una pagina pubblica/di autenticazione
+          const currentUrl = this.router.routerState.snapshot.url;
+          const isPublicRoute = PUBLIC_ROUTES.some(r => currentUrl === r || currentUrl.startsWith(r + '/'));
+
+          if (!isPublicRoute) {
+            this.stateStorageService.storeUrl(currentUrl);
+          }
+
+          this.loginService.logout();
+          this.router.navigate(['/login']);
         },
       }),
     );

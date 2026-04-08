@@ -49,16 +49,54 @@
   </div>
 }
 
-<!-- FASE 3: SPOTLIGHT
-     L'overlay copre tutto. L'elemento evidenziato ha z-index alto
-     e viene "bucato" fuori dall'overlay tramite la classe CSS iniettata dal TS.
-     La card tooltip è fissa in alto a destra. -->
+<!-- FASE 3: SPOTLIGHT -->
 @if (ph === 'spotlight') {
-  <!-- Overlay scuro su TUTTO — l'elemento evidenziato è sopra tramite z-index -->
-  <div class="rh-spotlight-overlay"></div>
+  @let rect = spotRect();
 
-  <!-- Card tooltip fissa in alto a destra -->
-  <div class="rh-spotlight-card" role="dialog" aria-modal="true">
+  <!--
+    SVG overlay con pointer-events: none sull'intero SVG.
+    Solo il path scuro (la parte fuori dal buco) riceve i click tramite
+    pointer-events: all inline. Il buco è trasparente sia visivamente che
+    agli eventi: i click ci passano attraverso e arrivano all'elemento sotto
+    (es. il bottone hamburger).
+  -->
+  <svg
+    class="rh-svg-overlay"
+    [attr.width]="vw()"
+    [attr.height]="vh()"
+    [attr.viewBox]="'0 0 ' + vw() + ' ' + vh()"
+    style="pointer-events: none"
+  >
+    @if (rect) {
+      <!-- Overlay scuro: pointer-events: all solo qui — il buco non intercetta -->
+      <path
+        [attr.d]="buildClipPath(rect)"
+        fill="rgba(6,6,6,0.55)"
+        fill-rule="evenodd"
+        style="pointer-events: all; cursor: default"
+        (click)="skip()"
+      />
+      <!-- Bordo dorato pulsante — solo visivo, non intercetta click -->
+      <rect
+        class="rh-spot-border"
+        [attr.x]="rect.x"
+        [attr.y]="rect.y"
+        [attr.width]="rect.w"
+        [attr.height]="rect.h"
+        [attr.rx]="rect.r"
+        fill="none"
+        stroke="#ffd200"
+        stroke-width="2.5"
+        style="pointer-events: none"
+      />
+    } @else {
+      <!-- Nessun elemento trovato: overlay pieno cliccabile -->
+      <rect width="100%" height="100%" fill="rgba(6,6,6,0.55)" style="pointer-events: all; cursor: default" (click)="skip()" />
+    }
+  </svg>
+
+  <!-- Card tooltip -->
+  <div class="rh-spotlight-card" [class.rh-spot-bottom]="rect && rect.y < 200" role="dialog" aria-modal="true">
     <div class="rh-spot-header">
       <span class="rh-spot-step">{{ currentSpotlight() + 1 }} / {{ spotlightSteps.length }}</span>
       <button class="rh-spot-close" (click)="skip()" title="Esci">✕</button>
