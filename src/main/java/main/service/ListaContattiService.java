@@ -71,7 +71,8 @@ public class ListaContattiService {
         }
 
         existing.setNome(dto.getNome());
-        existing.setMenuIds(dto.getMenuIds() != null ? dto.getMenuIds() : new HashSet<>());
+        // menuIds non è nel DTO: le associazioni menu-lista si gestiscono lato Menu
+        // e vengono preservate invariate durante l'aggiornamento della lista.
 
         // Ricrea gli items: svuota e reinserisce in ordine
         existing.getItems().clear();
@@ -137,7 +138,8 @@ public class ListaContattiService {
         ListaContattiDTO dto = new ListaContattiDTO();
         dto.setId(e.getId());
         dto.setNome(e.getNome());
-        dto.setMenuIds(e.getMenuIds() != null ? new HashSet<>(e.getMenuIds()) : new HashSet<>());
+        // menuIds non esposto nel DTO: il frontend non lo usa direttamente.
+        // La ricerca per menu avviene via ListaContattiRepository.findByMenuId() (JOIN JPQL).
 
         if (e.getRistoratore() != null) {
             UserDTO u = new UserDTO();
@@ -159,7 +161,7 @@ public class ListaContattiService {
         ListaContatti e = new ListaContatti();
         if (dto.getId() != null) e.setId(dto.getId());
         e.setNome(dto.getNome());
-        e.setMenuIds(dto.getMenuIds() != null ? new HashSet<>(dto.getMenuIds()) : new HashSet<>());
+        // menuIds non è nel DTO: la nuova lista parte senza associazioni menu.
         if (dto.getItems() != null) {
             for (int i = 0; i < dto.getItems().size(); i++) {
                 ContattoItem item = toItemEntity(dto.getItems().get(i));

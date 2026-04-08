@@ -28,7 +28,9 @@ public class ListaContatti implements Serializable {
     @Column(name = "nome", nullable = false)
     private String nome;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    // LAZY: gli UUID dei menu associati non servono in quasi nessun caso d'uso;
+    // la selezione per menu avviene via JOIN JPQL in ListaContattiRepository.findByMenuId().
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "lista_contatti_menu", joinColumns = @JoinColumn(name = "lista_contatti_id"))
     @Column(name = "menu_id")
     private Set<UUID> menuIds = new HashSet<>();

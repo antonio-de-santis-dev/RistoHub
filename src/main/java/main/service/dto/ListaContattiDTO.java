@@ -14,9 +14,6 @@ public class ListaContattiDTO implements Serializable {
     @NotNull
     private String nome;
 
-    /** UUID dei menu su cui questa lista è visibile */
-    private Set<UUID> menuIds = new HashSet<>();
-
     /** Campi di contatto ordinati */
     private List<ContattoItemDTO> items = new ArrayList<>();
 
@@ -37,14 +34,6 @@ public class ListaContattiDTO implements Serializable {
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public Set<UUID> getMenuIds() {
-        return menuIds;
-    }
-
-    public void setMenuIds(Set<UUID> menuIds) {
-        this.menuIds = menuIds;
     }
 
     public List<ContattoItemDTO> getItems() {
@@ -78,6 +67,6 @@ public class ListaContattiDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "ListaContattiDTO{id=" + id + ", nome='" + nome + "', menuIds=" + menuIds + "}";
+        return "ListaContattiDTO{id=" + id + ", nome='" + nome + "'}";
     }
 }
