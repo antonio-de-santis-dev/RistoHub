@@ -170,7 +170,7 @@ export interface MenuCompletoDTO {
   menu: MenuDTO;
   portate: PortataConProdottiDTO[];
   piattiDelGiorno: PiattoDelGiornoDTO[];
-  immagini: ImmagineMenuMetaDTO[];
+  immagini: ImmagineMenuDTO[];
   allergeni: AllergeneDTO[];
   contatti: ListaContattiDTO[];
 }
