@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        OPT-11: indice composto su (menu_id, tipo, nome_default) per supportare
+        la query findByMenuIdOrdered() in PortataRepository.
+        Evita full scan della tabella portata ad ogni caricamento menu.
+    -->
+    <changeSet id="20260408000000-1" author="antonio-dev">
+        <createIndex indexName="idx_portata_menu_tipo_nome"
+                     tableName="portata">
+            <column name="menu_id"/>
+            <column name="tipo"/>
+            <column name="nome_default"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
