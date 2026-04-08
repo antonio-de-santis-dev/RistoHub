@@ -1,12 +1,14 @@
 package main.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import main.domain.PiattoDelGiorno;
 import main.repository.MenuRepository;
 import main.service.dto.AllergeneDTO;
-import main.service.dto.ImmagineMenuDTO;
+import main.service.dto.ImmagineMenuMetaDTO;
 import main.service.dto.ListaContattiDTO;
 import main.service.dto.MenuCompletoDTO;
 import main.service.dto.MenuDTO;
@@ -113,27 +115,33 @@ public class MenuCompletoService {
         }
         MenuDTO menu = menuOpt.get();
 
-        // Portate con prodotti annidati
+        // Query unica per tutti i prodotti del menu con allergeni già in JOIN FETCH.
+        // Sostituisce il loop N+1 (findByMenuId + findByPortataId per ogni portata).
+        Map<UUID, List<ProdottoDTO>> prodottiPerPortata = prodottoService
+            .findProdottiCompletiByMenuId(id)
+            .stream()
+            .collect(Collectors.groupingBy(p -> p.getPortata().getId()));
+
+        // Portate con prodotti annidati — l'ordine canonico è garantito da findByMenuId
         List<PortataConProdottiDTO> portateConProdotti = portataService
             .findByMenuId(id)
             .stream()
-            .map(portata -> {
-                List<ProdottoDTO> prodotti = prodottoService.findByPortataId(portata.getId());
-                return new PortataConProdottiDTO(
+            .map(portata ->
+                new PortataConProdottiDTO(
                     portata.getId(),
                     portata.getTipo(),
                     portata.getNomeDefault(),
                     portata.getNomePersonalizzato(),
-                    prodotti
-                );
-            })
+                    prodottiPerPortata.getOrDefault(portata.getId(), List.of())
+                )
+            )
             .toList();
 
         // Piatti del giorno attivi (già con allergeni — vedi findPiattiDelGiornoAttiviByMenuId)
         List<PiattoDelGiornoDTO> piattiDelGiorno = findPiattiDelGiornoAttiviByMenuId(id);
 
-        // Immagini, allergeni, contatti
-        List<ImmagineMenuDTO> immagini = immagineMenuService.findByMenuId(id);
+        // Immagini: solo metadati + contentUrl, senza byte[] (riduce payload da ~2.5 MB a ~1 KB)
+        List<ImmagineMenuMetaDTO> immagini = immagineMenuService.findMetaByMenuId(id);
         List<AllergeneDTO> allergeni = allergeneService.findAll();
         List<ListaContattiDTO> contatti = listaContattiService.findByMenuId(id);
 

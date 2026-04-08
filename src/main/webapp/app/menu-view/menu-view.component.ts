@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -9,6 +9,7 @@ import {
   AllergeneDTO,
   ContattoItemDTO,
   ImmagineMenuDTO,
+  ImmagineMenuMetaDTO,
   ListaContattiDTO,
   MenuCompletoDTO,
   MenuDTO,
@@ -60,10 +61,11 @@ interface Lingua {
   templateUrl: './menu-view.component.html',
   styleUrls: ['./menu-view.component.scss'],
 })
-export class MenuViewComponent implements OnInit {
+export class MenuViewComponent implements OnInit, OnDestroy {
   menu: MenuDTO | null = null;
   portate: PortataConProdottiDTO[] = [];
   logoUrl: SafeUrl | null = null;
+  private _logoBlobUrl: string | null = null;
   isLoading = true;
   errore = false;
   piattiDelGiorno: PiattoDelGiornoDTO[] = [];
@@ -403,6 +405,13 @@ export class MenuViewComponent implements OnInit {
     this.caricaMenu(id);
   }
 
+  ngOnDestroy(): void {
+    if (this._logoBlobUrl) {
+      URL.revokeObjectURL(this._logoBlobUrl);
+      this._logoBlobUrl = null;
+    }
+  }
+
   tornaAiMieiMenu(): void {
     this.router.navigate(['/menu-list']);
   }
@@ -447,16 +456,15 @@ export class MenuViewComponent implements OnInit {
       this.allergeniByNome = new Map(tuttiAllergeni.map((a: AllergeneDTO) => [a.nome.toLowerCase().trim(), a]));
 
       // ── 3. Immagini (logo + carosello copertine) ─────────────
-      const immagini: ImmagineMenuDTO[] = dati.immagini ?? [];
+      const immagini: ImmagineMenuMetaDTO[] = dati.immagini ?? [];
       const logo = immagini.find(i => i.tipo === 'LOGO');
-      if (logo?.immagine) {
-        const blob = this.base64ToBlob(logo.immagine ?? '', logo.immagineContentType ?? 'image/jpeg');
-        this.logoUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob));
+      if (logo?.contentUrl) {
+        this.logoUrl = this.sanitizer.bypassSecurityTrustUrl(logo.contentUrl);
       }
       const copertine = immagini
-        .filter((i: ImmagineMenuDTO) => i.tipo === 'COPERTINA' && i.visibile !== false)
-        .sort((a: ImmagineMenuDTO, b: ImmagineMenuDTO) => (a.ordine ?? 0) - (b.ordine ?? 0))
-        .map((i: ImmagineMenuDTO) => `data:${i.immagineContentType};base64,${i.immagine}`);
+        .filter(i => i.tipo === 'COPERTINA' && i.visibile !== false)
+        .sort((a, b) => (a.ordine ?? 0) - (b.ordine ?? 0))
+        .map(i => i.contentUrl);
       this.modernoImmagini = copertine;
       this.rusticoImmagini = copertine;
       this.modernoImmaginiCaricate = new Array(copertine.length).fill(false);

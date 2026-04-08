@@ -148,6 +148,16 @@ public class ImmagineMenuService {
         }
 
         // Ricarica solo i metadati (senza blob) per la risposta di conferma
+        return findMetaByMenuId(menuId);
+    }
+
+    /**
+     * Restituisce i metadati delle immagini di un menu senza caricare i blob.
+     * Ogni DTO include contentUrl → il client scarica i byte solo quando servono,
+     * con header Cache-Control: public, max-age=86400.
+     */
+    @Transactional(readOnly = true)
+    public List<ImmagineMenuMetaDTO> findMetaByMenuId(UUID menuId) {
         return immagineMenuRepository
             .findMetaByMenuId(menuId)
             .stream()
@@ -158,7 +168,8 @@ public class ImmagineMenuService {
                     m.getImmagineContentType(),
                     m.getTipo() != null ? m.getTipo().toString() : null,
                     m.getOrdine(),
-                    m.getVisibile()
+                    m.getVisibile(),
+                    "/api/public/immagini/" + m.getId() + "/content"
                 )
             )
             .toList();

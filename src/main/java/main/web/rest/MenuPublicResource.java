@@ -10,7 +10,7 @@ import main.service.MenuService;
 import main.service.PortataService;
 import main.service.ProdottoService;
 import main.service.dto.AllergeneDTO;
-import main.service.dto.ImmagineMenuDTO;
+import main.service.dto.ImmagineMenuMetaDTO;
 import main.service.dto.ListaContattiDTO;
 import main.service.dto.MenuCompletoDTO;
 import main.service.dto.MenuDTO;
@@ -19,6 +19,8 @@ import main.service.dto.PortataDTO;
 import main.service.dto.ProdottoDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -93,12 +95,32 @@ public class MenuPublicResource {
 
     /**
      * GET /api/public/menus/{id}/immagini
-     * Immagini del menu (logo + copertine visibili).
+     * Metadati delle immagini del menu (senza byte[]). Usare contentUrl per scaricare i bytes.
      */
     @GetMapping("/menus/{id}/immagini")
-    public List<ImmagineMenuDTO> getImmagini(@PathVariable("id") UUID id) {
-        LOG.debug("PUBLIC request to get immagini for Menu : {}", id);
-        return immagineMenuService.findByMenuId(id);
+    public List<ImmagineMenuMetaDTO> getImmagini(@PathVariable("id") UUID id) {
+        LOG.debug("PUBLIC request to get immagini meta for Menu : {}", id);
+        return immagineMenuService.findMetaByMenuId(id);
+    }
+
+    /**
+     * GET /api/public/immagini/{id}/content
+     * Restituisce i byte grezzi dell'immagine con Content-Type corretto e header di cache.
+     * Cache-Control: public, max-age=86400 → il browser non ri-scarica per 24 ore.
+     */
+    @GetMapping("/immagini/{id}/content")
+    public ResponseEntity<byte[]> getImmagineContent(@PathVariable("id") UUID id) {
+        LOG.debug("PUBLIC request to get image content : {}", id);
+        return immagineMenuService
+            .findOne(id)
+            .filter(dto -> dto.getImmagine() != null && dto.getImmagineContentType() != null)
+            .map(dto ->
+                ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(dto.getImmagineContentType()))
+                    .header(HttpHeaders.CACHE_CONTROL, "public, max-age=86400")
+                    .body(dto.getImmagine())
+            )
+            .orElse(ResponseEntity.notFound().build());
     }
 
     /**

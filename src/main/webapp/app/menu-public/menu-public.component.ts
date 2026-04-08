@@ -8,6 +8,7 @@ import {
   AllergeneDTO,
   ContattoItemDTO,
   ImmagineMenuDTO,
+  ImmagineMenuMetaDTO,
   ListaContattiDTO,
   MenuCompletoDTO,
   MenuDTO,
@@ -54,6 +55,7 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
   menu: MenuDTO | null = null;
   portate: PortataConProdottiDTO[] = [];
   logoUrl: SafeUrl | null = null;
+  private _logoBlobUrl: string | null = null;
   isLoading = true;
   errore = false;
   piattiDelGiorno: PiattoDelGiornoDTO[] = [];
@@ -225,6 +227,10 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this._logoBlobUrl) {
+      URL.revokeObjectURL(this._logoBlobUrl);
+      this._logoBlobUrl = null;
+    }
     this.fermaAutoplay();
     this.fermaAutoplayRustico();
   }
@@ -348,17 +354,16 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
       this.allergeniByNome = new Map(allergeni.map((a: AllergeneDTO) => [a.nome.toLowerCase().trim(), a] as [string, AllergeneDTO]));
 
       // ── immagini ──────────────────────────────────────────────────────────
-      const immaginiList = dati.immagini ?? [];
-      const logo = immaginiList.find((i: ImmagineMenuDTO) => i.tipo === 'LOGO');
-      if (logo?.immagine) {
-        const blob = this.base64ToBlob(logo.immagine ?? '', logo.immagineContentType ?? 'image/jpeg');
-        this.logoUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob));
+      const immaginiList: ImmagineMenuMetaDTO[] = dati.immagini ?? [];
+      const logo = immaginiList.find(i => i.tipo === 'LOGO');
+      if (logo?.contentUrl) {
+        this.logoUrl = this.sanitizer.bypassSecurityTrustUrl(logo.contentUrl);
       }
 
       const copertine = immaginiList
-        .filter((i: ImmagineMenuDTO) => i.tipo === 'COPERTINA' && i.visibile !== false)
-        .sort((a: ImmagineMenuDTO, b: ImmagineMenuDTO) => (a.ordine ?? 0) - (b.ordine ?? 0))
-        .map((i: ImmagineMenuDTO) => `data:${i.immagineContentType};base64,${i.immagine}`);
+        .filter(i => i.tipo === 'COPERTINA' && i.visibile !== false)
+        .sort((a, b) => (a.ordine ?? 0) - (b.ordine ?? 0))
+        .map(i => i.contentUrl);
       this.modernoImmagini = copertine;
       this.rusticoImmagini = copertine;
       this.modernoImmaginiCaricate = new Array(copertine.length).fill(false);

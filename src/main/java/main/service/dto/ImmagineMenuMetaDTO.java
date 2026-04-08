@@ -23,17 +23,28 @@ public class ImmagineMenuMetaDTO implements Serializable {
     private String tipo;
     private Integer ordine;
     private Boolean visibile;
+    /** URL diretto al bytes dell'immagine — cacheable dal browser (max-age=86400). */
+    private String contentUrl;
 
     public ImmagineMenuMetaDTO() {}
 
     // ── Costruttore da proiezione repository ─────────────────────────────────
-    public ImmagineMenuMetaDTO(UUID id, String nome, String immagineContentType, String tipo, Integer ordine, Boolean visibile) {
+    public ImmagineMenuMetaDTO(
+        UUID id,
+        String nome,
+        String immagineContentType,
+        String tipo,
+        Integer ordine,
+        Boolean visibile,
+        String contentUrl
+    ) {
         this.id = id;
         this.nome = nome;
         this.immagineContentType = immagineContentType;
         this.tipo = tipo;
         this.ordine = ordine;
         this.visibile = visibile;
+        this.contentUrl = contentUrl;
     }
 
     // ── Getter / Setter ───────────────────────────────────────────────────────
@@ -86,6 +97,14 @@ public class ImmagineMenuMetaDTO implements Serializable {
         this.visibile = visibile;
     }
 
+    public String getContentUrl() {
+        return contentUrl;
+    }
+
+    public void setContentUrl(String contentUrl) {
+        this.contentUrl = contentUrl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -101,6 +120,18 @@ public class ImmagineMenuMetaDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "ImmagineMenuMetaDTO{id='" + id + "', tipo='" + tipo + "', ordine=" + ordine + ", visibile=" + visibile + "}";
+        return (
+            "ImmagineMenuMetaDTO{id='" +
+            id +
+            "', tipo='" +
+            tipo +
+            "', ordine=" +
+            ordine +
+            ", visibile=" +
+            visibile +
+            ", contentUrl='" +
+            contentUrl +
+            "'}"
+        );
     }
 }

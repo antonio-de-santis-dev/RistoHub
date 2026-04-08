@@ -133,6 +133,17 @@ export interface ImmagineMenuDTO {
   isNew?: boolean;
 }
 
+/** DTO leggero restituito da /full e /immagini — senza byte[]. Usare contentUrl per i byte. */
+export interface ImmagineMenuMetaDTO {
+  id: string;
+  nome?: string;
+  immagineContentType?: string;
+  tipo: TipoImmagine;
+  ordine: number;
+  visibile: boolean;
+  contentUrl: string;
+}
+
 // ── Contatti ──────────────────────────────────────────────────────────────────
 
 export type TipoContatto = 'TELEFONO' | 'EMAIL' | 'SOCIAL' | 'INDIRIZZO';
@@ -159,7 +170,7 @@ export interface MenuCompletoDTO {
   menu: MenuDTO;
   portate: PortataConProdottiDTO[];
   piattiDelGiorno: PiattoDelGiornoDTO[];
-  immagini: ImmagineMenuDTO[];
+  immagini: ImmagineMenuMetaDTO[];
   allergeni: AllergeneDTO[];
   contatti: ListaContattiDTO[];
 }

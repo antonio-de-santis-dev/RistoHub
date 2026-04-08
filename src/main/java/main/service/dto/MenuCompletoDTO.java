@@ -7,7 +7,7 @@ public record MenuCompletoDTO(
     MenuDTO menu,
     List<PortataConProdottiDTO> portate,
     List<PiattoDelGiornoDTO> piattiDelGiorno,
-    List<ImmagineMenuDTO> immagini,
+    List<ImmagineMenuMetaDTO> immagini,
     List<AllergeneDTO> allergeni,
     List<ListaContattiDTO> contatti
 )
