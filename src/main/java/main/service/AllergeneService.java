@@ -9,6 +9,8 @@ import main.service.dto.AllergeneDTO;
 import main.service.mapper.AllergeneMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,11 +45,13 @@ public class AllergeneService {
      * @param allergeneDTO the entity to save.
      * @return the persisted entity.
      */
+    @CacheEvict(cacheNames = "main.domain.Allergene", allEntries = true)
     public AllergeneDTO save(AllergeneDTO allergeneDTO) {
         LOG.debug("Request to save Allergene : {}", allergeneDTO);
         return persistAllergene(allergeneDTO);
     }
 
+    @CacheEvict(cacheNames = "main.domain.Allergene", allEntries = true)
     public AllergeneDTO update(AllergeneDTO allergeneDTO) {
         LOG.debug("Request to update Allergene : {}", allergeneDTO);
         return persistAllergene(allergeneDTO);
@@ -65,6 +69,7 @@ public class AllergeneService {
      * @param allergeneDTO the entity to update partially.
      * @return the persisted entity.
      */
+    @CacheEvict(cacheNames = "main.domain.Allergene", allEntries = true)
     public Optional<AllergeneDTO> partialUpdate(AllergeneDTO allergeneDTO) {
         LOG.debug("Request to partially update Allergene : {}", allergeneDTO);
 
@@ -82,8 +87,15 @@ public class AllergeneService {
     /**
      * Get all the allergenes.
      *
+     * <p>TTL 24 ore (coldCacheConfiguration): gli allergeni sono dati quasi-immutabili
+     * — cambiano solo con intervento manuale dell'admin. Tenerli in cache per un'intera
+     * giornata evita query ripetute al DB su ogni chiamata pubblica /api/public/menus/{id}/full.
+     * Il @CacheEvict su save/update/delete/partialUpdate garantisce coerenza immediata
+     * in caso di modifica.</p>
+     *
      * @return the list of entities.
      */
+    @Cacheable(cacheNames = "main.domain.Allergene")
     @Transactional(readOnly = true)
     public List<AllergeneDTO> findAll() {
         LOG.debug("Request to get all Allergenes");
@@ -107,6 +119,7 @@ public class AllergeneService {
      *
      * @param id the id of the entity.
      */
+    @CacheEvict(cacheNames = "main.domain.Allergene", allEntries = true)
     public void delete(UUID id) {
         LOG.debug("Request to delete Allergene : {}", id);
         allergeneRepository.deleteById(id);

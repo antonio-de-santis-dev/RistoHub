@@ -21,15 +21,6 @@ import {
 // ── COSTANTE PER L'IMMAGINE DEGLI ALLERGENI PERSONALIZZATI ──
 const ALLERGENE_MANUALE_ICONA = '/content/images/allergene-manuale.png';
 
-interface Prodotto {
-  id: string;
-  nome: string;
-  descrizione?: string;
-  prezzo: number;
-  allergenis?: AllergeneDTO[];
-  portata?: { id: string };
-}
-
 // ─── Contatti ─────────────────────────────────────────────────────────────
 
 const SOCIAL_ICONS_SVG: Record<string, string> = {
