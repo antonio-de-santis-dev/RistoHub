@@ -1,8 +1,5 @@
 <jhi-page-ribbon />
 
-<!-- Loader globale: appare su ogni chiamata HTTP -->
-<rh-loader />
-
 @if (showNavbar()) {
   <div>
     <router-outlet name="navbar" />
@@ -20,3 +17,7 @@
 @if (showFooter()) {
   <jhi-footer />
 }
+
+<!-- Loader globale: appendito al <body> via JS per evitare problemi di
+     stacking context con i componenti landing/login (position:fixed z-900) -->
+<rh-loader />

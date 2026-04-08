@@ -8,6 +8,7 @@ import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from 'app/config/err
 import SharedModule from 'app/shared/shared.module';
 import PasswordStrengthBarComponent from '../password/password-strength-bar/password-strength-bar.component';
 import { RegisterService } from './register.service';
+import { LoaderService } from 'app/shared/loader/loader.service';
 
 @Component({
   selector: 'jhi-register',
@@ -27,6 +28,7 @@ export default class RegisterComponent implements AfterViewInit, OnInit, OnDestr
   private styleTag: HTMLStyleElement | null = null;
   private readonly translateService = inject(TranslateService);
   private readonly registerService = inject(RegisterService);
+  private readonly loaderService = inject(LoaderService);
 
   registerForm = new FormGroup({
     login: new FormControl('', {
@@ -61,7 +63,6 @@ export default class RegisterComponent implements AfterViewInit, OnInit, OnDestr
   });
 
   ngOnInit(): void {
-    // Nasconde navbar e footer sulla pagina di registrazione
     this.styleTag = document.createElement('style');
     this.styleTag.textContent = `
       jhi-navbar, nav.navbar, jhi-footer, footer,
@@ -94,9 +95,19 @@ export default class RegisterComponent implements AfterViewInit, OnInit, OnDestr
     }
 
     const { login, email, firstName, lastName } = this.registerForm.getRawValue();
-    this.registerService
-      .save({ login, email, password, langKey: this.translateService.currentLang, firstName, lastName })
-      .subscribe({ next: () => this.success.set(true), error: response => this.processError(response) });
+
+    // Attiviamo il loader manualmente durante la chiamata POST /api/register
+    this.loaderService.show();
+    this.registerService.save({ login, email, password, langKey: this.translateService.currentLang, firstName, lastName }).subscribe({
+      next: () => {
+        this.loaderService.hide();
+        this.success.set(true);
+      },
+      error: (response: HttpErrorResponse) => {
+        this.loaderService.hide();
+        this.processError(response);
+      },
+    });
   }
 
   private processError(response: HttpErrorResponse): void {

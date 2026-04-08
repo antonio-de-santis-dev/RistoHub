@@ -6,6 +6,7 @@ import { Router, RouterModule } from '@angular/router';
 import SharedModule from 'app/shared/shared.module';
 import { LoginService } from 'app/login/login.service';
 import { AccountService } from 'app/core/auth/account.service';
+import { LoaderService } from 'app/shared/loader/loader.service';
 import { PasswordResetInitService } from 'app/account/password-reset/init/password-reset-init.service';
 
 @Component({
@@ -40,16 +41,13 @@ export default class LoginComponent implements OnInit, AfterViewInit, OnDestroy 
   // ── Servizi ────────────────────────────────────────────────────
   private readonly accountService = inject(AccountService);
   private readonly loginService = inject(LoginService);
+  private readonly loaderService = inject(LoaderService);
   private readonly router = inject(Router);
   private readonly passwordResetInitService = inject(PasswordResetInitService);
   private styleTag: HTMLStyleElement | null = null;
-
-  // BUG-2 FIX: DestroyRef per cancellare automaticamente la subscription
-  // quando il componente viene distrutto, evitando redirect indesiderati
   private readonly destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    // Nasconde la navbar sulla pagina di login
     this.styleTag = document.createElement('style');
     this.styleTag.textContent = `
       jhi-navbar, nav.navbar,
@@ -57,10 +55,6 @@ export default class LoginComponent implements OnInit, AfterViewInit, OnDestroy 
     `;
     document.head.appendChild(this.styleTag);
 
-    // BUG-2 FIX: takeUntilDestroyed garantisce che il subscribe venga
-    // cancellato non appena LoginComponent viene distrutto. Senza questo,
-    // se identity() risolve dopo la navigazione verso /account/register,
-    // il callback potrebbe ancora scattare e reindirizzare a /home.
     this.accountService
       .identity()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -84,44 +78,47 @@ export default class LoginComponent implements OnInit, AfterViewInit, OnDestroy 
 
   // ── Metodi login ───────────────────────────────────────────────
   login(): void {
+    // Attiviamo il loader manualmente: la sequenza di login coinvolge
+    // POST /api/authentication (ora non più skippata) + GET /api/account
+    // (ancora skippata come GET silenziosa). Il loader manuale copre
+    // l'intera catena finché non arriva la risposta finale.
+    this.loaderService.show();
     this.loginService.login(this.loginForm.getRawValue()).subscribe({
       next: () => {
+        this.loaderService.hide();
         this.authenticationError.set(false);
         if (!this.router.getCurrentNavigation()) {
           this.router.navigate(['/home']);
         }
       },
-      error: () => this.authenticationError.set(true),
+      error: () => {
+        this.loaderService.hide();
+        this.authenticationError.set(true);
+      },
     });
   }
 
   // ── Metodi modal recupero password ─────────────────────────────
-
-  /** Apre il modal senza navigare */
   apriRecuperoPassword(): void {
     this.resetRequestForm.reset();
     this.recuperoSuccess.set(false);
     this.mostraModalRecupero.set(true);
   }
 
-  /** Chiude il modal */
   chiudiRecuperoPassword(): void {
     this.mostraModalRecupero.set(false);
     this.recuperoSuccess.set(false);
   }
 
-  /** Chiude cliccando sull'overlay scuro fuori dalla card */
   chiudiSuOverlay(event: MouseEvent): void {
     if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
       this.chiudiRecuperoPassword();
     }
   }
 
-  /** Invia la richiesta di reset password */
   requestReset(): void {
     this.passwordResetInitService.save(this.resetRequestForm.get(['email'])!.value).subscribe(() => {
       this.recuperoSuccess.set(true);
-      // Chiude automaticamente dopo 3 secondi
       setTimeout(() => this.chiudiRecuperoPassword(), 3000);
     });
   }

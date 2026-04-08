@@ -11,11 +11,41 @@ import PageRibbonComponent from '../profiles/page-ribbon.component';
 import { LoaderComponent } from 'app/shared/loader/loader.component';
 import { routeAnimations } from 'app/route-animations';
 
-// Rotte su cui il footer NON deve apparire
-const ROUTES_WITHOUT_FOOTER = ['/menu-view', '/menu-public'];
+// Allowlist delle rotte su cui footer e navbar devono APPARIRE.
+// Tutto il resto (landing '/', /login, /account/register, /menu-public)
+// NON li mostra. Default false elimina il flash visivo durante il caricamento
+// iniziale di landing/login/register.
+const ROUTES_WITH_FOOTER = [
+  '/home',
+  '/admin',
+  '/account/password',
+  '/account/settings',
+  '/entities',
+  '/menu-wizard',
+  '/menu-list',
+  '/menu-view',
+  '/menu-wizard-edit',
+  '/menu-cover-editor',
+  '/prodotto-add',
+  '/piatti-giorno',
+  '/contatti',
+];
 
-// Rotte su cui la navbar NON deve apparire
-const ROUTES_WITHOUT_NAVBAR = ['/menu-public'];
+const ROUTES_WITH_NAVBAR = [
+  '/home',
+  '/admin',
+  '/account/password',
+  '/account/settings',
+  '/entities',
+  '/menu-wizard',
+  '/menu-list',
+  '/menu-view',
+  '/menu-wizard-edit',
+  '/menu-cover-editor',
+  '/prodotto-add',
+  '/piatti-giorno',
+  '/contatti',
+];
 
 /** Mappa path → nome stato per le animazioni */
 const ROUTE_ANIMATION_STATE: Record<string, string> = {
@@ -33,8 +63,10 @@ const ROUTE_ANIMATION_STATE: Record<string, string> = {
 export default class MainComponent implements OnInit {
   private readonly renderer: Renderer2;
 
-  showFooter = signal(true);
-  showNavbar = signal(true);
+  // Partono da false: nessun flash di footer/navbar durante il caricamento
+  // di landing, login, register. Si attivano solo dopo NavigationEnd.
+  showFooter = signal(false);
+  showNavbar = signal(false);
 
   private readonly router = inject(Router);
   private readonly appPageTitleStrategy = inject(AppPageTitleStrategy);
@@ -50,12 +82,13 @@ export default class MainComponent implements OnInit {
     // try to log in automatically
     this.accountService.identity().subscribe();
 
-    // Nascondi footer sulle rotte specificate
+    // Mostra footer e navbar solo sulle rotte in allowlist.
+    // Usando un allowlist invece di una blocklist evitiamo il flash iniziale:
+    // prima di NavigationEnd i signal restano false, nessun elemento appare.
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe((e: NavigationEnd) => {
-      const hide = ROUTES_WITHOUT_FOOTER.some(r => e.urlAfterRedirects.startsWith(r));
-      this.showFooter.set(!hide);
-      const hideNavbar = ROUTES_WITHOUT_NAVBAR.some(r => e.urlAfterRedirects.startsWith(r));
-      this.showNavbar.set(!hideNavbar);
+      const url = e.urlAfterRedirects;
+      this.showFooter.set(ROUTES_WITH_FOOTER.some(r => url.startsWith(r)));
+      this.showNavbar.set(ROUTES_WITH_NAVBAR.some(r => url.startsWith(r)));
     });
 
     this.translateService.onLangChange.subscribe((langChangeEvent: LangChangeEvent) => {

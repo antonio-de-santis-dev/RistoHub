@@ -4,6 +4,12 @@
 //  Le posate sono elementi HTML separati — non ruotano
 // ══════════════════════════════════════════════════════
 
+// Quando il componente viene spostato nel <body> via appendChild,
+// l'elemento host non deve avere dimensioni proprie né disturbare il layout.
+:host {
+  display: contents;
+}
+
 .rh-loader-overlay {
   position: fixed;
   inset: 0;
