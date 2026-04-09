@@ -106,22 +106,22 @@
   *ngIf="!isLoading && !errore && menu && !isModerno && !isRustico"
   class="menu-page"
   [style.fontFamily]="fontTesto"
-  [style.backgroundColor]="coloreSecondario + '22'"
+  [style.backgroundColor]="coloreSecondario"
 >
   <div class="menu-header" [style.backgroundColor]="coloreSecondario" [style.borderBottomColor]="colorePrimario">
-    <button class="btn-back-home" [style.color]="colorePrimario" (click)="tornaAiMieiMenu()">← I Miei Menu</button>
+    <button class="btn-back-home" [style.color]="getContrastColor(coloreSecondario)" (click)="tornaAiMieiMenu()">← I Miei Menu</button>
     <div class="header-content">
       <div *ngIf="logoUrl" class="logo-wrap">
         <img [src]="logoUrl" class="logo-img" alt="Logo" />
       </div>
-      <div *ngIf="!logoUrl" class="logo-placeholder" [style.color]="colorePrimario">{{ menu.nome }}</div>
+      <div *ngIf="!logoUrl" class="logo-placeholder" [style.color]="getContrastColor(coloreSecondario)">{{ menu.nome }}</div>
     </div>
     <!-- SELETTORE LINGUA -->
     <div class="lingua-selettore" (click)="$event.stopPropagation()">
       <button
         class="lingua-btn-attuale"
         [style.borderColor]="colorePrimario"
-        [style.color]="colorePrimario"
+        [style.color]="'#1a1a1a'"
         (click)="mostraDropdownLingua = !mostraDropdownLingua"
         [attr.aria-label]="'Lingua: ' + linguaAttuale.nome"
       >
@@ -156,13 +156,13 @@
 
     <section *ngIf="piattiDelGiorno.length > 0" class="portata-section">
       <div class="portata-header" [style.backgroundColor]="colorePrimario" (click)="togglePiattiGiorno()">
-        <h2 class="portata-nome">{{ getUI('PIATTI_GIORNO') }}</h2>
-        <span class="portata-arrow" [class.open]="piattiGiornoAperti">›</span>
+        <h2 class="portata-nome" [style.color]="getContrastColor(colorePrimario)">{{ getUI('PIATTI_GIORNO') }}</h2>
+        <span class="portata-arrow" [class.open]="piattiGiornoAperti" [style.color]="getContrastColor(colorePrimario)">›</span>
       </div>
       <div class="prodotti-list" [class.aperta]="piattiGiornoAperti">
         <div *ngFor="let piatto of piattiDelGiorno" class="prodotto-card prodotto-speciale" [style.borderLeftColor]="colorePrimario">
           <div class="prodotto-top">
-            <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ getT(piatto.prodotto?.nome ?? piatto.nome) }}</h4>
+            <h4 class="prodotto-nome" [style.color]="'#1a1a1a'">{{ getT(piatto.prodotto?.nome ?? piatto.nome) }}</h4>
             <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}</h4>
           </div>
           <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="prodotto-desc">
@@ -195,8 +195,8 @@
 
     <section *ngFor="let portata of portate" class="portata-section">
       <div class="portata-header" [style.backgroundColor]="colorePrimario" (click)="togglePortata(portata)">
-        <h2 class="portata-nome">{{ nomePortata(portata) | uppercase }}</h2>
-        <span class="portata-arrow" [class.open]="portata.aperta">›</span>
+        <h2 class="portata-nome" [style.color]="getContrastColor(colorePrimario)">{{ nomePortata(portata) | uppercase }}</h2>
+        <span class="portata-arrow" [class.open]="portata.aperta" [style.color]="getContrastColor(colorePrimario)">›</span>
       </div>
       <div class="prodotti-list" [class.aperta]="portata.aperta">
         <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="prodotti-empty">
@@ -204,7 +204,7 @@
         </div>
         <div *ngFor="let prodotto of portata.prodotti" class="prodotto-card">
           <div class="prodotto-top">
-            <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ getT(prodotto.nome) }}</h4>
+            <h4 class="prodotto-nome" [style.color]="'#1a1a1a'">{{ getT(prodotto.nome) }}</h4>
             <div class="prodotto-azioni">
               <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</h4>
               <button class="btn-edit" [style.--edit-color]="colorePrimario" (click)="apriModifica(prodotto)" title="Modifica">
@@ -289,7 +289,12 @@
     </div>
 
     <!-- ── CONTATTI (classico) ────────────────────────────────── -->
-    <div class="contatti-card" *ngIf="listeContatti.length > 0" [style.backgroundColor]="colorePrimario">
+    <div
+      class="contatti-card"
+      *ngIf="listeContatti.length > 0"
+      [style.backgroundColor]="colorePrimario"
+      [style.color]="getContrastColor(colorePrimario)"
+    >
       <div class="contatti-card-title">
         <svg
           width="18"
@@ -373,16 +378,18 @@
   *ngIf="!isLoading && !errore && menu && isModerno"
   class="moderno-page"
   [style.fontFamily]="fontTesto"
-  [style.backgroundColor]="coloreSecondario + '18'"
+  [style.backgroundColor]="coloreSecondario"
 >
-  <header class="moderno-header" [style.backgroundColor]="coloreSecondario + '40'" [style.borderBottomColor]="colorePrimario + '55'">
-    <button class="moderno-btn-back" [style.color]="colorePrimario" (click)="tornaAiMieiMenu()">← I miei menu</button>
+  <header class="moderno-header" [style.backgroundColor]="coloreSecondario" [style.borderBottomColor]="colorePrimario + '55'">
+    <button class="moderno-btn-back" [style.color]="getContrastColor(coloreSecondario)" (click)="tornaAiMieiMenu()">← I miei menu</button>
     <div class="moderno-flag">🇮🇹</div>
     <div class="moderno-logo-wrap" *ngIf="logoUrl; else modernoTitleFallback">
       <img [src]="logoUrl" class="moderno-logo-img" alt="Logo ristorante" />
     </div>
     <ng-template #modernoTitleFallback>
-      <h1 class="moderno-title" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{ menu.nome | uppercase }}</h1>
+      <h1 class="moderno-title" [style.color]="getContrastColor(coloreSecondario)" [style.fontFamily]="fontTesto">
+        {{ menu.nome | uppercase }}
+      </h1>
     </ng-template>
     <div class="moderno-divider" [style.background]="colorePrimario"></div>
     <!-- SELETTORE LINGUA MODERNO -->
@@ -390,7 +397,7 @@
       <button
         class="lingua-btn-attuale"
         [style.borderColor]="colorePrimario"
-        [style.color]="colorePrimario"
+        [style.color]="'#1a1a1a'"
         (click)="mostraDropdownLingua = !mostraDropdownLingua"
       >
         <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(linguaAttuale.svgBandiera)"></span>
@@ -416,7 +423,7 @@
     </div>
   </header>
 
-  <div class="moderno-tabs-wrapper" [style.backgroundColor]="coloreSecondario + '30'" [style.borderBottomColor]="colorePrimario + '33'">
+  <div class="moderno-tabs-wrapper" [style.backgroundColor]="coloreSecondario" [style.borderBottomColor]="colorePrimario + '33'">
     <div class="moderno-tabs">
       <button
         *ngIf="piattiDelGiorno.length > 0"
@@ -424,7 +431,7 @@
         [class.active]="modernoTabAttiva === 'piatti-giorno'"
         [style.background]="modernoTabAttiva === 'piatti-giorno' ? colorePrimario : 'transparent'"
         [style.borderColor]="colorePrimario + '66'"
-        [style.color]="modernoTabAttiva === 'piatti-giorno' ? '#fff' : colorePrimario"
+        [style.color]="modernoTabAttiva === 'piatti-giorno' ? getContrastColor(colorePrimario) : getContrastColor(coloreSecondario)"
         (click)="modernoTabAttiva = 'piatti-giorno'; modernoPortataAttiva = null; fermaAutoplay()"
       >
         {{ getUI('PIATTI_GIORNO_SHORT') }}
@@ -435,7 +442,7 @@
         [class.active]="modernoTabAttiva === portata.id"
         [style.background]="modernoTabAttiva === portata.id ? colorePrimario : 'transparent'"
         [style.borderColor]="colorePrimario + '66'"
-        [style.color]="modernoTabAttiva === portata.id ? '#fff' : colorePrimario"
+        [style.color]="modernoTabAttiva === portata.id ? getContrastColor(colorePrimario) : getContrastColor(coloreSecondario)"
         (click)="modernoApriPortata(portata)"
       >
         {{ nomePortata(portata) }}
@@ -499,16 +506,16 @@
         ></div>
       </div>
       <div class="moderno-welcome">
-        <p class="moderno-welcome-text" [style.color]="colorePrimario + 'aa'" [style.fontFamily]="fontTesto">
+        <p class="moderno-welcome-text" [style.color]="getContrastColor(coloreSecondario)" [style.fontFamily]="fontTesto">
           {{ getUI('SELEZIONA_PORTATA') }}
         </p>
       </div>
     </div>
 
-    <div class="moderno-lista" [class.visible]="modernoTabAttiva === 'piatti-giorno'" [style.backgroundColor]="coloreSecondario + '18'">
+    <div class="moderno-lista" [class.visible]="modernoTabAttiva === 'piatti-giorno'">
       <button class="moderno-back-btn" [style.color]="colorePrimario" (click)="modernoTornaHome()">{{ getUI('TORNA_HOME') }}</button>
       <div class="moderno-lista-header" [style.borderBottomColor]="colorePrimario">
-        <span class="moderno-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{
+        <span class="moderno-lista-nome" [style.color]="getContrastColor(coloreSecondario)" [style.fontFamily]="fontTesto">{{
           getUI('PIATTI_GIORNO_SHORT')
         }}</span>
         <span class="moderno-lista-count">{{ piattiDelGiorno.length }} {{ getUI('PIATTI_PAROLA') }}</span>
@@ -517,7 +524,9 @@
         <div *ngFor="let piatto of piattiDelGiorno" class="moderno-prodotto-item moderno-speciale" [style.borderLeftColor]="colorePrimario">
           <div class="moderno-prodotto-row">
             <span class="moderno-bullet" [style.background]="colorePrimario"></span>
-            <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto">{{ getT(piatto.prodotto?.nome ?? piatto.nome) }}</span>
+            <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto" [style.color]="'#1a1a1a'">{{
+              getT(piatto.prodotto?.nome ?? piatto.nome)
+            }}</span>
             <span class="moderno-dots-leader"></span>
             <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">{{
               formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
@@ -544,12 +553,7 @@
       </div>
     </div>
 
-    <div
-      *ngFor="let portata of portate"
-      class="moderno-lista"
-      [class.visible]="modernoTabAttiva === portata.id"
-      [style.backgroundColor]="coloreSecondario + '18'"
-    >
+    <div *ngFor="let portata of portate" class="moderno-lista" [class.visible]="modernoTabAttiva === portata.id">
       <button class="moderno-back-btn" [style.color]="colorePrimario" (click)="modernoTornaHome()">{{ getUI('TORNA_HOME') }}</button>
       <div class="moderno-lista-header" [style.borderBottomColor]="colorePrimario">
         <span class="moderno-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{ nomePortata(portata) }}</span>
@@ -562,7 +566,7 @@
         <div *ngFor="let prodotto of portata.prodotti" class="moderno-prodotto-item">
           <div class="moderno-prodotto-row">
             <span class="moderno-bullet" [style.background]="colorePrimario"></span>
-            <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto">{{ getT(prodotto.nome) }}</span>
+            <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto" [style.color]="'#1a1a1a'">{{ getT(prodotto.nome) }}</span>
             <span class="moderno-dots-leader"></span>
             <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
             <div class="prodotto-azioni prodotto-azioni-row">
@@ -649,7 +653,12 @@
     </div>
 
     <!-- ── CONTATTI (moderno) ─────────────────────────────────── -->
-    <div class="contatti-card" *ngIf="listeContatti.length > 0" [style.backgroundColor]="colorePrimario">
+    <div
+      class="contatti-card"
+      *ngIf="listeContatti.length > 0"
+      [style.backgroundColor]="colorePrimario"
+      [style.color]="getContrastColor(colorePrimario)"
+    >
       <div class="contatti-card-title">
         <svg
           width="18"
@@ -731,12 +740,12 @@
   *ngIf="!isLoading && !errore && menu && isRustico"
   class="rustico-page"
   [style.fontFamily]="fontTesto"
-  [style.backgroundColor]="coloreSecondario + '18'"
+  [style.backgroundColor]="coloreSecondario"
 >
   <!-- Header con colori utente — come classico e moderno -->
   <header class="rustico-header" [style.backgroundColor]="coloreSecondario" [style.borderBottomColor]="colorePrimario">
     <div class="rustico-header-left">
-      <button class="rustico-btn-back" [style.color]="colorePrimario" (click)="tornaAiMieiMenu()">← I miei menu</button>
+      <button class="rustico-btn-back" [style.color]="getContrastColor(coloreSecondario)" (click)="tornaAiMieiMenu()">← I miei menu</button>
     </div>
     <div class="rustico-header-center">
       <div class="rustico-logo-wrap" *ngIf="logoUrl; else rusticoTitleFallback">
@@ -748,7 +757,9 @@
           <div class="rustico-ornament-diamond" [style.background]="colorePrimario"></div>
           <div class="rustico-ornament-line right"></div>
         </div>
-        <h1 class="rustico-title" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{ menu.nome | uppercase }}</h1>
+        <h1 class="rustico-title" [style.color]="getContrastColor(coloreSecondario)" [style.fontFamily]="fontTesto">
+          {{ menu.nome | uppercase }}
+        </h1>
       </ng-template>
     </div>
     <div class="rustico-header-right">
@@ -757,7 +768,7 @@
         <button
           class="lingua-btn-attuale lingua-btn-rustico"
           [style.borderColor]="colorePrimario"
-          [style.color]="colorePrimario"
+          [style.color]="'#1a1a1a'"
           (click)="mostraDropdownLingua = !mostraDropdownLingua"
         >
           <span class="lingua-bandiera-svg lingua-bandiera-svg-sm" [innerHTML]="getSafeSvg(linguaAttuale.svgBandiera)"></span>
@@ -787,7 +798,7 @@
   <div class="rustico-layout">
     <aside class="rustico-sidebar" [style.borderRightColor]="colorePrimario + '22'">
       <!-- Label fissa in cima con colore utente -->
-      <div class="rustico-sidebar-label" [style.color]="colorePrimario + '99'">Portate</div>
+      <div class="rustico-sidebar-label" [style.color]="colorePrimario">Portate</div>
       <!-- Bottoni scrollabili -->
       <nav class="rustico-nav">
         <button
@@ -795,8 +806,8 @@
           class="rustico-nav-btn"
           [class.active]="rusticoTabAttiva === 'piatti-giorno'"
           [style.borderColor]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario : colorePrimario + '33'"
-          [style.color]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario : colorePrimario + 'aa'"
-          [style.background]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario + '14' : 'transparent'"
+          [style.color]="rusticoTabAttiva === 'piatti-giorno' ? getContrastColor(colorePrimario) : getContrastColor(coloreSecondario)"
+          [style.background]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario : 'transparent'"
           (click)="rusticoApriTab('piatti-giorno', null)"
         >
           {{ getUI('PIATTI_PAROLA') | titlecase }}<br />del Giorno
@@ -806,8 +817,8 @@
           class="rustico-nav-btn"
           [class.active]="rusticoTabAttiva === portata.id"
           [style.borderColor]="rusticoTabAttiva === portata.id ? colorePrimario : colorePrimario + '33'"
-          [style.color]="rusticoTabAttiva === portata.id ? colorePrimario : colorePrimario + 'aa'"
-          [style.background]="rusticoTabAttiva === portata.id ? colorePrimario + '14' : 'transparent'"
+          [style.color]="rusticoTabAttiva === portata.id ? getContrastColor(colorePrimario) : getContrastColor(coloreSecondario)"
+          [style.background]="rusticoTabAttiva === portata.id ? colorePrimario : 'transparent'"
           (click)="rusticoApriTab(portata.id, portata)"
         >
           {{ nomePortata(portata) }}
@@ -869,14 +880,14 @@
         </div>
       </div>
 
-      <div class="rustico-lista-wrap" [class.visibile]="rusticoTabAttiva !== null" [style.backgroundColor]="coloreSecondario + '18'">
+      <div class="rustico-lista-wrap" [class.visibile]="rusticoTabAttiva !== null">
         <button class="rustico-back-btn" [style.color]="colorePrimario" (click)="rusticoTornaCarosello()">
           <span class="rustico-back-arrow">‹</span><span class="rustico-back-label">{{ getUI('TORNA_FOTO') }}</span>
         </button>
 
         <ng-container *ngIf="rusticoTabAttiva === 'piatti-giorno'">
           <div class="rustico-lista-header" [style.borderBottomColor]="colorePrimario">
-            <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{
+            <span class="rustico-lista-nome" [style.color]="getContrastColor(coloreSecondario)" [style.fontFamily]="fontTesto">{{
               getUI('PIATTI_GIORNO_SHORT')
             }}</span>
             <span class="rustico-lista-count">{{ piattiDelGiorno.length }} {{ getUI('PIATTI_PAROLA') }}</span>
@@ -889,7 +900,9 @@
             >
               <div class="rustico-prodotto-row">
                 <span class="rustico-bullet" [style.background]="colorePrimario"></span>
-                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto">{{ getT(piatto.prodotto?.nome ?? piatto.nome) }}</span>
+                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto" [style.color]="'#1a1a1a'">{{
+                  getT(piatto.prodotto?.nome ?? piatto.nome)
+                }}</span>
                 <span class="rustico-leader"></span>
                 <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{
                   formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
@@ -918,7 +931,7 @@
 
         <ng-container *ngIf="rusticoPortataAttiva">
           <div class="rustico-lista-header" [style.borderBottomColor]="colorePrimario">
-            <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{
+            <span class="rustico-lista-nome" [style.color]="getContrastColor(coloreSecondario)" [style.fontFamily]="fontTesto">{{
               nomePortata(rusticoPortataAttiva)
             }}</span>
             <span class="rustico-lista-count">{{ rusticoPortataAttiva.prodotti.length }} {{ getUI('PIATTI_PAROLA') }}</span>
@@ -930,7 +943,9 @@
             <div *ngFor="let prodotto of rusticoPortataAttiva.prodotti" class="rustico-prodotto-item">
               <div class="rustico-prodotto-row">
                 <span class="rustico-bullet" [style.background]="colorePrimario"></span>
-                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto">{{ getT(prodotto.nome) }}</span>
+                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto" [style.color]="'#1a1a1a'">{{
+                  getT(prodotto.nome)
+                }}</span>
                 <span class="rustico-leader"></span>
                 <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
                 <div class="prodotto-azioni prodotto-azioni-row">
@@ -1026,7 +1041,7 @@
 
   <!-- ── CONTATTI (rustico) — fuori dal flex, a tutta larghezza ── -->
   <div class="rustico-contatti-wrap" *ngIf="listeContatti.length > 0">
-    <div class="contatti-card" [style.backgroundColor]="colorePrimario">
+    <div class="contatti-card" [style.backgroundColor]="colorePrimario" [style.color]="getContrastColor(colorePrimario)">
       <div class="contatti-card-title">
         <svg
           width="18"

@@ -9,6 +9,7 @@ import {
   AllergeneDTO,
   ContattoItemDTO,
   ImmagineMenuDTO,
+  ImmagineMenuMetaDTO,
   ListaContattiDTO,
   MenuCompletoDTO,
   MenuDTO,
@@ -449,16 +450,16 @@ export class MenuViewComponent implements OnInit {
       this.allergeniByNome = new Map(tuttiAllergeni.map((a: AllergeneDTO) => [a.nome.toLowerCase().trim(), a]));
 
       // ── 3. Immagini (logo + carosello copertine) ─────────────
-      const immagini: ImmagineMenuDTO[] = dati.immagini ?? [];
+      // Il backend restituisce ImmagineMenuMetaDTO (contentUrl, senza byte[])
+      const immagini: ImmagineMenuMetaDTO[] = (dati.immagini as unknown as ImmagineMenuMetaDTO[]) ?? [];
       const logo = immagini.find(i => i.tipo === 'LOGO');
-      if (logo?.immagine) {
-        const blob = this.base64ToBlob(logo.immagine ?? '', logo.immagineContentType ?? 'image/jpeg');
-        this.logoUrl = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob));
+      if (logo?.contentUrl) {
+        this.logoUrl = this.sanitizer.bypassSecurityTrustUrl(logo.contentUrl);
       }
       const copertine = immagini
-        .filter((i: ImmagineMenuDTO) => i.tipo === 'COPERTINA' && i.visibile !== false)
-        .sort((a: ImmagineMenuDTO, b: ImmagineMenuDTO) => (a.ordine ?? 0) - (b.ordine ?? 0))
-        .map((i: ImmagineMenuDTO) => `data:${i.immagineContentType};base64,${i.immagine}`);
+        .filter((i: ImmagineMenuMetaDTO) => i.tipo === 'COPERTINA' && i.visibile !== false)
+        .sort((a: ImmagineMenuMetaDTO, b: ImmagineMenuMetaDTO) => (a.ordine ?? 0) - (b.ordine ?? 0))
+        .map((i: ImmagineMenuMetaDTO) => i.contentUrl);
       this.modernoImmagini = copertine;
       this.rusticoImmagini = copertine;
       this.modernoImmaginiCaricate = new Array(copertine.length).fill(false);
@@ -828,6 +829,21 @@ export class MenuViewComponent implements OnInit {
   get coloreSecondario(): string {
     return this.menu?.coloreSecondario ?? '#e8c832';
   }
+
+  /**
+   * Restituisce '#ffffff' o '#000000' in base alla luminosità del colore,
+   * garantendo sempre contrasto leggibile.
+   */
+  getContrastColor(hex: string): string {
+    const h = (hex ?? '#000000').replace('#', '');
+    if (h.length < 6) return '#000000';
+    const r = parseInt(h.substring(0, 2), 16);
+    const g = parseInt(h.substring(2, 4), 16);
+    const b = parseInt(h.substring(4, 6), 16);
+    const luminanza = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminanza > 0.5 ? '#000000' : '#ffffff';
+  }
+
   get fontTesto(): string {
     return this.menu?.fontMenu ?? 'Playfair Display';
   }

@@ -226,7 +226,8 @@ a:hover {
 .card.jh-card:has(jhi-settings),
 .card.jh-card:has(jhi-password),
 .card.jh-card:has(jhi-menu-cover-editor),
-.card.jh-card:has(jhi-contatti-gestione) {
+.card.jh-card:has(jhi-contatti-gestione),
+.card.jh-card:has(jhi-menu-view) {
   padding: 0 !important;
   margin-top: 0 !important;
   border: none !important;
