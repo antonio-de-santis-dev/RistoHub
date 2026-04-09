@@ -1,0 +1,236 @@
+// ══════════════════════════════════════════════════════
+//  RistoHub — Loader Preview Page
+// ══════════════════════════════════════════════════════
+
+:host {
+  display: block;
+}
+
+.lp-page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  font-family: 'Lato', 'Helvetica Neue', sans-serif;
+  color: #fff;
+}
+
+// ── Header ──────────────────────────────────────────────
+.lp-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.lp-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  color: #ffd200;
+  letter-spacing: -0.02em;
+}
+
+.lp-subtitle {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+// ── Status badge ────────────────────────────────────────
+.lp-status {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  width: fit-content;
+  transition: all 0.3s ease;
+
+  &--active {
+    border-color: rgba(61, 214, 200, 0.4);
+    background: rgba(61, 214, 200, 0.07);
+  }
+}
+
+.lp-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+
+  .lp-status--active & {
+    background: #3dd6c8;
+    box-shadow: 0 0 0 3px rgba(61, 214, 200, 0.25);
+    animation: dotPulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes dotPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(61, 214, 200, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(61, 214, 200, 0.08);
+  }
+}
+
+.lp-status-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.3s;
+
+  .lp-status--active & {
+    color: #3dd6c8;
+  }
+}
+
+// ── Sezioni ─────────────────────────────────────────────
+.lp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.lp-section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+}
+
+// ── Bottoni durata ──────────────────────────────────────
+.lp-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.lp-btn {
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.6rem 1.3rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 210, 0, 0.35);
+  background: rgba(255, 210, 0, 0.08);
+  color: #ffd200;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 210, 0, 0.16);
+    border-color: rgba(255, 210, 0, 0.6);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  &--stop {
+    border-color: rgba(229, 62, 62, 0.4);
+    background: rgba(229, 62, 62, 0.08);
+    color: #fc8181;
+
+    &:hover:not(:disabled) {
+      background: rgba(229, 62, 62, 0.16);
+      border-color: rgba(229, 62, 62, 0.65);
+    }
+  }
+}
+
+// ── Feature grid ────────────────────────────────────────
+.lp-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.6rem;
+}
+
+.lp-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.lp-feature-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+// ── Auto-activation list ────────────────────────────────
+.lp-auto-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lp-auto-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+
+  &--on {
+    background: rgba(61, 214, 200, 0.05);
+    border-color: rgba(61, 214, 200, 0.12);
+    color: rgba(255, 255, 255, 0.7);
+  }
+  &--off {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+.lp-auto-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+  letter-spacing: 0.05em;
+
+  &--on {
+    background: rgba(61, 214, 200, 0.15);
+    color: #3dd6c8;
+  }
+  &--off {
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.35);
+  }
+}
+
+// ── Mobile ──────────────────────────────────────────────
+@media (max-width: 520px) {
+  .lp-page {
+    padding: 1.5rem 1rem 3rem;
+  }
+  .lp-btn-row {
+    flex-direction: column;
+  }
+  .lp-btn {
+    width: 100%;
+    text-align: center;
+  }
+}

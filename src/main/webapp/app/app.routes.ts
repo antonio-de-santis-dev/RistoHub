@@ -101,6 +101,16 @@ const routes: Routes = [
     loadComponent: () => import('./contatti-gestione/contatti-gestione.component').then(m => m.ContattiGestioneComponent),
   },
 
+  // ── LOADER PREVIEW ───────────────────────────────────────────────
+  // Pagina di anteprima e test del loader globale.
+  // Solo utenti autenticati possono accedervi.
+  {
+    path: 'loader-preview',
+    loadComponent: () => import('./loader-preview/loader-preview.component').then(m => m.LoaderPreviewComponent),
+    canActivate: [UserRouteAccessService],
+    title: 'Anteprima Loader',
+  },
+
   ...errorRoute,
 ];
 

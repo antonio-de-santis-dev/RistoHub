@@ -14,10 +14,12 @@
   </div>
 </div>
 
-@if (showFooter()) {
-  <jhi-footer />
-}
+<!--
+  Footer SEMPRE nel DOM — mai rimosso con @if.
+  La classe "rh-footer-hidden" lo rende invisibile e senza altezza,
+  così non causa mai reflow o "salti" durante la navigazione o il loader.
+-->
+<jhi-footer [class.rh-footer-hidden]="!showFooter()" />
 
-<!-- Loader globale: appendito al <body> via JS per evitare problemi di
-     stacking context con i componenti landing/login (position:fixed z-900) -->
+<!-- Loader globale: appendito al <body> via JS -->
 <rh-loader />

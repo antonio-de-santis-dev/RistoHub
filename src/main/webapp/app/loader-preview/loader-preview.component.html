@@ -1,0 +1,77 @@
+<div class="lp-page">
+  <div class="lp-header">
+    <h1 class="lp-title">Anteprima Loader</h1>
+    <p class="lp-subtitle">Visualizza il loader globale di RistoHub</p>
+  </div>
+
+  <!-- Stato attuale -->
+  <div class="lp-status" [class.lp-status--active]="isActive">
+    <span class="lp-status-dot"></span>
+    <span class="lp-status-label">{{ isActive ? 'Loader attivo' : 'Loader inattivo' }}</span>
+  </div>
+
+  <!-- Pulsanti durata -->
+  <div class="lp-section">
+    <p class="lp-section-label">Attiva per una durata fissa</p>
+    <div class="lp-btn-row">
+      <button class="lp-btn" (click)="mostraLoader(2)" [disabled]="isActive">2 secondi</button>
+      <button class="lp-btn" (click)="mostraLoader(5)" [disabled]="isActive">5 secondi</button>
+      <button class="lp-btn" (click)="mostraLoader(10)" [disabled]="isActive">10 secondi</button>
+      <button class="lp-btn lp-btn--stop" (click)="fermaLoader()" [disabled]="!isActive">Ferma subito</button>
+    </div>
+  </div>
+
+  <!-- Cosa mostra il loader -->
+  <div class="lp-section">
+    <p class="lp-section-label">Cosa include il loader</p>
+    <div class="lp-feature-grid">
+      <div class="lp-feature">
+        <span class="lp-feature-icon">🖼️</span>
+        <span>Logo RistoHub</span>
+      </div>
+      <div class="lp-feature">
+        <span class="lp-feature-icon">🍴</span>
+        <span>Forchetta e coltello</span>
+      </div>
+      <div class="lp-feature">
+        <span class="lp-feature-icon">⭕</span>
+        <span>Piatto animato (oro + turchese)</span>
+      </div>
+      <div class="lp-feature">
+        <span class="lp-feature-icon">✦</span>
+        <span>Testo e puntini pulsanti</span>
+      </div>
+      <div class="lp-feature">
+        <span class="lp-feature-icon">🌫️</span>
+        <span>Overlay sfocato su tutta la pagina</span>
+      </div>
+      <div class="lp-feature">
+        <span class="lp-feature-icon">⚡</span>
+        <span>Si attiva automaticamente su ogni HTTP</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quando si attiva automaticamente -->
+  <div class="lp-section">
+    <p class="lp-section-label">Si attiva automaticamente su</p>
+    <div class="lp-auto-list">
+      <div class="lp-auto-item lp-auto-item--on">
+        <span class="lp-auto-badge lp-auto-badge--on">Attivo</span>
+        <span>Qualsiasi chiamata HTTP (GET, POST, PUT, DELETE)</span>
+      </div>
+      <div class="lp-auto-item lp-auto-item--on">
+        <span class="lp-auto-badge lp-auto-badge--on">Attivo</span>
+        <span>Navigazione tra pagine</span>
+      </div>
+      <div class="lp-auto-item lp-auto-item--off">
+        <span class="lp-auto-badge lp-auto-badge--off">Skip</span>
+        <span>GET /api/account (check autenticazione silenzioso)</span>
+      </div>
+      <div class="lp-auto-item lp-auto-item--off">
+        <span class="lp-auto-badge lp-auto-badge--off">Skip</span>
+        <span>POST /api/logout</span>
+      </div>
+    </div>
+  </div>
+</div>
