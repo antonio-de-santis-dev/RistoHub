@@ -17,6 +17,9 @@ public class ListaContattiDTO implements Serializable {
     /** Campi di contatto ordinati */
     private List<ContattoItemDTO> items = new ArrayList<>();
 
+    /** ID dei menu a cui questa lista è associata */
+    private List<UUID> menuIds = new ArrayList<>();
+
     /** Ristoratore proprietario (solo login e id, mai password) */
     private UserDTO ristoratore;
 
@@ -42,6 +45,14 @@ public class ListaContattiDTO implements Serializable {
 
     public void setItems(List<ContattoItemDTO> items) {
         this.items = items;
+    }
+
+    public List<UUID> getMenuIds() {
+        return menuIds;
+    }
+
+    public void setMenuIds(List<UUID> menuIds) {
+        this.menuIds = menuIds;
     }
 
     public UserDTO getRistoratore() {

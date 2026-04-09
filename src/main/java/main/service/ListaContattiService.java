@@ -71,6 +71,10 @@ public class ListaContattiService {
         }
 
         existing.setNome(dto.getNome());
+        // Aggiorna le associazioni ai menu
+        if (dto.getMenuIds() != null) {
+            existing.setMenuIds(new HashSet<>(dto.getMenuIds()));
+        }
         // menuIds non è nel DTO: le associazioni menu-lista si gestiscono lato Menu
         // e vengono preservate invariate durante l'aggiornamento della lista.
 
@@ -148,6 +152,10 @@ public class ListaContattiService {
             dto.setRistoratore(u);
         }
 
+        if (e.getMenuIds() != null) {
+            dto.setMenuIds(new ArrayList<>(e.getMenuIds()));
+        }
+
         List<ContattoItemDTO> itemDtos =
             (e.getItems() != null ? e.getItems() : List.<ContattoItem>of()).stream()
                 .sorted(Comparator.comparingInt(i -> (i.getOrdine() != null ? i.getOrdine() : 0)))
@@ -161,6 +169,10 @@ public class ListaContattiService {
         ListaContatti e = new ListaContatti();
         if (dto.getId() != null) e.setId(dto.getId());
         e.setNome(dto.getNome());
+        // Salva le associazioni ai menu ricevute dal frontend
+        if (dto.getMenuIds() != null) {
+            e.setMenuIds(new HashSet<>(dto.getMenuIds()));
+        }
         // menuIds non è nel DTO: la nuova lista parte senza associazioni menu.
         if (dto.getItems() != null) {
             for (int i = 0; i < dto.getItems().size(); i++) {
