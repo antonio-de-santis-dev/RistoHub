@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeUrl, SafeHtml } from '@angular/platform-browser';
 import { firstValueFrom } from 'rxjs';
+import { TraduzioneService } from '../core/services/traduzione.service';
 import {
   AllergeneDTO,
   ContattoItemDTO,
@@ -100,7 +101,6 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
   isTraducendo = false;
   mostraDropdownLingua = false;
   erroreTraduzioneVisible = false;
-  private cacheTraduzioni = new Map<string, Map<string, string>>();
 
   private readonly NOMI_PORTATE: Record<string, Record<string, string>> = {
     ANTIPASTO: { it: 'ANTIPASTO', en: 'STARTER', fr: 'ENTRÉE', de: 'VORSPEISE', es: 'ENTRANTE' },
@@ -215,6 +215,7 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef,
+    private traduzioneService: TraduzioneService,
   ) {}
 
   ngOnInit(): void {
@@ -240,7 +241,7 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
   getT(testo: string | undefined | null): string {
     if (!testo) return testo ?? '';
     if (this.linguaCorrente === 'it') return testo;
-    return this.cacheTraduzioni.get(this.linguaCorrente)?.get(testo) ?? testo;
+    return this.traduzioneService.getCached(this.linguaCorrente)?.get(testo) ?? testo;
   }
 
   getUI(chiave: string): string {
@@ -264,7 +265,7 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
     if (codice === this.linguaCorrente) return;
     this.linguaCorrente = codice;
     if (codice === 'it') return;
-    if (this.cacheTraduzioni.has(codice)) return;
+    if (this.traduzioneService.hasCached(codice)) return;
 
     const stringhe = new Set<string>();
     this.portate.forEach(p => {
@@ -284,37 +285,15 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
 
     this.isTraducendo = true;
     this.erroreTraduzioneVisible = false;
-    const nuovaCache = new Map<string, string>();
-    const lista = Array.from(stringhe).filter(s => s.trim().length > 0);
-    const BATCH = 5;
-    let errori = 0;
 
-    for (let i = 0; i < lista.length; i += BATCH) {
-      const batch = lista.slice(i, i + BATCH);
-      await Promise.all(
-        batch.map(async testo => {
-          try {
-            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(testo)}&langpair=it|${codice}`;
-            const resp = await fetch(url);
-            if (!resp.ok) {
-              errori++;
-              return;
-            }
-            const data = await resp.json();
-            const tradotto = data.responseData?.translatedText;
-            const statusOk = Number(data.responseStatus) === 200;
-            if (tradotto && tradotto !== testo && statusOk) nuovaCache.set(testo, tradotto);
-          } catch {
-            errori++;
-          }
-        }),
-      );
-      if (i + BATCH < lista.length) await new Promise(res => setTimeout(res, 120));
-    }
-
-    this.cacheTraduzioni.set(codice, nuovaCache);
+    const result = await this.traduzioneService.traduci(Array.from(stringhe), codice);
     this.isTraducendo = false;
-    if (errori > 0 && nuovaCache.size === 0) {
+
+    if (result.rateLimited) {
+      this.erroreTraduzioneVisible = true;
+      // mostra: 'Limite traduzioni raggiunto. Riprova più tardi.'
+      setTimeout(() => (this.erroreTraduzioneVisible = false), 4000);
+    } else if (result.errori > 0 && result.cache.size === 0) {
       this.erroreTraduzioneVisible = true;
       setTimeout(() => (this.erroreTraduzioneVisible = false), 4000);
     }

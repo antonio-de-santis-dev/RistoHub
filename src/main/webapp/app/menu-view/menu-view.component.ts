@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeUrl, SafeHtml } from '@angular/platform-browser';
 import { firstValueFrom } from 'rxjs';
+import { TraduzioneService } from '../core/services/traduzione.service';
 import {
   AllergeneDTO,
   ContattoItemDTO,
@@ -135,9 +136,6 @@ export class MenuViewComponent implements OnInit, OnDestroy {
   mostraDropdownLingua = false;
   erroreTraduzioneVisible = false;
 
-  // Cache traduzioni: lingua -> Map<originale, tradotto>
-  private cacheTraduzioni = new Map<string, Map<string, string>>();
-
   // Traduzioni statiche per i nomi portate default
   private readonly NOMI_PORTATE: Record<string, Record<string, string>> = {
     ANTIPASTO: { it: 'ANTIPASTO', en: 'STARTER', fr: 'ENTRÉE', de: 'VORSPEISE', es: 'ENTRANTE' },
@@ -250,7 +248,7 @@ export class MenuViewComponent implements OnInit, OnDestroy {
   getT(testo: string | undefined | null): string {
     if (!testo) return testo ?? '';
     if (this.linguaCorrente === 'it') return testo;
-    return this.cacheTraduzioni.get(this.linguaCorrente)?.get(testo) ?? testo;
+    return this.traduzioneService.getCached(this.linguaCorrente)?.get(testo) ?? testo;
   }
 
   /** Restituisce etichetta UI statica tradotta */
@@ -277,14 +275,10 @@ export class MenuViewComponent implements OnInit, OnDestroy {
     if (codice === this.linguaCorrente) return;
     this.linguaCorrente = codice;
 
-    if (codice === 'it') return; // Italiano = nessuna traduzione necessaria
+    if (codice === 'it') return;
+    if (this.traduzioneService.hasCached(codice)) return;
 
-    // Se già in cache, niente da fare
-    if (this.cacheTraduzioni.has(codice)) return;
-
-    // Raccolta di tutte le stringhe da tradurre
     const stringhe = new Set<string>();
-
     this.portate.forEach(p => {
       if (p.tipo === 'PERSONALIZZATA' && p.nomePersonalizzato) {
         stringhe.add(p.nomePersonalizzato);
@@ -294,7 +288,6 @@ export class MenuViewComponent implements OnInit, OnDestroy {
         if (prod.descrizione) stringhe.add(prod.descrizione);
       });
     });
-
     this.piattiDelGiorno.forEach(p => {
       const nome = p.prodotto?.nome ?? p.nome;
       const desc = p.prodotto?.descrizione ?? p.descrizione;
@@ -306,46 +299,15 @@ export class MenuViewComponent implements OnInit, OnDestroy {
 
     this.isTraducendo = true;
     this.erroreTraduzioneVisible = false;
-    const nuovaCache = new Map<string, string>();
-    const lista = Array.from(stringhe).filter(s => s.trim().length > 0);
 
-    // Traduzione in batch paralleli (5 alla volta per rispettare rate-limit)
-    const BATCH = 5;
-    let errori = 0;
-
-    for (let i = 0; i < lista.length; i += BATCH) {
-      const batch = lista.slice(i, i + BATCH);
-      await Promise.all(
-        batch.map(async testo => {
-          try {
-            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(testo)}&langpair=it|${codice}`;
-            const resp = await fetch(url);
-            if (!resp.ok) {
-              errori++;
-              return;
-            }
-            const data = await resp.json();
-            const tradotto = data.responseData?.translatedText;
-            // MyMemory restituisce responseStatus come stringa ("200"), non numero
-            const statusOk = Number(data.responseStatus) === 200;
-            if (tradotto && tradotto !== testo && statusOk) {
-              nuovaCache.set(testo, tradotto);
-            }
-          } catch {
-            errori++;
-          }
-        }),
-      );
-      // Piccola pausa tra batch per non inondare l'API
-      if (i + BATCH < lista.length) {
-        await new Promise(res => setTimeout(res, 120));
-      }
-    }
-
-    this.cacheTraduzioni.set(codice, nuovaCache);
+    const result = await this.traduzioneService.traduci(Array.from(stringhe), codice);
     this.isTraducendo = false;
 
-    if (errori > 0 && nuovaCache.size === 0) {
+    if (result.rateLimited) {
+      this.erroreTraduzioneVisible = true;
+      // mostra: 'Limite traduzioni raggiunto. Riprova più tardi.'
+      setTimeout(() => (this.erroreTraduzioneVisible = false), 4000);
+    } else if (result.errori > 0 && result.cache.size === 0) {
       this.erroreTraduzioneVisible = true;
       setTimeout(() => (this.erroreTraduzioneVisible = false), 4000);
     }
@@ -395,6 +357,7 @@ export class MenuViewComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef,
+    private traduzioneService: TraduzioneService,
   ) {}
 
   ngOnInit(): void {
@@ -597,7 +560,7 @@ export class MenuViewComponent implements OnInit, OnDestroy {
       this.prodottiMap.set(String(aggiornato.id), aggiornato);
       this.calcolaTuttiAllergeni();
       // Invalida le cache di traduzione perché il testo è cambiato
-      this.cacheTraduzioni.clear();
+      this.traduzioneService.clearCache();
       this.chiudiModifica();
     } catch (err) {
       console.error('Errore modifica prodotto:', err);
