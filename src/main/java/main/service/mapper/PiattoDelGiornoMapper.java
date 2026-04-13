@@ -32,7 +32,16 @@ public interface PiattoDelGiornoMapper extends EntityMapper<PiattoDelGiornoDTO, 
 
     @Mapping(target = "allergenis", source = "allergenis", qualifiedByName = "allergenDtoListToSet")
     @Mapping(target = "removeAllergeni", ignore = true)
+    @Mapping(target = "prodotto", source = "prodotto", qualifiedByName = "prodottoFromDto")
+    @Mapping(target = "menu", source = "menu", qualifiedByName = "menuFromDto")
     PiattoDelGiorno toEntity(PiattoDelGiornoDTO piattoDelGiornoDTO);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "allergenis", source = "allergenis", qualifiedByName = "allergenDtoListToSet")
+    @Mapping(target = "removeAllergeni", ignore = true)
+    @Mapping(target = "prodotto", source = "prodotto", qualifiedByName = "prodottoFromDto")
+    @Mapping(target = "menu", source = "menu", qualifiedByName = "menuFromDto")
+    void partialUpdate(@MappingTarget PiattoDelGiorno entity, PiattoDelGiornoDTO dto);
 
     /**
      * Mappa il prodotto includendo id, nome, descrizione, prezzo e allergenis.
@@ -94,6 +103,22 @@ public interface PiattoDelGiornoMapper extends EntityMapper<PiattoDelGiornoDTO, 
             }
         }
         return result;
+    }
+
+    @Named("menuFromDto")
+    default Menu menuFromDto(MenuDTO menuDTO) {
+        if (menuDTO == null || menuDTO.getId() == null) return null;
+        Menu menu = new Menu();
+        menu.setId(menuDTO.getId());
+        return menu;
+    }
+
+    @Named("prodottoFromDto")
+    default Prodotto prodottoFromDto(ProdottoDTO prodottoDTO) {
+        if (prodottoDTO == null || prodottoDTO.getId() == null) return null;
+        Prodotto prodotto = new Prodotto();
+        prodotto.setId(prodottoDTO.getId());
+        return prodotto;
     }
 
     default String map(UUID value) {

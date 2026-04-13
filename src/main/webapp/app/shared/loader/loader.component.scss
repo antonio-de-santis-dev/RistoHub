@@ -3,15 +3,23 @@
 //  Struttura: forchetta | piatto (animato) | coltello
 // ══════════════════════════════════════════════════════
 
-// L'host non deve avere dimensioni proprie né disturbare il layout.
+// Prima che ngOnInit assegni position:fixed via JS, l'host è un block vuoto
+// senza dimensioni: non disturba il layout della pagina.
+// ngOnInit sovrascrive con: position:fixed; inset:0; z-index:2147483647;
+// pointer-events:none; display:block — vedi loader.component.ts.
 :host {
-  display: contents;
+  display: block;
 }
 
 .rh-loader-overlay {
-  position: fixed;
+  // L'host è già position:fixed;inset:0 (impostato via JS in ngOnInit).
+  // Qui usiamo position:absolute;inset:0 → riempie l'host al 100%.
+  // z-index non serve: l'host gestisce già lo stacking context globale.
+  // pointer-events:auto → sovrascrive il pointer-events:none dell'host
+  // in modo che il clic sia bloccato durante il caricamento.
+  position: absolute;
   inset: 0;
-  z-index: 9999;
+  pointer-events: auto;
   display: flex;
   align-items: center;
   justify-content: center;

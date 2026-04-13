@@ -12,7 +12,7 @@ import { TutorialService } from 'app/shared/tutorial/tutorial.service';
 @Component({
   selector: 'jhi-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, TutorialComponent],
+  imports: [CommonModule, RouterModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
@@ -49,23 +49,17 @@ export default class HomeComponent implements OnInit {
   async caricaDashboard(): Promise<void> {
     const account = this.account();
     if (!account) return;
-    const login = account.login;
 
     this.isLoadingPiatti = true;
     this.isLoadingMenus = true;
 
     try {
       const tuttiMenu: MenuDTO[] = (await firstValueFrom(this.http.get<MenuDTO[]>('/api/menus'))) ?? [];
-      const meiMenuIds = new Set(tuttiMenu.filter(m => m.ristoratore?.login === login).map(m => m.id));
-      this.menuAttivi = tuttiMenu.filter(m => m.attivo && m.ristoratore?.login === login);
+      this.menuAttivi = tuttiMenu.filter(m => m.attivo);
       this.isLoadingMenus = false;
 
-      const tutti: PiattoDelGiornoDTO[] = (await firstValueFrom(this.http.get<PiattoDelGiornoDTO[]>('/api/piatto-del-giornos'))) ?? [];
-      this.piattiAttivi = tutti.filter(p => {
-        if (!p.attivo) return false;
-        if (!p.menu?.id) return true;
-        return meiMenuIds.has(p.menu.id);
-      });
+      const tutti: PiattoDelGiornoDTO[] = (await firstValueFrom(this.http.get<PiattoDelGiornoDTO[]>('/api/piatto-del-giornos/my'))) ?? [];
+      this.piattiAttivi = tutti.filter(p => p.attivo);
     } catch (err) {
       console.error('Errore dashboard:', err);
     } finally {

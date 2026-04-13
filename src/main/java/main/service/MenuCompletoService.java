@@ -19,6 +19,7 @@ import main.service.mapper.MenuMapper;
 import main.service.mapper.PiattoDelGiornoMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,6 +78,7 @@ public class MenuCompletoService {
      * istanze. Le collection vengono inizializzate in memoria prima della
      * serializzazione del mapper → icone allergeni correttamente incluse nella risposta.
      */
+    @Cacheable(value = "piattiGiorno", key = "#menuId")
     public List<PiattoDelGiornoDTO> findPiattiDelGiornoAttiviByMenuId(UUID menuId) {
         LOG.debug("Request to get active PiattiDelGiorno with allergenis for Menu : {}", menuId);
 
@@ -105,6 +107,7 @@ public class MenuCompletoService {
      * @param id UUID del menu pubblico
      * @return Optional con il DTO aggregato, vuoto se il menu non esiste
      */
+    @Cacheable(value = "menuCompleto", key = "#id")
     public Optional<MenuCompletoDTO> findMenuCompleto(UUID id) {
         LOG.debug("Request to get MenuCompleto (aggregato) : {}", id);
 

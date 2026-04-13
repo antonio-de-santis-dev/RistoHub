@@ -143,6 +143,12 @@ public class PiattoDelGiornoResource {
         return piattoDelGiornoService.findAll();
     }
 
+    @GetMapping("/my")
+    public List<PiattoDelGiornoDTO> getMyPiattoDelGiornos() {
+        LOG.debug("REST request to get PiattoDelGiornos for current user");
+        return piattoDelGiornoService.findAllByCurrentUser();
+    }
+
     /**
      * {@code GET  /piatto-del-giornos/:id} : get the "id" piattoDelGiorno.
      *

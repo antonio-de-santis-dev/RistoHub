@@ -45,4 +45,7 @@ public interface PiattoDelGiornoRepository extends JpaRepository<PiattoDelGiorno
      */
     @Query("SELECT DISTINCT p FROM PiattoDelGiorno p LEFT JOIN FETCH p.allergenis")
     List<PiattoDelGiorno> findAllConAllergeniDiretti();
+
+    @Query("SELECT p FROM PiattoDelGiorno p WHERE p.menu.ristoratore.login = :login")
+    List<PiattoDelGiorno> findByMenuRistoratoreLogin(@Param("login") String login);
 }

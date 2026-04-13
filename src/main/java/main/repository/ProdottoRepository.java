@@ -28,6 +28,9 @@ public interface ProdottoRepository extends ProdottoRepositoryWithBagRelationshi
     @Query("SELECT DISTINCT p FROM Prodotto p " + "LEFT JOIN FETCH p.allergenis " + "WHERE p.portata.menu.id = :menuId")
     List<Prodotto> findByPortataMenuIdWithAllergeni(@Param("menuId") UUID menuId);
 
+    @Query("SELECT p.portata.menu.ristoratore.login FROM Prodotto p WHERE p.id = :id")
+    Optional<String> findRistoratoreLoginByProdottoId(@Param("id") UUID id);
+
     default Optional<Prodotto> findOneWithEagerRelationships(UUID id) {
         return this.fetchBagRelationships(this.findById(id));
     }

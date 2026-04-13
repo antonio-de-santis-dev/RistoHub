@@ -104,6 +104,9 @@ public class CacheConfiguration {
             createCache(cm, main.domain.ListaContatti.class.getName());
             createCache(cm, main.domain.ListaContatti.class.getName() + ".items");
             createCache(cm, main.domain.ContattoItem.class.getName());
+            // ── Cache aggregata menu pubblico — TTL 5 min, 500 entry ─────────
+            createCacheWithConfig(cm, "menuCompleto", hotCacheConfiguration);
+            createCacheWithConfig(cm, "piattiGiorno", hotCacheConfiguration);
             // jhipster-needle-ehcache-add-entry
         };
     }

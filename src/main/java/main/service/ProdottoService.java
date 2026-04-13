@@ -130,15 +130,10 @@ public class ProdottoService {
     private void checkProdottoOwnership(UUID prodottoId) {
         String currentLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new BadRequestAlertException("Utente non autenticato", "prodotto", "unauthenticated"));
-        Prodotto prodotto = prodottoRepository
-            .findById(prodottoId)
+        String ownerLogin = prodottoRepository
+            .findRistoratoreLoginByProdottoId(prodottoId)
             .orElseThrow(() -> new BadRequestAlertException("Prodotto non trovato", "prodotto", "idnotfound"));
-        if (
-            prodotto.getPortata() == null ||
-            prodotto.getPortata().getMenu() == null ||
-            prodotto.getPortata().getMenu().getRistoratore() == null ||
-            !prodotto.getPortata().getMenu().getRistoratore().getLogin().equals(currentLogin)
-        ) {
+        if (!ownerLogin.equals(currentLogin)) {
             throw new BadRequestAlertException("Accesso negato", "prodotto", "forbidden");
         }
     }

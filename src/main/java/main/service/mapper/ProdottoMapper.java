@@ -107,6 +107,12 @@ public interface ProdottoMapper extends EntityMapper<ProdottoDTO, Prodotto> {
         return result;
     }
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "allergenis", source = "allergenis", qualifiedByName = "allergenDtoListToSet")
+    @Mapping(target = "removeAllergeni", ignore = true)
+    @Mapping(target = "portata", source = "portata", qualifiedByName = "portataFromDto")
+    void partialUpdate(@MappingTarget Prodotto entity, ProdottoDTO dto);
+
     default String map(UUID value) {
         return Objects.toString(value, null);
     }

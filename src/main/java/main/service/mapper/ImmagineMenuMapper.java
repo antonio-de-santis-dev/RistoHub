@@ -20,6 +20,7 @@ public interface ImmagineMenuMapper extends EntityMapper<ImmagineMenuDTO, Immagi
 
     @Mapping(target = "ordine", source = "ordine")
     @Mapping(target = "visibile", source = "visibile")
+    @Mapping(target = "menu", source = "menu", qualifiedByName = "menuFromDto")
     ImmagineMenu toEntity(ImmagineMenuDTO dto);
 
     @Named("menuId")
@@ -30,7 +31,16 @@ public interface ImmagineMenuMapper extends EntityMapper<ImmagineMenuDTO, Immagi
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "ordine", source = "ordine")
     @Mapping(target = "visibile", source = "visibile")
+    @Mapping(target = "menu", source = "menu", qualifiedByName = "menuFromDto")
     void partialUpdate(@MappingTarget ImmagineMenu entity, ImmagineMenuDTO dto);
+
+    @Named("menuFromDto")
+    default Menu menuFromDto(MenuDTO menuDTO) {
+        if (menuDTO == null || menuDTO.getId() == null) return null;
+        Menu menu = new Menu();
+        menu.setId(menuDTO.getId());
+        return menu;
+    }
 
     default String map(UUID value) {
         return Objects.toString(value, null);

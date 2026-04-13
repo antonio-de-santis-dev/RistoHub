@@ -12,6 +12,8 @@ import main.service.mapper.MenuMapper;
 import main.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,6 +52,7 @@ public class MenuService {
     /**
      * Update a menu.
      */
+    @Caching(evict = { @CacheEvict(value = "menuCompleto", key = "#menuDTO.id"), @CacheEvict(value = "piattiGiorno", key = "#menuDTO.id") })
     public MenuDTO update(MenuDTO menuDTO) {
         LOG.debug("Request to update Menu : {}", menuDTO);
         checkOwnership(menuDTO.getId());
@@ -65,6 +68,7 @@ public class MenuService {
     /**
      * Partially update a menu.
      */
+    @Caching(evict = { @CacheEvict(value = "menuCompleto", key = "#menuDTO.id"), @CacheEvict(value = "piattiGiorno", key = "#menuDTO.id") })
     public Optional<MenuDTO> partialUpdate(MenuDTO menuDTO) {
         LOG.debug("Request to partially update Menu : {}", menuDTO);
         checkOwnership(menuDTO.getId());
@@ -112,6 +116,7 @@ public class MenuService {
     /**
      * Delete the menu by id.
      */
+    @Caching(evict = { @CacheEvict(value = "menuCompleto", key = "#id"), @CacheEvict(value = "piattiGiorno", key = "#id") })
     public void delete(UUID id) {
         LOG.debug("Request to delete Menu : {}", id);
         checkOwnership(id);

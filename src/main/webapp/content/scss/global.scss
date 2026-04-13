@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'bootstrap-variables';
 @import 'bootstrap/scss/functions';
 @import 'bootstrap/scss/variables';
@@ -28,7 +29,7 @@ a:not([href]):not([tabindex]):hover.dropdown-item {
 }
 
 .dropdown-item.active:hover {
-  background-color: mix($dropdown-link-hover-bg, $dropdown-link-active-bg, 50%);
+  background-color: color.mix($dropdown-link-hover-bg, $dropdown-link-active-bg, 50%);
 }
 
 a:hover {

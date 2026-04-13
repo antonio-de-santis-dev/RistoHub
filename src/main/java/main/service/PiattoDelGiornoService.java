@@ -98,6 +98,19 @@ public class PiattoDelGiornoService {
     }
 
     /**
+     * Restituisce solo i piatti del giorno appartenenti ai menu dell'utente corrente.
+     */
+    @Transactional(readOnly = true)
+    public List<PiattoDelGiornoDTO> findAllByCurrentUser() {
+        LOG.debug("Request to get all PiattoDelGiornos for current user");
+        return piattoDelGiornoRepository
+            .findByMenuRistoratoreLogin(main.security.SecurityUtils.getCurrentUserLogin().orElseThrow())
+            .stream()
+            .map(piattoDelGiornoMapper::toDto)
+            .toList();
+    }
+
+    /**
      * Get one piattoDelGiorno by id.
      */
     @Transactional(readOnly = true)

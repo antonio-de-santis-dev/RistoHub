@@ -24,6 +24,11 @@ public interface AllergeneMapper extends EntityMapper<AllergeneDTO, Allergene> {
     @Mapping(target = "removeProdotto", ignore = true)
     Allergene toEntity(AllergeneDTO allergeneDTO);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "prodottos", ignore = true)
+    @Mapping(target = "removeProdotto", ignore = true)
+    void partialUpdate(@MappingTarget Allergene entity, AllergeneDTO dto);
+
     @Named("prodottoId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")

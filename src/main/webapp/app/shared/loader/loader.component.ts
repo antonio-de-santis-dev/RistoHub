@@ -7,17 +7,14 @@ import { LoaderService } from './loader.service';
 /**
  * Loader globale di RistoHub.
  *
- * PROBLEMA STACKING CONTEXT:
- * Alcune pagine (landing, login, menu-public) hanno :host { position: fixed; z-index: 900 }.
- * Questo crea uno stacking context isolato che può sovrapporsi al loader
- * anche se il loader ha z-index: 9999, perché il confronto avviene
- * tra stacking context diversi nella catena DOM.
- *
- * SOLUZIONE:
- * 1. Il loader viene spostato direttamente nel <body> via appendChild
- *    → esce da qualsiasi stacking context annidato di jhi-main.
- * 2. z-index: 2147483647 (massimo int a 32 bit) → sopra qualsiasi elemento.
- * 3. Nessun backdrop-filter → non dipende dallo stacking context del parent.
+ * STRATEGIA:
+ * 1. body.appendChild(el) → esce da qualsiasi stacking context annidato di jhi-main.
+ * 2. Il HOST stesso diventa position:fixed;inset:0 (via JS, dopo il reparenting).
+ *    Questo è più affidabile di affidarsi al figlio position:fixed:
+ *    - display:contents + figlio position:fixed ha comportamento ambiguo tra browser.
+ *    - position:fixed sull'HOST (diretto figlio di body) è deterministico al 100%.
+ * 3. Il figlio .rh-loader-overlay usa position:absolute;inset:0 → riempie l'host.
+ * 4. pointer-events:none sull'host quando il loader è nascosto → nessuna interferenza.
  */
 @Component({
   selector: 'rh-loader',
@@ -38,13 +35,17 @@ export class LoaderComponent implements OnInit, OnDestroy {
     if (isPlatformBrowser(this.platformId)) {
       const el: HTMLElement = this.elementRef.nativeElement;
 
-      // Sposta nel <body> per uscire da stacking context annidati
+      // 1. Sposta nel <body> — esce da tutti gli stacking context annidati
       this.document.body.appendChild(el);
 
-      // Forza z-index massimo sull'host element direttamente
-      // (il CSS :host potrebbe non applicarsi dopo il reparenting)
-      this.renderer.setStyle(el, 'position', 'relative');
+      // 2. L'host stesso è l'overlay fixed: diretto figlio di body → ancora al viewport.
+      //    Nessuna dipendenza da display:contents o da come il browser tratta
+      //    position:fixed su un elemento figlio di un display:contents.
+      this.renderer.setStyle(el, 'position', 'fixed');
+      this.renderer.setStyle(el, 'inset', '0');
       this.renderer.setStyle(el, 'z-index', '2147483647');
+      this.renderer.setStyle(el, 'pointer-events', 'none');
+      this.renderer.setStyle(el, 'display', 'block');
     }
   }
 
