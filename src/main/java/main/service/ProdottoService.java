@@ -5,8 +5,10 @@ import java.util.Optional;
 import java.util.UUID;
 import main.domain.Prodotto;
 import main.repository.ProdottoRepository;
+import main.security.SecurityUtils;
 import main.service.dto.ProdottoDTO;
 import main.service.mapper.ProdottoMapper;
+import main.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -52,6 +54,7 @@ public class ProdottoService {
 
     public ProdottoDTO update(ProdottoDTO prodottoDTO) {
         LOG.debug("Request to update Prodotto : {}", prodottoDTO);
+        checkProdottoOwnership(prodottoDTO.getId());
         return persistProdotto(prodottoDTO);
     }
 
@@ -120,7 +123,24 @@ public class ProdottoService {
      */
     public void delete(UUID id) {
         LOG.debug("Request to delete Prodotto : {}", id);
+        checkProdottoOwnership(id);
         prodottoRepository.deleteById(id);
+    }
+
+    private void checkProdottoOwnership(UUID prodottoId) {
+        String currentLogin = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new BadRequestAlertException("Utente non autenticato", "prodotto", "unauthenticated"));
+        Prodotto prodotto = prodottoRepository
+            .findById(prodottoId)
+            .orElseThrow(() -> new BadRequestAlertException("Prodotto non trovato", "prodotto", "idnotfound"));
+        if (
+            prodotto.getPortata() == null ||
+            prodotto.getPortata().getMenu() == null ||
+            prodotto.getPortata().getMenu().getRistoratore() == null ||
+            !prodotto.getPortata().getMenu().getRistoratore().getLogin().equals(currentLogin)
+        ) {
+            throw new BadRequestAlertException("Accesso negato", "prodotto", "forbidden");
+        }
     }
 
     public List<ProdottoDTO> findByPortataId(UUID portataId) {
