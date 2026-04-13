@@ -8,7 +8,7 @@
 
 <div class="rh-main-wrapper">
   <div class="card jh-card">
-    <div [@routeAnimations]="getRouteAnimationData(outlet)" style="position: relative">
+    <div [@routeAnimations]="getRouteAnimationData(outlet)" style="position: relative; min-height: calc(100vh - 52px)">
       <router-outlet #outlet="outlet" />
     </div>
   </div>

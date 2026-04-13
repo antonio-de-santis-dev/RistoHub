@@ -1,41 +1,26 @@
 // ══════════════════════════════════════════════════════
 //  RistoHub — Loader Globale
-//  Struttura: forchetta | piatto (animato) | coltello
 // ══════════════════════════════════════════════════════
 
-// Prima che ngOnInit assegni position:fixed via JS, l'host è un block vuoto
-// senza dimensioni: non disturba il layout della pagina.
-// ngOnInit sovrascrive con: position:fixed; inset:0; z-index:2147483647;
-// pointer-events:none; display:block — vedi loader.component.ts.
+// display:contents → l'host è "trasparente" per il layout.
+// I figli partecipano al layout del genitore (body) come se l'host non esistesse.
+// Fondamentale: NON crea containing block → il figlio position:fixed
+// si ancora correttamente al viewport.
 :host {
-  display: block;
+  display: contents;
 }
 
+// z-index e position:fixed stanno QUI sull'overlay, non sull'host.
+// Dopo body.appendChild, il parent dell'host è <body> (nessun transform) →
+// position:fixed si ancora al viewport → copre l'intero schermo.
 .rh-loader-overlay {
-  // L'host è già position:fixed;inset:0 (impostato via JS in ngOnInit).
-  // Qui usiamo position:absolute;inset:0 → riempie l'host al 100%.
-  // z-index non serve: l'host gestisce già lo stacking context globale.
-  // pointer-events:auto → sovrascrive il pointer-events:none dell'host
-  // in modo che il clic sia bloccato durante il caricamento.
-  position: absolute;
+  position: fixed;
   inset: 0;
-  pointer-events: auto;
+  z-index: 2147483647;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  // FIX backdrop-filter:
-  // backdrop-filter: blur() non funziona se un antenato nella catena DOM
-  // ha un transform attivo (route animations, position:fixed con z-index, ecc.)
-  // perché ogni transform crea uno stacking context isolato che cattura il blur.
-  // Soluzione: sfondo semi-trasparente scuro senza blur — la pagina si vede
-  // attraverso l'overlay, il loader rimane leggibile su qualsiasi sfondo.
   background: rgba(6, 6, 6, 0.72);
-
-  // Nessun backdrop-filter — non funziona in modo affidabile su questa app
-  // a causa degli stacking context creati da route animations e dai :host
-  // position:fixed delle pagine landing/login/menu-public.
-
   animation: overlayIn 0.25s ease;
 }
 
