@@ -77,6 +77,7 @@ export class MenuViewComponent implements OnInit, OnDestroy {
   allergeniMap: Map<string, AllergeneDTO> = new Map();
   private allergeniByNome: Map<string, AllergeneDTO> = new Map();
   private prodottiMap: Map<string, ProdottoDTO> = new Map();
+  private _tuttiAllergeniMenu: AllergeneDTO[] = [];
 
   // ── Modifica prodotto ──
   prodottoInModifica: ProdottoDTO | null = null;
@@ -484,6 +485,7 @@ export class MenuViewComponent implements OnInit, OnDestroy {
       // ── 5. Piatti del giorno ─────────────────────────────────
       const piattiAttivi: PiattoDelGiornoDTO[] = dati.piattiDelGiorno ?? [];
       this.piattiDelGiorno = piattiAttivi.map(p => this.arricchisciPiatto(p));
+      this.calcolaTuttiAllergeni();
 
       // ── 6. Autoplay carosello ─────────────────────────────────
       if (this.menu?.templateStyle === 'MODERNO' && this.modernoImmagini.length > 0) this.avviaAutoplay();
@@ -592,6 +594,7 @@ export class MenuViewComponent implements OnInit, OnDestroy {
         prodotti: (portata.prodotti ?? []).map((p: ProdottoDTO) => (p.id === aggiornato.id ? { ...aggiornato } : p)),
       }));
       this.prodottiMap.set(String(aggiornato.id), aggiornato);
+      this.calcolaTuttiAllergeni();
       // Invalida le cache di traduzione perché il testo è cambiato
       this.cacheTraduzioni.clear();
       this.chiudiModifica();
@@ -626,6 +629,7 @@ export class MenuViewComponent implements OnInit, OnDestroy {
         prodotti: (portata.prodotti ?? []).filter((p: ProdottoDTO) => p.id !== idEliminato),
       }));
       this.prodottiMap.delete(String(idEliminato));
+      this.calcolaTuttiAllergeni();
       this.chiudiConfermaEliminazione();
     } catch (err) {
       console.error('Errore eliminazione prodotto:', err);
@@ -794,6 +798,10 @@ export class MenuViewComponent implements OnInit, OnDestroy {
   }
 
   get tuttiAllergeniMenu(): AllergeneDTO[] {
+    return this._tuttiAllergeniMenu;
+  }
+
+  private calcolaTuttiAllergeni(): void {
     const map = new Map<string, AllergeneDTO>();
     this.portate.forEach(portata => {
       (portata.prodotti ?? []).forEach((p: ProdottoDTO) => {
@@ -810,7 +818,7 @@ export class MenuViewComponent implements OnInit, OnDestroy {
         if (key) map.set(key, a);
       });
     });
-    return Array.from(map.values());
+    this._tuttiAllergeniMenu = Array.from(map.values()) as AllergeneDTO[];
   }
 
   nomePortata(p: PortataConProdottiDTO): string {
