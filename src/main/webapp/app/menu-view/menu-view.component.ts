@@ -434,8 +434,9 @@ export class MenuViewComponent implements OnInit, OnDestroy {
       // ── 1. Menu ───────────────────────────────────────────────
       this.menu = dati.menu ?? null;
 
-      if (this.menu?.fontMenu) {
-        const fontName = this.menu.fontMenu.replace(/ /g, '+');
+      const safeFontName = this.sanitizeFontName(this.menu?.fontMenu);
+      if (safeFontName) {
+        const fontName = safeFontName.replace(/ /g, '+');
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = `https://fonts.googleapis.com/css2?family=${fontName}:wght@400;700&display=swap`;
@@ -650,6 +651,12 @@ export class MenuViewComponent implements OnInit, OnDestroy {
   // ══════════════════════════════════════════════════
   //  METODI ESISTENTI
   // ══════════════════════════════════════════════════
+
+  private sanitizeFontName(font: string | undefined | null): string | null {
+    if (!font) return null;
+    const safe = font.replace(/[^a-zA-Z0-9 \-]/g, '').trim();
+    return safe.length > 0 && safe.length < 60 ? safe : null;
+  }
 
   private arricchisciPiatto(piatto: PiattoDelGiornoDTO): PiattoDelGiornoDTO {
     if (piatto.prodotto?.id) {
