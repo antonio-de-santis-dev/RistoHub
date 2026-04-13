@@ -233,6 +233,13 @@ export class MenuWizardEditComponent implements OnInit {
 
       await firstValueFrom(this.http.patch(`/api/menus/${this.menuId}`, menuPayload));
 
+      // 2. Upload logo se l'utente ne ha selezionato uno nuovo
+      if (this.logoFile) {
+        const formData = new FormData();
+        formData.append('file', this.logoFile);
+        await firstValueFrom(this.http.post(`/api/menus/${this.menuId}/logo/upload`, formData));
+      }
+
       // Ritorna al view a fine modifica
       this.router.navigate(['/menu-view', this.menuId]);
     } catch (err) {

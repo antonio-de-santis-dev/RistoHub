@@ -476,7 +476,6 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.4s ease;
-  background: white; /* sempre bianco per leggibilità */
   &.aperta {
     max-height: 2000px;
   }
@@ -485,13 +484,14 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 .prodotti-empty {
   padding: 16px 18px;
   font-size: 0.88rem;
-  color: #9ca3af;
+  color: inherit;
+  opacity: 0.6;
   font-style: italic;
 }
 
 .prodotto-card {
   padding: 14px 18px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   &:last-child {
     border-bottom: none;
   }
@@ -527,7 +527,8 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
 .prodotto-desc {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: inherit;
+  opacity: 0.7;
   margin: 5px 0 0;
   line-height: 1.4;
 }
@@ -572,15 +573,21 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
 .btn-add-prodotto {
   font-size: 0.78rem;
-  background: rgba(0, 0, 0, 0.06);
+  background: transparent;
   color: inherit;
+  border: 1px solid currentColor;
   border-radius: 6px;
   padding: 3px 10px;
   text-decoration: none;
   display: inline-block;
   margin: 8px 18px;
+  opacity: 0.85;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
   &:hover {
-    background: rgba(0, 0, 0, 0.12);
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.06);
   }
 }
 
@@ -1771,14 +1778,15 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .btn-delete {
+  --delete-color: #dc2626;
   display: inline-flex;
   align-items: center;
   gap: 5px;
   padding: 5px 11px;
-  border: 1.5px solid #dc2626;
+  border: 1.5px solid var(--delete-color);
   border-radius: 20px;
   background: transparent;
-  color: #dc2626;
+  color: var(--delete-color);
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.2px;
@@ -1795,9 +1803,9 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease;
   }
   &:hover {
-    background: #dc2626;
+    background: var(--delete-color);
     color: white;
-    box-shadow: 0 3px 10px rgba(220, 38, 38, 0.3);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
     transform: translateY(-1px);
     svg {
       transform: scale(1.15);

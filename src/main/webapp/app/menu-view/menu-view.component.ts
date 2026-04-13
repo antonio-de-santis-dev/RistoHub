@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -62,7 +62,7 @@ interface Lingua {
   styleUrls: ['./menu-view.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MenuViewComponent implements OnInit {
+export class MenuViewComponent implements OnInit, OnDestroy {
   menu: MenuDTO | null = null;
   portate: PortataConProdottiDTO[] = [];
   logoUrl: SafeUrl | null = null;
@@ -406,6 +406,11 @@ export class MenuViewComponent implements OnInit {
     this.caricaMenu(id);
   }
 
+  ngOnDestroy(): void {
+    this.fermaAutoplay();
+    this.fermaAutoplayRustico();
+  }
+
   tornaAiMieiMenu(): void {
     this.router.navigate(['/menu-list']);
   }
@@ -450,7 +455,7 @@ export class MenuViewComponent implements OnInit {
       this.allergeniByNome = new Map(tuttiAllergeni.map((a: AllergeneDTO) => [a.nome.toLowerCase().trim(), a]));
 
       // ── 3. Immagini (logo + carosello copertine) ─────────────
-      // Il backend restituisce ImmagineMenuMetaDTO (contentUrl, senza byte[])
+      // Il backend restituisce ImmagineMenuMetaDTO con contentUrl (senza byte[])
       const immagini: ImmagineMenuMetaDTO[] = (dati.immagini as unknown as ImmagineMenuMetaDTO[]) ?? [];
       const logo = immagini.find(i => i.tipo === 'LOGO');
       if (logo?.contentUrl) {
@@ -830,18 +835,15 @@ export class MenuViewComponent implements OnInit {
     return this.menu?.coloreSecondario ?? '#e8c832';
   }
 
-  /**
-   * Restituisce '#ffffff' o '#000000' in base alla luminosità del colore,
-   * garantendo sempre contrasto leggibile.
-   */
+  /** Restituisce '#ffffff' o '#000000' garantendo sempre contrasto leggibile. */
   getContrastColor(hex: string): string {
     const h = (hex ?? '#000000').replace('#', '');
     if (h.length < 6) return '#000000';
     const r = parseInt(h.substring(0, 2), 16);
     const g = parseInt(h.substring(2, 4), 16);
     const b = parseInt(h.substring(4, 6), 16);
-    const luminanza = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return luminanza > 0.5 ? '#000000' : '#ffffff';
+    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return lum > 0.5 ? '#000000' : '#ffffff';
   }
 
   get fontTesto(): string {

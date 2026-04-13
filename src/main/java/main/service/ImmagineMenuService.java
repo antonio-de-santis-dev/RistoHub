@@ -92,6 +92,35 @@ public class ImmagineMenuService {
     }
 
     /**
+     * Upload o sostituzione del logo del menu.
+     * Se esiste già un logo per questo menu, viene sostituito (delete + insert).
+     * Tipo impostato automaticamente a LOGO.
+     */
+    public ImmagineMenuDTO uploadLogo(UUID menuId, MultipartFile file) throws Exception {
+        LOG.debug("Request to upload logo for Menu : {}", menuId);
+
+        Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new IllegalArgumentException("Menu non trovato: " + menuId));
+
+        // Elimina il logo esistente se presente
+        immagineMenuRepository
+            .findByMenuIdOrderByOrdine(menuId)
+            .stream()
+            .filter(i -> TipoImmagine.LOGO.equals(i.getTipo()))
+            .forEach(immagineMenuRepository::delete);
+
+        ImmagineMenu img = new ImmagineMenu();
+        img.setMenu(menu);
+        img.setNome(file.getOriginalFilename());
+        img.setImmagine(file.getBytes());
+        img.setImmagineContentType(file.getContentType());
+        img.setOrdine(0);
+        img.setVisibile(true);
+        img.setTipo(TipoImmagine.LOGO);
+        img = immagineMenuRepository.save(img);
+        return immagineMenuMapper.toDto(img);
+    }
+
+    /**
      * Upload una nuova immagine di copertina come BLOB nel DB.
      * Tipo impostato automaticamente a COPERTINA.
      */

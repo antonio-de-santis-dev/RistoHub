@@ -124,7 +124,7 @@ public class MenuService {
      * Verifica che il menu con l'id dato appartenga all'utente corrente.
      * Lancia BadRequestAlertException se il menu non esiste o appartiene ad un altro utente.
      */
-    void checkOwnership(UUID id) {
+    public void checkOwnership(UUID id) {
         String currentLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new BadRequestAlertException("Utente non autenticato", "menu", "unauthenticated"));
         Menu menu = menuRepository.findById(id).orElseThrow(() -> new BadRequestAlertException("Menu non trovato", "menu", "idnotfound"));

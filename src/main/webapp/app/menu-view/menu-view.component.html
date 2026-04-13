@@ -79,7 +79,7 @@
 
 <div *ngIf="prodottoInEliminazione" class="modal-overlay" (click)="chiudiConfermaEliminazione()">
   <div class="modal-box modal-box-small" (click)="$event.stopPropagation()">
-    <div class="modal-header modal-header-danger">
+    <div class="modal-header" [style.backgroundColor]="colorePrimario">
       <h3 class="modal-titolo">🗑️ Elimina prodotto</h3>
       <button class="modal-close" (click)="chiudiConfermaEliminazione()">✕</button>
     </div>
@@ -121,7 +121,7 @@
       <button
         class="lingua-btn-attuale"
         [style.borderColor]="colorePrimario"
-        [style.color]="'#1a1a1a'"
+        [style.color]="getContrastColor(coloreSecondario)"
         (click)="mostraDropdownLingua = !mostraDropdownLingua"
         [attr.aria-label]="'Lingua: ' + linguaAttuale.nome"
       >
@@ -159,10 +159,12 @@
         <h2 class="portata-nome" [style.color]="getContrastColor(colorePrimario)">{{ getUI('PIATTI_GIORNO') }}</h2>
         <span class="portata-arrow" [class.open]="piattiGiornoAperti" [style.color]="getContrastColor(colorePrimario)">›</span>
       </div>
-      <div class="prodotti-list" [class.aperta]="piattiGiornoAperti">
+      <div class="prodotti-list" [class.aperta]="piattiGiornoAperti" [style.backgroundColor]="coloreSecondario">
         <div *ngFor="let piatto of piattiDelGiorno" class="prodotto-card prodotto-speciale" [style.borderLeftColor]="colorePrimario">
           <div class="prodotto-top">
-            <h4 class="prodotto-nome" [style.color]="'#1a1a1a'">{{ getT(piatto.prodotto?.nome ?? piatto.nome) }}</h4>
+            <h4 class="prodotto-nome" [style.color]="getContrastColor(coloreSecondario)">
+              {{ getT(piatto.prodotto?.nome ?? piatto.nome) }}
+            </h4>
             <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}</h4>
           </div>
           <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="prodotto-desc">
@@ -198,13 +200,13 @@
         <h2 class="portata-nome" [style.color]="getContrastColor(colorePrimario)">{{ nomePortata(portata) | uppercase }}</h2>
         <span class="portata-arrow" [class.open]="portata.aperta" [style.color]="getContrastColor(colorePrimario)">›</span>
       </div>
-      <div class="prodotti-list" [class.aperta]="portata.aperta">
+      <div class="prodotti-list" [class.aperta]="portata.aperta" [style.backgroundColor]="coloreSecondario">
         <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="prodotti-empty">
           <span>{{ getUI('NESSUN_PIATTO') }}</span>
         </div>
         <div *ngFor="let prodotto of portata.prodotti" class="prodotto-card">
           <div class="prodotto-top">
-            <h4 class="prodotto-nome" [style.color]="'#1a1a1a'">{{ getT(prodotto.nome) }}</h4>
+            <h4 class="prodotto-nome" [style.color]="getContrastColor(coloreSecondario)">{{ getT(prodotto.nome) }}</h4>
             <div class="prodotto-azioni">
               <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</h4>
               <button class="btn-edit" [style.--edit-color]="colorePrimario" (click)="apriModifica(prodotto)" title="Modifica">
@@ -223,7 +225,12 @@
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg
                 ><span class="btn-label">Modifica</span>
               </button>
-              <button class="btn-delete" (click)="apriConfermaEliminazione(prodotto)" title="Elimina">
+              <button
+                class="btn-delete"
+                [style.--delete-color]="colorePrimario"
+                (click)="apriConfermaEliminazione(prodotto)"
+                title="Elimina"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="13"
@@ -264,7 +271,13 @@
             </ng-container>
           </div>
         </div>
-        <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">{{ getUI('AGGIUNGI_PIATTO') }}</a>
+        <a
+          [routerLink]="['/prodotto-add', portata.id]"
+          class="btn-add-prodotto"
+          [style.color]="colorePrimario"
+          [style.borderColor]="colorePrimario"
+          >{{ getUI('AGGIUNGI_PIATTO') }}</a
+        >
       </div>
     </section>
 
@@ -397,7 +410,7 @@
       <button
         class="lingua-btn-attuale"
         [style.borderColor]="colorePrimario"
-        [style.color]="'#1a1a1a'"
+        [style.color]="getContrastColor(coloreSecondario)"
         (click)="mostraDropdownLingua = !mostraDropdownLingua"
       >
         <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(linguaAttuale.svgBandiera)"></span>
@@ -524,7 +537,7 @@
         <div *ngFor="let piatto of piattiDelGiorno" class="moderno-prodotto-item moderno-speciale" [style.borderLeftColor]="colorePrimario">
           <div class="moderno-prodotto-row">
             <span class="moderno-bullet" [style.background]="colorePrimario"></span>
-            <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto" [style.color]="'#1a1a1a'">{{
+            <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto" [style.color]="getContrastColor(coloreSecondario)">{{
               getT(piatto.prodotto?.nome ?? piatto.nome)
             }}</span>
             <span class="moderno-dots-leader"></span>
@@ -566,7 +579,9 @@
         <div *ngFor="let prodotto of portata.prodotti" class="moderno-prodotto-item">
           <div class="moderno-prodotto-row">
             <span class="moderno-bullet" [style.background]="colorePrimario"></span>
-            <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto" [style.color]="'#1a1a1a'">{{ getT(prodotto.nome) }}</span>
+            <span class="moderno-prodotto-nome" [style.fontFamily]="fontTesto" [style.color]="getContrastColor(coloreSecondario)">{{
+              getT(prodotto.nome)
+            }}</span>
             <span class="moderno-dots-leader"></span>
             <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
             <div class="prodotto-azioni prodotto-azioni-row">
@@ -591,7 +606,12 @@
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
               </button>
-              <button class="btn-delete btn-delete-compact" (click)="apriConfermaEliminazione(prodotto)" title="Elimina">
+              <button
+                class="btn-delete btn-delete-compact"
+                [style.--delete-color]="colorePrimario"
+                (click)="apriConfermaEliminazione(prodotto)"
+                title="Elimina"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="13"
@@ -628,7 +648,13 @@
             </ng-container>
           </div>
         </div>
-        <a [routerLink]="['/prodotto-add', portata.id]" class="btn-add-prodotto">{{ getUI('AGGIUNGI_PIATTO') }}</a>
+        <a
+          [routerLink]="['/prodotto-add', portata.id]"
+          class="btn-add-prodotto"
+          [style.color]="colorePrimario"
+          [style.borderColor]="colorePrimario"
+          >{{ getUI('AGGIUNGI_PIATTO') }}</a
+        >
       </div>
     </div>
 
@@ -768,7 +794,7 @@
         <button
           class="lingua-btn-attuale lingua-btn-rustico"
           [style.borderColor]="colorePrimario"
-          [style.color]="'#1a1a1a'"
+          [style.color]="getContrastColor(coloreSecondario)"
           (click)="mostraDropdownLingua = !mostraDropdownLingua"
         >
           <span class="lingua-bandiera-svg lingua-bandiera-svg-sm" [innerHTML]="getSafeSvg(linguaAttuale.svgBandiera)"></span>
@@ -900,7 +926,7 @@
             >
               <div class="rustico-prodotto-row">
                 <span class="rustico-bullet" [style.background]="colorePrimario"></span>
-                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto" [style.color]="'#1a1a1a'">{{
+                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto" [style.color]="getContrastColor(coloreSecondario)">{{
                   getT(piatto.prodotto?.nome ?? piatto.nome)
                 }}</span>
                 <span class="rustico-leader"></span>
@@ -943,7 +969,7 @@
             <div *ngFor="let prodotto of rusticoPortataAttiva.prodotti" class="rustico-prodotto-item">
               <div class="rustico-prodotto-row">
                 <span class="rustico-bullet" [style.background]="colorePrimario"></span>
-                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto" [style.color]="'#1a1a1a'">{{
+                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto" [style.color]="getContrastColor(coloreSecondario)">{{
                   getT(prodotto.nome)
                 }}</span>
                 <span class="rustico-leader"></span>
@@ -970,7 +996,12 @@
                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                     </svg>
                   </button>
-                  <button class="btn-delete btn-delete-compact" (click)="apriConfermaEliminazione(prodotto)" title="Elimina">
+                  <button
+                    class="btn-delete btn-delete-compact"
+                    [style.--delete-color]="colorePrimario"
+                    (click)="apriConfermaEliminazione(prodotto)"
+                    title="Elimina"
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="13"
@@ -1007,7 +1038,13 @@
                 </ng-container>
               </div>
             </div>
-            <a [routerLink]="['/prodotto-add', rusticoPortataAttiva.id]" class="btn-add-prodotto">{{ getUI('AGGIUNGI_PIATTO') }}</a>
+            <a
+              [routerLink]="['/prodotto-add', rusticoPortataAttiva.id]"
+              class="btn-add-prodotto"
+              [style.color]="colorePrimario"
+              [style.borderColor]="colorePrimario"
+              >{{ getUI('AGGIUNGI_PIATTO') }}</a
+            >
           </div>
         </ng-container>
 

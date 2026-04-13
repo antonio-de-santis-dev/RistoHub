@@ -175,6 +175,22 @@ public class MenuResource {
     }
 
     /**
+     * POST /api/menus/{id}/logo/upload  (multipart/form-data)
+     * Carica o sostituisce il logo del menu.
+     */
+    @PostMapping(value = "/{id}/logo/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ImmagineMenuDTO> uploadLogo(@PathVariable("id") UUID menuId, @RequestParam("file") MultipartFile file) {
+        LOG.debug("REST request to upload logo for Menu : {}", menuId);
+        try {
+            ImmagineMenuDTO result = immagineMenuService.uploadLogo(menuId, file);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            LOG.error("Errore upload logo", e);
+            throw new BadRequestAlertException("Errore durante l'upload del logo", "immagineMenu", "uploaderror");
+        }
+    }
+
+    /**
      * POST /api/menus/{id}/immagini-copertina/upload  (multipart/form-data)
      * Carica una nuova immagine di copertina come BLOB nel DB.
      * Parametri form: file (MultipartFile)
@@ -186,11 +202,20 @@ public class MenuResource {
         @RequestParam("file") MultipartFile file
     ) {
         LOG.debug("REST request to upload copertina for Menu : {}", menuId);
+        menuService.checkOwnership(menuId);
         if (file.isEmpty()) {
             throw new BadRequestAlertException("Il file è vuoto", "immagineMenu", "fileempty");
         }
         if (!menuRepository.existsById(menuId)) {
             throw new BadRequestAlertException("Menu non trovato", ENTITY_NAME, "idnotfound");
+        }
+        String ct = file.getContentType();
+        if (ct == null || !ct.startsWith("image/")) {
+            throw new BadRequestAlertException("Solo file immagine sono accettati", "immagineMenu", "invalidtype");
+        }
+        long MAX_BYTES = 5L * 1024 * 1024; // 5 MB
+        if (file.getSize() > MAX_BYTES) {
+            throw new BadRequestAlertException("Immagine troppo grande (max 5 MB)", "immagineMenu", "toolarge");
         }
         try {
             ImmagineMenuDTO result = immagineMenuService.uploadCopertina(menuId, file);
@@ -218,6 +243,7 @@ public class MenuResource {
         @RequestBody List<ImmagineMenuDTO> updates
     ) {
         LOG.debug("REST request to update immagini copertina for Menu : {}", menuId);
+        menuService.checkOwnership(menuId);
         if (!menuRepository.existsById(menuId)) {
             throw new BadRequestAlertException("Menu non trovato", ENTITY_NAME, "idnotfound");
         }
@@ -236,11 +262,12 @@ public class MenuResource {
     @DeleteMapping("/{menuId}/immagini-copertina/{immagineId}")
     public ResponseEntity<Void> deleteImmagineCopertina(@PathVariable("menuId") UUID menuId, @PathVariable("immagineId") UUID immagineId) {
         LOG.debug("REST request to delete immagine copertina {} for Menu : {}", immagineId, menuId);
+        menuService.checkOwnership(menuId);
         immagineMenuService.delete(immagineId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/menus/{id}/full")
+    @GetMapping("/{id}/full")
     public ResponseEntity<MenuCompletoDTO> getMenuCompleto(@PathVariable("id") UUID id) {
         LOG.debug("PUBLIC request to get MenuCompleto (aggregato) : {}", id);
         return menuCompletoService.findMenuCompleto(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
