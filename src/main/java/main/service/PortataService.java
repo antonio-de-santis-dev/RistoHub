@@ -3,8 +3,10 @@ package main.service;
 import java.util.*;
 import main.domain.Portata;
 import main.repository.PortataRepository;
+import main.security.SecurityUtils;
 import main.service.dto.PortataDTO;
 import main.service.mapper.PortataMapper;
+import main.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,7 @@ public class PortataService {
 
     public PortataDTO update(PortataDTO portataDTO) {
         LOG.debug("Request to update Portata : {}", portataDTO);
+        checkPortataOwnership(portataDTO.getId());
         return persistPortata(portataDTO);
     }
 
@@ -107,7 +110,23 @@ public class PortataService {
      */
     public void delete(UUID id) {
         LOG.debug("Request to delete Portata : {}", id);
+        checkPortataOwnership(id);
         portataRepository.deleteById(id);
+    }
+
+    private void checkPortataOwnership(UUID portataId) {
+        String currentLogin = SecurityUtils.getCurrentUserLogin()
+            .orElseThrow(() -> new BadRequestAlertException("Utente non autenticato", "portata", "unauthenticated"));
+        Portata portata = portataRepository
+            .findById(portataId)
+            .orElseThrow(() -> new BadRequestAlertException("Portata non trovata", "portata", "idnotfound"));
+        if (
+            portata.getMenu() == null ||
+            portata.getMenu().getRistoratore() == null ||
+            !portata.getMenu().getRistoratore().getLogin().equals(currentLogin)
+        ) {
+            throw new BadRequestAlertException("Accesso negato", "portata", "forbidden");
+        }
     }
 
     public List<PortataDTO> findByMenuId(UUID menuId) {
