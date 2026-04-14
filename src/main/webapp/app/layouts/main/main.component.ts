@@ -23,7 +23,6 @@ const ROUTES_WITH_FOOTER = [
   '/entities',
   '/menu-wizard',
   '/menu-list',
-  '/menu-view',
   '/menu-wizard-edit',
   '/menu-cover-editor',
   '/prodotto-add',

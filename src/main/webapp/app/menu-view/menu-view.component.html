@@ -108,7 +108,7 @@
   [style.fontFamily]="fontTesto"
   [style.backgroundColor]="coloreSecondario"
 >
-  <div class="menu-header" [style.backgroundColor]="coloreSecondario" [style.borderBottomColor]="colorePrimario">
+  <div class="menu-header" [style.backgroundColor]="colorePrimario">
     <button class="btn-back-home" [style.color]="getContrastColor(coloreSecondario)" (click)="tornaAiMieiMenu()">← I Miei Menu</button>
     <div class="header-content">
       <div *ngIf="logoUrl" class="logo-wrap">
@@ -161,23 +161,29 @@
     </div>
 
     <section *ngIf="piattiDelGiorno.length > 0" class="portata-section">
-      <div class="portata-header" [style.backgroundColor]="colorePrimario" (click)="togglePiattiGiorno()">
-        <h2 class="portata-nome" [style.color]="getContrastColor(colorePrimario)">{{ getUI('PIATTI_GIORNO') }}</h2>
-        <span class="portata-arrow" [class.open]="piattiGiornoAperti" [style.color]="getContrastColor(colorePrimario)">›</span>
+      <div class="portata-header" [style.backgroundColor]="coloreSecondario" (click)="togglePiattiGiorno()">
+        <h2 class="portata-nome" [style.color]="colorePrimario">{{ getUI('PIATTI_GIORNO') }}</h2>
+        <span class="portata-arrow" [class.open]="piattiGiornoAperti" [style.color]="colorePrimario">›</span>
       </div>
-      <div class="prodotti-list" [class.aperta]="piattiGiornoAperti" [style.backgroundColor]="coloreSecondario">
-        <div *ngFor="let piatto of piattiDelGiorno" class="prodotto-card prodotto-speciale" [style.borderLeftColor]="colorePrimario">
+      <div class="prodotti-list" [class.aperta]="piattiGiornoAperti">
+        <div
+          *ngFor="let piatto of piattiDelGiorno; let i = index"
+          class="prodotto-card"
+          [style.backgroundColor]="i % 2 === 0 ? coloreSecondario : colorePrimario"
+        >
           <div class="prodotto-top">
-            <h4 class="prodotto-nome" [style.color]="getContrastColor(coloreSecondario)">
+            <h4 class="prodotto-nome" [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario">
               {{ getT(piatto.prodotto?.nome ?? piatto.nome) }}
             </h4>
-            <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}</h4>
+            <h4 class="prodotto-prezzo" [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario">
+              {{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}
+            </h4>
           </div>
           <p
             *ngIf="piatto.prodotto?.descrizione || piatto.descrizione"
             class="prodotto-desc"
-            [style.color]="getContrastColor(coloreSecondario)"
-            [style.opacity]="'0.75'"
+            [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario"
+            [style.opacity]="'0.85'"
           >
             {{ getT(piatto.prodotto?.descrizione ?? piatto.descrizione) }}
           </p>
@@ -207,20 +213,31 @@
     </section>
 
     <section *ngFor="let portata of portate" class="portata-section">
-      <div class="portata-header" [style.backgroundColor]="colorePrimario" (click)="togglePortata(portata)">
-        <h2 class="portata-nome" [style.color]="getContrastColor(colorePrimario)">{{ nomePortata(portata) | uppercase }}</h2>
-        <span class="portata-arrow" [class.open]="portata.aperta" [style.color]="getContrastColor(colorePrimario)">›</span>
+      <div class="portata-header" [style.backgroundColor]="coloreSecondario" (click)="togglePortata(portata)">
+        <h2 class="portata-nome" [style.color]="colorePrimario">{{ nomePortata(portata) | uppercase }}</h2>
+        <span class="portata-arrow" [class.open]="portata.aperta" [style.color]="colorePrimario">›</span>
       </div>
-      <div class="prodotti-list" [class.aperta]="portata.aperta" [style.backgroundColor]="coloreSecondario">
+      <div class="prodotti-list" [class.aperta]="portata.aperta">
         <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="prodotti-empty">
           <span>{{ getUI('NESSUN_PIATTO') }}</span>
         </div>
-        <div *ngFor="let prodotto of portata.prodotti" class="prodotto-card">
+        <div
+          *ngFor="let prodotto of portata.prodotti; let i = index"
+          class="prodotto-card"
+          [style.backgroundColor]="i % 2 === 0 ? coloreSecondario : colorePrimario"
+        >
           <div class="prodotto-top">
-            <h4 class="prodotto-nome" [style.color]="getContrastColor(coloreSecondario)">{{ getT(prodotto.nome) }}</h4>
+            <h4 class="prodotto-nome" [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario">{{ getT(prodotto.nome) }}</h4>
             <div class="prodotto-azioni">
-              <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</h4>
-              <button class="btn-edit" [style.--edit-color]="colorePrimario" (click)="apriModifica(prodotto)" title="Modifica">
+              <h4 class="prodotto-prezzo" [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario">
+                {{ formatPrezzo(prodotto.prezzo) }}
+              </h4>
+              <button
+                class="btn-edit"
+                [style.--edit-color]="i % 2 === 0 ? colorePrimario : coloreSecondario"
+                (click)="apriModifica(prodotto)"
+                title="Modifica"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="13"
@@ -238,7 +255,7 @@
               </button>
               <button
                 class="btn-delete"
-                [style.--delete-color]="colorePrimario"
+                [style.--delete-color]="i % 2 === 0 ? colorePrimario : coloreSecondario"
                 (click)="apriConfermaEliminazione(prodotto)"
                 title="Elimina"
               >
@@ -262,7 +279,12 @@
               </button>
             </div>
           </div>
-          <p *ngIf="prodotto.descrizione" class="prodotto-desc" [style.color]="getContrastColor(coloreSecondario)" [style.opacity]="'0.75'">
+          <p
+            *ngIf="prodotto.descrizione"
+            class="prodotto-desc"
+            [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario"
+            [style.opacity]="'0.85'"
+          >
             {{ getT(prodotto.descrizione) }}
           </p>
           <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
@@ -294,12 +316,7 @@
       </div>
     </section>
 
-    <div
-      class="sezione-allergeni-footer"
-      *ngIf="tuttiAllergeniMenu.length > 0"
-      [style.borderTopColor]="colorePrimario + '44'"
-      [style.backgroundColor]="coloreSecondario + '22'"
-    >
+    <div class="sezione-allergeni-footer" *ngIf="tuttiAllergeniMenu.length > 0" [style.borderTopColor]="colorePrimario + '44'">
       <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">{{ getUI('ALLERGENI_TITOLO') }}</h3>
       <div class="allergeni-footer-lista">
         <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
@@ -313,10 +330,10 @@
             />
             <span *ngIf="!getAllergeneIcona(a)" class="allergene-footer-iniziale">{{ a.nome.charAt(0) }}</span>
           </div>
-          <span class="allergene-footer-nome">{{ a.nome }}</span>
+          <span class="allergene-footer-nome" [style.color]="colorePrimario">{{ a.nome }}</span>
         </div>
       </div>
-      <p class="allergeni-footer-nota">{{ getUI('ALLERGENI_NOTA') }}</p>
+      <p class="allergeni-footer-nota" [style.color]="colorePrimario" [style.opacity]="'0.7'">{{ getUI('ALLERGENI_NOTA') }}</p>
     </div>
 
     <!-- ── CONTATTI (classico) ────────────────────────────────── -->
@@ -326,7 +343,7 @@
       [style.backgroundColor]="colorePrimario"
       [style.color]="getContrastColor(colorePrimario)"
     >
-      <div class="contatti-card-title">
+      <div class="contatti-card-title" [style.color]="getContrastColor(colorePrimario)">
         <svg
           width="18"
           height="18"
@@ -352,26 +369,29 @@
             [attr.rel]="item.tipo === 'SOCIAL' ? 'noopener noreferrer' : null"
             class="contatto-item"
             [class.no-link]="!getContattoLink(item)"
+            [style.color]="getContrastColor(colorePrimario)"
+            [style.backgroundColor]="coloreSecondario + '26'"
           >
             <span
               class="contatto-icona"
               *ngIf="item.tipo === 'SOCIAL' && item.reteSociale !== 'ALTRO' && getSocialIconSvg(item.reteSociale)"
               [innerHTML]="getSafeSocialSvg(item.reteSociale)"
+              [style.color]="getContrastColor(colorePrimario)"
             ></span>
-            <span class="contatto-icona" *ngIf="item.tipo === 'TELEFONO'">
+            <span class="contatto-icona" *ngIf="item.tipo === 'TELEFONO'" [style.color]="getContrastColor(colorePrimario)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
                   d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
                 />
               </svg>
             </span>
-            <span class="contatto-icona" *ngIf="item.tipo === 'EMAIL'">
+            <span class="contatto-icona" *ngIf="item.tipo === 'EMAIL'" [style.color]="getContrastColor(colorePrimario)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                 <polyline points="22,6 12,13 2,6" />
               </svg>
             </span>
-            <span class="contatto-icona" *ngIf="item.tipo === 'INDIRIZZO'">
+            <span class="contatto-icona" *ngIf="item.tipo === 'INDIRIZZO'" [style.color]="getContrastColor(colorePrimario)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
                 <circle cx="12" cy="10" r="3" />
@@ -380,6 +400,7 @@
             <span
               class="contatto-icona"
               *ngIf="item.tipo === 'SOCIAL' && (item.reteSociale === 'ALTRO' || !getSocialIconSvg(item.reteSociale))"
+              [style.color]="getContrastColor(colorePrimario)"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="18" cy="5" r="3" />
@@ -398,7 +419,7 @@
       </div>
     </div>
 
-    <div class="menu-note" [style.borderLeftColor]="colorePrimario">{{ getUI('MENU_NOTE') }}</div>
+    <!-- RIMOSSO: menu-note non previsto nel template classico -->
   </main>
 </div>
 

@@ -625,6 +625,16 @@ export class MenuViewComponent implements OnInit, OnDestroy {
     return this.menu?.coloreSecondario ?? '#e8c832';
   }
 
+  /** Sfondo card prodotto alternato: pari = primario, dispari = secondario. */
+  getCardBg(index: number): string {
+    return index % 2 === 0 ? this.colorePrimario : this.coloreSecondario;
+  }
+
+  /** Testo card prodotto: opposto rispetto allo sfondo. */
+  getCardText(index: number): string {
+    return index % 2 === 0 ? this.coloreSecondario : this.colorePrimario;
+  }
+
   /** Restituisce '#ffffff' o '#000000' garantendo sempre contrasto leggibile. */
   getContrastColor(hex: string): string {
     const h = (hex ?? '#000000').replace('#', '');
