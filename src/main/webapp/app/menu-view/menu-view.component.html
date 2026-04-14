@@ -151,7 +151,13 @@
   <main class="menu-main">
     <div *ngIf="portate.length === 0" class="empty-state">
       <p>Nessuna portata ancora aggiunta.</p>
-      <a routerLink="/portata/new" class="btn-aggiungi" [style.backgroundColor]="colorePrimario">+ Aggiungi portate</a>
+      <a
+        routerLink="/portata/new"
+        class="btn-aggiungi"
+        [style.backgroundColor]="colorePrimario"
+        [style.color]="getContrastColor(colorePrimario)"
+        >+ Aggiungi portate</a
+      >
     </div>
 
     <section *ngIf="piattiDelGiorno.length > 0" class="portata-section">
@@ -167,7 +173,12 @@
             </h4>
             <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}</h4>
           </div>
-          <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="prodotto-desc">
+          <p
+            *ngIf="piatto.prodotto?.descrizione || piatto.descrizione"
+            class="prodotto-desc"
+            [style.color]="getContrastColor(coloreSecondario)"
+            [style.opacity]="'0.75'"
+          >
             {{ getT(piatto.prodotto?.descrizione ?? piatto.descrizione) }}
           </p>
           <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
@@ -251,7 +262,9 @@
               </button>
             </div>
           </div>
-          <p *ngIf="prodotto.descrizione" class="prodotto-desc">{{ getT(prodotto.descrizione) }}</p>
+          <p *ngIf="prodotto.descrizione" class="prodotto-desc" [style.color]="getContrastColor(coloreSecondario)" [style.opacity]="'0.75'">
+            {{ getT(prodotto.descrizione) }}
+          </p>
           <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
             <ng-container *ngFor="let a of prodotto.allergenis">
               <img
@@ -281,7 +294,12 @@
       </div>
     </section>
 
-    <div class="sezione-allergeni-footer" *ngIf="tuttiAllergeniMenu.length > 0" [style.borderTopColor]="colorePrimario + '44'">
+    <div
+      class="sezione-allergeni-footer"
+      *ngIf="tuttiAllergeniMenu.length > 0"
+      [style.borderTopColor]="colorePrimario + '44'"
+      [style.backgroundColor]="coloreSecondario + '22'"
+    >
       <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">{{ getUI('ALLERGENI_TITOLO') }}</h3>
       <div class="allergeni-footer-lista">
         <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
@@ -545,7 +563,12 @@
               formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
             }}</span>
           </div>
-          <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="moderno-prodotto-desc">
+          <p
+            *ngIf="piatto.prodotto?.descrizione || piatto.descrizione"
+            class="moderno-prodotto-desc"
+            [style.color]="getContrastColor(coloreSecondario)"
+            [style.opacity]="'0.75'"
+          >
             {{ getT(piatto.prodotto?.descrizione ?? piatto.descrizione) }}
           </p>
           <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
@@ -632,7 +655,14 @@
               </button>
             </div>
           </div>
-          <p *ngIf="prodotto.descrizione" class="moderno-prodotto-desc">{{ getT(prodotto.descrizione) }}</p>
+          <p
+            *ngIf="prodotto.descrizione"
+            class="moderno-prodotto-desc"
+            [style.color]="getContrastColor(coloreSecondario)"
+            [style.opacity]="'0.75'"
+          >
+            {{ getT(prodotto.descrizione) }}
+          </p>
           <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
             <ng-container *ngFor="let a of prodotto.allergenis">
               <img
@@ -658,7 +688,12 @@
       </div>
     </div>
 
-    <div class="sezione-allergeni-footer" *ngIf="tuttiAllergeniMenu.length > 0" [style.borderTopColor]="colorePrimario + '44'">
+    <div
+      class="sezione-allergeni-footer"
+      *ngIf="tuttiAllergeniMenu.length > 0"
+      [style.borderTopColor]="colorePrimario + '44'"
+      [style.backgroundColor]="coloreSecondario + '22'"
+    >
       <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">{{ getUI('ALLERGENI_TITOLO') }}</h3>
       <div class="allergeni-footer-lista">
         <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
@@ -934,7 +969,12 @@
                   formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
                 }}</span>
               </div>
-              <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="rustico-prodotto-desc">
+              <p
+                *ngIf="piatto.prodotto?.descrizione || piatto.descrizione"
+                class="rustico-prodotto-desc"
+                [style.color]="getContrastColor(coloreSecondario)"
+                [style.opacity]="'0.75'"
+              >
                 {{ getT(piatto.prodotto?.descrizione ?? piatto.descrizione) }}
               </p>
               <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
@@ -1022,7 +1062,14 @@
                   </button>
                 </div>
               </div>
-              <p *ngIf="prodotto.descrizione" class="rustico-prodotto-desc">{{ getT(prodotto.descrizione) }}</p>
+              <p
+                *ngIf="prodotto.descrizione"
+                class="rustico-prodotto-desc"
+                [style.color]="getContrastColor(coloreSecondario)"
+                [style.opacity]="'0.75'"
+              >
+                {{ getT(prodotto.descrizione) }}
+              </p>
               <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
                 <ng-container *ngFor="let a of prodotto.allergenis">
                   <img
