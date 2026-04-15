@@ -19,153 +19,159 @@
 <!-- ══════════════════════════════════════════════════ -->
 <div
   *ngIf="!isLoading && !errore && menu && !isModerno && !isRustico"
-  class="menu-page"
+  class="cl-page"
   [style.fontFamily]="fontTesto"
-  [style.backgroundColor]="coloreSecondario + '22'"
+  [style.backgroundColor]="coloreSecondario"
 >
-  <div class="menu-header" [style.backgroundColor]="coloreSecondario" [style.borderBottomColor]="colorePrimario">
-    <!-- Nessun bottone "Torna ai miei menu" per utenti non registrati -->
-    <div class="header-content">
-      <div *ngIf="logoUrl" class="logo-wrap">
-        <img [src]="logoUrl" class="logo-img" alt="Logo" />
-      </div>
-      <div *ngIf="!logoUrl" class="logo-placeholder" [style.color]="colorePrimario">{{ menu.nome }}</div>
+  <!-- HEADER -->
+  <div class="cl-header" [style.backgroundColor]="colorePrimario">
+    <div class="cl-header-logo">
+      <img *ngIf="logoUrl" [src]="logoUrl" class="cl-logo-img" alt="Logo" />
+      <span *ngIf="!logoUrl" class="cl-logo-text" [style.color]="coloreSecondario">{{ menu.nome }}</span>
     </div>
-    <!-- SELETTORE LINGUA -->
-    <div class="lingua-selettore" (click)="$event.stopPropagation()">
+    <!-- SELETTORE LINGUA — pill bianca, solo questo componente resta bianco -->
+    <div class="cl-lingua-wrap" (click)="$event.stopPropagation()">
       <button
-        class="lingua-btn-attuale"
-        [style.borderColor]="colorePrimario"
-        [style.color]="colorePrimario"
+        class="cl-lingua-btn"
         (click)="mostraDropdownLingua = !mostraDropdownLingua"
         [attr.aria-label]="'Lingua: ' + linguaAttuale.nome"
       >
-        <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(linguaAttuale.svgBandiera)"></span>
-        <span class="lingua-codice-btn">{{ linguaAttuale.codice | uppercase }}</span>
-        <span class="lingua-chevron" [class.aperto]="mostraDropdownLingua">▾</span>
+        <span class="cl-lingua-flag" [innerHTML]="getSafeSvg(linguaAttuale.svgBandiera)"></span>
+        <span class="cl-lingua-codice">{{ linguaAttuale.codice | uppercase }}</span>
+        <span class="cl-lingua-chevron" [class.aperto]="mostraDropdownLingua">▾</span>
       </button>
-      <div class="lingua-dropdown" *ngIf="mostraDropdownLingua">
-        <div class="lingua-dropdown-header">Lingua</div>
-        <div class="lingua-griglia">
+      <div class="cl-lingua-dropdown" *ngIf="mostraDropdownLingua">
+        <div class="cl-lingua-dropdown-header">Lingua</div>
+        <div class="cl-lingua-griglia">
           <button
             *ngFor="let l of LINGUE"
-            class="lingua-opzione"
+            class="cl-lingua-opzione"
             [class.attiva]="l.codice === linguaCorrente"
             [style.borderColor]="l.codice === linguaCorrente ? colorePrimario : 'transparent'"
             (click)="cambiaLingua(l.codice)"
           >
-            <span class="lingua-bandiera-svg" [innerHTML]="getSafeSvg(l.svgBandiera)"></span>
-            <span class="lingua-nome-corto" [style.color]="l.codice === linguaCorrente ? colorePrimario : ''">{{ l.nome }}</span>
-            <span *ngIf="l.codice === linguaCorrente" class="lingua-check-icon" [style.color]="colorePrimario">✓</span>
+            <span class="cl-lingua-flag" [innerHTML]="getSafeSvg(l.svgBandiera)"></span>
+            <span class="cl-lingua-nome" [style.color]="l.codice === linguaCorrente ? colorePrimario : ''">{{ l.nome }}</span>
+            <span *ngIf="l.codice === linguaCorrente" class="cl-lingua-check" [style.color]="colorePrimario">✓</span>
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <main class="menu-main">
+  <!-- BODY -->
+  <div class="cl-body">
     <!-- Piatti del giorno -->
-    <section *ngIf="piattiDelGiorno.length > 0" class="portata-section">
-      <div class="portata-header" [style.backgroundColor]="colorePrimario" (click)="togglePiattiGiorno()">
-        <h2 class="portata-nome">{{ getUI('PIATTI_GIORNO') }}</h2>
-        <span class="portata-arrow" [class.open]="piattiGiornoAperti">›</span>
+    <div *ngIf="piattiDelGiorno.length > 0" class="cl-accordion-wrap" [style.backgroundColor]="colorePrimario">
+      <div class="cl-accordion-header" (click)="togglePiattiGiorno()">
+        <span class="cl-acc-title" [style.color]="coloreSecondario">{{ getUI('PIATTI_GIORNO') }}</span>
+        <span class="cl-acc-chevron" [class.open]="piattiGiornoAperti">
+          <svg viewBox="0 0 24 24" [style.stroke]="coloreSecondario"><polyline points="9 18 15 12 9 6" /></svg>
+        </span>
       </div>
-      <div class="prodotti-list" [class.aperta]="piattiGiornoAperti">
-        <div *ngFor="let piatto of piattiDelGiorno" class="prodotto-card prodotto-speciale" [style.borderLeftColor]="colorePrimario">
-          <div class="prodotto-top">
-            <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ getT(piatto.prodotto?.nome ?? piatto.nome) }}</h4>
-            <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}</h4>
+      <div class="cl-accordion-body" [class.open]="piattiGiornoAperti">
+        <div
+          *ngFor="let piatto of piattiDelGiorno; let i = index"
+          class="cl-menu-row"
+          [style.backgroundColor]="i % 2 === 0 ? coloreSecondario : colorePrimario"
+        >
+          <div class="cl-row-main">
+            <span class="cl-item-name" [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario">
+              {{ getT(piatto.prodotto?.nome ?? piatto.nome) }}
+            </span>
+            <span class="cl-item-price" [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario">
+              {{ formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo) }}
+            </span>
           </div>
-          <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="prodotto-desc">
-            {{ getT(piatto.prodotto?.descrizione ?? piatto.descrizione) }}
-          </p>
-          <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
-            <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis || []">
-              <img
-                *ngIf="getAllergeneIcona(a)"
-                [src]="getAllergeneIcona(a)"
-                [title]="a.nome"
-                class="allergene-icona-mini"
-                style="width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: middle"
-              />
-              <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
-                a.nome
-              }}</span>
-            </ng-container>
-          </div>
-          <span class="badge-speciale" [style.backgroundColor]="coloreSecondario" [style.color]="colorePrimario">{{
-            getUI('BADGE_SPECIALE')
-          }}</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Portate -->
-    <section *ngFor="let portata of portate" class="portata-section">
-      <div class="portata-header" [style.backgroundColor]="colorePrimario" (click)="togglePortata(portata)">
-        <h2 class="portata-nome">{{ nomePortata(portata) | uppercase }}</h2>
-        <span class="portata-arrow" [class.open]="portata.aperta">›</span>
-      </div>
-      <div class="prodotti-list" [class.aperta]="portata.aperta">
-        <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="prodotti-empty">
-          <span>{{ getUI('NESSUN_PIATTO') }}</span>
-        </div>
-        <div *ngFor="let prodotto of portata.prodotti" class="prodotto-card">
-          <div class="prodotto-top">
-            <h4 class="prodotto-nome" [style.color]="colorePrimario">{{ getT(prodotto.nome) }}</h4>
-            <!-- Solo prezzo, nessun bottone modifica/elimina -->
-            <h4 class="prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</h4>
-          </div>
-          <p *ngIf="prodotto.descrizione" class="prodotto-desc">{{ getT(prodotto.descrizione) }}</p>
-          <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
-            <ng-container *ngFor="let a of prodotto.allergenis">
-              <img
-                *ngIf="getAllergeneIcona(a)"
-                [src]="getAllergeneIcona(a)"
-                [title]="a.nome"
-                class="allergene-icona-mini"
-                style="width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: middle"
-              />
-              <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
-                a.nome
-              }}</span>
-            </ng-container>
+          <div class="cl-row-sub">
+            <span
+              class="cl-item-desc"
+              *ngIf="piatto.prodotto?.descrizione || piatto.descrizione"
+              [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario"
+            >
+              {{ getT(piatto.prodotto?.descrizione ?? piatto.descrizione) }}
+            </span>
+            <div class="cl-allergen-row" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
+              <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis || []">
+                <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="cl-allergen-icon-img" />
+                <span *ngIf="!getAllergeneIcona(a)" class="cl-allergen-icon">!</span>
+                <span class="cl-allergen-label" [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario">
+                  {{ a.nome }}
+                </span>
+              </ng-container>
+            </div>
           </div>
         </div>
-        <!-- Nessun bottone "Aggiungi piatto" -->
       </div>
-    </section>
-
-    <!-- Footer allergeni -->
-    <div class="sezione-allergeni-footer" *ngIf="tuttiAllergeniMenu.length > 0" [style.borderTopColor]="colorePrimario + '44'">
-      <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">{{ getUI('ALLERGENI_TITOLO') }}</h3>
-      <div class="allergeni-footer-lista">
-        <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
-          <div class="allergene-footer-cerchio" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'">
-            <img
-              *ngIf="getAllergeneIcona(a)"
-              [src]="getAllergeneIcona(a)"
-              [alt]="a.nome"
-              class="allergene-footer-icona"
-              style="width: 100%; height: 100%; object-fit: contain"
-            />
-            <span *ngIf="!getAllergeneIcona(a)" class="allergene-footer-iniziale">{{ a.nome.charAt(0) }}</span>
-          </div>
-          <span class="allergene-footer-nome">{{ a.nome }}</span>
-        </div>
-      </div>
-      <p class="allergeni-footer-nota">{{ getUI('ALLERGENI_NOTA') }}</p>
     </div>
 
+    <!-- Portate -->
+    <div *ngFor="let portata of portate" class="cl-accordion-wrap" [style.backgroundColor]="colorePrimario">
+      <div class="cl-accordion-header" (click)="togglePortata(portata)">
+        <span class="cl-acc-title" [style.color]="coloreSecondario">{{ nomePortata(portata) }}</span>
+        <span class="cl-acc-chevron" [class.open]="portata.aperta">
+          <svg viewBox="0 0 24 24" [style.stroke]="coloreSecondario"><polyline points="9 18 15 12 9 6" /></svg>
+        </span>
+      </div>
+      <div class="cl-accordion-body" [class.open]="portata.aperta">
+        <div *ngIf="portata.prodotti && portata.prodotti.length === 0" class="cl-empty-row">
+          <span>{{ getUI('NESSUN_PIATTO') }}</span>
+        </div>
+        <div
+          *ngFor="let prodotto of portata.prodotti; let i = index"
+          class="cl-menu-row"
+          [style.backgroundColor]="i % 2 === 0 ? coloreSecondario : colorePrimario"
+        >
+          <div class="cl-row-main">
+            <span class="cl-item-name" [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario">
+              {{ getT(prodotto.nome) }}
+            </span>
+            <span class="cl-item-price" [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario">
+              {{ formatPrezzo(prodotto.prezzo) }}
+            </span>
+          </div>
+          <div class="cl-row-sub">
+            <span class="cl-item-desc" *ngIf="prodotto.descrizione" [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario">
+              {{ getT(prodotto.descrizione) }}
+            </span>
+            <div class="cl-allergen-row" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
+              <ng-container *ngFor="let a of prodotto.allergenis">
+                <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [title]="a.nome" class="cl-allergen-icon-img" />
+                <span *ngIf="!getAllergeneIcona(a)" class="cl-allergen-icon">!</span>
+                <span class="cl-allergen-label" [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario">
+                  {{ a.nome }}
+                </span>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer allergeni -->
+    <div class="cl-allergen-section" *ngIf="tuttiAllergeniMenu.length > 0">
+      <div class="cl-allergen-section-title" [style.color]="colorePrimario">{{ getUI('ALLERGENI_TITOLO') }}</div>
+      <div class="cl-allergen-grid">
+        <div *ngFor="let a of tuttiAllergeniMenu" class="cl-ag-item">
+          <span class="cl-ag-icon" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'">
+            <img *ngIf="getAllergeneIcona(a)" [src]="getAllergeneIcona(a)" [alt]="a.nome" class="cl-ag-icon-img" />
+            <span *ngIf="!getAllergeneIcona(a)">!</span>
+          </span>
+          <span class="cl-ag-nome" [style.color]="colorePrimario">{{ a.nome }}</span>
+        </div>
+      </div>
+      <p class="cl-allergen-note">{{ getUI('ALLERGENI_NOTA') }}</p>
+    </div>
+
+    <div class="cl-divider"></div>
+
     <!-- Contatti -->
-    <div class="contatti-card" *ngIf="listeContatti.length > 0" [style.backgroundColor]="colorePrimario">
-      <div class="contatti-card-title">
+    <div class="cl-contacts-section" *ngIf="listeContatti.length > 0" [style.backgroundColor]="colorePrimario">
+      <div class="cl-contacts-title" [style.color]="coloreSecondario">
         <svg
-          width="18"
-          height="18"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="currentColor"
+          [style.stroke]="coloreSecondario"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -173,48 +179,77 @@
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
           <circle cx="12" cy="7" r="4" />
         </svg>
-        <span>Contatti</span>
+        Contatti
       </div>
-      <div *ngFor="let lista of listeContatti" class="contatti-lista-wrap">
-        <p class="contatti-lista-nome" *ngIf="listeContatti.length > 1">{{ lista.nome }}</p>
-        <div class="contatti-items">
+      <div *ngFor="let lista of listeContatti" class="cl-contatti-lista-wrap">
+        <p class="cl-contatti-lista-nome" *ngIf="listeContatti.length > 1" [style.color]="coloreSecondario">{{ lista.nome }}</p>
+        <div class="cl-contatti-items">
           <a
             *ngFor="let item of lista.items"
             [href]="getContattoLink(item)"
             [attr.target]="item.tipo === 'SOCIAL' ? '_blank' : null"
             [attr.rel]="item.tipo === 'SOCIAL' ? 'noopener noreferrer' : null"
-            class="contatto-item"
+            class="cl-contact-btn"
             [class.no-link]="!getContattoLink(item)"
+            [style.backgroundColor]="coloreSecondario + '33'"
           >
             <span
-              class="contatto-icona"
+              class="cl-contact-icon"
               *ngIf="item.tipo === 'SOCIAL' && item.reteSociale !== 'ALTRO' && getSocialIconSvg(item.reteSociale)"
               [innerHTML]="getSafeSocialSvg(item.reteSociale)"
             ></span>
-            <span class="contatto-icona" *ngIf="item.tipo === 'TELEFONO'">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <span class="cl-contact-icon" *ngIf="item.tipo === 'TELEFONO'">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                [style.stroke]="coloreSecondario"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <path
                   d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
                 />
               </svg>
             </span>
-            <span class="contatto-icona" *ngIf="item.tipo === 'EMAIL'">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <span class="cl-contact-icon" *ngIf="item.tipo === 'EMAIL'">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                [style.stroke]="coloreSecondario"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                 <polyline points="22,6 12,13 2,6" />
               </svg>
             </span>
-            <span class="contatto-icona" *ngIf="item.tipo === 'INDIRIZZO'">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <span class="cl-contact-icon" *ngIf="item.tipo === 'INDIRIZZO'">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                [style.stroke]="coloreSecondario"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
                 <circle cx="12" cy="10" r="3" />
               </svg>
             </span>
             <span
-              class="contatto-icona"
+              class="cl-contact-icon"
               *ngIf="item.tipo === 'SOCIAL' && (item.reteSociale === 'ALTRO' || !getSocialIconSvg(item.reteSociale))"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                [style.stroke]="coloreSecondario"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <circle cx="18" cy="5" r="3" />
                 <circle cx="6" cy="12" r="3" />
                 <circle cx="18" cy="19" r="3" />
@@ -222,17 +257,16 @@
                 <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
               </svg>
             </span>
-            <div class="contatto-testo">
-              <span class="contatto-label">{{ getContattoLabel(item) }}</span>
-              <span class="contatto-valore" *ngIf="item.tipo === 'INDIRIZZO'">{{ item.valore }}</span>
+            <div class="cl-contact-testo">
+              <span class="cl-contact-label" [style.color]="coloreSecondario">{{ getContattoLabel(item) }}</span>
+              <span class="cl-contact-valore" *ngIf="item.tipo === 'INDIRIZZO'" [style.color]="coloreSecondario">{{ item.valore }}</span>
             </div>
           </a>
         </div>
       </div>
     </div>
-
-    <div class="menu-note" [style.borderLeftColor]="colorePrimario">{{ getUI('MENU_NOTE') }}</div>
-  </main>
+  </div>
+  <!-- fine cl-body -->
 </div>
 
 <!-- ══════════════════════════════════════════════════ -->

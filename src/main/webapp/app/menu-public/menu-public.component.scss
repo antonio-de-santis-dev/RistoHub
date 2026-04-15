@@ -2,6 +2,14 @@
 $radius: 12px;
 $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
+// Reset globale: elimina i margini del browser (causa spazio bianco ai lati)
+:host {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 // ── Loading / Errore ──
 .loading-screen,
 .errore-screen {
@@ -105,212 +113,584 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 //  SELETTORE LINGUA — SOLO BANDIERE, GRIGLIA
 // ══════════════════════════════════════════════════
 
-.lingua-selettore {
+// ══════════════════════════════════════════════════
+//  TEMPLATE CLASSICO — stile accordion mobile-first
+// ══════════════════════════════════════════════════
+
+.cl-page {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  padding-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+// ── HEADER ────────────────────────────────────────
+.cl-header {
+  width: 100%;
+  min-height: 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 24px 20px;
+  margin-bottom: 12px;
+}
+
+.cl-header-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cl-logo-img {
+  max-width: 180px;
+  max-height: 110px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.cl-logo-text {
+  font-size: 3.2rem;
+  font-weight: 700;
+}
+
+// ── LINGUA PILL (bianca, non eredita i colori primario/secondario) ──
+.cl-lingua-wrap {
   position: absolute;
+  right: 18px;
   top: 50%;
-  right: 14px;
   transform: translateY(-50%);
   z-index: 200;
 }
 
-// Bottone — bandiera attiva + codice lingua + freccia
-.lingua-btn-attuale {
+.cl-lingua-btn {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: white;
-  border: 2px solid;
-  border-radius: 50px;
-  padding: 5px 11px 5px 6px;
+  gap: 7px;
+  background: #ffffff;
+  border: none;
+  border-radius: 30px;
+  padding: 7px 14px;
   cursor: pointer;
-  backdrop-filter: blur(6px);
-  box-shadow:
-    0 2px 12px rgba(0, 0, 0, 0.16),
-    0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease;
-  line-height: 1;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.5px;
-  min-width: 72px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.16);
+  font-size: 15px;
+  font-weight: 600;
+  color: #111;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
 
   &:hover {
-    background: white;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
     transform: translateY(-2px);
   }
-  &:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  }
 }
 
-// Codice lingua nel bottone
-.lingua-codice-btn {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  flex-shrink: 0;
-}
-
-// Wrapper SVG nel bottone principale
-.lingua-bandiera-svg {
+.cl-lingua-flag {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  border: 1px solid #ddd;
+
+  ::ng-deep svg {
+    width: 26px;
+    height: 26px;
+    display: block;
+  }
+}
+
+.cl-lingua-codice {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #111;
+}
+
+.cl-lingua-chevron {
+  font-size: 12px;
+  color: #555;
+  transition: transform 0.2s;
+  &.aperto {
+    transform: rotate(180deg);
+  }
+}
+
+// Dropdown lingua
+.cl-lingua-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  padding: 12px;
+  min-width: 200px;
+  z-index: 300;
+}
+
+.cl-lingua-dropdown-header {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #999;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.cl-lingua-griglia {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.cl-lingua-opzione {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background: none;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+  &.attiva {
+    background: #f0f4ff;
+  }
+}
+
+.cl-lingua-nome {
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+
+.cl-lingua-check {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+// ── BODY ──────────────────────────────────────────
+.cl-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: calc(100% - 28px);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+// ── ACCORDION ─────────────────────────────────────
+// Il wrapper HA il colorePrimario come background.
+// I 4px di gap delle righe interne mostrano quel colore come "bordo visivo".
+// overflow:hidden + border-radius sul padre ritagliano tutto perfettamente.
+.cl-accordion-wrap {
+  border-radius: 30px;
+  overflow: hidden;
+  // background-color iniettato via [style.backgroundColor] = colorePrimario
+}
+
+.cl-accordion-header {
+  padding: 0 24px;
+  height: 76px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cl-acc-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  // color iniettato via [style.color] = coloreSecondario
+}
+
+.cl-acc-chevron {
+  svg {
+    width: 30px;
+    height: 30px;
+    fill: none;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.25s ease;
+    display: block;
+  }
+  &.open svg {
+    transform: rotate(90deg);
+  }
+}
+
+// ── RIGHE MENU ────────────────────────────────────
+.cl-accordion-body {
+  display: none;
+  flex-direction: column;
+
+  &.open {
+    display: flex;
+    padding-bottom: 4px; // mostra il bordo verde inferiore del wrapper
+  }
+}
+
+// Ogni riga: margin 4px laterale e bottom mostra 4px di colorePrimario
+// come bordo visivo. Nessun border-radius interno: overflow:hidden del padre taglia.
+.cl-menu-row {
+  margin: 0 4px 4px;
+  padding: 18px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-radius: 0; // nessun raggio individuale — overflow:hidden del padre fa il lavoro
+
+  &:first-child {
+    margin-top: 4px;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  // background-color iniettato dinamicamente via [style.backgroundColor]
+}
+
+.cl-row-main {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.cl-item-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  flex: 1;
+  // color iniettato
+}
+
+.cl-item-price {
+  font-size: 1.15rem;
+  font-weight: 700;
+  white-space: nowrap;
+  // color iniettato
+}
+
+.cl-row-sub {
+  width: 100%;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.cl-item-desc {
+  font-size: 13px;
+  line-height: 1.4;
+  // color iniettato (versione più scura del colore dominante)
+  opacity: 0.85;
+}
+
+.cl-allergen-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.cl-allergen-icon {
+  width: 24px;
+  height: 24px;
+  background: #ffcc00;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  color: #ff4400;
+  flex-shrink: 0;
+}
+
+.cl-allergen-icon-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cl-allergen-label {
+  font-size: 14px;
+  font-weight: 500;
+  // color iniettato
+}
+
+.cl-empty-row {
+  margin: 4px;
+  padding: 16px 20px;
+  font-size: 0.88rem;
+  color: #9ca3af;
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+// ── SEZIONE ALLERGENI FOOTER ──────────────────────
+.cl-allergen-section {
+  padding: 14px 4px 6px;
+}
+
+.cl-allergen-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  // color = colorePrimario
+  margin-bottom: 12px;
+}
+
+.cl-allergen-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px 4px;
+}
+
+.cl-ag-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.cl-ag-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: #ff4400;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #ffcc00;
+}
+
+.cl-ag-icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+}
+
+.cl-ag-nome {
+  font-size: 10px;
+  font-weight: 500;
+  // color = colorePrimario
+}
+
+.cl-allergen-note {
+  font-size: 10px;
+  color: #999;
+  line-height: 1.5;
+  margin-top: 10px;
+  font-style: italic;
+}
+
+.cl-divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.08);
+  margin: 6px 0;
+}
+
+// ── CONTATTI ──────────────────────────────────────
+.cl-contacts-section {
+  border-radius: 20px;
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  // background-color = colorePrimario
+}
+
+.cl-contacts-title {
+  font-size: 19px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  // color = coloreSecondario
 
   svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.cl-contatti-lista-wrap {
+  & + & {
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+  }
+}
+
+.cl-contatti-lista-nome {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+  margin: 0 0 6px;
+}
+
+.cl-contatti-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cl-contact-btn {
+  border-radius: 14px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 18px;
+  text-decoration: none;
+  width: 100%;
+  transition:
+    opacity 0.18s,
+    transform 0.18s;
+  // background-color iniettato (coloreSecondario con opacità)
+
+  &:hover:not(.no-link) {
+    opacity: 0.85;
+    transform: translateY(-1px);
+  }
+  &.no-link {
+    cursor: default;
+  }
+}
+
+.cl-contact-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  ::ng-deep svg[fill='currentColor'] {
     width: 100%;
     height: 100%;
     display: block;
   }
 }
 
-// Variante piccola (rustico header compatto)
-.lingua-bandiera-svg-sm {
-  width: 20px;
-  height: 20px;
-}
-
-.lingua-chevron {
-  font-size: 8px;
-  opacity: 0.5;
-  transition: transform 0.22s ease;
-  margin-top: 1px;
-  &.aperto {
-    transform: rotate(180deg);
-  }
-}
-
-// Dropdown — lista verticale di lingue
-.lingua-dropdown {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  background: white;
-  border: 1.5px solid rgba(0, 0, 0, 0.08);
-  border-radius: 16px;
-  padding: 8px 6px 8px;
-  box-shadow:
-    0 16px 40px rgba(0, 0, 0, 0.15),
-    0 2px 8px rgba(0, 0, 0, 0.07);
-  animation: dropdownFadeIn 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
-  min-width: 170px;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -7px;
-    right: 18px;
-    width: 13px;
-    height: 13px;
-    background: white;
-    border-left: 1.5px solid rgba(0, 0, 0, 0.08);
-    border-top: 1.5px solid rgba(0, 0, 0, 0.08);
-    transform: rotate(45deg);
-    border-radius: 2px 0 0 0;
-  }
-}
-
-@keyframes dropdownFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px) scale(0.93);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.lingua-dropdown-header {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #bbb;
-  text-align: center;
-  padding: 0 6px 8px;
-  margin-bottom: 3px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-// Lista verticale lingue
-.lingua-griglia {
+.cl-contact-testo {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-}
-
-// Ogni opzione lingua — layout orizzontale (bandiera + nome + check)
-.lingua-opzione {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  background: transparent;
-  border: 1.5px solid transparent;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  width: 100%;
-  text-align: left;
-
-  &:hover:not(.attiva) {
-    background: #f5f5f5;
-    transform: translateX(2px);
-  }
-
-  &.attiva {
-    background: rgba(0, 0, 0, 0.05);
-    // border-color viene applicato inline
-
-    .lingua-bandiera-svg {
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-      transform: scale(1.08);
-    }
-
-    .lingua-nome-corto {
-      font-weight: 800;
-    }
-  }
-}
-
-// Bandiera nel dropdown verticale
-.lingua-griglia .lingua-bandiera-svg {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-  transition: transform 0.18s ease;
-}
-
-.lingua-nome-corto {
-  font-size: 13px;
-  font-weight: 500;
-  color: #333;
-  letter-spacing: 0.2px;
-  text-align: left;
-  line-height: 1;
+  gap: 1px;
+  min-width: 0;
   flex: 1;
 }
 
-.lingua-check-icon {
-  font-size: 11px;
-  font-weight: 700;
-  margin-left: auto;
-  flex-shrink: 0;
+.cl-contact-label {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  // color = coloreSecondario
 }
 
-// ── Variante MODERNO ──
+.cl-contact-valore {
+  font-size: 12px;
+  opacity: 0.75;
+  line-height: 1.3;
+  // color = coloreSecondario
+}
+
+// ── RESPONSIVE ────────────────────────────────────
+@media (max-width: 480px) {
+  .cl-body {
+    width: calc(100% - 20px);
+  }
+  .cl-header {
+    min-height: 110px;
+  }
+  .cl-logo-text {
+    font-size: 2.4rem;
+  }
+  .cl-acc-title {
+    font-size: 1.3rem;
+  }
+  .cl-item-name,
+  .cl-item-price {
+    font-size: 1rem;
+  }
+  .cl-allergen-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+// Tablet e desktop: allarga il contenuto, header allineato
+@media (min-width: 768px) {
+  .cl-body {
+    width: calc(100% - 48px);
+    max-width: 1200px;
+  }
+  .cl-header {
+    padding: 28px 24px;
+  }
+  .cl-acc-title {
+    font-size: 1.8rem;
+  }
+  .cl-item-name,
+  .cl-item-price {
+    font-size: 1.25rem;
+  }
+  .cl-allergen-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
 .lingua-selettore-moderno {
   top: auto;
   bottom: 12px;
