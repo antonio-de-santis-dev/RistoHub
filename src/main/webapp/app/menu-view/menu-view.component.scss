@@ -656,6 +656,12 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
 }
 
+// Ultimo elemento dell'accordion: angoli inferiori arrotondati.
+// Corrisponde a [class.cl-menu-row--last]="last" nel template.
+.cl-menu-row--last {
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+}
 .cl-row-main {
   width: 100%;
   display: flex;

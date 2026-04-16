@@ -71,8 +71,9 @@
       </div>
       <div class="cl-accordion-body" [class.open]="piattiGiornoAperti">
         <div
-          *ngFor="let piatto of piattiDelGiorno; let i = index"
+          *ngFor="let piatto of piattiDelGiorno; let i = index; let last = last"
           class="cl-menu-row"
+          [class.cl-menu-row--last]="last"
           [style.backgroundColor]="i % 2 === 0 ? coloreSecondario : colorePrimario"
         >
           <div class="cl-row-main">
@@ -118,8 +119,9 @@
           <span>{{ getUI('NESSUN_PIATTO') }}</span>
         </div>
         <div
-          *ngFor="let prodotto of portata.prodotti; let i = index"
+          *ngFor="let prodotto of portata.prodotti; let i = index; let last = last"
           class="cl-menu-row"
+          [class.cl-menu-row--last]="last"
           [style.backgroundColor]="i % 2 === 0 ? coloreSecondario : colorePrimario"
         >
           <div class="cl-row-main">
