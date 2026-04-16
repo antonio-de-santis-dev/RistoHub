@@ -320,6 +320,11 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 .cl-acc-title {
   font-size: 1.6rem;
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
   // color iniettato via [style.color] = coloreSecondario
 }
 
@@ -665,7 +670,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     font-size: 2.4rem;
   }
   .cl-acc-title {
-    font-size: 1.3rem;
+    font-size: clamp(0.75rem, 3.8vw, 1.3rem);
   }
   .cl-item-name,
   .cl-item-price {

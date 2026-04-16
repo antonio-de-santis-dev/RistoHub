@@ -49,20 +49,20 @@ export const LINGUE: Lingua[] = [
 
 export const UI_LABELS: Record<string, Record<string, string>> = {
   PIATTI_GIORNO: {
-    it: '✨ PIATTI DEL GIORNO / FUORI MENU',
-    en: "✨ TODAY'S SPECIALS / OFF-MENU",
-    fr: '✨ PLATS DU JOUR / HORS MENU',
-    de: '✨ TAGESGERICHTE / AUSSER DER KARTE',
-    es: '✨ PLATOS DEL DÍA / FUERA DE CARTA',
+    it: 'PIATTI DEL GIORNO / FUORI MENU',
+    en: "TODAY'S SPECIALS / OFF-MENU",
+    fr: 'PLATS DU JOUR / HORS MENU',
+    de: 'TAGESGERICHTE / AUSSER DER KARTE',
+    es: 'PLATOS DEL DÍA / FUERA DE CARTA',
   },
   PIATTI_GIORNO_SHORT: {
-    it: '✨ Piatti del Giorno',
-    en: "✨ Today's Specials",
-    fr: '✨ Plats du Jour',
-    de: '✨ Tagesgerichte',
-    es: '✨ Platos del Día',
+    it: 'Piatti del Giorno',
+    en: "Today's Specials",
+    fr: 'Plats du Jour',
+    de: 'Tagesgerichte',
+    es: 'Platos del Día',
   },
-  BADGE_SPECIALE: { it: '🌟 Speciale', en: '🌟 Special', fr: '🌟 Spécial', de: '🌟 Speziell', es: '🌟 Especial' },
+  BADGE_SPECIALE: { it: 'Speciale', en: 'Special', fr: 'Spécial', de: 'Speziell', es: 'Especial' },
   ALLERGENI_TITOLO: {
     it: 'Allergeni presenti in questo menu',
     en: 'Allergens in this menu',
