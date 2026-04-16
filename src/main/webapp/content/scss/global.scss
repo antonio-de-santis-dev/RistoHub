@@ -260,6 +260,18 @@ $rh-topbar-h: 52px;
 }
 
 /* ==========================================================================
+   MENU PUBLIC — vista fullscreen QR-code, nessun wrapper, nessun margin.
+   Il router-outlet viene renderizzato direttamente nel body (vedi main.component.html).
+   Questi reset garantiscono che jhi-menu-public non erediti spazi da Bootstrap.
+========================================================================== */
+jhi-menu-public {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* ==========================================================================
    FOOTER — nascosto senza rimozione dal DOM (no @if → no reflow/salto).
    height: 0 + visibility: hidden = zero spazio, zero visibilità,
    zero interazione — il layout non cambia mai dimensione.

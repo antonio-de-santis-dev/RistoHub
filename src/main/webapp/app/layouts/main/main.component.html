@@ -6,13 +6,19 @@
   </div>
 }
 
-<div class="rh-main-wrapper">
-  <div class="card jh-card">
-    <div [@routeAnimations]="getRouteAnimationData(outlet)" style="position: relative; min-height: calc(100vh - 52px)">
-      <router-outlet #outlet="outlet" />
+@if (isFullscreen()) {
+  <!-- Rotte fullscreen (es. menu-public): nessun wrapper, nessun padding,
+       occupa tutto il viewport da 0,0 senza spazio per navbar o footer. -->
+  <router-outlet #outlet="outlet" />
+} @else {
+  <div class="rh-main-wrapper">
+    <div class="card jh-card">
+      <div [@routeAnimations]="getRouteAnimationData(outlet)" style="position: relative; min-height: calc(100vh - 52px)">
+        <router-outlet #outlet="outlet" />
+      </div>
     </div>
   </div>
-</div>
+}
 
 <!--
   Footer SEMPRE nel DOM — mai rimosso con @if.

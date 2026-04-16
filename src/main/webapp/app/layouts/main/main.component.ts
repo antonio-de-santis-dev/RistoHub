@@ -46,6 +46,10 @@ const ROUTES_WITH_NAVBAR = [
   '/contatti',
 ];
 
+// Rotte che devono occupare tutto il viewport senza wrapper/padding.
+// menu-public è la vista QR-code accessibile senza login.
+const ROUTES_FULLSCREEN = ['/menu-public'];
+
 /** Mappa path → nome stato per le animazioni */
 const ROUTE_ANIMATION_STATE: Record<string, string> = {
   '': 'landing',
@@ -66,6 +70,13 @@ export default class MainComponent implements OnInit {
   // di landing, login, register. Si attivano solo dopo NavigationEnd.
   showFooter = signal(false);
   showNavbar = signal(false);
+
+  /**
+   * true quando la rotta corrente è una vista fullscreen (es. menu-public).
+   * In questo caso il template rimuove tutti i wrapper (rh-main-wrapper,
+   * jh-card, min-height navbar) e il router-outlet va direttamente nel body.
+   */
+  isFullscreen = signal(false);
 
   private readonly router = inject(Router);
   private readonly appPageTitleStrategy = inject(AppPageTitleStrategy);
@@ -88,6 +99,7 @@ export default class MainComponent implements OnInit {
       const url = e.urlAfterRedirects;
       this.showFooter.set(ROUTES_WITH_FOOTER.some(r => url.startsWith(r)));
       this.showNavbar.set(ROUTES_WITH_NAVBAR.some(r => url.startsWith(r)));
+      this.isFullscreen.set(ROUTES_FULLSCREEN.some(r => url.startsWith(r)));
     });
 
     this.translateService.onLangChange.subscribe((langChangeEvent: LangChangeEvent) => {
