@@ -1,6 +1,7 @@
 /* ══════════════════════════════════════════════════════
    RistoHub — Splash Loader iniziale (HTML/CSS puro)
    Stile elegante: logo + piatto oro/turchese + posate bianche
+   Mobile-responsive fix: media query ≤ 480 px
    ══════════════════════════════════════════════════════ */
 
 .app-loading {
@@ -51,7 +52,7 @@
   }
 }
 
-/* SVG posate */
+/* SVG posate + piatto */
 .rh-splash-icon svg {
   width: 180px;
   height: 180px;
@@ -167,5 +168,37 @@
   40% {
     transform: scale(1.3);
     opacity: 1;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE — max-width: 480 px
+   ══════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .rh-splash-icon {
+    gap: 16px;
+  }
+
+  /* Logo più piccolo su mobile */
+  .rh-splash-icon img {
+    width: 110px;
+  }
+
+  /* SVG posate + piatto scalato */
+  .rh-splash-icon svg {
+    width: 130px;
+    height: 130px;
+  }
+
+  /* Testo leggermente più piccolo */
+  .rh-splash-text {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+  }
+
+  /* Puntini leggermente più piccoli */
+  .rh-splash-dots span {
+    width: 7px;
+    height: 7px;
   }
 }
