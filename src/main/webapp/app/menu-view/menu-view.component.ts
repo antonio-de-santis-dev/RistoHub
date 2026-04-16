@@ -310,7 +310,10 @@ export class MenuViewComponent implements OnInit, OnDestroy {
       const v = item.valore.trim();
       return v.startsWith('http') ? v : `https://${v}`;
     }
-    return null; // INDIRIZZO: nessun link
+    if (item.tipo === 'INDIRIZZO') {
+      return `https://maps.google.com/?q=${encodeURIComponent(item.valore)}`;
+    }
+    return null;
   }
 
   getContattoLabel(item: ContattoItemDTO): string {

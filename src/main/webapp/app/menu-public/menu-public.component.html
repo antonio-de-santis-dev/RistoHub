@@ -162,7 +162,7 @@
           <span class="cl-ag-nome" [style.color]="colorePrimario">{{ a.nome }}</span>
         </div>
       </div>
-      <p class="cl-allergen-note">{{ getUI('ALLERGENI_NOTA') }}</p>
+      <p class="cl-allergen-note" [style.color]="colorePrimario">{{ getUI('ALLERGENI_NOTA') }}</p>
     </div>
 
     <div class="cl-divider"></div>
@@ -188,9 +188,9 @@
         <div class="cl-contatti-items">
           <a
             *ngFor="let item of lista.items"
-            [href]="getContattoLink(item)"
-            [attr.target]="item.tipo === 'SOCIAL' ? '_blank' : null"
-            [attr.rel]="item.tipo === 'SOCIAL' ? 'noopener noreferrer' : null"
+            [attr.href]="getContattoLink(item)"
+            [attr.target]="item.tipo === 'SOCIAL' || item.tipo === 'INDIRIZZO' ? '_blank' : null"
+            [attr.rel]="item.tipo === 'SOCIAL' || item.tipo === 'INDIRIZZO' ? 'noopener noreferrer' : null"
             class="cl-contact-btn"
             [class.no-link]="!getContattoLink(item)"
             [style.backgroundColor]="coloreSecondario + '33'"
@@ -199,6 +199,7 @@
               class="cl-contact-icon"
               *ngIf="item.tipo === 'SOCIAL' && item.reteSociale !== 'ALTRO' && getSocialIconSvg(item.reteSociale)"
               [innerHTML]="getSafeSocialSvg(item.reteSociale)"
+              [style.color]="coloreSecondario"
             ></span>
             <span class="cl-contact-icon" *ngIf="item.tipo === 'TELEFONO'">
               <svg
@@ -532,9 +533,9 @@
         <div class="contatti-items">
           <a
             *ngFor="let item of lista.items"
-            [href]="getContattoLink(item)"
-            [attr.target]="item.tipo === 'SOCIAL' ? '_blank' : null"
-            [attr.rel]="item.tipo === 'SOCIAL' ? 'noopener noreferrer' : null"
+            [attr.href]="getContattoLink(item)"
+            [attr.target]="item.tipo === 'SOCIAL' || item.tipo === 'INDIRIZZO' ? '_blank' : null"
+            [attr.rel]="item.tipo === 'SOCIAL' || item.tipo === 'INDIRIZZO' ? 'noopener noreferrer' : null"
             class="contatto-item"
             [class.no-link]="!getContattoLink(item)"
           >
@@ -542,6 +543,7 @@
               class="contatto-icona"
               *ngIf="item.tipo === 'SOCIAL' && item.reteSociale !== 'ALTRO' && getSocialIconSvg(item.reteSociale)"
               [innerHTML]="getSafeSocialSvg(item.reteSociale)"
+              [style.color]="coloreSecondario"
             ></span>
             <span class="contatto-icona" *ngIf="item.tipo === 'TELEFONO'">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -855,9 +857,9 @@
         <div class="contatti-items">
           <a
             *ngFor="let item of lista.items"
-            [href]="getContattoLink(item)"
-            [attr.target]="item.tipo === 'SOCIAL' ? '_blank' : null"
-            [attr.rel]="item.tipo === 'SOCIAL' ? 'noopener noreferrer' : null"
+            [attr.href]="getContattoLink(item)"
+            [attr.target]="item.tipo === 'SOCIAL' || item.tipo === 'INDIRIZZO' ? '_blank' : null"
+            [attr.rel]="item.tipo === 'SOCIAL' || item.tipo === 'INDIRIZZO' ? 'noopener noreferrer' : null"
             class="contatto-item"
             [class.no-link]="!getContattoLink(item)"
           >
@@ -865,6 +867,7 @@
               class="contatto-icona"
               *ngIf="item.tipo === 'SOCIAL' && item.reteSociale !== 'ALTRO' && getSocialIconSvg(item.reteSociale)"
               [innerHTML]="getSafeSocialSvg(item.reteSociale)"
+              [style.color]="coloreSecondario"
             ></span>
             <span class="contatto-icona" *ngIf="item.tipo === 'TELEFONO'">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

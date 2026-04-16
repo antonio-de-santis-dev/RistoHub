@@ -281,6 +281,9 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
       const v = item.valore.trim();
       return v.startsWith('http') ? v : `https://${v}`;
     }
+    if (item.tipo === 'INDIRIZZO') {
+      return `https://maps.google.com/?q=${encodeURIComponent(item.valore)}`;
+    }
     return null;
   }
 
