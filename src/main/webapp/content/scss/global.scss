@@ -255,6 +255,9 @@ $rh-topbar-h: 52px;
   jhi-menu-cover-editor .ce-inner {
     padding-top: $rh-topbar-h;
   }
+  jhi-import-menu .im-inner {
+    padding-top: $rh-topbar-h;
+  }
 }
 
 /* ==========================================================================
@@ -279,4 +282,12 @@ jhi-footer.rh-footer-hidden {
 ========================================================================== */
 .rh-tut-highlight {
   /* non più usata — il buco SVG sostituisce questa tecnica */
+}
+.card.jh-card:has(jhi-import-menu) {
+  padding: 0 !important;
+  margin-top: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
 }

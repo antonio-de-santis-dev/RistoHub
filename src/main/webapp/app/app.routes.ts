@@ -110,6 +110,10 @@ const routes: Routes = [
     canActivate: [UserRouteAccessService],
     title: 'Anteprima Loader',
   },
+  {
+    path: 'import-menu',
+    loadComponent: () => import('./import-menu/import-menu.component').then(m => m.ImportMenuComponent),
+  },
 
   ...errorRoute,
 ];
