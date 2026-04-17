@@ -1,0 +1,714 @@
+// ══════════════════════════════════════════════════════
+//  RistoHub — Import Menu (dark glassmorphism)
+//  Coerente con prodotto-add.component.scss
+// ══════════════════════════════════════════════════════
+
+$accent: #c8102e;
+$accent-light: rgba(200, 16, 46, 0.18);
+$text-white: #ffffff;
+$muted-white: rgba(255, 255, 255, 0.62);
+$border-glass: rgba(255, 255, 255, 0.13);
+$card-bg: rgba(255, 255, 255, 0.07);
+$card-bg-hover: rgba(255, 255, 255, 0.11);
+$radius: 16px;
+
+:host {
+  display: block;
+  margin: -1.5rem -15px 0;
+}
+
+// ── Page shell ────────────────────────────────────────
+.im-page {
+  min-height: 100vh;
+  position: relative;
+  background-image: url('/content/images/sfondo.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 0;
+    pointer-events: none;
+  }
+}
+
+.im-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+// ── Back link ─────────────────────────────────────────
+.im-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: $muted-white;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  margin-bottom: 2rem;
+  transition: color 0.15s;
+  &:hover {
+    color: $text-white;
+  }
+}
+
+// ── Header ────────────────────────────────────────────
+.im-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 2rem;
+}
+
+.im-header-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: $accent-light;
+  border: 1px solid rgba(200, 16, 46, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: $accent;
+
+  &--green {
+    background: rgba(34, 197, 94, 0.15);
+    border-color: rgba(34, 197, 94, 0.35);
+    color: #22c55e;
+  }
+}
+
+.im-title {
+  font-family: 'Playfair Display', 'Georgia', serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: $text-white;
+  margin: 0 0 4px;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8);
+}
+
+.im-subtitle {
+  color: $muted-white;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+// ── Fade in animazione ────────────────────────────────
+.im-fade-in {
+  animation: imFadeIn 0.35s ease both;
+}
+@keyframes imFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ── Steps card ────────────────────────────────────────
+.im-steps-card {
+  background: $card-bg;
+  border: 1px solid $border-glass;
+  border-radius: $radius;
+  backdrop-filter: blur(12px);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.im-steps-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $text-white;
+  margin: 0 0 1.2rem;
+}
+
+.im-steps-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.im-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.im-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: $accent;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.im-step-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  strong {
+    color: $text-white;
+    font-size: 0.88rem;
+  }
+  span {
+    color: $muted-white;
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+}
+
+.im-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid $border-glass;
+  border-radius: 10px;
+  color: $text-white;
+  text-decoration: none;
+  padding: 10px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition:
+    background 0.2s,
+    transform 0.15s;
+  &:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px);
+    color: $text-white;
+  }
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+// ── Form card ─────────────────────────────────────────
+.im-form-card {
+  background: $card-bg;
+  border: 1px solid $border-glass;
+  border-radius: $radius;
+  backdrop-filter: blur(12px);
+  padding: 1.75rem;
+}
+
+.im-form-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $text-white;
+  margin: 0 0 1.5rem;
+}
+
+.im-field {
+  margin-bottom: 1.4rem;
+}
+
+.im-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.im-field-hint {
+  font-size: 0.78rem;
+  color: $muted-white;
+  margin: 6px 0 0;
+}
+
+.im-select {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid $border-glass;
+  color: $text-white;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+  cursor: pointer;
+
+  option {
+    background: #1a1a2e;
+    color: white;
+  }
+
+  &:focus {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+// ── Drop zone ─────────────────────────────────────────
+.im-dropzone {
+  border: 2px dashed $border-glass;
+  border-radius: 12px;
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.04);
+
+  &--over {
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &--filled {
+    border-color: rgba(200, 16, 46, 0.5);
+    background: rgba(200, 16, 46, 0.06);
+  }
+}
+
+.im-dropzone-icon {
+  color: $muted-white;
+}
+
+.im-dropzone-text {
+  color: $muted-white;
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.im-dropzone-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid $border-glass;
+  border-radius: 8px;
+  color: $text-white;
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.im-file-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $text-white;
+  margin: 0;
+  word-break: break-all;
+}
+
+.im-remove-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(220, 38, 38, 0.2);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  border-radius: 8px;
+  color: #fca5a5;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: rgba(220, 38, 38, 0.35);
+  }
+}
+
+// ── Alert ─────────────────────────────────────────────
+.im-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  margin-bottom: 1.2rem;
+
+  &--error {
+    background: rgba(220, 38, 38, 0.15);
+    border: 1px solid rgba(220, 38, 38, 0.35);
+    color: #fca5a5;
+  }
+}
+
+// ── CTA button ────────────────────────────────────────
+.im-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: $accent;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 13px 28px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition:
+    filter 0.2s,
+    transform 0.15s;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.im-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid $border-glass;
+  border-radius: 12px;
+  color: $text-white;
+  padding: 12px 22px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.15s;
+  &:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px);
+  }
+}
+
+.im-loading-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.im-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: imSpin 0.7s linear infinite;
+}
+@keyframes imSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ── Anteprima ─────────────────────────────────────────
+.im-stats-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.im-stat {
+  background: $card-bg;
+  border: 1px solid $border-glass;
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 100px;
+  backdrop-filter: blur(10px);
+}
+
+.im-stat-num {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: $text-white;
+  line-height: 1;
+
+  &--warn {
+    color: #fbbf24;
+  }
+}
+
+.im-stat-lbl {
+  font-size: 0.75rem;
+  color: $muted-white;
+  text-align: center;
+}
+
+.im-dest-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: $accent-light;
+  border: 1px solid rgba(200, 16, 46, 0.3);
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: rgba(255, 200, 200, 0.9);
+  font-size: 0.82rem;
+  margin-bottom: 1.2rem;
+  strong {
+    color: $text-white;
+  }
+}
+
+.im-avvisi-card {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.im-avvisi-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fbbf24;
+  margin: 0 0 10px;
+}
+
+.im-avvisi-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  li {
+    font-size: 0.8rem;
+    color: rgba(251, 191, 36, 0.85);
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+}
+
+// ── Portate anteprima ─────────────────────────────────
+.im-portate-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.im-portata-card {
+  background: $card-bg;
+  border: 1px solid $border-glass;
+  border-radius: 12px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.im-portata-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(200, 16, 46, 0.15);
+  border-bottom: 1px solid rgba(200, 16, 46, 0.2);
+}
+
+.im-portata-nome {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: $text-white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.im-portata-count {
+  font-size: 0.75rem;
+  color: $muted-white;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.im-prodotti-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+
+  th {
+    text-align: left;
+    padding: 8px 16px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid $border-glass;
+  }
+
+  td {
+    padding: 10px 16px;
+    color: $muted-white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    vertical-align: top;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.im-td-nome {
+  font-weight: 600;
+  color: $text-white;
+  width: 35%;
+}
+.im-td-desc {
+  width: 45%;
+}
+.im-td-prezzo {
+  font-weight: 700;
+  color: $accent;
+  white-space: nowrap;
+  text-align: right;
+}
+.im-th-prezzo {
+  text-align: right;
+}
+
+// ── Actions row ───────────────────────────────────────
+.im-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .im-cta-btn {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  &--center {
+    justify-content: center;
+    .im-cta-btn {
+      flex: unset;
+      width: auto;
+      min-width: 180px;
+    }
+  }
+}
+
+// ── Successo ──────────────────────────────────────────
+.im-success-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 3rem 1rem;
+  gap: 1rem;
+}
+
+.im-success-icon {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.12);
+  border: 2px solid rgba(34, 197, 94, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.im-success-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: $text-white;
+  margin: 0;
+}
+
+.im-success-sub {
+  color: $muted-white;
+  font-size: 0.95rem;
+  margin: 0;
+  max-width: 500px;
+  line-height: 1.6;
+  strong {
+    color: $text-white;
+  }
+}
+
+// ── Errore ─────────────────────────────────────────────
+.im-error-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 3rem 1rem;
+  gap: 1rem;
+}
+.im-error-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $text-white;
+  margin: 0;
+}
+.im-error-msg {
+  color: rgba(252, 165, 165, 0.9);
+  font-size: 0.9rem;
+  margin: 0;
+  max-width: 480px;
+}
+
+// ── Responsive ────────────────────────────────────────
+@media (max-width: 600px) {
+  .im-inner {
+    padding: 1.5rem 1rem 3rem;
+  }
+  .im-title {
+    font-size: 1.4rem;
+  }
+  .im-steps-grid {
+    grid-template-columns: 1fr;
+  }
+  .im-actions-row {
+    flex-direction: column;
+    .im-cta-btn {
+      width: 100%;
+    }
+    .im-secondary-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}

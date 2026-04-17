@@ -80,6 +80,46 @@ $radius: 16px;
   }
 }
 
+.pa-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+// Pulsante "Importa da PDF" nell'header di Gestione Prodotti
+.pa-import-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  padding: 9px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
+  flex-shrink: 0;
+  margin-top: 6px;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+}
+
 // ── Loading ───────────────────────────────────────────
 .pa-loading {
   display: flex;
