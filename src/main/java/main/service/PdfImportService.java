@@ -207,9 +207,11 @@ public class PdfImportService {
      * Confronto case-insensitive su nomeDefault (enum) o nomePersonalizzato.
      */
     private boolean nomeCorreisponde(String nomePdf, main.domain.Portata portata) {
-        String n = nomePdf.toUpperCase().trim();
-        if (portata.getNomeDefault() != null && portata.getNomeDefault().name().equalsIgnoreCase(n)) return true;
-        if (portata.getNomePersonalizzato() != null && portata.getNomePersonalizzato().equalsIgnoreCase(nomePdf.trim())) return true;
+        String n = nomePdf.trim();
+        // Normalizza: "Vino Rosso" → "VINO_ROSSO"
+        String nNorm = n.toUpperCase().replace(" ", "_");
+        if (portata.getNomeDefault() != null && portata.getNomeDefault().name().equalsIgnoreCase(nNorm)) return true;
+        if (portata.getNomePersonalizzato() != null && portata.getNomePersonalizzato().equalsIgnoreCase(n)) return true;
         return false;
     }
 

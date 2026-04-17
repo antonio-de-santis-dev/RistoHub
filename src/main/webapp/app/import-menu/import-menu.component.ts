@@ -66,7 +66,7 @@ export class ImportMenuComponent implements OnInit {
 
   private async caricaMenus(): Promise<void> {
     try {
-      this.menus = await firstValueFrom(this.http.get<MenuDTO[]>('/api/menus/my'));
+      this.menus = await firstValueFrom(this.http.get<MenuDTO[]>('/api/menus'));
     } catch {
       this.errorMessage = 'Impossibile caricare i menu. Riprova più tardi.';
     }

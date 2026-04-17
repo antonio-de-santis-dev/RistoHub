@@ -2,6 +2,7 @@ package main.web.rest;
 
 import java.io.IOException;
 import java.util.UUID;
+import main.security.AuthoritiesConstants;
 import main.service.PdfImportService;
 import main.service.dto.PdfImportResultDTO;
 import org.slf4j.Logger;
@@ -11,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import tech.jhipster.security.AuthoritiesConstants;
 
 /**
  * REST controller per l'importazione bulk di prodotti tramite PDF.
