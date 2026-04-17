@@ -18,8 +18,12 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -58,11 +62,18 @@ public class PdfImportService {
     private final PortataRepository portataRepository;
     private final ProdottoService prodottoService;
     private final MenuService menuService;
+    private final CacheManager cacheManager;
 
-    public PdfImportService(PortataRepository portataRepository, ProdottoService prodottoService, MenuService menuService) {
+    public PdfImportService(
+        PortataRepository portataRepository,
+        ProdottoService prodottoService,
+        MenuService menuService,
+        CacheManager cacheManager
+    ) {
         this.portataRepository = portataRepository;
         this.prodottoService = prodottoService;
         this.menuService = menuService;
+        this.cacheManager = cacheManager;
     }
 
     // ── STEP 1: parsing (solo analisi, nessuna scrittura su DB) ─────────────
@@ -93,6 +104,23 @@ public class PdfImportService {
     public PdfImportResultDTO importaPdf(MultipartFile file, UUID menuId) throws IOException {
         // Verifica che il menu appartenga all'utente corrente
         menuService.checkOwnership(menuId);
+
+        // Registra l'invalidazione della cache DOPO il commit della transazione.
+        // Se invalidassimo prima, una richiesta concorrente (o la successiva GET /full)
+        // potrebbe rileggere i dati pre-commit e ripopolare la cache con stato obsoleto.
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        evictMenuCaches(menuId);
+                    }
+                }
+            );
+        } else {
+            // Fallback se la transazione non è attiva (non dovrebbe succedere con @Transactional)
+            evictMenuCaches(menuId);
+        }
 
         String testo = estraiTesto(file.getInputStream());
         PdfImportResultDTO parsed = parseTesto(testo);
@@ -228,5 +256,17 @@ public class PdfImportService {
             LOG.warn("Prezzo non parsabile: '{}' — impostato a 0", prezzoStr);
             return BigDecimal.ZERO;
         }
+    }
+
+    /**
+     * Svuota le cache relative al menu. Chiamato DOPO il commit della transazione
+     * per evitare che richieste concorrenti ripopolino la cache con dati pre-commit.
+     */
+    private void evictMenuCaches(UUID menuId) {
+        Cache menuCompleto = cacheManager.getCache("menuCompleto");
+        if (menuCompleto != null) menuCompleto.evict(menuId);
+        Cache piattiGiorno = cacheManager.getCache("piattiGiorno");
+        if (piattiGiorno != null) piattiGiorno.evict(menuId);
+        LOG.debug("Cache invalidate per menu {} dopo commit import PDF", menuId);
     }
 }

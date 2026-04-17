@@ -310,7 +310,10 @@ export class MenuViewComponent implements OnInit, OnDestroy {
       const v = item.valore.trim();
       return v.startsWith('http') ? v : `https://${v}`;
     }
-    return null; // INDIRIZZO: nessun link
+    if (item.tipo === 'INDIRIZZO') {
+      return `https://maps.google.com/?q=${encodeURIComponent(item.valore)}`;
+    }
+    return null;
   }
 
   getContattoLabel(item: ContattoItemDTO): string {
@@ -383,6 +386,14 @@ export class MenuViewComponent implements OnInit, OnDestroy {
         prodotti: (portata.prodotti ?? []).map((p: ProdottoDTO) => (p.id === aggiornato.id ? { ...aggiornato } : p)),
       }));
       this.prodottiMap.set(String(aggiornato.id), aggiornato);
+      // Risincronizza le reference alle portate attive (moderno e rustico tengono un ref
+      // diretto all'oggetto portata; senza questo refresh la lista visualizzata non si aggiorna)
+      if (this.rusticoPortataAttiva) {
+        this.rusticoPortataAttiva = this.portate.find(p => p.id === this.rusticoPortataAttiva!.id) ?? null;
+      }
+      if (this.modernoPortataAttiva) {
+        this.modernoPortataAttiva = this.portate.find(p => p.id === this.modernoPortataAttiva!.id) ?? null;
+      }
       this.calcolaTuttiAllergeni();
       // Invalida le cache di traduzione perché il testo è cambiato
       this.traduzioneService.clearCache();
@@ -392,6 +403,7 @@ export class MenuViewComponent implements OnInit, OnDestroy {
       this.editErrore = 'Errore durante il salvataggio. Riprova.';
     } finally {
       this.isSavingEdit = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -418,12 +430,21 @@ export class MenuViewComponent implements OnInit, OnDestroy {
         prodotti: (portata.prodotti ?? []).filter((p: ProdottoDTO) => p.id !== idEliminato),
       }));
       this.prodottiMap.delete(String(idEliminato));
+      // Risincronizza le reference alle portate attive (moderno e rustico tengono un ref
+      // diretto all'oggetto portata; senza questo refresh il prodotto eliminato resta visibile)
+      if (this.rusticoPortataAttiva) {
+        this.rusticoPortataAttiva = this.portate.find(p => p.id === this.rusticoPortataAttiva!.id) ?? null;
+      }
+      if (this.modernoPortataAttiva) {
+        this.modernoPortataAttiva = this.portate.find(p => p.id === this.modernoPortataAttiva!.id) ?? null;
+      }
       this.calcolaTuttiAllergeni();
       this.chiudiConfermaEliminazione();
     } catch (err) {
       console.error('Errore eliminazione prodotto:', err);
     } finally {
       this.isDeleting = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -623,6 +644,16 @@ export class MenuViewComponent implements OnInit, OnDestroy {
   }
   get coloreSecondario(): string {
     return this.menu?.coloreSecondario ?? '#e8c832';
+  }
+
+  /** Sfondo card prodotto alternato: pari = primario, dispari = secondario. */
+  getCardBg(index: number): string {
+    return index % 2 === 0 ? this.colorePrimario : this.coloreSecondario;
+  }
+
+  /** Testo card prodotto: opposto rispetto allo sfondo. */
+  getCardText(index: number): string {
+    return index % 2 === 0 ? this.coloreSecondario : this.colorePrimario;
   }
 
   /** Restituisce '#ffffff' o '#000000' garantendo sempre contrasto leggibile. */
