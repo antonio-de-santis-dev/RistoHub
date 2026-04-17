@@ -955,6 +955,7 @@
               *ngFor="let img of rusticoImmagini; let i = index"
               class="rustico-slide"
               [class.rustico-slide-attiva]="i === rusticoCarouselIndex"
+              [style.backgroundImage]="'url(' + img + ')'"
             >
               <div class="slide-skeleton" [class.slide-skeleton-hidden]="rusticoImmaginiCaricate[i]"></div>
               <img
