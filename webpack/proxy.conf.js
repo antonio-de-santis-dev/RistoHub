@@ -1,5 +1,5 @@
 function setupProxy({ tls }) {
-  const serverResources = ['/api', '/services', '/management', '/v3/api-docs', '/h2-console', '/health'];
+  const serverResources = ['/api', '/services', '/management', '/v3/api-docs', '/h2-console', '/health', '/template-menu-ristohub.docx'];
   return [
     {
       context: serverResources,
