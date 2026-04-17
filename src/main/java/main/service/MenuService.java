@@ -34,11 +34,18 @@ public class MenuService {
     private final MenuRepository menuRepository;
     private final MenuMapper menuMapper;
     private final PiattoDelGiornoRepository piattoDelGiornoRepository;
+    private final main.repository.UserRepository userRepository;
 
-    public MenuService(MenuRepository menuRepository, MenuMapper menuMapper, PiattoDelGiornoRepository piattoDelGiornoRepository) {
+    public MenuService(
+        MenuRepository menuRepository,
+        MenuMapper menuMapper,
+        PiattoDelGiornoRepository piattoDelGiornoRepository,
+        main.repository.UserRepository userRepository
+    ) {
         this.menuRepository = menuRepository;
         this.menuMapper = menuMapper;
         this.piattoDelGiornoRepository = piattoDelGiornoRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -62,6 +69,8 @@ public class MenuService {
     // metodo privato condiviso — evita duplicazione tra save() e update()
     private MenuDTO persistMenu(MenuDTO dto) {
         Menu menu = menuMapper.toEntity(dto);
+        // Imposta sempre il ristoratore dall'utente corrente autenticato
+        SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneByLogin).ifPresent(menu::setRistoratore);
         return menuMapper.toDto(menuRepository.save(menu));
     }
 

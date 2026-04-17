@@ -18,6 +18,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -90,6 +92,7 @@ public class PdfImportService {
      * @param menuId UUID del menu in cui inserire i prodotti
      * @return struttura con prodotti inseriti e avvisi
      */
+    @Caching(evict = { @CacheEvict(value = "menuCompleto", key = "#menuId"), @CacheEvict(value = "piattiGiorno", key = "#menuId") })
     public PdfImportResultDTO importaPdf(MultipartFile file, UUID menuId) throws IOException {
         // Verifica che il menu appartenga all'utente corrente
         menuService.checkOwnership(menuId);
