@@ -1149,33 +1149,6 @@
               </div>
             </div>
 
-            <!-- Allergeni footer -->
-            <div
-              class="sezione-allergeni-footer"
-              *ngIf="rusticoTabAttiva && tuttiAllergeniMenu.length > 0"
-              [style.borderTopColor]="colorePrimario + '44'"
-            >
-              <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">{{ getUI('ALLERGENI_TITOLO') }}</h3>
-              <div class="allergeni-footer-lista">
-                <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
-                  <div class="allergene-footer-cerchio" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'">
-                    <img
-                      *ngIf="getAllergeneIcona(a)"
-                      [src]="getAllergeneIcona(a)"
-                      [alt]="a.nome"
-                      class="allergene-footer-icona"
-                      style="width: 100%; height: 100%; object-fit: contain"
-                    />
-                    <span *ngIf="!getAllergeneIcona(a)" class="allergene-footer-iniziale" [style.color]="coloreSecondario">{{
-                      a.nome.charAt(0)
-                    }}</span>
-                  </div>
-                  <span class="allergene-footer-nome" [style.color]="colorePrimario + 'BB'">{{ a.nome }}</span>
-                </div>
-              </div>
-              <p class="allergeni-footer-nota" [style.color]="colorePrimario + '77'">{{ getUI('ALLERGENI_NOTA') }}</p>
-            </div>
-
             <a
               [routerLink]="['/prodotto-add', rusticoPortataAttiva.id]"
               class="btn-add-prodotto"
@@ -1190,10 +1163,39 @@
     </main>
   </div>
 
+  <!-- ALLERGENI — tra layout e contatti, sempre visibili, fuori dallo scroll -->
+  <div
+    class="rustico-allergeni-esterni"
+    *ngIf="tuttiAllergeniMenu.length > 0"
+    [style.backgroundColor]="coloreSecondario"
+    [style.borderTopColor]="colorePrimario + '33'"
+    [style.borderBottomColor]="colorePrimario + '33'"
+  >
+    <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">{{ getUI('ALLERGENI_TITOLO') }}</h3>
+    <div class="allergeni-footer-lista">
+      <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
+        <div class="allergene-footer-cerchio" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || colorePrimario">
+          <img
+            *ngIf="getAllergeneIcona(a)"
+            [src]="getAllergeneIcona(a)"
+            [alt]="a.nome"
+            class="allergene-footer-icona"
+            style="width: 100%; height: 100%; object-fit: contain"
+          />
+          <span *ngIf="!getAllergeneIcona(a)" class="allergene-footer-iniziale" [style.color]="coloreSecondario">{{
+            a.nome.charAt(0)
+          }}</span>
+        </div>
+        <span class="allergene-footer-nome" [style.color]="colorePrimario + 'CC'">{{ a.nome }}</span>
+      </div>
+    </div>
+    <p class="allergeni-footer-nota" [style.color]="colorePrimario + '88'">{{ getUI('ALLERGENI_NOTA') }}</p>
+  </div>
+
   <!-- CONTATTI — fuori dal flex, a tutta larghezza -->
   <div class="rustico-contatti-wrap" *ngIf="listeContatti.length > 0">
-    <div class="contatti-card" [style.backgroundColor]="colorePrimario" [style.color]="getContrastColor(colorePrimario)">
-      <div class="contatti-card-title">
+    <div class="contatti-card" [style.backgroundColor]="colorePrimario" [style.color]="coloreSecondario">
+      <div class="contatti-card-title" [style.color]="coloreSecondario">
         <svg
           width="18"
           height="18"
@@ -1210,14 +1212,14 @@
         <span>Contatti</span>
       </div>
       <div *ngFor="let lista of listeContatti" class="contatti-lista-wrap">
-        <p class="contatti-lista-nome" *ngIf="listeContatti.length > 1">{{ lista.nome }}</p>
+        <p class="contatti-lista-nome" *ngIf="listeContatti.length > 1" [style.color]="coloreSecondario">{{ lista.nome }}</p>
         <div class="contatti-items">
           <a
             *ngFor="let item of lista.items"
             [attr.href]="getContattoLink(item)"
             [attr.target]="item.tipo === 'SOCIAL' || item.tipo === 'INDIRIZZO' ? '_blank' : null"
             class="contatto-item"
-            [style.color]="getContrastColor(colorePrimario)"
+            [style.color]="coloreSecondario"
           >
             <span
               class="contatto-icona"
@@ -1225,20 +1227,20 @@
               [innerHTML]="getSafeSocialSvg(item.reteSociale)"
               [style.color]="coloreSecondario"
             ></span>
-            <span class="contatto-icona" *ngIf="item.tipo === 'TELEFONO'">
+            <span class="contatto-icona" *ngIf="item.tipo === 'TELEFONO'" [style.color]="coloreSecondario">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
                   d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
                 />
               </svg>
             </span>
-            <span class="contatto-icona" *ngIf="item.tipo === 'EMAIL'">
+            <span class="contatto-icona" *ngIf="item.tipo === 'EMAIL'" [style.color]="coloreSecondario">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                 <polyline points="22,6 12,13 2,6" />
               </svg>
             </span>
-            <span class="contatto-icona" *ngIf="item.tipo === 'INDIRIZZO'">
+            <span class="contatto-icona" *ngIf="item.tipo === 'INDIRIZZO'" [style.color]="coloreSecondario">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
                 <circle cx="12" cy="10" r="3" />
@@ -1247,6 +1249,7 @@
             <span
               class="contatto-icona"
               *ngIf="item.tipo === 'SOCIAL' && (item.reteSociale === 'ALTRO' || !getSocialIconSvg(item.reteSociale))"
+              [style.color]="coloreSecondario"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="18" cy="5" r="3" />
@@ -1257,8 +1260,8 @@
               </svg>
             </span>
             <div class="contatto-testo">
-              <span class="contatto-label">{{ getContattoLabel(item) }}</span>
-              <span class="contatto-valore" *ngIf="item.tipo === 'INDIRIZZO'">{{ item.valore }}</span>
+              <span class="contatto-label" [style.color]="coloreSecondario">{{ getContattoLabel(item) }}</span>
+              <span class="contatto-valore" *ngIf="item.tipo === 'INDIRIZZO'" [style.color]="coloreSecondario">{{ item.valore }}</span>
             </div>
           </a>
         </div>

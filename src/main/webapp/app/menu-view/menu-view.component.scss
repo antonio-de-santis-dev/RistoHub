@@ -1946,7 +1946,7 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   align-items: baseline;
   justify-content: space-between;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.6);
+  // background: coloreSecondario tramite il parent .rustico-page
   // borderBottomColor via [style]
 }
 
@@ -2114,6 +2114,82 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   text-align: center;
   color: rgba(0, 0, 0, 0.35);
   font-size: 12px;
+}
+
+// ── ALLERGENI ESTERNI (tra layout e contatti, fuori dallo scroll) ──
+.rustico-allergeni-esterni {
+  padding: 14px 18px 12px;
+  border-top: 1.5px solid;
+  border-bottom: 1.5px solid;
+
+  .allergeni-footer-titolo {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 0 0 10px;
+    // color via [style]
+  }
+
+  .allergeni-footer-lista {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px 8px;
+    margin-bottom: 8px;
+  }
+
+  .allergene-footer-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .allergene-footer-cerchio {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .allergene-footer-icona {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .allergene-footer-iniziale {
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .allergene-footer-nome {
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .allergeni-footer-nota {
+    font-size: 9px;
+    font-style: italic;
+    margin: 4px 0 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .rustico-allergeni-esterni .allergeni-footer-lista {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+
+@media (max-width: 380px) {
+  .rustico-allergeni-esterni .allergeni-footer-lista {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 // ── AZIONI PRODOTTO ─────────────────────────────────────────────────
