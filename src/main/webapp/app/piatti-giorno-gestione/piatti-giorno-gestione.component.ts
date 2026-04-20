@@ -15,12 +15,9 @@ import {
   ProdottoDTO,
 } from 'app/shared/model/risto.model';
 
-// Percorso immagine fallback per allergeni senza icona (inseriti manualmente).
-// Posizionare il file in: src/main/webapp/content/images/allergene-manuale.png
 const ALLERGENE_MANUALE_ICONA = 'content/images/allergene-manuale.png';
 const ALLERGENI_ICONE_BASE = 'content/images/iconeAlergeni/';
 
-// Mappa nome allergene (lowercase) → nome file immagine
 const ALLERGENE_ICONE_MAP: Record<string, string> = {
   glutine: 'Glutine.png',
   crostacei: 'Crostacei.png',
@@ -37,6 +34,17 @@ const ALLERGENE_ICONE_MAP: Record<string, string> = {
   lupini: 'lupoli.png',
   molluschi: 'Moluschi.png',
 };
+
+interface PiattoGruppo {
+  key: string;
+  entries: PiattoDelGiornoDTO[];
+  isFromMenu: boolean;
+  isMulti: boolean;
+  nome: string;
+  descrizione?: string | null;
+  prezzo: number;
+  allergeni: AllergeneDTO[];
+}
 
 @Component({
   selector: 'jhi-piatti-giorno-gestione',
@@ -63,12 +71,20 @@ export class PiattiGiornoGestioneComponent implements OnInit {
   menus: MenuDTO[] = [];
   portate: PortataDTO[] = [];
   prodotti: ProdottoDTO[] = [];
+
+  // "Crea Nuovo": set di menu selezionati (multi)
+  menuNuovoPiattoIds: Set<string> = new Set();
+
+  // "Da Menu": menu sorgente per sfogliare portate/prodotti
   menuSelezionato: string | null = null;
-  menuNuovoPiatto: string | null = null;
   portataSelezionata: string | null = null;
 
-  private _prodottoDettaglio: ProdottoDTO | null = null;
-  private _menuDettaglio: MenuDTO | null = null;
+  // "Da Menu": step 4 — selezione menu di destinazione (multi)
+  step4DaMenuAttivo = false;
+  menuDestinazioneIds: Set<string> = new Set();
+
+  _prodottoDettaglio: ProdottoDTO | null = null;
+  _menuDettaglio: MenuDTO | null = null;
 
   allergeniDisponibili: AllergeneUI[] = [];
   allergeniSelezionati: Set<string> = new Set();
@@ -125,9 +141,6 @@ export class PiattiGiornoGestioneComponent implements OnInit {
 
   private async costruisciProdottiMap(): Promise<void> {
     try {
-      // Passo B: un solo endpoint aggregato per menu → nessun loop multi-livello.
-      // GET /api/menus/{id}/prodotti-completi restituisce tutti i prodotti
-      // con allergeni già caricati, tramite una singola query JOIN FETCH sul backend.
       const tuttiIProdotti: ProdottoDTO[][] = await Promise.all(
         this.menus.map(menu => firstValueFrom(this.http.get<ProdottoDTO[]>(`/api/menus/${menu.id}/prodotti-completi`)).then(r => r ?? [])),
       );
@@ -186,80 +199,102 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     return this.arricchisciAllergeni(lista);
   }
 
-  /**
-   * Restituisce l'URL dell'icona di un allergene.
-   * Priorità: 1) immagine statica per allergeni di default
-   *           2) icona base64 dal DB (allergeni custom)
-   *           3) fallback generico
-   */
   getAllergeneIcona(a: AllergeneDTO): string {
     if (!a) return ALLERGENE_MANUALE_ICONA;
-
-    // 1. Icona statica per allergeni di default (nome → file locale)
     const nomeKey = (a.nome ?? '').toLowerCase().trim();
-    if (ALLERGENE_ICONE_MAP[nomeKey]) {
-      return ALLERGENI_ICONE_BASE + ALLERGENE_ICONE_MAP[nomeKey];
-    }
-
-    // 2. Icona base64 diretta sull'oggetto
-    if (a.icona && a.iconaContentType) {
-      return `data:${a.iconaContentType};base64,${a.icona}`;
-    }
-
-    // 3. Cerca nell'elenco locale per ID (allergeni custom con icona nel DB)
+    if (ALLERGENE_ICONE_MAP[nomeKey]) return ALLERGENI_ICONE_BASE + ALLERGENE_ICONE_MAP[nomeKey];
+    if (a.icona && a.iconaContentType) return `data:${a.iconaContentType};base64,${a.icona}`;
     if (a.id != null) {
-      const trovato = this.allergeniDisponibili.find(d => String(d.id) === String(a.id));
-      if (trovato?.icona && trovato?.iconaContentType) {
-        return `data:${trovato.iconaContentType};base64,${trovato.icona}`;
-      }
+      const t = this.allergeniDisponibili.find(d => String(d.id) === String(a.id));
+      if (t?.icona && t?.iconaContentType) return `data:${t.iconaContentType};base64,${t.icona}`;
     }
-
-    // 4. Cerca per nome (fallback per allergeni custom senza icona)
     if (a.nome) {
-      const trovato = this.allergeniDisponibili.find(d => d.nome.toLowerCase().trim() === nomeKey);
-      if (trovato?.icona && trovato?.iconaContentType) {
-        return `data:${trovato.iconaContentType};base64,${trovato.icona}`;
-      }
+      const t = this.allergeniDisponibili.find(d => d.nome.toLowerCase().trim() === nomeKey);
+      if (t?.icona && t?.iconaContentType) return `data:${t.iconaContentType};base64,${t.icona}`;
     }
-
-    // 5. Fallback: icona generica per allergeni manuali
     return ALLERGENE_MANUALE_ICONA;
   }
 
   // ══════════════════════════════════════════════════
+  //  SELEZIONE MULTI-MENU
+  // ══════════════════════════════════════════════════
+
+  toggleMenuNuovoPiatto(id: string): void {
+    if (this.menuNuovoPiattoIds.has(id)) this.menuNuovoPiattoIds.delete(id);
+    else this.menuNuovoPiattoIds.add(id);
+    this.menuNuovoPiattoIds = new Set(this.menuNuovoPiattoIds);
+  }
+
+  toggleMenuDestinazione(id: string): void {
+    if (this.menuDestinazioneIds.has(id)) this.menuDestinazioneIds.delete(id);
+    else this.menuDestinazioneIds.add(id);
+    this.menuDestinazioneIds = new Set(this.menuDestinazioneIds);
+  }
+
+  // ══════════════════════════════════════════════════
+  //  RAGGRUPPAMENTO CARD PER PRODOTTO
+  // ══════════════════════════════════════════════════
+
+  /** Restituisce true se almeno un entry del gruppo è attivo */
+  gruppoHaAttivo(gruppo: PiattoGruppo): boolean {
+    for (const entry of gruppo.entries) {
+      if (entry.attivo) return true;
+    }
+    return false;
+  }
+
+  get piattiGruppo(): PiattoGruppo[] {
+    const map = new Map<string, PiattoDelGiornoDTO[]>();
+    for (const p of this.piattiGiorno) {
+      // Prodotti "da menu" → raggruppati per prodotto.id
+      // Prodotti personalizzati → raggruppati per nome + prezzo (stesso piatto su più menu)
+      let key: string;
+      if (p.prodotto?.id) {
+        key = `prod_${p.prodotto.id}`;
+      } else {
+        const nome = (p.nome ?? '').trim().toLowerCase();
+        const prezzo = String(p.prezzo ?? '');
+        key = `custom_${nome}_${prezzo}`;
+      }
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(p);
+    }
+    return Array.from(map.entries()).map(([key, entries]) => {
+      const first = entries[0];
+      return {
+        key,
+        entries,
+        isFromMenu: !!first.prodotto,
+        isMulti: entries.length > 1,
+        nome: this.nomePiatto(first),
+        descrizione: this.descrizionePiatto(first),
+        prezzo: this.prezzoPiatto(first),
+        allergeni: this.getAllergeniPiatto(first),
+      };
+    });
+  }
+
+  // ══════════════════════════════════════════════════
   //  ALLERGENI CUSTOM → PERSISTENZA NEL DB
-  //
-  //  Prima del salvataggio di qualsiasi piatto, crea nel DB
-  //  tutti gli allergeni con ID temporaneo (custom_*).
-  //  Restituisce la lista finale con gli ID reali del DB.
   // ══════════════════════════════════════════════════
 
   private async assicuraAllergeniNelDb(idSet: Set<string>): Promise<{ id: string }[]> {
     const risultato: { id: string }[] = [];
     for (const id of idSet) {
       if (!id.startsWith('custom_')) {
-        // Allergene già persistito nel DB
         risultato.push({ id });
       } else {
-        // Allergene custom: lo creiamo ora nel DB
         const locale = this.allergeniDisponibili.find(a => String(a.id) === id);
         if (!locale) continue;
         try {
           const creato: AllergeneUI = await firstValueFrom(
-            this.http.post<AllergeneUI>('/api/allergenes', {
-              nome: locale.nome,
-              colore: locale.colore ?? '#607D8B',
-            }),
+            this.http.post<AllergeneUI>('/api/allergenes', { nome: locale.nome, colore: locale.colore ?? '#607D8B' }),
           );
-          // Aggiorna l'ID temporaneo con quello reale nell'elenco locale
           const idx = this.allergeniDisponibili.findIndex(a => String(a.id) === id);
-          if (idx !== -1) {
-            this.allergeniDisponibili[idx] = { ...this.allergeniDisponibili[idx], id: creato.id };
-          }
+          if (idx !== -1) this.allergeniDisponibili[idx] = { ...this.allergeniDisponibili[idx], id: creato.id };
           risultato.push({ id: String(creato.id) });
         } catch (err) {
           console.error(`Errore creazione allergene custom "${locale.nome}":`, err);
-          // Salta questo allergene, continua con gli altri
         }
       }
     }
@@ -274,7 +309,6 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     this.piattoInModifica = piatto;
     this.editErrore = null;
     this.editMenuId = piatto.menu?.id ?? null;
-
     if (piatto.prodotto) {
       this.editNome = piatto.prodotto.nome;
       this.editDescrizione = piatto.prodotto.descrizione ?? '';
@@ -286,7 +320,6 @@ export class PiattiGiornoGestioneComponent implements OnInit {
       this.editPrezzo = piatto.prezzo ?? null;
       this.editAllergeniSelezionati = new Set((piatto.allergenis ?? []).map(a => String(a.id)));
     }
-
     this.editNomeAllergeneCustom = '';
     this.modaleModificaAperto = true;
   }
@@ -324,17 +357,13 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     if (!this.piattoInModifica?.id || !this.editFormValido()) return;
     this.isSavingEdit = true;
     this.editErrore = null;
-
     try {
-      // ✅ Crea nel DB gli eventuali allergeni custom prima del salvataggio
       const allergeni = await this.assicuraAllergeniNelDb(this.editAllergeniSelezionati);
-
       const body: PiattoDelGiornoBody = {
         id: this.piattoInModifica.id,
         attivo: this.piattoInModifica.attivo,
         menu: { id: this.editMenuId! },
       };
-
       if (this.piattoInModifica.prodotto) {
         body.prodotto = { id: this.piattoInModifica.prodotto.id };
         body.nome = null;
@@ -348,9 +377,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
         body.prezzo = this.editPrezzo;
         body.allergenis = allergeni;
       }
-
       await firstValueFrom(this.http.put(`/api/piatto-del-giornos/${this.piattoInModifica.id}`, body));
-
       const menuInfo = this.menus.find(m => m.id === this.editMenuId);
       this.piattiGiorno = this.piattiGiorno.map(p => {
         if (p.id !== this.piattoInModifica!.id) return p;
@@ -362,12 +389,10 @@ export class PiattiGiornoGestioneComponent implements OnInit {
           aggiornato.nome = this.editNome.trim();
           aggiornato.descrizione = this.editDescrizione.trim() || undefined;
           aggiornato.prezzo = this.editPrezzo!;
-          // ✅ IDs reali post-creazione allergeni
           aggiornato.allergenis = allergeni.map(a => this.getAllergeneById(a.id)).filter((a): a is AllergeneUI => a !== undefined);
         }
         return aggiornato;
       });
-
       this.isSavingEdit = false;
       this.chiudiModaleModifica();
     } catch (err) {
@@ -398,7 +423,7 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     try {
       await firstValueFrom(this.http.delete(`/api/piatto-del-giornos/${this.piattoInEliminazione.id}`));
       this.piattiGiorno = this.piattiGiorno.filter(p => p.id !== this.piattoInEliminazione!.id);
-      this.isDeleting = false; // ✅ reset PRIMA di chiudere
+      this.isDeleting = false;
       this.chiudiModaleEliminazione();
     } catch (err) {
       console.error('Errore eliminazione:', err);
@@ -461,7 +486,9 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     this.prezzo = null;
     this.prodottoSelezionato = null;
     this.menuSelezionato = null;
-    this.menuNuovoPiatto = null;
+    this.menuNuovoPiattoIds = new Set();
+    this.menuDestinazioneIds = new Set();
+    this.step4DaMenuAttivo = false;
     this.portataSelezionata = null;
     this.portate = [];
     this.prodotti = [];
@@ -474,8 +501,10 @@ export class PiattiGiornoGestioneComponent implements OnInit {
   }
 
   formValido(): boolean {
-    if (this.modalitaSelezioneProdotto) return this.prodottoSelezionato !== null && this.menuSelezionato !== null;
-    return this.nome.trim() !== '' && this.prezzo !== null && this.prezzo > 0 && this.menuNuovoPiatto !== null;
+    if (this.modalitaSelezioneProdotto) {
+      return this.prodottoSelezionato !== null && this.menuDestinazioneIds.size > 0;
+    }
+    return this.nome.trim() !== '' && this.prezzo !== null && this.prezzo > 0 && this.menuNuovoPiattoIds.size > 0;
   }
 
   toggleAllergene(id: string): void {
@@ -494,10 +523,20 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     this.nomeAllergeneCustom = '';
   }
 
+  /** Step 3 → Step 4: memorizza prodotto e mostra selezione menu destinazione */
   selezionaESalvaProdotto(prod: ProdottoDTO): void {
     this._prodottoDettaglio = prod;
     this.prodottoSelezionato = prod.id;
-    this.salvaPiatto();
+    this.menuDestinazioneIds = new Set();
+    this.step4DaMenuAttivo = true;
+  }
+
+  /** Torna allo step 3 annullando la selezione menu */
+  tornaAStep3(): void {
+    this.step4DaMenuAttivo = false;
+    this.prodottoSelezionato = null;
+    this._prodottoDettaglio = null;
+    this.menuDestinazioneIds = new Set();
   }
 
   async salvaPiatto(): Promise<void> {
@@ -507,57 +546,62 @@ export class PiattiGiornoGestioneComponent implements OnInit {
     this.errorMessage = null;
     try {
       let allergeni: { id: string }[] = [];
-
       if (!this.modalitaSelezioneProdotto) {
-        // ✅ Crea nel DB gli eventuali allergeni custom prima del salvataggio
         allergeni = await this.assicuraAllergeniNelDb(this.allergeniSelezionati);
       }
 
-      const body: PiattoDelGiornoBody = { attivo: true };
-      if (this.modalitaSelezioneProdotto && this.prodottoSelezionato) {
-        body.prodotto = { id: this.prodottoSelezionato };
-        body.menu = { id: this.menuSelezionato! };
-        body.nome = null;
-        body.descrizione = null;
-        body.prezzo = null;
-      } else {
-        body.nome = this.nome.trim();
-        body.descrizione = this.descrizione.trim() || null;
-        body.prezzo = this.prezzo;
-        body.prodotto = null;
-        body.menu = { id: this.menuNuovoPiatto! };
-        body.allergenis = allergeni;
+      const menuIds = this.modalitaSelezioneProdotto ? Array.from(this.menuDestinazioneIds) : Array.from(this.menuNuovoPiattoIds);
+
+      const nuoviPiatti: PiattoDelGiornoDTO[] = [];
+
+      for (const menuId of menuIds) {
+        const body: PiattoDelGiornoBody = { attivo: true };
+        if (this.modalitaSelezioneProdotto && this.prodottoSelezionato) {
+          body.prodotto = { id: this.prodottoSelezionato };
+          body.menu = { id: menuId };
+          body.nome = null;
+          body.descrizione = null;
+          body.prezzo = null;
+        } else {
+          body.nome = this.nome.trim();
+          body.descrizione = this.descrizione.trim() || null;
+          body.prezzo = this.prezzo;
+          body.prodotto = null;
+          body.menu = { id: menuId };
+          body.allergenis = allergeni;
+        }
+
+        const piattoRisposta: PiattoDelGiornoDTO = await firstValueFrom(
+          this.http.post<PiattoDelGiornoDTO>('/api/piatto-del-giornos', body),
+        );
+        const menuInfo = this.menus.find(m => m.id === menuId);
+        let piattoArricchito: PiattoDelGiornoDTO;
+
+        if (this.modalitaSelezioneProdotto && this._prodottoDettaglio) {
+          piattoArricchito = {
+            ...piattoRisposta,
+            attivo: true,
+            prodotto: {
+              id: this._prodottoDettaglio.id,
+              nome: this._prodottoDettaglio.nome,
+              descrizione: this._prodottoDettaglio.descrizione,
+              prezzo: this._prodottoDettaglio.prezzo,
+              allergenis: this.arricchisciAllergeni(this._prodottoDettaglio.allergenis ?? []),
+            },
+            menu: menuInfo ? { id: menuInfo.id, nome: menuInfo.nome } : piattoRisposta.menu,
+          };
+        } else {
+          piattoArricchito = {
+            ...piattoRisposta,
+            attivo: true,
+            menu: menuInfo ? { id: menuInfo.id, nome: menuInfo.nome } : piattoRisposta.menu,
+            allergenis: allergeni.map(a => this.getAllergeneById(a.id)).filter((a): a is AllergeneUI => a !== undefined),
+          };
+        }
+        nuoviPiatti.push(piattoArricchito);
       }
 
-      const piattoRisposta: PiattoDelGiornoDTO = await firstValueFrom(this.http.post<PiattoDelGiornoDTO>('/api/piatto-del-giornos', body));
-
-      let piattoArricchito: PiattoDelGiornoDTO;
-      if (this.modalitaSelezioneProdotto && this._prodottoDettaglio) {
-        const menuInfo = this._menuDettaglio ?? this.menus.find(m => m.id === this.menuSelezionato);
-        piattoArricchito = {
-          ...piattoRisposta,
-          attivo: true,
-          prodotto: {
-            id: this._prodottoDettaglio.id,
-            nome: this._prodottoDettaglio.nome,
-            descrizione: this._prodottoDettaglio.descrizione,
-            prezzo: this._prodottoDettaglio.prezzo,
-            allergenis: this.arricchisciAllergeni(this._prodottoDettaglio.allergenis ?? []),
-          },
-          menu: menuInfo ? { id: menuInfo.id, nome: menuInfo.nome } : piattoRisposta.menu,
-        };
-      } else {
-        const menuInfo = this.menus.find(m => m.id === this.menuNuovoPiatto);
-        piattoArricchito = {
-          ...piattoRisposta,
-          attivo: true,
-          menu: menuInfo ? { id: menuInfo.id, nome: menuInfo.nome } : piattoRisposta.menu,
-          // ✅ IDs reali post-creazione allergeni
-          allergenis: allergeni.map(a => this.getAllergeneById(a.id)).filter((a): a is AllergeneUI => a !== undefined),
-        };
-      }
-
-      this.piattiGiorno = [piattoArricchito, ...this.piattiGiorno];
+      this.piattiGiorno = [...nuoviPiatti, ...this.piattiGiorno];
       this.chiudiModale();
     } catch (err) {
       console.error('Errore salvataggio:', err);

@@ -35,19 +35,24 @@
     </div>
 
     <div *ngIf="!isLoading && piattiGiorno.length > 0" class="pg-grid">
-      <div *ngFor="let piatto of piattiGiorno" class="pg-card" [class.pg-card-inattivo]="!piatto.attivo">
-        <div class="pg-card-bar" [style.background]="piatto.attivo ? '#4ade80' : '#e5e7eb'"></div>
+      <div *ngFor="let gruppo of piattiGruppo" class="pg-card" [class.pg-card-inattivo]="!gruppoHaAttivo(gruppo)">
+        <div class="pg-card-bar" [style.background]="gruppoHaAttivo(gruppo) ? '#4ade80' : '#e5e7eb'"></div>
         <div class="pg-card-badge-row">
-          <span class="pg-badge pg-badge-menu" *ngIf="piatto.prodotto">🔗 Da Menu</span>
-          <span class="pg-badge pg-badge-custom" *ngIf="!piatto.prodotto">✨ Personalizzato</span>
-          <span class="pg-menu-nome" *ngIf="piatto.menu?.nome">{{ piatto.menu?.nome }}</span>
+          <span class="pg-badge pg-badge-menu" *ngIf="gruppo.isFromMenu">🔗 Da Menu</span>
+          <span class="pg-badge pg-badge-custom" *ngIf="!gruppo.isFromMenu">✨ Personalizzato</span>
+          <!-- menu singolo: mostra nome menu -->
+          <span class="pg-menu-nome" *ngIf="!gruppo.isMulti && gruppo.entries[0].menu?.nome">
+            {{ gruppo.entries[0].menu?.nome }}
+          </span>
+          <!-- multi-menu: mostra contatore -->
+          <span class="pg-menu-nome pg-menu-multi-badge" *ngIf="gruppo.isMulti"> 📋 {{ gruppo.entries.length }} menu </span>
         </div>
         <div class="pg-card-body">
-          <h3 class="pg-nome">{{ nomePiatto(piatto) }}</h3>
-          <p class="pg-desc" *ngIf="descrizionePiatto(piatto)">{{ descrizionePiatto(piatto) }}</p>
-          <div class="pg-prezzo">{{ formatPrezzo(prezzoPiatto(piatto)) }}</div>
-          <div class="pg-allergeni" *ngIf="getAllergeniPiatto(piatto).length > 0">
-            <ng-container *ngFor="let a of getAllergeniPiatto(piatto)">
+          <h3 class="pg-nome">{{ gruppo.nome }}</h3>
+          <p class="pg-desc" *ngIf="gruppo.descrizione">{{ gruppo.descrizione }}</p>
+          <div class="pg-prezzo">{{ formatPrezzo(gruppo.prezzo) }}</div>
+          <div class="pg-allergeni" *ngIf="gruppo.allergeni.length > 0">
+            <ng-container *ngFor="let a of gruppo.allergeni">
               <div
                 class="pg-all-cerchio"
                 [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'"
@@ -64,27 +69,29 @@
             </ng-container>
           </div>
         </div>
-        <div class="pg-card-actions">
+
+        <!-- ── CARD CON MENU SINGOLO: azioni standard ── -->
+        <div *ngIf="!gruppo.isMulti" class="pg-card-actions">
           <button
             class="pg-btn-toggle"
-            [class.pg-visibile]="piatto.attivo"
-            [class.pg-nascosto]="!piatto.attivo"
-            (click)="toggleAttivo(piatto)"
+            [class.pg-visibile]="gruppo.entries[0].attivo"
+            [class.pg-nascosto]="!gruppo.entries[0].attivo"
+            (click)="toggleAttivo(gruppo.entries[0])"
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
               <circle cx="12" cy="12" r="3" />
             </svg>
-            {{ piatto.attivo ? 'Visibile' : 'Nascosto' }}
+            {{ gruppo.entries[0].attivo ? 'Visibile' : 'Nascosto' }}
           </button>
-          <button class="pg-btn-edit" (click)="apriModaleModifica(piatto)" title="Modifica">
+          <button class="pg-btn-edit" (click)="apriModaleModifica(gruppo.entries[0])" title="Modifica">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
             </svg>
             <span class="pg-btn-label">Modifica</span>
           </button>
-          <button class="pg-btn-delete" (click)="apriModaleEliminazione(piatto)" title="Elimina">
+          <button class="pg-btn-delete" (click)="apriModaleEliminazione(gruppo.entries[0])" title="Elimina">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="3 6 5 6 21 6" />
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
@@ -92,11 +99,49 @@
             <span class="pg-btn-label">Elimina</span>
           </button>
         </div>
+
+        <!-- ── CARD MULTI-MENU: disponibilità per menu ── -->
+        <div *ngIf="gruppo.isMulti" class="pg-menu-disponibilita">
+          <div class="pg-menu-dispo-title">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            Disponibilità nei menu
+          </div>
+          <div *ngFor="let entry of gruppo.entries" class="pg-menu-dispo-row">
+            <span class="pg-menu-dispo-nome">{{ entry.menu?.nome ?? '—' }}</span>
+            <div class="pg-menu-dispo-actions">
+              <button
+                class="pg-btn-toggle-sm"
+                [class.pg-visibile]="entry.attivo"
+                [class.pg-nascosto]="!entry.attivo"
+                (click)="toggleAttivo(entry)"
+                [title]="entry.attivo ? 'Clicca per nascondere' : 'Clicca per rendere visibile'"
+              >
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                {{ entry.attivo ? 'Visibile' : 'Nascosto' }}
+              </button>
+              <button class="pg-btn-delete-sm" (click)="apriModaleEliminazione(entry)" title="Rimuovi da questo menu">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- ════════════════════════════════════════════════════
+     MODALE: CREA NUOVO (con multi-menu)
+════════════════════════════════════════════════════ -->
 <div *ngIf="modaleCreazioneAperto && !modalitaSelezioneProdotto" class="pg-modal-overlay" (click)="chiudiModale()">
   <div class="pg-modal-box" (click)="$event.stopPropagation()">
     <div class="pg-modal-header">
@@ -117,17 +162,41 @@
     <div *ngIf="errorMessage" class="pg-alert pg-alert-error">{{ errorMessage }}</div>
 
     <div class="pg-modal-body">
+      <!-- MULTI-MENU SELECTOR -->
       <div class="pg-form-group">
         <label class="pg-form-label">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
           </svg>
-          Associa a un Menu
+          Pubblica nei menu
+          <span class="pg-label-hint">(seleziona uno o più)</span>
         </label>
-        <select class="pg-form-control" [(ngModel)]="menuNuovoPiatto">
-          <option [ngValue]="null">— Seleziona un menu —</option>
-          <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
-        </select>
+        <div class="pg-menu-checkboxes">
+          <label
+            *ngFor="let m of menus"
+            class="pg-menu-checkbox-item"
+            [class.pg-menu-checkbox-selected]="menuNuovoPiattoIds.has(m.id)"
+            (click)="toggleMenuNuovoPiatto(m.id)"
+          >
+            <span class="pg-menu-checkbox-dot" [class.pg-menu-checkbox-dot-on]="menuNuovoPiattoIds.has(m.id)">
+              <svg
+                *ngIf="menuNuovoPiattoIds.has(m.id)"
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </span>
+            {{ m.nome }}
+          </label>
+        </div>
+        <p *ngIf="menuNuovoPiattoIds.size > 1" class="pg-multi-hint">
+          ✅ Verrà creato in <strong>{{ menuNuovoPiattoIds.size }} menu</strong>
+        </p>
       </div>
 
       <div class="pg-form-row">
@@ -158,8 +227,6 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
           </svg>
           Descrizione
         </label>
@@ -227,7 +294,7 @@
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="20 6 9 17 4 12" />
           </svg>
-          Salva Piatto
+          Salva {{ menuNuovoPiattoIds.size > 1 ? 'in ' + menuNuovoPiattoIds.size + ' menu' : 'Piatto' }}
         </span>
         <span *ngIf="isSaving" class="pg-saving-row">
           <span class="pg-mini-spinner"></span>
@@ -238,7 +305,10 @@
   </div>
 </div>
 
-<div *ngIf="modaleCreazioneAperto && modalitaSelezioneProdotto" class="pg-modal-overlay" (click)="chiudiModale()">
+<!-- ════════════════════════════════════════════════════
+     MODALE: DA MENU — Step 1/2/3 (sfoglia prodotti)
+════════════════════════════════════════════════════ -->
+<div *ngIf="modaleCreazioneAperto && modalitaSelezioneProdotto && !step4DaMenuAttivo" class="pg-modal-overlay" (click)="chiudiModale()">
   <div class="pg-modal-box" (click)="$event.stopPropagation()">
     <div class="pg-modal-header">
       <div class="pg-modal-icon pg-modal-icon-blue">🔗</div>
@@ -256,10 +326,7 @@
 
     <div class="pg-modal-body">
       <div class="pg-step">
-        <div class="pg-step-label">
-          <span class="pg-step-num">1</span>
-          <span>Scegli il menu</span>
-        </div>
+        <div class="pg-step-label"><span class="pg-step-num">1</span><span>Scegli il menu sorgente</span></div>
         <select class="pg-form-control" [(ngModel)]="menuSelezionato" (ngModelChange)="onMenuSelezionato()">
           <option [ngValue]="null">— Seleziona un menu —</option>
           <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
@@ -267,10 +334,7 @@
       </div>
 
       <div class="pg-step" *ngIf="portate.length > 0">
-        <div class="pg-step-label">
-          <span class="pg-step-num">2</span>
-          <span>Scegli la portata</span>
-        </div>
+        <div class="pg-step-label"><span class="pg-step-num">2</span><span>Scegli la portata</span></div>
         <select class="pg-form-control" [(ngModel)]="portataSelezionata" (ngModelChange)="onPortataSelezionata()">
           <option [ngValue]="null">— Seleziona una portata —</option>
           <option *ngFor="let p of portate" [value]="p.id">{{ nomePortata(p) }}</option>
@@ -278,17 +342,9 @@
       </div>
 
       <div class="pg-step" *ngIf="prodotti.length > 0">
-        <div class="pg-step-label">
-          <span class="pg-step-num">3</span>
-          <span>Clicca un piatto per aggiungerlo</span>
-        </div>
+        <div class="pg-step-label"><span class="pg-step-num">3</span><span>Clicca un piatto per sceglierlo</span></div>
         <div class="pg-prodotti-lista">
-          <div
-            class="pg-prodotto-item"
-            *ngFor="let prod of prodotti"
-            (click)="selezionaESalvaProdotto(prod)"
-            [class.pg-prodotto-saving]="isSaving && prodottoSelezionato === prod.id"
-          >
+          <div class="pg-prodotto-item" *ngFor="let prod of prodotti" (click)="selezionaESalvaProdotto(prod)">
             <div class="pg-prodotto-info">
               <span class="pg-prodotto-nome">{{ prod.nome }}</span>
               <span class="pg-prodotto-desc" *ngIf="prod.descrizione">{{ prod.descrizione }}</span>
@@ -296,19 +352,10 @@
             <div class="pg-prodotto-right">
               <span class="pg-prodotto-prezzo">{{ formatPrezzo(prod.prezzo) }}</span>
               <span class="pg-prodotto-add-icon">
-                <svg
-                  *ngIf="!(isSaving && prodottoSelezionato === prod.id)"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
-                <span *ngIf="isSaving && prodottoSelezionato === prod.id" class="pg-mini-spinner"></span>
               </span>
             </div>
           </div>
@@ -327,6 +374,95 @@
   </div>
 </div>
 
+<!-- ════════════════════════════════════════════════════
+     MODALE: DA MENU — Step 4 (selezione menu destinazione)
+════════════════════════════════════════════════════ -->
+<div *ngIf="modaleCreazioneAperto && modalitaSelezioneProdotto && step4DaMenuAttivo" class="pg-modal-overlay" (click)="chiudiModale()">
+  <div class="pg-modal-box" (click)="$event.stopPropagation()">
+    <div class="pg-modal-header">
+      <div class="pg-modal-icon pg-modal-icon-blue">📋</div>
+      <div>
+        <h2 class="pg-modal-title">Pubblica nei Menu</h2>
+        <p class="pg-modal-subtitle">Scegli in quali menu mostrare questo piatto</p>
+      </div>
+      <button class="pg-modal-close" (click)="chiudiModale()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="pg-modal-body">
+      <!-- Riepilogo prodotto scelto -->
+      <div class="pg-step4-prodotto-preview" *ngIf="_prodottoDettaglio">
+        <div class="pg-step4-preview-row">
+          <span class="pg-step4-label">Piatto</span>
+          <span class="pg-step4-value pg-step4-nome">{{ _prodottoDettaglio.nome }}</span>
+        </div>
+        <div class="pg-step4-preview-row" *ngIf="_prodottoDettaglio.descrizione">
+          <span class="pg-step4-label">Descrizione</span>
+          <span class="pg-step4-value pg-step4-desc">{{ _prodottoDettaglio.descrizione }}</span>
+        </div>
+        <div class="pg-step4-preview-row">
+          <span class="pg-step4-label">Prezzo</span>
+          <span class="pg-step4-value pg-step4-prezzo">{{ formatPrezzo(_prodottoDettaglio.prezzo) }}</span>
+        </div>
+      </div>
+
+      <!-- Selezione multi-menu -->
+      <div class="pg-step">
+        <div class="pg-step-label"><span class="pg-step-num">4</span><span>Seleziona i menu di destinazione</span></div>
+        <div class="pg-menu-checkboxes">
+          <label
+            *ngFor="let m of menus"
+            class="pg-menu-checkbox-item"
+            [class.pg-menu-checkbox-selected]="menuDestinazioneIds.has(m.id)"
+            (click)="toggleMenuDestinazione(m.id)"
+          >
+            <span class="pg-menu-checkbox-dot" [class.pg-menu-checkbox-dot-on]="menuDestinazioneIds.has(m.id)">
+              <svg
+                *ngIf="menuDestinazioneIds.has(m.id)"
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </span>
+            {{ m.nome }}
+          </label>
+        </div>
+        <p *ngIf="menuDestinazioneIds.size > 1" class="pg-multi-hint">
+          ✅ Verrà aggiunto a <strong>{{ menuDestinazioneIds.size }} menu</strong>
+        </p>
+      </div>
+    </div>
+
+    <div class="pg-modal-footer">
+      <button class="pg-btn-cancel" (click)="tornaAStep3()">← Cambia piatto</button>
+      <button class="pg-btn-save" (click)="salvaPiatto()" [disabled]="isSaving || !formValido()">
+        <span *ngIf="!isSaving">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          Aggiungi {{ menuDestinazioneIds.size > 1 ? 'a ' + menuDestinazioneIds.size + ' menu' : 'al menu' }}
+        </span>
+        <span *ngIf="isSaving" class="pg-saving-row">
+          <span class="pg-mini-spinner"></span>
+          Salvataggio...
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     MODALE: MODIFICA
+════════════════════════════════════════════════════ -->
 <div *ngIf="modaleModificaAperto && piattoInModifica" class="pg-modal-overlay" (click)="chiudiModaleModifica()">
   <div class="pg-modal-box" (click)="$event.stopPropagation()">
     <div class="pg-modal-header pg-modal-header-edit">
@@ -406,47 +542,20 @@
       <ng-container *ngIf="!piattoInModifica.prodotto">
         <div class="pg-form-row">
           <div class="pg-form-group" style="flex: 1">
-            <label class="pg-form-label">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 20h9" />
-                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-              </svg>
-              Nome del piatto *
-            </label>
+            <label class="pg-form-label">Nome del piatto *</label>
             <input type="text" class="pg-form-control" [(ngModel)]="editNome" placeholder="Nome del piatto" maxlength="100" />
           </div>
           <div class="pg-form-group pg-form-group-prezzo">
-            <label class="pg-form-label">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="1" x2="12" y2="23" />
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
-              Prezzo (€) *
-            </label>
+            <label class="pg-form-label">Prezzo (€) *</label>
             <input type="number" class="pg-form-control" [(ngModel)]="editPrezzo" placeholder="0,00" min="0" step="0.50" />
           </div>
         </div>
-
         <div class="pg-form-group">
-          <label class="pg-form-label">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-            </svg>
-            Descrizione
-          </label>
+          <label class="pg-form-label">Descrizione</label>
           <textarea class="pg-form-control" [(ngModel)]="editDescrizione" rows="2" placeholder="Descrizione (opzionale)"></textarea>
         </div>
-
         <div class="pg-form-group" *ngIf="allergeniDisponibili.length > 0">
-          <label class="pg-form-label">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-              <line x1="12" y1="9" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
-            </svg>
-            Allergeni
-          </label>
+          <label class="pg-form-label">Allergeni</label>
           <div class="pg-allergeni-grid">
             <div
               *ngFor="let a of allergeniDisponibili"
@@ -493,12 +602,7 @@
       </ng-container>
 
       <div class="pg-form-group">
-        <label class="pg-form-label">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
-          </svg>
-          Menu di appartenenza *
-        </label>
+        <label class="pg-form-label">Menu di appartenenza *</label>
         <select class="pg-form-control" [(ngModel)]="editMenuId">
           <option [ngValue]="null">— Seleziona un menu —</option>
           <option *ngFor="let m of menus" [value]="m.id">{{ m.nome }}</option>
@@ -524,6 +628,9 @@
   </div>
 </div>
 
+<!-- ════════════════════════════════════════════════════
+     MODALE: ELIMINA
+════════════════════════════════════════════════════ -->
 <div
   *ngIf="modaleEliminazioneAperto && piattoInEliminazione"
   class="pg-modal-overlay pg-modal-overlay-danger"
@@ -567,11 +674,9 @@
           {{ piattoInEliminazione.attivo ? 'Visibile' : 'Nascosto' }}
         </div>
       </div>
-
       <p class="pg-elimina-avviso">
-        Stai per eliminare definitivamente
-        <strong>{{ nomePiatto(piattoInEliminazione) }}</strong>
-        dai piatti del giorno. Non sarà più visibile nel menu.
+        Stai per eliminare definitivamente <strong>{{ nomePiatto(piattoInEliminazione) }}</strong> dai piatti del giorno. Non sarà più
+        visibile nel menu.
       </p>
     </div>
 
