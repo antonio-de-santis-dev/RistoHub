@@ -2019,20 +2019,22 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
 // ── PRODOTTI ─────────────────────────────────────────────────────────
 .rustico-prodotto-item {
-  padding: 10px 14px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 12px 14px;
   animation: rusticoFadeUp 0.28s ease forwards;
   opacity: 0;
-  transition: background 0.15s ease;
+  transition: filter 0.15s ease;
+
+  // Sfondo e colore testo gestiti inline via [style.backgroundColor] / [style.color]
+  // usando colorePrimario / coloreSecondario alternati (effetto zebra pieno)
 
   &:hover {
-    background: rgba(0, 0, 0, 0.02);
+    filter: brightness(0.95);
   }
 
   &.rustico-speciale {
     border-left: 3px solid;
-    // borderLeftColor via [style]
     padding-left: 11px;
+    // borderLeftColor via [style]
   }
 }
 

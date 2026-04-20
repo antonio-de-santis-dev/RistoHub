@@ -469,6 +469,17 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
   get fontTesto(): string {
     return this.menu?.fontMenu ?? 'Playfair Display';
   }
+
+  /** Restituisce '#ffffff' o '#000000' garantendo sempre contrasto leggibile. */
+  getContrastColor(hex: string): string {
+    const h = (hex ?? '#000000').replace('#', '');
+    if (h.length < 6) return '#000000';
+    const r = parseInt(h.substring(0, 2), 16);
+    const g = parseInt(h.substring(2, 4), 16);
+    const b = parseInt(h.substring(4, 6), 16);
+    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return lum > 0.5 ? '#000000' : '#ffffff';
+  }
   get isModerno(): boolean {
     return this.menu?.templateStyle === 'MODERNO';
   }

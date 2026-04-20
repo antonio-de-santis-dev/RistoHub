@@ -588,33 +588,33 @@
 </div>
 
 <!-- ══════════════════════════════════════════════════ -->
+
+<!-- ══════════════════════════════════════════════════ -->
 <!--  TEMPLATE RUSTICO (read-only)                     -->
 <!-- ══════════════════════════════════════════════════ -->
 <div
   *ngIf="!isLoading && !errore && menu && isRustico"
   class="rustico-page"
   [style.fontFamily]="fontTesto"
-  [style.backgroundColor]="coloreSecondario + '18'"
+  [style.backgroundColor]="coloreSecondario"
 >
-  <header class="rustico-header" [style.backgroundColor]="coloreSecondario + '40'" [style.borderBottomColor]="colorePrimario + '44'">
-    <div class="rustico-header-left"><!-- nessun bottone back --></div>
+  <!-- Header: sfondo colorePrimario, testo/logo in contrasto -->
+  <header class="rustico-header" [style.backgroundColor]="colorePrimario">
+    <div class="rustico-header-left"><!-- nessun bottone back nella vista pubblica --></div>
     <div class="rustico-header-center">
       <div class="rustico-logo-wrap" *ngIf="logoUrl; else rusticoTitleFallback">
         <img [src]="logoUrl" class="rustico-logo-img" alt="Logo ristorante" />
       </div>
       <ng-template #rusticoTitleFallback>
-        <h1 class="rustico-title" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{ menu.nome | uppercase }}</h1>
+        <h1 class="rustico-title" [style.color]="getContrastColor(colorePrimario)" [style.fontFamily]="'Playfair Display, serif'">
+          {{ menu.nome | uppercase }}
+        </h1>
       </ng-template>
     </div>
     <div class="rustico-header-right">
       <!-- SELETTORE LINGUA RUSTICO -->
       <div class="lingua-selettore lingua-selettore-rustico" (click)="$event.stopPropagation()">
-        <button
-          class="lingua-btn-attuale lingua-btn-rustico"
-          [style.borderColor]="colorePrimario"
-          [style.color]="colorePrimario"
-          (click)="mostraDropdownLingua = !mostraDropdownLingua"
-        >
+        <button class="lingua-btn-attuale lingua-btn-rustico" (click)="mostraDropdownLingua = !mostraDropdownLingua">
           <span class="lingua-bandiera-svg lingua-bandiera-svg-sm" [innerHTML]="getSafeSvg(linguaAttuale.svgBandiera)"></span>
           <span class="lingua-codice-btn">{{ linguaAttuale.codice | uppercase }}</span>
           <span class="lingua-chevron" [class.aperto]="mostraDropdownLingua">▾</span>
@@ -640,26 +640,28 @@
   </header>
 
   <div class="rustico-layout">
-    <aside class="rustico-sidebar" [style.backgroundColor]="coloreSecondario + '35'" [style.borderRightColor]="colorePrimario + '33'">
+    <!-- Sidebar: sfondo mix secondario+primario -->
+    <aside class="rustico-sidebar" [style.backgroundColor]="coloreSecondario" [style.borderRightColor]="colorePrimario + '44'">
+      <div class="rustico-sidebar-label" [style.color]="colorePrimario">Portate</div>
       <nav class="rustico-nav">
         <button
           *ngIf="piattiDelGiorno.length > 0"
           class="rustico-nav-btn"
           [class.active]="rusticoTabAttiva === 'piatti-giorno'"
-          [style.borderColor]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario : colorePrimario + '44'"
-          [style.color]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario : colorePrimario + 'aa'"
-          [style.background]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario + '18' : 'white'"
+          [style.borderColor]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario : colorePrimario + '33'"
+          [style.color]="rusticoTabAttiva === 'piatti-giorno' ? getContrastColor(colorePrimario) : colorePrimario"
+          [style.background]="rusticoTabAttiva === 'piatti-giorno' ? colorePrimario : 'transparent'"
           (click)="rusticoApriTab('piatti-giorno', null)"
         >
-          ✨ {{ getUI('PIATTI_PAROLA') | titlecase }}<br />del Giorno
+          {{ getUI('PIATTI_PAROLA') | titlecase }}<br />del Giorno
         </button>
         <button
           *ngFor="let portata of portate"
           class="rustico-nav-btn"
           [class.active]="rusticoTabAttiva === portata.id"
-          [style.borderColor]="rusticoTabAttiva === portata.id ? colorePrimario : colorePrimario + '44'"
-          [style.color]="rusticoTabAttiva === portata.id ? colorePrimario : colorePrimario + 'aa'"
-          [style.background]="rusticoTabAttiva === portata.id ? colorePrimario + '18' : 'white'"
+          [style.borderColor]="rusticoTabAttiva === portata.id ? colorePrimario : colorePrimario + '33'"
+          [style.color]="rusticoTabAttiva === portata.id ? getContrastColor(colorePrimario) : colorePrimario"
+          [style.background]="rusticoTabAttiva === portata.id ? colorePrimario : 'transparent'"
           (click)="rusticoApriTab(portata.id, portata)"
         >
           {{ nomePortata(portata) }}
@@ -668,20 +670,39 @@
     </aside>
 
     <main class="rustico-main">
+      <!-- CAROSELLO -->
       <div class="rustico-carousel-wrap" [class.nascosto]="rusticoTabAttiva !== null">
         <div
           class="rustico-carousel"
+          [style.background]="colorePrimario + '33'"
           (touchstart)="onTouchStart($event, 'rustico')"
           (touchend)="onTouchEnd($event, 'rustico')"
           (touchmove)="$event.preventDefault()"
           [attr.aria-label]="'Galleria immagini ' + menu.nome"
           role="region"
         >
+          <!-- Placeholder se nessuna immagine -->
+          <div class="rustico-carousel-placeholder" *ngIf="rusticoImmagini.length === 0">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              [style.color]="getContrastColor(colorePrimario) + '66'"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
+            </svg>
+            <span [style.color]="getContrastColor(colorePrimario) + '66'">Immagini del menu</span>
+          </div>
+
           <div class="rustico-carousel-track" [style.transform]="'translateX(-' + rusticoCarouselIndex * 100 + '%)'">
             <div
               *ngFor="let img of rusticoImmagini; let i = index"
               class="rustico-slide"
               [class.rustico-slide-attiva]="i === rusticoCarouselIndex"
+              [style.backgroundImage]="'url(' + img + ')'"
             >
               <div class="slide-skeleton" [class.slide-skeleton-hidden]="rusticoImmaginiCaricate[i]"></div>
               <img
@@ -696,6 +717,7 @@
               <div class="rustico-slide-overlay"></div>
             </div>
           </div>
+
           <ng-container *ngIf="rusticoImmagini.length > 1">
             <button class="rustico-carousel-btn prev" (click)="rusticoGoToSlide(rusticoCarouselIndex - 1)" aria-label="Immagine precedente">
               ‹
@@ -704,6 +726,7 @@
               ›
             </button>
           </ng-container>
+
           <div class="rustico-slide-counter" *ngIf="rusticoImmagini.length > 1">
             {{ rusticoCarouselIndex + 1 }}&thinsp;/&thinsp;{{ rusticoImmagini.length }}
           </div>
@@ -712,131 +735,162 @@
               *ngFor="let img of rusticoImmagini; let i = index"
               class="rustico-dot"
               [class.active]="i === rusticoCarouselIndex"
-              [style.background]="i === rusticoCarouselIndex ? colorePrimario : ''"
+              [style.background]="i === rusticoCarouselIndex ? coloreSecondario : ''"
               (click)="rusticoGoToSlide(i)"
             ></button>
           </div>
         </div>
       </div>
 
-      <div class="rustico-lista-wrap" [class.visibile]="rusticoTabAttiva !== null" [style.backgroundColor]="coloreSecondario + '18'">
-        <button class="rustico-back-btn" [style.color]="colorePrimario" (click)="rusticoTornaCarosello()">
-          <span class="rustico-back-arrow">‹</span><span class="rustico-back-label">{{ getUI('TORNA_FOTO') }}</span>
+      <!-- LISTA PORTATA -->
+      <div class="rustico-lista-wrap" [class.visibile]="rusticoTabAttiva !== null">
+        <button
+          class="rustico-back-btn"
+          [style.color]="colorePrimario"
+          [style.borderBottomColor]="colorePrimario + '22'"
+          (click)="rusticoTornaCarosello()"
+        >
+          <span class="rustico-back-arrow">‹</span>
+          <span class="rustico-back-label">{{ getUI('TORNA_FOTO') }}</span>
         </button>
 
+        <!-- PIATTI DEL GIORNO -->
         <ng-container *ngIf="rusticoTabAttiva === 'piatti-giorno'">
           <div class="rustico-lista-header" [style.borderBottomColor]="colorePrimario">
-            <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{
+            <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="'Playfair Display, serif'">{{
               getUI('PIATTI_GIORNO_SHORT')
             }}</span>
-            <span class="rustico-lista-count">{{ piattiDelGiorno.length }} {{ getUI('PIATTI_PAROLA') }}</span>
-          </div>
-          <div class="rustico-prodotti">
-            <div
-              *ngFor="let piatto of piattiDelGiorno"
-              class="rustico-prodotto-item rustico-speciale"
-              [style.borderLeftColor]="colorePrimario"
+            <span class="rustico-lista-count" [style.color]="colorePrimario + '88'"
+              >{{ piattiDelGiorno.length }} {{ getUI('PIATTI_PAROLA') }}</span
             >
-              <div class="rustico-prodotto-row">
-                <span class="rustico-bullet" [style.background]="colorePrimario"></span>
-                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto">{{ getT(piatto.prodotto?.nome ?? piatto.nome) }}</span>
-                <span class="rustico-leader"></span>
-                <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{
-                  formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
-                }}</span>
-              </div>
-              <p *ngIf="piatto.prodotto?.descrizione || piatto.descrizione" class="rustico-prodotto-desc">
-                {{ getT(piatto.prodotto?.descrizione ?? piatto.descrizione) }}
-              </p>
-              <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
-                <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis || []">
-                  <img
-                    *ngIf="getAllergeneIcona(a)"
-                    [src]="getAllergeneIcona(a)"
-                    [title]="a.nome"
-                    class="allergene-icona-mini"
-                    style="width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: middle"
-                  />
-                  <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
-                    a.nome
+          </div>
+          <div class="rustico-scroll-area">
+            <div class="rustico-prodotti">
+              <div
+                *ngFor="let piatto of piattiDelGiorno"
+                class="rustico-prodotto-item rustico-speciale"
+                [style.borderLeftColor]="colorePrimario"
+                [style.backgroundColor]="colorePrimario + '08'"
+              >
+                <div class="rustico-prodotto-row">
+                  <span class="rustico-bullet" [style.background]="colorePrimario"></span>
+                  <span class="rustico-prodotto-nome" [style.color]="colorePrimario + 'CC'">{{
+                    getT(piatto.prodotto?.nome ?? piatto.nome)
                   }}</span>
-                </ng-container>
+                  <span class="rustico-leader" [style.borderBottomColor]="colorePrimario + '44'"></span>
+                  <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{
+                    formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
+                  }}</span>
+                </div>
+                <p
+                  *ngIf="piatto.prodotto?.descrizione || piatto.descrizione"
+                  class="rustico-prodotto-desc"
+                  [style.color]="colorePrimario + '99'"
+                >
+                  {{ getT(piatto.prodotto?.descrizione ?? piatto.descrizione) }}
+                </p>
+                <div class="prodotto-allergeni" *ngIf="(piatto.prodotto?.allergenis || piatto.allergenis || []).length > 0">
+                  <ng-container *ngFor="let a of piatto.prodotto?.allergenis || piatto.allergenis || []">
+                    <img
+                      *ngIf="getAllergeneIcona(a)"
+                      [src]="getAllergeneIcona(a)"
+                      [title]="a.nome"
+                      class="allergene-icona-mini"
+                      style="width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: middle"
+                    />
+                    <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
+                      a.nome
+                    }}</span>
+                  </ng-container>
+                </div>
               </div>
             </div>
           </div>
         </ng-container>
 
+        <!-- PORTATA NORMALE -->
         <ng-container *ngIf="rusticoPortataAttiva">
           <div class="rustico-lista-header" [style.borderBottomColor]="colorePrimario">
-            <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="fontTesto">{{
+            <span class="rustico-lista-nome" [style.color]="colorePrimario" [style.fontFamily]="'Playfair Display, serif'">{{
               nomePortata(rusticoPortataAttiva)
             }}</span>
-            <span class="rustico-lista-count">{{ rusticoPortataAttiva.prodotti.length }} {{ getUI('PIATTI_PAROLA') }}</span>
+            <span class="rustico-lista-count" [style.color]="colorePrimario + '88'"
+              >{{ rusticoPortataAttiva.prodotti.length }} {{ getUI('PIATTI_PAROLA') }}</span
+            >
           </div>
-          <div class="rustico-prodotti">
-            <div *ngIf="rusticoPortataAttiva.prodotti && rusticoPortataAttiva.prodotti.length === 0" class="rustico-empty">
-              <p>{{ getUI('NESSUN_PIATTO') }}</p>
-            </div>
-            <div *ngFor="let prodotto of rusticoPortataAttiva.prodotti" class="rustico-prodotto-item">
-              <div class="rustico-prodotto-row">
-                <span class="rustico-bullet" [style.background]="colorePrimario"></span>
-                <span class="rustico-prodotto-nome" [style.fontFamily]="fontTesto">{{ getT(prodotto.nome) }}</span>
-                <span class="rustico-leader"></span>
-                <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
-                <!-- Nessun bottone modifica/elimina -->
+          <div class="rustico-scroll-area">
+            <div class="rustico-prodotti">
+              <div *ngIf="rusticoPortataAttiva.prodotti && rusticoPortataAttiva.prodotti.length === 0" class="rustico-empty">
+                <p>{{ getUI('NESSUN_PIATTO') }}</p>
               </div>
-              <p *ngIf="prodotto.descrizione" class="rustico-prodotto-desc">{{ getT(prodotto.descrizione) }}</p>
-              <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
-                <ng-container *ngFor="let a of prodotto.allergenis">
-                  <img
-                    *ngIf="getAllergeneIcona(a)"
-                    [src]="getAllergeneIcona(a)"
-                    [title]="a.nome"
-                    class="allergene-icona-mini"
-                    style="width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: middle"
-                  />
-                  <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
-                    a.nome
-                  }}</span>
-                </ng-container>
+              <div *ngFor="let prodotto of rusticoPortataAttiva.prodotti" class="rustico-prodotto-item">
+                <div class="rustico-prodotto-row">
+                  <span class="rustico-bullet" [style.background]="colorePrimario"></span>
+                  <span class="rustico-prodotto-nome" [style.color]="colorePrimario + 'CC'">{{ getT(prodotto.nome) }}</span>
+                  <span class="rustico-leader" [style.borderBottomColor]="colorePrimario + '44'"></span>
+                  <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
+                  <!-- Nessun bottone modifica/elimina nella vista pubblica -->
+                </div>
+                <p *ngIf="prodotto.descrizione" class="rustico-prodotto-desc" [style.color]="colorePrimario + '99'">
+                  {{ getT(prodotto.descrizione) }}
+                </p>
+                <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
+                  <ng-container *ngFor="let a of prodotto.allergenis">
+                    <img
+                      *ngIf="getAllergeneIcona(a)"
+                      [src]="getAllergeneIcona(a)"
+                      [title]="a.nome"
+                      class="allergene-icona-mini"
+                      style="width: 22px; height: 22px; object-fit: contain; margin-right: 4px; vertical-align: middle"
+                    />
+                    <span *ngIf="!getAllergeneIcona(a)" class="allergene-tag-solo-nome" [style.backgroundColor]="a.colore || '#888'">{{
+                      a.nome
+                    }}</span>
+                  </ng-container>
+                </div>
               </div>
             </div>
-            <!-- Nessun "Aggiungi piatto" -->
+            <!-- Nessun "Aggiungi piatto" nella vista pubblica -->
           </div>
         </ng-container>
-
-        <div
-          class="sezione-allergeni-footer"
-          *ngIf="rusticoTabAttiva && tuttiAllergeniMenu.length > 0"
-          [style.borderTopColor]="colorePrimario + '44'"
-        >
-          <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">{{ getUI('ALLERGENI_TITOLO') }}</h3>
-          <div class="allergeni-footer-lista">
-            <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
-              <div class="allergene-footer-cerchio" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || '#888'">
-                <img
-                  *ngIf="getAllergeneIcona(a)"
-                  [src]="getAllergeneIcona(a)"
-                  [alt]="a.nome"
-                  class="allergene-footer-icona"
-                  style="width: 100%; height: 100%; object-fit: contain"
-                />
-                <span *ngIf="!getAllergeneIcona(a)" class="allergene-footer-iniziale">{{ a.nome.charAt(0) }}</span>
-              </div>
-              <span class="allergene-footer-nome">{{ a.nome }}</span>
-            </div>
-          </div>
-          <p class="allergeni-footer-nota">{{ getUI('ALLERGENI_NOTA') }}</p>
-        </div>
       </div>
-
-      <!-- Contatti rustico -->
+      <!-- fine rustico-lista-wrap -->
     </main>
   </div>
 
+  <!-- ALLERGENI — tra layout e contatti, sempre visibili, fuori dallo scroll -->
+  <div
+    class="rustico-allergeni-esterni"
+    *ngIf="tuttiAllergeniMenu.length > 0"
+    [style.backgroundColor]="coloreSecondario"
+    [style.borderTopColor]="colorePrimario + '33'"
+    [style.borderBottomColor]="colorePrimario + '33'"
+  >
+    <h3 class="allergeni-footer-titolo" [style.color]="colorePrimario">{{ getUI('ALLERGENI_TITOLO') }}</h3>
+    <div class="allergeni-footer-lista">
+      <div *ngFor="let a of tuttiAllergeniMenu" class="allergene-footer-item">
+        <div class="allergene-footer-cerchio" [style.backgroundColor]="getAllergeneIcona(a) ? 'transparent' : a.colore || colorePrimario">
+          <img
+            *ngIf="getAllergeneIcona(a)"
+            [src]="getAllergeneIcona(a)"
+            [alt]="a.nome"
+            class="allergene-footer-icona"
+            style="width: 100%; height: 100%; object-fit: contain"
+          />
+          <span *ngIf="!getAllergeneIcona(a)" class="allergene-footer-iniziale" [style.color]="coloreSecondario">{{
+            a.nome.charAt(0)
+          }}</span>
+        </div>
+        <span class="allergene-footer-nome" [style.color]="colorePrimario + 'CC'">{{ a.nome }}</span>
+      </div>
+    </div>
+    <p class="allergeni-footer-nota" [style.color]="colorePrimario + '88'">{{ getUI('ALLERGENI_NOTA') }}</p>
+  </div>
+
+  <!-- CONTATTI — fuori dal flex, a tutta larghezza -->
   <div class="rustico-contatti-wrap" *ngIf="listeContatti.length > 0">
-    <div class="contatti-card" [style.backgroundColor]="colorePrimario">
-      <div class="contatti-card-title">
+    <div class="contatti-card" [style.backgroundColor]="colorePrimario" [style.color]="coloreSecondario">
+      <div class="contatti-card-title" [style.color]="coloreSecondario">
         <svg
           width="18"
           height="18"
@@ -853,7 +907,7 @@
         <span>Contatti</span>
       </div>
       <div *ngFor="let lista of listeContatti" class="contatti-lista-wrap">
-        <p class="contatti-lista-nome" *ngIf="listeContatti.length > 1">{{ lista.nome }}</p>
+        <p class="contatti-lista-nome" *ngIf="listeContatti.length > 1" [style.color]="coloreSecondario">{{ lista.nome }}</p>
         <div class="contatti-items">
           <a
             *ngFor="let item of lista.items"
@@ -862,6 +916,7 @@
             [attr.rel]="item.tipo === 'SOCIAL' || item.tipo === 'INDIRIZZO' ? 'noopener noreferrer' : null"
             class="contatto-item"
             [class.no-link]="!getContattoLink(item)"
+            [style.color]="coloreSecondario"
           >
             <span
               class="contatto-icona"
@@ -869,20 +924,20 @@
               [innerHTML]="getSafeSocialSvg(item.reteSociale)"
               [style.color]="coloreSecondario"
             ></span>
-            <span class="contatto-icona" *ngIf="item.tipo === 'TELEFONO'">
+            <span class="contatto-icona" *ngIf="item.tipo === 'TELEFONO'" [style.color]="coloreSecondario">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
                   d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
                 />
               </svg>
             </span>
-            <span class="contatto-icona" *ngIf="item.tipo === 'EMAIL'">
+            <span class="contatto-icona" *ngIf="item.tipo === 'EMAIL'" [style.color]="coloreSecondario">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                 <polyline points="22,6 12,13 2,6" />
               </svg>
             </span>
-            <span class="contatto-icona" *ngIf="item.tipo === 'INDIRIZZO'">
+            <span class="contatto-icona" *ngIf="item.tipo === 'INDIRIZZO'" [style.color]="coloreSecondario">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
                 <circle cx="12" cy="10" r="3" />
@@ -891,6 +946,7 @@
             <span
               class="contatto-icona"
               *ngIf="item.tipo === 'SOCIAL' && (item.reteSociale === 'ALTRO' || !getSocialIconSvg(item.reteSociale))"
+              [style.color]="coloreSecondario"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="18" cy="5" r="3" />
@@ -901,8 +957,8 @@
               </svg>
             </span>
             <div class="contatto-testo">
-              <span class="contatto-label">{{ getContattoLabel(item) }}</span>
-              <span class="contatto-valore" *ngIf="item.tipo === 'INDIRIZZO'">{{ item.valore }}</span>
+              <span class="contatto-label" [style.color]="coloreSecondario">{{ getContattoLabel(item) }}</span>
+              <span class="contatto-valore" *ngIf="item.tipo === 'INDIRIZZO'" [style.color]="coloreSecondario">{{ item.valore }}</span>
             </div>
           </a>
         </div>
