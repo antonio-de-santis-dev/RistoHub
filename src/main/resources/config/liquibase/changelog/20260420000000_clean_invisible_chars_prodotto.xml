@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <!--
+    Pulizia una-tantum dei caratteri Unicode invisibili nei prodotti già
+    importati via PDF prima del fix in PdfImportService.pulisciTesto().
+
+    Problema: PDFBox può preservare NBSP (\u00A0), narrow NBSP (\u202F),
+    zero-width space (\u200B) ecc. Il metodo Java String.trim() NON li
+    rimuove (rimuove solo caratteri ≤ U+0020), quindi finivano nel DB.
+
+    Effetto: l'API di traduzione mymemory restituisce stringa identica
+    all'input quando contiene questi caratteri, e il frontend scarta la
+    risposta perché "tradotto === testo" → i prodotti non vengono tradotti
+    in menu-view e menu-public.
+
+    Questa migration pulisce i dati storici. Da questo changelog in poi i
+    nuovi import PDF sono già puliti a livello di parsing.
+
+    Caratteri gestiti:
+      U+00A0 (NBSP)            → spazio normale
+      U+202F (narrow NBSP)     → spazio normale
+      U+2007 (figure space)    → spazio normale
+      U+2060 (word joiner)     → spazio normale
+      U+200B (zero-width sp.)  → rimosso
+      U+200C (ZW non-joiner)   → rimosso
+      U+200D (ZW joiner)       → rimosso
+      U+200E (LRM)             → rimosso
+      U+200F (RLM)             → rimosso
+      U+FEFF (BOM)             → rimosso
+      U+00AD (soft hyphen)     → rimosso
+  -->
+  <changeSet id="20260420000000-clean-invisible-chars-prodotto" author="migration">
+
+    <!--
+      Usiamo REPLACE a catena perché è SQL standard e funziona sia su
+      PostgreSQL (prod) che su H2 (dev). REGEXP_REPLACE avrebbe sintassi
+      e flag diversi tra i due DB.
+
+      CHR(codepoint) è supportato da entrambi i DB.
+    -->
+    <sql>
+      UPDATE prodotto SET nome =
+        TRIM(
+          REPLACE(
+            REPLACE(
+              REPLACE(
+                REPLACE(
+                  REPLACE(
+                    REPLACE(
+                      REPLACE(
+                        REPLACE(
+                          REPLACE(
+                            REPLACE(
+                              REPLACE(nome, CHR(160), ' '),
+                              CHR(8239), ' '),
+                            CHR(8199), ' '),
+                          CHR(8288), ' '),
+                        CHR(8203), ''),
+                      CHR(8204), ''),
+                    CHR(8205), ''),
+                  CHR(8206), ''),
+                CHR(8207), ''),
+              CHR(65279), ''),
+            CHR(173), '')
+        )
+      WHERE nome IS NOT NULL;
+    </sql>
+
+    <sql>
+      UPDATE prodotto SET descrizione =
+        TRIM(
+          REPLACE(
+            REPLACE(
+              REPLACE(
+                REPLACE(
+                  REPLACE(
+                    REPLACE(
+                      REPLACE(
+                        REPLACE(
+                          REPLACE(
+                            REPLACE(
+                              REPLACE(descrizione, CHR(160), ' '),
+                              CHR(8239), ' '),
+                            CHR(8199), ' '),
+                          CHR(8288), ' '),
+                        CHR(8203), ''),
+                      CHR(8204), ''),
+                    CHR(8205), ''),
+                  CHR(8206), ''),
+                CHR(8207), ''),
+              CHR(65279), ''),
+            CHR(173), '')
+        )
+      WHERE descrizione IS NOT NULL;
+    </sql>
+
+  </changeSet>
+
+</databaseChangeLog>

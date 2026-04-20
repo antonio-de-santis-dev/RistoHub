@@ -151,8 +151,11 @@ public class PdfImportService {
             for (ProdottoImportDTO pi : portataImport.getProdotti()) {
                 try {
                     ProdottoDTO dto = new ProdottoDTO();
-                    dto.setNome(pi.getNome().trim());
-                    dto.setDescrizione(pi.getDescrizione() != null && !pi.getDescrizione().isBlank() ? pi.getDescrizione().trim() : null);
+                    // Doppia pulizia: anche se parseTesto già normalizza, la applichiamo
+                    // di nuovo per proteggerci da eventuali modifiche future al flusso.
+                    dto.setNome(pulisciTesto(pi.getNome()));
+                    String descPulita = pulisciTesto(pi.getDescrizione());
+                    dto.setDescrizione(descPulita != null && !descPulita.isBlank() ? descPulita : null);
                     dto.setPrezzo(parsePrezzo(pi.getPrezzo()));
 
                     PortataDTO portataRef = new PortataDTO();
@@ -172,6 +175,34 @@ public class PdfImportService {
     }
 
     // ── Helpers di parsing ────────────────────────────────────────────────────
+
+    /**
+     * Normalizza una stringa estratta da PDF rimuovendo caratteri invisibili Unicode
+     * che PDFBox può preservare e che rompono:
+     *   • il confronto di uguaglianza tra stringhe
+     *   • le API di traduzione esterne (mymemory) che non li gestiscono
+     *   • la visualizzazione coerente nel frontend
+     *
+     * Gestisce:
+     *   • NBSP (\u00A0), narrow NBSP (\u202F), figure space (\u2007)
+     *   • zero-width space (\u200B), LRM/RLM (\u200E/F), line/paragraph separator
+     *   • BOM (\uFEFF)
+     *   • spazi multipli consecutivi
+     *
+     * NB: usa String.strip() (non trim()) perché trim() rimuove SOLO caratteri ≤ U+0020,
+     *     mentre strip() rimuove tutti gli spazi Unicode.
+     */
+    private static String pulisciTesto(String s) {
+        if (s == null) return null;
+        String pulito = s
+            .replace('\u00A0', ' ') // NBSP
+            .replace('\u202F', ' ') // narrow NBSP
+            .replace('\u2007', ' ') // figure space
+            .replace('\u2060', ' ') // word joiner
+            .replaceAll("[\\u200B-\\u200F\\u2028\\u2029\\uFEFF\\u00AD]", "") // zero-width + soft hyphen
+            .replaceAll("\\s+", " "); // collassa whitespace multipli
+        return pulito.strip();
+    }
 
     private String estraiTesto(InputStream inputStream) throws IOException {
         try (PDDocument document = Loader.loadPDF(inputStream.readAllBytes())) {
@@ -202,7 +233,7 @@ public class PdfImportService {
                     portate.add(new PortataImportDTO(portataCorrente, new ArrayList<>(prodottiCorrenti)));
                     totaleProdotti += prodottiCorrenti.size();
                 }
-                portataCorrente = rigaTrim.substring("PORTATA:".length()).trim();
+                portataCorrente = pulisciTesto(rigaTrim.substring("PORTATA:".length()));
                 prodottiCorrenti = new ArrayList<>();
                 continue;
             }
@@ -212,10 +243,12 @@ public class PdfImportService {
                 String contenuto = rigaTrim.substring(2).trim();
                 String[] parti = contenuto.split("\\|", -1);
                 if (parti.length >= 1) {
-                    String nome = parti[0].trim();
-                    String descrizione = parti.length >= 2 ? parti[1].trim() : "";
-                    String prezzo = parti.length >= 3 ? parti[2].trim() : "0";
-                    if (!nome.isBlank()) {
+                    // pulisciTesto rimuove caratteri Unicode invisibili (NBSP ecc.)
+                    // che romperebbero la traduzione lato frontend.
+                    String nome = pulisciTesto(parti[0]);
+                    String descrizione = parti.length >= 2 ? pulisciTesto(parti[1]) : "";
+                    String prezzo = parti.length >= 3 ? pulisciTesto(parti[2]) : "0";
+                    if (nome != null && !nome.isBlank()) {
                         prodottiCorrenti.add(new ProdottoImportDTO(nome, descrizione, prezzo));
                     }
                 } else {
