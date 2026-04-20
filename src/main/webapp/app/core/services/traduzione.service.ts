@@ -6,17 +6,33 @@ export class TraduzioneService {
   private readonly BATCH = 5;
   private readonly DELAY_MS = 120;
 
+  /**
+   * Traduce le stringhe richieste in una determinata lingua.
+   * Se la cache contiene già alcune stringhe, traduce SOLO quelle mancanti
+   * (cache incrementale) e le aggiunge alla cache esistente.
+   */
   async traduci(testi: string[], lingua: string): Promise<{ cache: Map<string, string>; errori: number; rateLimited: boolean }> {
-    if (this.cache.has(lingua)) {
-      return { cache: this.cache.get(lingua)!, errori: 0, rateLimited: false };
+    // Prendi la cache esistente o creane una nuova
+    let cacheLingua = this.cache.get(lingua);
+    if (!cacheLingua) {
+      cacheLingua = new Map<string, string>();
+      this.cache.set(lingua, cacheLingua);
     }
-    const nuovaCache = new Map<string, string>();
-    const lista = testi.filter(s => s.trim().length > 0);
+
+    // Filtra e trova solo le stringhe MANCANTI dalla cache
+    const tuttiValidi = testi.filter(s => s && s.trim().length > 0);
+    const mancanti = Array.from(new Set(tuttiValidi.filter(s => !cacheLingua!.has(s))));
+
     let errori = 0;
     let rateLimited = false;
 
-    for (let i = 0; i < lista.length; i += this.BATCH) {
-      const batch = lista.slice(i, i + this.BATCH);
+    if (mancanti.length === 0) {
+      // Tutto già tradotto in cache
+      return { cache: cacheLingua, errori: 0, rateLimited: false };
+    }
+
+    for (let i = 0; i < mancanti.length; i += this.BATCH) {
+      const batch = mancanti.slice(i, i + this.BATCH);
       await Promise.all(
         batch.map(async testo => {
           try {
@@ -33,25 +49,47 @@ export class TraduzioneService {
             }
             const tradotto = data.responseData?.translatedText;
             if (tradotto && tradotto !== testo && Number(data.responseStatus) === 200) {
-              nuovaCache.set(testo, tradotto);
+              cacheLingua!.set(testo, tradotto);
             }
           } catch {
             errori++;
           }
         }),
       );
-      if (i + this.BATCH < lista.length) await new Promise(res => setTimeout(res, this.DELAY_MS));
+      if (i + this.BATCH < mancanti.length) await new Promise(res => setTimeout(res, this.DELAY_MS));
     }
-    this.cache.set(lingua, nuovaCache);
-    return { cache: nuovaCache, errori, rateLimited };
+
+    return { cache: cacheLingua, errori, rateLimited };
   }
 
+  /**
+   * Ritorna la mappa di traduzione per una lingua.
+   * NOTA: con la cache incrementale questa mappa può essere parziale.
+   */
   getCached(lingua: string): Map<string, string> | undefined {
     return this.cache.get(lingua);
   }
 
+  /**
+   * Verifica se TUTTE le stringhe richieste sono già in cache per quella lingua.
+   * Usato dai componenti per decidere se serve chiamare traduci().
+   */
+  hasAllCached(testi: string[], lingua: string): boolean {
+    const cacheLingua = this.cache.get(lingua);
+    if (!cacheLingua) return false;
+    for (const t of testi) {
+      if (t && t.trim().length > 0 && !cacheLingua.has(t)) return false;
+    }
+    return true;
+  }
+
+  /**
+   * DEPRECATED: mantenuto per compatibilità. Usare hasAllCached() per verifiche granulari.
+   * Ritorna true solo se esiste una cache non vuota per la lingua.
+   */
   hasCached(lingua: string): boolean {
-    return this.cache.has(lingua);
+    const c = this.cache.get(lingua);
+    return !!c && c.size > 0;
   }
 
   clearCache(): void {

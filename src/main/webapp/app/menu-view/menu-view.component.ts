@@ -113,10 +113,48 @@ export class MenuViewComponent implements OnInit, OnDestroy {
     this.mostraDropdownLingua = false;
     if (codice === this.linguaCorrente) return;
     this.linguaCorrente = codice;
+    this.cdr.markForCheck();
 
     if (codice === 'it') return;
-    if (this.traduzioneService.hasCached(codice)) return;
 
+    // Raccoglie TUTTE le stringhe traducibili da portate, prodotti e piatti del giorno
+    const stringhe = this.raccogliStringheTraducibili();
+    if (stringhe.size === 0) return;
+
+    // Se tutte le stringhe sono già in cache, ri-renderizza e basta
+    if (this.traduzioneService.hasAllCached(Array.from(stringhe), codice)) {
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.isTraducendo = true;
+    this.erroreTraduzioneVisible = false;
+    this.cdr.markForCheck();
+
+    const result = await this.traduzioneService.traduci(Array.from(stringhe), codice);
+    this.isTraducendo = false;
+    this.cdr.markForCheck();
+
+    if (result.rateLimited) {
+      this.erroreTraduzioneVisible = true;
+      setTimeout(() => {
+        this.erroreTraduzioneVisible = false;
+        this.cdr.markForCheck();
+      }, 4000);
+    } else if (result.errori > 0 && result.cache.size === 0) {
+      this.erroreTraduzioneVisible = true;
+      setTimeout(() => {
+        this.erroreTraduzioneVisible = false;
+        this.cdr.markForCheck();
+      }, 4000);
+    }
+  }
+
+  /**
+   * Raccoglie tutte le stringhe traducibili del menu: nomi portate personalizzate,
+   * nomi e descrizioni di tutti i prodotti di tutte le portate, e dei piatti del giorno.
+   */
+  private raccogliStringheTraducibili(): Set<string> {
     const stringhe = new Set<string>();
     this.portate.forEach(p => {
       if (p.tipo === 'PERSONALIZZATA' && p.nomePersonalizzato) {
@@ -133,23 +171,7 @@ export class MenuViewComponent implements OnInit, OnDestroy {
       if (nome) stringhe.add(nome);
       if (desc) stringhe.add(desc);
     });
-
-    if (stringhe.size === 0) return;
-
-    this.isTraducendo = true;
-    this.erroreTraduzioneVisible = false;
-
-    const result = await this.traduzioneService.traduci(Array.from(stringhe), codice);
-    this.isTraducendo = false;
-
-    if (result.rateLimited) {
-      this.erroreTraduzioneVisible = true;
-      // mostra: 'Limite traduzioni raggiunto. Riprova più tardi.'
-      setTimeout(() => (this.erroreTraduzioneVisible = false), 4000);
-    } else if (result.errori > 0 && result.cache.size === 0) {
-      this.erroreTraduzioneVisible = true;
-      setTimeout(() => (this.erroreTraduzioneVisible = false), 4000);
-    }
+    return stringhe;
   }
 
   // ══════════════════════════════════════════════════

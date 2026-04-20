@@ -9,6 +9,25 @@ import { AccountDTO, AllergeneDTO, AllergeneUI, MenuDTO, PortataDTO, ProdottoDTO
 // Percorso immagine fallback per allergeni senza icona (inseriti manualmente).
 // Posizionare il file in: src/main/webapp/content/images/allergene-manuale.png
 const ALLERGENE_MANUALE_ICONA = 'content/images/allergene-manuale.png';
+const ALLERGENI_ICONE_BASE = 'content/images/iconeAlergeni/';
+
+// Mappa nome allergene (lowercase) → nome file immagine
+const ALLERGENE_ICONE_MAP: Record<string, string> = {
+  glutine: 'Glutine.png',
+  crostacei: 'Crostacei.png',
+  uova: 'Uova.png',
+  pesce: 'Pesce.png',
+  arachidi: 'Arachidi.png',
+  soia: 'Soia.png',
+  latte: 'Latte.png',
+  'frutta a guscio': 'Frutta_a_guscio.png',
+  sedano: 'Sedano.png',
+  senape: 'Senape.png',
+  sesamo: 'Sesamo.png',
+  'anidride solforosa': 'anidride_solforosa.png',
+  lupini: 'lupoli.png',
+  molluschi: 'Moluschi.png',
+};
 
 @Component({
   selector: 'jhi-prodotto-add',
@@ -152,29 +171,41 @@ export class ProdottoAddComponent implements OnInit {
 
   /**
    * Restituisce l'URL dell'icona di un allergene.
-   * Per gli allergeni senza icona (inseriti manualmente) usa l'immagine di fallback.
+   * Priorità: 1) immagine statica per allergeni di default
+   *           2) icona base64 dal DB (allergeni custom)
+   *           3) fallback generico
    */
   getAllergeneIcona(a: AllergeneDTO): string {
     if (!a) return ALLERGENE_MANUALE_ICONA;
-    // Icona diretta sull'oggetto
+
+    // 1. Icona statica per allergeni di default (nome → file locale)
+    const nomeKey = (a.nome ?? '').toLowerCase().trim();
+    if (ALLERGENE_ICONE_MAP[nomeKey]) {
+      return ALLERGENI_ICONE_BASE + ALLERGENE_ICONE_MAP[nomeKey];
+    }
+
+    // 2. Icona base64 diretta sull'oggetto
     if (a.icona && a.iconaContentType) {
       return `data:${a.iconaContentType};base64,${a.icona}`;
     }
-    // Cerca nell'elenco locale per ID
+
+    // 3. Cerca nell'elenco locale per ID (allergeni custom con icona nel DB)
     if (a.id != null) {
       const trovato = this.allergeniDisponibili.find(d => String(d.id) === String(a.id));
       if (trovato?.icona && trovato?.iconaContentType) {
         return `data:${trovato.iconaContentType};base64,${trovato.icona}`;
       }
     }
-    // Cerca per nome
+
+    // 4. Cerca per nome (fallback per allergeni custom senza icona)
     if (a.nome) {
-      const trovato = this.allergeniDisponibili.find(d => d.nome.toLowerCase().trim() === a.nome.toLowerCase().trim());
+      const trovato = this.allergeniDisponibili.find(d => d.nome.toLowerCase().trim() === nomeKey);
       if (trovato?.icona && trovato?.iconaContentType) {
         return `data:${trovato.iconaContentType};base64,${trovato.icona}`;
       }
     }
-    // Fallback: icona generica per allergeni manuali
+
+    // 5. Fallback: icona generica per allergeni manuali
     return ALLERGENE_MANUALE_ICONA;
   }
 
