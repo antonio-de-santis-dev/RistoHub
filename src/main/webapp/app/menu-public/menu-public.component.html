@@ -767,25 +767,24 @@
           <div class="rustico-scroll-area">
             <div class="rustico-prodotti">
               <div
-                *ngFor="let piatto of piattiDelGiorno"
+                *ngFor="let piatto of piattiDelGiorno; let i = index"
                 class="rustico-prodotto-item rustico-speciale"
-                [style.borderLeftColor]="colorePrimario"
-                [style.backgroundColor]="colorePrimario + '08'"
+                [style.backgroundColor]="i % 2 === 0 ? colorePrimario : coloreSecondario"
               >
                 <div class="rustico-prodotto-row">
-                  <span class="rustico-bullet" [style.background]="colorePrimario"></span>
-                  <span class="rustico-prodotto-nome" [style.color]="colorePrimario + 'CC'">{{
+                  <span class="rustico-bullet" [style.background]="i % 2 === 0 ? coloreSecondario : colorePrimario"></span>
+                  <span class="rustico-prodotto-nome" [style.color]="i % 2 === 0 ? coloreSecondario : colorePrimario">{{
                     getT(piatto.prodotto?.nome ?? piatto.nome)
                   }}</span>
-                  <span class="rustico-leader" [style.borderBottomColor]="colorePrimario + '44'"></span>
-                  <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{
+                  <span class="rustico-leader" [style.borderBottomColor]="(i % 2 === 0 ? coloreSecondario : colorePrimario) + '55'"></span>
+                  <span class="rustico-prodotto-prezzo" [style.color]="i % 2 === 0 ? coloreSecondario : colorePrimario">{{
                     formatPrezzo(piatto.prodotto?.prezzo ?? piatto.prezzo)
                   }}</span>
                 </div>
                 <p
                   *ngIf="piatto.prodotto?.descrizione || piatto.descrizione"
                   class="rustico-prodotto-desc"
-                  [style.color]="colorePrimario + '99'"
+                  [style.color]="(i % 2 === 0 ? coloreSecondario : colorePrimario) + 'CC'"
                 >
                   {{ getT(piatto.prodotto?.descrizione ?? piatto.descrizione) }}
                 </p>
@@ -823,15 +822,27 @@
               <div *ngIf="rusticoPortataAttiva.prodotti && rusticoPortataAttiva.prodotti.length === 0" class="rustico-empty">
                 <p>{{ getUI('NESSUN_PIATTO') }}</p>
               </div>
-              <div *ngFor="let prodotto of rusticoPortataAttiva.prodotti" class="rustico-prodotto-item">
+              <div
+                *ngFor="let prodotto of rusticoPortataAttiva.prodotti; let i = index"
+                class="rustico-prodotto-item"
+                [style.backgroundColor]="i % 2 === 0 ? colorePrimario : coloreSecondario"
+              >
                 <div class="rustico-prodotto-row">
-                  <span class="rustico-bullet" [style.background]="colorePrimario"></span>
-                  <span class="rustico-prodotto-nome" [style.color]="colorePrimario + 'CC'">{{ getT(prodotto.nome) }}</span>
-                  <span class="rustico-leader" [style.borderBottomColor]="colorePrimario + '44'"></span>
-                  <span class="rustico-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
+                  <span class="rustico-bullet" [style.background]="i % 2 === 0 ? coloreSecondario : colorePrimario"></span>
+                  <span class="rustico-prodotto-nome" [style.color]="i % 2 === 0 ? coloreSecondario : colorePrimario">{{
+                    getT(prodotto.nome)
+                  }}</span>
+                  <span class="rustico-leader" [style.borderBottomColor]="(i % 2 === 0 ? coloreSecondario : colorePrimario) + '55'"></span>
+                  <span class="rustico-prodotto-prezzo" [style.color]="i % 2 === 0 ? coloreSecondario : colorePrimario">{{
+                    formatPrezzo(prodotto.prezzo)
+                  }}</span>
                   <!-- Nessun bottone modifica/elimina nella vista pubblica -->
                 </div>
-                <p *ngIf="prodotto.descrizione" class="rustico-prodotto-desc" [style.color]="colorePrimario + '99'">
+                <p
+                  *ngIf="prodotto.descrizione"
+                  class="rustico-prodotto-desc"
+                  [style.color]="(i % 2 === 0 ? coloreSecondario : colorePrimario) + 'CC'"
+                >
                   {{ getT(prodotto.descrizione) }}
                 </p>
                 <div class="prodotto-allergeni" *ngIf="prodotto.allergenis && prodotto.allergenis.length > 0">
