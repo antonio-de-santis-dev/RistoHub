@@ -40,6 +40,10 @@ public class ProdottoService {
      * @param prodottoDTO the entity to save.
      * @return the persisted entity.
      */
+    public ProdottoDTO save(ProdottoDTO prodottoDTO) {
+        LOG.debug("Request to save Prodotto : {}", prodottoDTO);
+        return persistProdotto(prodottoDTO);
+    }
 
     /**
      * Update a prodotto.
@@ -47,11 +51,6 @@ public class ProdottoService {
      * @param prodottoDTO the entity to save.
      * @return the persisted entity.
      */
-    public ProdottoDTO save(ProdottoDTO prodottoDTO) {
-        LOG.debug("Request to save Prodotto : {}", prodottoDTO);
-        return persistProdotto(prodottoDTO);
-    }
-
     public ProdottoDTO update(ProdottoDTO prodottoDTO) {
         LOG.debug("Request to update Prodotto : {}", prodottoDTO);
         checkProdottoOwnership(prodottoDTO.getId());
@@ -82,6 +81,30 @@ public class ProdottoService {
             })
             .map(prodottoRepository::save)
             .map(prodottoMapper::toDto);
+    }
+
+    /**
+     * Inverte il flag `visibile` del prodotto specificato.
+     *
+     * Solo il ristoratore proprietario può modificare la visibilità.
+     * Restituisce il DTO aggiornato con il nuovo valore di visibile.
+     *
+     * @param id UUID del prodotto da mostrare/nascondere
+     * @return DTO aggiornato
+     */
+    public ProdottoDTO toggleVisibilita(UUID id) {
+        LOG.debug("Request to toggle visibilità Prodotto : {}", id);
+        checkProdottoOwnership(id);
+
+        Prodotto prodotto = prodottoRepository
+            .findById(id)
+            .orElseThrow(() -> new BadRequestAlertException("Prodotto non trovato", "prodotto", "idnotfound"));
+
+        // Inverte il flag; se per qualche motivo è null, lo considera true e lo nasconde
+        boolean nuovoValore = prodotto.getVisibile() == null || !prodotto.getVisibile();
+        prodotto.setVisibile(nuovoValore);
+
+        return prodottoMapper.toDto(prodottoRepository.save(prodotto));
     }
 
     /**
@@ -130,25 +153,50 @@ public class ProdottoService {
     private void checkProdottoOwnership(UUID prodottoId) {
         String currentLogin = SecurityUtils.getCurrentUserLogin()
             .orElseThrow(() -> new BadRequestAlertException("Utente non autenticato", "prodotto", "unauthenticated"));
-        String ownerLogin = prodottoRepository
-            .findRistoratoreLoginByProdottoId(prodottoId)
+        Prodotto prodotto = prodottoRepository
+            .findById(prodottoId)
             .orElseThrow(() -> new BadRequestAlertException("Prodotto non trovato", "prodotto", "idnotfound"));
-        if (!ownerLogin.equals(currentLogin)) {
+        if (
+            prodotto.getPortata() == null ||
+            prodotto.getPortata().getMenu() == null ||
+            prodotto.getPortata().getMenu().getRistoratore() == null ||
+            !prodotto.getPortata().getMenu().getRistoratore().getLogin().equals(currentLogin)
+        ) {
             throw new BadRequestAlertException("Accesso negato", "prodotto", "forbidden");
         }
     }
 
+    /** Backoffice: tutti i prodotti di una portata (visibili e nascosti). */
     public List<ProdottoDTO> findByPortataId(UUID portataId) {
         return prodottoRepository.findByPortataId(portataId).stream().map(prodottoMapper::toDto).toList();
     }
 
     /**
+     * Menu pubblico: solo i prodotti visibili di una portata.
+     * Filtra per visibile = true.
+     */
+    public List<ProdottoDTO> findByPortataIdVisibili(UUID portataId) {
+        return prodottoRepository.findByPortataIdAndVisibileTrue(portataId).stream().map(prodottoMapper::toDto).toList();
+    }
+
+    /**
      * Restituisce tutti i prodotti delle portate di un menu con allergeni già caricati.
      * Usato da GET /api/menus/{id}/prodotti-completi — elimina il loop N+1 lato frontend.
+     * Backoffice: include tutti i prodotti (anche quelli nascosti).
      */
     @Transactional(readOnly = true)
     public List<ProdottoDTO> findProdottiCompletiByMenuId(UUID menuId) {
         LOG.debug("Request to get all Prodotti with allergeni for Menu : {}", menuId);
         return prodottoRepository.findByPortataMenuIdWithAllergeni(menuId).stream().map(prodottoMapper::toDto).toList();
+    }
+
+    /**
+     * Stessa query ma filtra solo i prodotti visibili (visibile = true).
+     * Usato dal menu pubblico aggregato per non esporre prodotti nascosti ai clienti.
+     */
+    @Transactional(readOnly = true)
+    public List<ProdottoDTO> findProdottiCompletiVisibiliByMenuId(UUID menuId) {
+        LOG.debug("Request to get visible Prodotti with allergeni for Menu : {}", menuId);
+        return prodottoRepository.findByPortataMenuIdWithAllergeniAndVisibile(menuId).stream().map(prodottoMapper::toDto).toList();
     }
 }

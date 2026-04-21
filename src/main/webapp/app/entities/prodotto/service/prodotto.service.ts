@@ -31,6 +31,16 @@ export class ProdottoService {
     return this.http.patch<IProdotto>(`${this.resourceUrl}/${this.getProdottoIdentifier(prodotto)}`, prodotto, { observe: 'response' });
   }
 
+  /**
+   * Inverte il flag `visibile` del prodotto tramite PATCH /api/prodottos/{id}/visibilita.
+   * Restituisce il DTO aggiornato con il nuovo valore di visibile.
+   *
+   * @param id UUID del prodotto
+   */
+  toggleVisibilita(id: string): Observable<EntityResponseType> {
+    return this.http.patch<IProdotto>(`${this.resourceUrl}/${id}/visibilita`, null, { observe: 'response' });
+  }
+
   find(id: string): Observable<EntityResponseType> {
     return this.http.get<IProdotto>(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }

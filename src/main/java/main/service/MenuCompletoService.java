@@ -19,7 +19,6 @@ import main.service.mapper.MenuMapper;
 import main.service.mapper.PiattoDelGiornoMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,7 +77,6 @@ public class MenuCompletoService {
      * istanze. Le collection vengono inizializzate in memoria prima della
      * serializzazione del mapper → icone allergeni correttamente incluse nella risposta.
      */
-    @Cacheable(value = "piattiGiorno", key = "#menuId")
     public List<PiattoDelGiornoDTO> findPiattiDelGiornoAttiviByMenuId(UUID menuId) {
         LOG.debug("Request to get active PiattiDelGiorno with allergenis for Menu : {}", menuId);
 
@@ -100,14 +98,17 @@ public class MenuCompletoService {
      *
      * Flusso interno (tutto nello stesso thread, stessa connessione DB):
      *  1. Carica il menu (se non esiste → Optional.empty() → 404)
-     *  2. Carica portate + prodotti per portata
+     *  2. Carica portate + prodotti VISIBILI per portata
      *  3. Carica piatti del giorno attivi con allergeni
      *  4. Carica immagini, allergeni, contatti
+     *
+     * NOTA VISIBILITÀ: viene usata la variante "Visibili" di findProdottiCompleti
+     * così i prodotti con visibile=false non vengono mai esposti al cliente finale,
+     * nemmeno tramite questo endpoint aggregato.
      *
      * @param id UUID del menu pubblico
      * @return Optional con il DTO aggregato, vuoto se il menu non esiste
      */
-    @Cacheable(value = "menuCompleto", key = "#id")
     public Optional<MenuCompletoDTO> findMenuCompleto(UUID id) {
         LOG.debug("Request to get MenuCompleto (aggregato) : {}", id);
 
@@ -118,10 +119,12 @@ public class MenuCompletoService {
         }
         MenuDTO menu = menuOpt.get();
 
-        // Query unica per tutti i prodotti del menu con allergeni già in JOIN FETCH.
-        // Sostituisce il loop N+1 (findByMenuId + findByPortataId per ogni portata).
+        // *** FIX VISIBILITÀ ***
+        // Usa la variante filtrata (visibile = true) invece di findProdottiCompletiByMenuId.
+        // Questo garantisce che i prodotti nascosti dal ristoratore non appaiano
+        // nel menu pubblico nemmeno via endpoint /full.
         Map<UUID, List<ProdottoDTO>> prodottiPerPortata = prodottoService
-            .findProdottiCompletiByMenuId(id)
+            .findProdottiCompletiVisibiliByMenuId(id)
             .stream()
             .collect(Collectors.groupingBy(p -> p.getPortata().getId()));
 

@@ -6,6 +6,12 @@ export interface IProdotto {
   nome?: string | null;
   descrizione?: string | null;
   prezzo?: number | null;
+  /**
+   * Visibilità nel menu pubblico.
+   * true  → il prodotto è mostrato ai clienti (default)
+   * false → il prodotto è nascosto nel menu pubblico
+   */
+  visibile?: boolean | null;
   allergenis?: Pick<IAllergene, 'id'>[] | null;
   portata?: Pick<IPortata, 'id'> | null;
 }

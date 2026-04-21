@@ -18,18 +18,31 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ProdottoRepository extends ProdottoRepositoryWithBagRelationships, JpaRepository<Prodotto, UUID> {
+    /** Tutti i prodotti di una portata (backoffice — include anche quelli nascosti). */
     List<Prodotto> findByPortataId(UUID portataId);
+
+    /**
+     * Prodotti di una portata VISIBILI nel menu pubblico (visibile = true).
+     * Usato dagli endpoint /api/public/** per filtrare cosa mostrare al cliente.
+     */
+    List<Prodotto> findByPortataIdAndVisibileTrue(UUID portataId);
 
     /**
      * Restituisce tutti i prodotti appartenenti alle portate di un dato menu,
      * con gli allergeni già inizializzati (evita N+1 sul join allergenis).
-     * Usato da GET /api/menus/{id}/prodotti-completi.
+     * Usato da GET /api/menus/{id}/prodotti-completi (backoffice — include tutti).
      */
     @Query("SELECT DISTINCT p FROM Prodotto p " + "LEFT JOIN FETCH p.allergenis " + "WHERE p.portata.menu.id = :menuId")
     List<Prodotto> findByPortataMenuIdWithAllergeni(@Param("menuId") UUID menuId);
 
-    @Query("SELECT p.portata.menu.ristoratore.login FROM Prodotto p WHERE p.id = :id")
-    Optional<String> findRistoratoreLoginByProdottoId(@Param("id") UUID id);
+    /**
+     * Stessa query ma filtra solo i prodotti visibili (visibile = true).
+     * Usato dal menu pubblico (endpoint /api/public/menus/{id}/full e by-portata).
+     */
+    @Query(
+        "SELECT DISTINCT p FROM Prodotto p " + "LEFT JOIN FETCH p.allergenis " + "WHERE p.portata.menu.id = :menuId AND p.visibile = true"
+    )
+    List<Prodotto> findByPortataMenuIdWithAllergeniAndVisibile(@Param("menuId") UUID menuId);
 
     default Optional<Prodotto> findOneWithEagerRelationships(UUID id) {
         return this.fetchBagRelationships(this.findById(id));

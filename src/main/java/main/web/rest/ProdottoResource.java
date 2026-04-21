@@ -132,6 +132,29 @@ public class ProdottoResource {
     }
 
     /**
+     * {@code PATCH  /prodottos/:id/visibilita} : Inverte il flag visibile del prodotto.
+     *
+     * Endpoint dedicato al toggle occhio nel backoffice.
+     * Solo il ristoratore proprietario può cambiare la visibilità.
+     *
+     * @param id UUID del prodotto
+     * @return DTO aggiornato con il nuovo valore di visibile
+     */
+    @PatchMapping("/{id}/visibilita")
+    public ResponseEntity<ProdottoDTO> toggleVisibilita(@PathVariable("id") UUID id) {
+        LOG.debug("REST request to toggle visibilità Prodotto : {}", id);
+
+        if (!prodottoRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        ProdottoDTO result = prodottoService.toggleVisibilita(id);
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(result);
+    }
+
+    /**
      * {@code GET  /prodottos} : get all the prodottos.
      *
      * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).

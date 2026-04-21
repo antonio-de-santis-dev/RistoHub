@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Aggiunge il campo `visibile` alla tabella prodotto.
+        Default TRUE: tutti i prodotti esistenti restano visibili nel menu pubblico.
+        Se FALSE, il prodotto viene oscurato dal menu pubblico (ma rimane gestibile dal backoffice).
+    -->
+    <changeSet id="20260421000000-add-visibile-to-prodotto" author="ristoHub">
+        <addColumn tableName="prodotto">
+            <column name="visibile" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

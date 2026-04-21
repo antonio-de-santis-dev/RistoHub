@@ -59,6 +59,25 @@ export class ProdottoComponent implements OnInit {
       .subscribe();
   }
 
+  /**
+   * Inverte la visibilità del prodotto nel menu pubblico.
+   * Aggiorna il segnale locale in modo ottimistico per evitare un reload completo.
+   */
+  toggleVisibilita(prodotto: IProdotto): void {
+    this.prodottoService.toggleVisibilita(prodotto.id).subscribe({
+      next: res => {
+        if (res.body) {
+          // Aggiornamento ottimistico: sostituisce il prodotto nella lista senza ricaricare tutto
+          this.prodottos.update(lista => lista.map(p => (p.id === prodotto.id ? { ...p, visibile: res.body!.visibile } : p)));
+        }
+      },
+      error: () => {
+        // In caso di errore ricarica la lista per garantire consistenza
+        this.load();
+      },
+    });
+  }
+
   load(): void {
     this.queryBackend().subscribe({
       next: (res: EntityArrayResponseType) => {

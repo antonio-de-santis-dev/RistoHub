@@ -36,28 +36,24 @@
             <th scope="col" jhiSortBy="id">
               <div class="d-flex">
                 <span jhiTranslate="ristoHubApp.prodotto.id">Id</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="nome">
               <div class="d-flex">
                 <span jhiTranslate="ristoHubApp.prodotto.nome">Nome</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="descrizione">
               <div class="d-flex">
                 <span jhiTranslate="ristoHubApp.prodotto.descrizione">Descrizione</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="prezzo">
               <div class="d-flex">
                 <span jhiTranslate="ristoHubApp.prodotto.prezzo">Prezzo</span>
-
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
@@ -73,12 +69,17 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col">
+              <div class="d-flex">
+                <span jhiTranslate="ristoHubApp.prodotto.visibile">Visibile</span>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
           @for (prodotto of prodottos(); track trackId(prodotto)) {
-            <tr data-cy="entityTable">
+            <tr data-cy="entityTable" [class.table-secondary]="prodotto.visibile === false">
               <td>
                 <a [routerLink]="['/prodotto', prodotto.id, 'view']">{{ prodotto.id }}</a>
               </td>
@@ -100,6 +101,14 @@
                   </div>
                 }
               </td>
+              <!-- Colonna stato visibilità: badge colorato -->
+              <td>
+                @if (prodotto.visibile !== false) {
+                  <span class="badge bg-success" jhiTranslate="ristoHubApp.prodotto.statoVisibile">Visibile</span>
+                } @else {
+                  <span class="badge bg-secondary" jhiTranslate="ristoHubApp.prodotto.statoNascosto">Nascosto</span>
+                }
+              </td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/prodotto', prodotto.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
@@ -111,6 +120,32 @@
                     <fa-icon icon="pencil-alt"></fa-icon>
                     <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Modifica</span>
                   </a>
+
+                  <!--
+                    Pulsante toggle visibilità menu pubblico.
+                    - Occhio aperto (eye)         → prodotto visibile  → clicca per nasconderlo
+                    - Occhio sbarrato (eye-slash) → prodotto nascosto  → clicca per renderlo visibile
+                    Il colore cambia in base allo stato corrente.
+                  -->
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    [class.btn-warning]="prodotto.visibile !== false"
+                    [class.btn-outline-secondary]="prodotto.visibile === false"
+                    [title]="prodotto.visibile !== false ? 'Nascondi dal menu pubblico' : 'Mostra nel menu pubblico'"
+                    (click)="toggleVisibilita(prodotto)"
+                    data-cy="entityToggleVisibilitaButton"
+                  >
+                    @if (prodotto.visibile !== false) {
+                      <!-- Occhio aperto: prodotto visibile, click per nasconderlo -->
+                      <fa-icon icon="eye"></fa-icon>
+                      <span class="d-none d-md-inline" jhiTranslate="ristoHubApp.prodotto.nascondi">Nascondi</span>
+                    } @else {
+                      <!-- Occhio sbarrato: prodotto nascosto, click per renderlo visibile -->
+                      <fa-icon icon="eye-slash"></fa-icon>
+                      <span class="d-none d-md-inline" jhiTranslate="ristoHubApp.prodotto.mostra">Mostra</span>
+                    }
+                  </button>
 
                   <button type="submit" (click)="delete(prodotto)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
                     <fa-icon icon="times"></fa-icon>

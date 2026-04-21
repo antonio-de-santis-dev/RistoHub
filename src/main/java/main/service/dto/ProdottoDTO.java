@@ -25,6 +25,13 @@ public class ProdottoDTO implements Serializable {
     private BigDecimal prezzo;
 
     /**
+     * Visibilità nel menu pubblico.
+     * true  → il prodotto è mostrato ai clienti (default)
+     * false → il prodotto è nascosto nel menu pubblico
+     */
+    private Boolean visibile = true;
+
+    /**
      * Riferimento alla portata di appartenenza.
      * Necessario per il salvataggio (Prodotto.portata è @NotNull nel DB).
      * Il mapper usa solo l'id per stabilire la relazione ManyToOne.
@@ -66,6 +73,14 @@ public class ProdottoDTO implements Serializable {
 
     public void setPrezzo(BigDecimal prezzo) {
         this.prezzo = prezzo;
+    }
+
+    public Boolean getVisibile() {
+        return visibile;
+    }
+
+    public void setVisibile(Boolean visibile) {
+        this.visibile = visibile;
     }
 
     public PortataDTO getPortata() {
@@ -112,6 +127,7 @@ public class ProdottoDTO implements Serializable {
             ", nome='" + getNome() + "'" +
             ", descrizione='" + getDescrizione() + "'" +
             ", prezzo=" + getPrezzo() +
+            ", visibile=" + getVisibile() +
             ", portata=" + getPortata() +
             ", allergenis=" + getAllergenis() +
             "}";

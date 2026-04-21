@@ -38,6 +38,15 @@ public class Prodotto implements Serializable {
     @Column(name = "prezzo", precision = 21, scale = 2, nullable = false)
     private BigDecimal prezzo;
 
+    /**
+     * Controlla la visibilità del prodotto nel menu pubblico.
+     * true  → visibile (default)
+     * false → nascosto; il prodotto non compare nel menu scansionato dal cliente.
+     */
+    @NotNull
+    @Column(name = "visibile", nullable = false)
+    private Boolean visibile = true;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "rel_prodotto__allergeni",
@@ -107,6 +116,19 @@ public class Prodotto implements Serializable {
         this.prezzo = prezzo;
     }
 
+    public Boolean getVisibile() {
+        return this.visibile;
+    }
+
+    public Prodotto visibile(Boolean visibile) {
+        this.setVisibile(visibile);
+        return this;
+    }
+
+    public void setVisibile(Boolean visibile) {
+        this.visibile = visibile;
+    }
+
     public Set<Allergene> getAllergenis() {
         return this.allergenis;
     }
@@ -170,6 +192,7 @@ public class Prodotto implements Serializable {
             ", nome='" + getNome() + "'" +
             ", descrizione='" + getDescrizione() + "'" +
             ", prezzo=" + getPrezzo() +
+            ", visibile=" + getVisibile() +
             "}";
     }
 }

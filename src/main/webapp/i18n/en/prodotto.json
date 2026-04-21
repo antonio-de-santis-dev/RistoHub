@@ -22,7 +22,12 @@
       "descrizione": "Descrizione",
       "prezzo": "Prezzo",
       "allergeni": "Allergeni",
-      "portata": "Portata"
+      "portata": "Portata",
+      "visibile": "Visible",
+      "statoVisibile": "Visible",
+      "statoNascosto": "Hidden",
+      "nascondi": "Hide",
+      "mostra": "Show"
     }
   }
 }

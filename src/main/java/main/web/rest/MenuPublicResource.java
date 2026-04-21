@@ -30,6 +30,10 @@ import org.springframework.web.bind.annotation.*;
  *
  * Tutti gli endpoint sono sotto /api/public/** e vengono esplicitamente
  * configurati come permitAll() in SecurityConfiguration.
+ *
+ * NOTA VISIBILITÀ: tutti gli endpoint che restituiscono prodotti usano le varianti
+ * "Visibili" dei metodi di servizio, in modo che i prodotti nascosti dal ristoratore
+ * (visibile = false) non vengano mai esposti al cliente finale.
  */
 @RestController
 @RequestMapping("/api/public")
@@ -125,12 +129,14 @@ public class MenuPublicResource {
 
     /**
      * GET /api/public/prodottos/by-portata/{portataId}
-     * Prodotti di una specifica portata.
+     * Prodotti VISIBILI di una specifica portata.
+     * I prodotti con visibile = false vengono esclusi dalla risposta.
      */
     @GetMapping("/prodottos/by-portata/{portataId}")
     public List<ProdottoDTO> getProdottiByPortata(@PathVariable("portataId") UUID portataId) {
-        LOG.debug("PUBLIC request to get prodotti for Portata : {}", portataId);
-        return prodottoService.findByPortataId(portataId);
+        LOG.debug("PUBLIC request to get prodotti visibili for Portata : {}", portataId);
+        // Usa il metodo filtrato: esclude i prodotti nascosti dal ristoratore
+        return prodottoService.findByPortataIdVisibili(portataId);
     }
 
     /**
@@ -157,6 +163,7 @@ public class MenuPublicResource {
      * GET /api/public/menus/{id}/full
      * Endpoint aggregato: restituisce menu + portate + prodotti + immagini + allergeni + contatti
      * in una sola chiamata HTTP. Elimina il pattern N+6 del frontend.
+     * I prodotti con visibile = false vengono esclusi automaticamente dal MenuCompletoService.
      */
     @GetMapping("/menus/{id}/full")
     public ResponseEntity<MenuCompletoDTO> getMenuCompleto(@PathVariable("id") UUID id) {

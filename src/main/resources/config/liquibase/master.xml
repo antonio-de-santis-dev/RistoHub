@@ -34,6 +34,7 @@
   <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
   <include file="config/liquibase/changelog/20260217131001_add_menu_to_piatto_del_giorno.xml" relativeToChangelogFile="false"/>
   <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
+  <include file="config/liquibase/changelog/20260421000000_add_visibile_to_prodotto.xml" relativeToChangelogFile="false"/>
   <include file="config/liquibase/changelog/20260219_alter_allergene_add_icona.xml"/>
   <include file="config/liquibase/changelog/20260219_insert_allergeni_default.xml"/>
   <include file="config/liquibase/changelog/20240101_add_piatto_del_giorno_allergenis.xml" relativeToChangelogFile="false"/>
