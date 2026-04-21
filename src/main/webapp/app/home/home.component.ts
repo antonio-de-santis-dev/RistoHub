@@ -98,6 +98,33 @@ export default class HomeComponent implements OnInit {
     return `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(this.qrUrl)}`;
   }
 
+  /**
+   * Scarica il QR code come file PNG.
+   * Usa fetch + Blob per forzare il download anche da URL cross-origin
+   * (il semplice attributo HTML "download" non funziona su risorse esterne).
+   */
+  async scaricaQr(): Promise<void> {
+    try {
+      const response = await fetch(this.qrImageUrl);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `qr-menu-${this.qrMenuId}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Errore download QR:', err);
+    }
+  }
+
+  /** Apre la pagina pubblica del menu in una nuova scheda. */
+  apriMenuPubblico(): void {
+    window.open(this.qrUrl, '_blank');
+  }
+
   formatPrezzo(p: number | undefined | null): string {
     if (p === undefined || p === null) return '—';
     return `€ ${Number(p).toFixed(2).replace('.', ',')}`;

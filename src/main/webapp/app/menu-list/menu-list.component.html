@@ -163,7 +163,8 @@
       </div>
       <p class="qr-link">{{ qrUrl }}</p>
       <div class="rh-modal-actions">
-        <a [href]="qrImageUrl" download="qr-menu.png" class="btn-download">⬇ Scarica QR</a>
+        <button class="btn-download" (click)="scaricaQr()">⬇ Scarica PNG</button>
+        <button class="btn-apri-pubblico" (click)="apriMenuPubblico()">🌐 Apri Menu Pubblico</button>
         <button class="btn-annulla" (click)="chiudiQr()">Chiudi</button>
       </div>
     </div>

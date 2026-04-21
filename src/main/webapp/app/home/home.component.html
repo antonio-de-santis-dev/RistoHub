@@ -68,10 +68,10 @@
           }
         </div>
 
-        <!-- CARD 2: I miei Menu — icona cambiata, rimossi cerchi colore -->
+        <!-- CARD 2: I miei Menu -->
         <div class="rh-dash-card">
           <div class="rh-card-header">
-            <!-- Nuova icona: libro/menu aperto -->
+            <!-- Icona: libro/menu aperto -->
             <span class="rh-card-icon">
               <svg
                 width="22"
@@ -115,7 +115,6 @@
             <div class="rh-menus-list">
               @for (menu of menuAttivi; track menu.id) {
                 <div class="rh-menu-row" (click)="apriMenu(menu.id)">
-                  <!-- RIMOSSO il cerchio colore, sostituito con indicatore stato -->
                   <div class="rh-menu-stato" [class.rh-menu-attivo]="menu.attivo" [class.rh-menu-inattivo]="!menu.attivo"></div>
                   <div class="rh-menu-info">
                     <span class="rh-menu-nome">{{ menu.nome }}</span>
@@ -145,14 +144,16 @@
     <div class="rh-modal-overlay" (click)="chiudiQr()">
       <div class="rh-modal" (click)="$event.stopPropagation()">
         <span class="rh-modal-icon">📱</span>
-        <h3>QR Code Menu</h3>
+        <h3>QR Code del Menu</h3>
+        <p class="rh-qr-subtitle">I clienti scansionano questo codice per visualizzare il menu</p>
         <div class="rh-qr-wrap">
           <img [src]="qrImageUrl" alt="QR Code" class="rh-qr-img" />
         </div>
         <p class="rh-qr-link">{{ qrUrl }}</p>
         <div class="rh-modal-actions">
-          <a [href]="qrImageUrl" download="qr-menu.png" class="rh-btn-download">⬇ Scarica PNG</a>
-          <button (click)="chiudiQr()" class="rh-btn-close">Chiudi</button>
+          <button class="rh-btn-download" (click)="scaricaQr()">⬇ Scarica PNG</button>
+          <button class="rh-btn-apri-pubblico" (click)="apriMenuPubblico()">🌐 Apri Menu Pubblico</button>
+          <button class="rh-btn-close" (click)="chiudiQr()">Chiudi</button>
         </div>
       </div>
     </div>
