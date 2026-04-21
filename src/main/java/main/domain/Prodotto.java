@@ -38,6 +38,17 @@ public class Prodotto implements Serializable {
     @Column(name = "prezzo", precision = 21, scale = 2, nullable = false)
     private BigDecimal prezzo;
 
+    /**
+     * Traduzioni automatiche di nome/descrizione in EN, FR, DE, ES.
+     * Contiene un JSON con struttura:
+     * { "en": {"nome":"...","descrizione":"..."}, "fr": {...}, "de": {...}, "es": {...} }
+     *
+     * Popolato automaticamente dal TraduzioneDeepLService in fase di save/update.
+     * Può essere null per prodotti legacy o se DeepL non è configurato.
+     */
+    @Column(name = "traduzioni", columnDefinition = "TEXT")
+    private String traduzioni;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "rel_prodotto__allergeni",
@@ -107,6 +118,19 @@ public class Prodotto implements Serializable {
         this.prezzo = prezzo;
     }
 
+    public String getTraduzioni() {
+        return this.traduzioni;
+    }
+
+    public void setTraduzioni(String traduzioni) {
+        this.traduzioni = traduzioni;
+    }
+
+    public Prodotto traduzioni(String traduzioni) {
+        this.setTraduzioni(traduzioni);
+        return this;
+    }
+
     public Set<Allergene> getAllergenis() {
         return this.allergenis;
     }
@@ -158,7 +182,6 @@ public class Prodotto implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 

@@ -43,6 +43,7 @@ export interface ProdottoDTO {
   prezzo: number;
   allergenis?: AllergeneDTO[];
   portata?: { id: string };
+  traduzioni?: string | null;
 }
 
 /** Riferimento minimo usato nei body delle richieste HTTP */
@@ -68,6 +69,8 @@ export interface PortataConProdottiDTO {
   tipo: TipoPortata;
   nomeDefault?: string;
   nomePersonalizzato?: string;
+  /** Traduzioni del nomePersonalizzato (solo portate PERSONALIZZATA) */
+  traduzioni?: string | null;
   prodotti: ProdottoDTO[];
   /** Stato UI locale — non viene dal backend */
   aperta?: boolean;
@@ -98,6 +101,7 @@ export interface PiattoDelGiornoDTO {
   prodotto?: ProdottoDTO;
   allergenis?: AllergeneDTO[];
   menu?: { id: string; nome?: string };
+  traduzioni?: string | null;
 }
 
 /**

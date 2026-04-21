@@ -19,18 +19,9 @@ public interface PiattoDelGiornoRepository extends JpaRepository<PiattoDelGiorno
 
     void deleteByMenuId(UUID menuId);
 
-    /**
-     * Passo 1 — carica tutti i piatti con il prodotto collegato.
-     * Query separata per evitare MultipleBagFetchException.
-     */
     @Query("SELECT DISTINCT p FROM PiattoDelGiorno p LEFT JOIN FETCH p.prodotto")
     List<PiattoDelGiorno> findAllConProdotto();
 
-    /**
-     * Passo 2 — carica i piatti con gli allergeni del prodotto collegato.
-     * Nella stessa transazione di findAllConProdotto(), Hibernate usa la 1st-level cache
-     * e aggiorna le stesse istanze già in memoria.
-     */
     @Query(
         "SELECT DISTINCT p FROM PiattoDelGiorno p " +
         "LEFT JOIN FETCH p.prodotto prod " +
@@ -39,13 +30,16 @@ public interface PiattoDelGiornoRepository extends JpaRepository<PiattoDelGiorno
     )
     List<PiattoDelGiorno> findAllConAllergeniProdotto();
 
-    /**
-     * Passo 3 — carica i piatti personalizzati con i loro allergeni diretti.
-     * Nella stessa transazione, Hibernate popola p.allergenis sulle istanze già in cache.
-     */
     @Query("SELECT DISTINCT p FROM PiattoDelGiorno p LEFT JOIN FETCH p.allergenis")
     List<PiattoDelGiorno> findAllConAllergeniDiretti();
 
     @Query("SELECT p FROM PiattoDelGiorno p WHERE p.menu.ristoratore.login = :login")
     List<PiattoDelGiorno> findByMenuRistoratoreLogin(@Param("login") String login);
+
+    /**
+     * Ritorna i piatti del giorno di un menu che non hanno ancora traduzioni.
+     * Usato dall'endpoint di fallback /api/public/menus/{id}/translate-missing.
+     */
+    @Query("SELECT p FROM PiattoDelGiorno p WHERE p.menu.id = :menuId " + "AND (p.traduzioni IS NULL OR p.traduzioni = '')")
+    List<PiattoDelGiorno> findByMenuIdWithNullTraduzioni(@Param("menuId") UUID menuId);
 }

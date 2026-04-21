@@ -157,39 +157,39 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
     if (codice === this.linguaCorrente) return;
     this.linguaCorrente = codice;
     this.cdr.markForCheck();
+
     if (codice === 'it') return;
 
-    // Raccoglie TUTTE le stringhe traducibili da portate, prodotti e piatti del giorno
-    const stringhe = this.raccogliStringheTraducibili();
-    if (stringhe.size === 0) return;
-
-    // Se tutte le stringhe sono già in cache, ri-renderizza e basta
-    if (this.traduzioneService.hasAllCached(Array.from(stringhe), codice)) {
+    // Le traduzioni sono già in cache (popolate da caricaMenu via popolaDaDati).
+    // Se la cache per questa lingua è vuota E ci sono entità senza traduzioni,
+    // chiediamo al backend di tradurre i record legacy e ricarichiamo il menu.
+    const cacheLingua = this.traduzioneService.getCached(codice);
+    if (cacheLingua && cacheLingua.size > 0) {
       this.cdr.markForCheck();
       return;
     }
 
+    // Nessuna traduzione in cache: probabile menu legacy. Chiama fallback backend.
     this.isTraducendo = true;
     this.erroreTraduzioneVisible = false;
     this.cdr.markForCheck();
 
-    const result = await this.traduzioneService.traduci(Array.from(stringhe), codice);
+    const menuId = this.menu?.id;
+    if (menuId) {
+      const tradotti = await this.traduzioneService.translateMissing(menuId);
+      if (tradotti > 0) {
+        // Ricarica il menu per prendere le traduzioni appena generate
+        await this.caricaMenu(menuId);
+      } else {
+        this.erroreTraduzioneVisible = true;
+        setTimeout(() => {
+          this.erroreTraduzioneVisible = false;
+          this.cdr.markForCheck();
+        }, 4000);
+      }
+    }
     this.isTraducendo = false;
     this.cdr.markForCheck();
-
-    if (result.rateLimited) {
-      this.erroreTraduzioneVisible = true;
-      setTimeout(() => {
-        this.erroreTraduzioneVisible = false;
-        this.cdr.markForCheck();
-      }, 4000);
-    } else if (result.errori > 0 && result.cache.size === 0) {
-      this.erroreTraduzioneVisible = true;
-      setTimeout(() => {
-        this.erroreTraduzioneVisible = false;
-        this.cdr.markForCheck();
-      }, 4000);
-    }
   }
 
   /**
@@ -271,6 +271,8 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
       // ── piatti del giorno e contatti ──────────────────────────────────────
       this.piattiDelGiorno = (dati.piattiDelGiorno ?? []).map((p: PiattoDelGiornoDTO) => this.arricchisciPiatto(p));
       this.listeContatti = dati.contatti ?? [];
+      this.traduzioneService.clearCache();
+      this.traduzioneService.popolaDaDati(this.portate, this.piattiDelGiorno);
 
       // OPT-06: calcola una volta sola dopo che portate e piatti del giorno sono pronti
       this.calcolaTuttiAllergeni();

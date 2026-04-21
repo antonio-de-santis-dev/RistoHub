@@ -40,6 +40,16 @@ public class Portata implements Serializable {
     @Column(name = "nome_personalizzato")
     private String nomePersonalizzato;
 
+    /**
+     * Traduzioni automatiche del nomePersonalizzato (solo per portate PERSONALIZZATA).
+     * Per le portate DEFAULT il nome è tradotto staticamente lato frontend
+     * (vedi NOMI_PORTATE in menu-ui.constants.ts).
+     *
+     * Formato: { "en": {"nomePersonalizzato":"..."}, "fr": {...}, ... }
+     */
+    @Column(name = "traduzioni", columnDefinition = "TEXT")
+    private String traduzioni;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "portata", cascade = CascadeType.ALL, orphanRemoval = true)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "allergenis", "portata" }, allowSetters = true)
@@ -104,6 +114,19 @@ public class Portata implements Serializable {
         this.nomePersonalizzato = nomePersonalizzato;
     }
 
+    public String getTraduzioni() {
+        return this.traduzioni;
+    }
+
+    public void setTraduzioni(String traduzioni) {
+        this.traduzioni = traduzioni;
+    }
+
+    public Portata traduzioni(String traduzioni) {
+        this.setTraduzioni(traduzioni);
+        return this;
+    }
+
     public Set<Prodotto> getProdottis() {
         return this.prodottis;
     }
@@ -163,7 +186,6 @@ public class Portata implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 

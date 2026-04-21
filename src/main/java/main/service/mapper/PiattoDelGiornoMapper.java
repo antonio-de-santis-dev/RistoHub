@@ -22,6 +22,9 @@ import org.mapstruct.*;
  * Gestisce due casi:
  * 1. Piatto collegato a un prodotto → allergenis presi da prodotto.allergenis
  * 2. Piatto personalizzato (prodotto = null) → allergenis diretti del piatto
+ *
+ * Include il campo "traduzioni" sia sul PiattoDelGiorno (per piatti personalizzati)
+ * sia sul prodotto nested (per piatti con prodotto collegato).
  */
 @Mapper(componentModel = "spring")
 public interface PiattoDelGiornoMapper extends EntityMapper<PiattoDelGiornoDTO, PiattoDelGiorno> {
@@ -44,7 +47,7 @@ public interface PiattoDelGiornoMapper extends EntityMapper<PiattoDelGiornoDTO, 
     void partialUpdate(@MappingTarget PiattoDelGiorno entity, PiattoDelGiornoDTO dto);
 
     /**
-     * Mappa il prodotto includendo id, nome, descrizione, prezzo e allergenis.
+     * Mappa il prodotto includendo id, nome, descrizione, prezzo, allergenis E traduzioni.
      */
     @Named("prodottoConDettagliEAllergeni")
     @BeanMapping(ignoreByDefault = true)
@@ -52,21 +55,15 @@ public interface PiattoDelGiornoMapper extends EntityMapper<PiattoDelGiornoDTO, 
     @Mapping(target = "nome", source = "nome")
     @Mapping(target = "descrizione", source = "descrizione")
     @Mapping(target = "prezzo", source = "prezzo")
+    @Mapping(target = "traduzioni", source = "traduzioni")
     @Mapping(target = "allergenis", source = "allergenis", qualifiedByName = "allergeniSetToList")
     ProdottoDTO toDtoProdottoConDettagliEAllergeni(Prodotto prodotto);
 
-    /**
-     * Mappa solo l'id del menu (per evitare ricorsione).
-     */
     @Named("menuId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     MenuDTO toDtoMenuId(Menu menu);
 
-    /**
-     * Converte Set<Allergene> → List<AllergeneDTO> con tutti i campi inclusi:
-     * id, nome, icona (byte[] → base64 automatico da Jackson), iconaContentType, colore.
-     */
     @Named("allergeniSetToList")
     default List<AllergeneDTO> allergeniSetToList(Set<Allergene> allergenis) {
         if (allergenis == null) {
@@ -85,10 +82,6 @@ public interface PiattoDelGiornoMapper extends EntityMapper<PiattoDelGiornoDTO, 
         return result;
     }
 
-    /**
-     * Converte List<AllergeneDTO> → Set<Allergene> per il salvataggio.
-     * JPA ha bisogno solo dell'id per stabilire la relazione ManyToMany.
-     */
     @Named("allergenDtoListToSet")
     default Set<Allergene> allergenDtoListToSet(List<AllergeneDTO> allergeniDtos) {
         if (allergeniDtos == null) {

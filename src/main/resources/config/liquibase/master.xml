@@ -45,4 +45,6 @@
   <include file="config/liquibase/changelog/20260313120000_add_tutorial_completed_to_user.xml" relativeToChangelogFile="false"/>
   <include file="config/liquibase/changelog/20260408000000_add_portata_sort_index.xml" relativeToChangelogFile="false"/>
   <include file="config/liquibase/changelog/20260420000000_clean_invisible_chars_prodotto.xml" relativeToChangelogFile="false"/>
+  <include file="config/liquibase/changelog/20260421000000_add_traduzioni_columns.xml" relativeToChangelogFile="false"/>
+
 </databaseChangeLog>

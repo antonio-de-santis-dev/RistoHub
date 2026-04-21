@@ -34,9 +34,15 @@ public class PiattoDelGiornoDTO implements Serializable {
 
     /**
      * Allergeni per i piatti personalizzati (senza prodotto collegato).
-     * Per i piatti collegati a un prodotto, gli allergeni sono in prodotto.allergenis.
      */
     private List<AllergeneDTO> allergenis = new ArrayList<>();
+
+    /**
+     * JSON con le traduzioni di nome/descrizione in EN/FR/DE/ES.
+     * Popolato solo per piatti personalizzati (senza prodotto collegato).
+     * Per i piatti con prodotto, il frontend legge prodotto.traduzioni.
+     */
+    private String traduzioni;
 
     public UUID getId() {
         return id;
@@ -108,6 +114,14 @@ public class PiattoDelGiornoDTO implements Serializable {
 
     public void setAllergenis(List<AllergeneDTO> allergenis) {
         this.allergenis = allergenis;
+    }
+
+    public String getTraduzioni() {
+        return traduzioni;
+    }
+
+    public void setTraduzioni(String traduzioni) {
+        this.traduzioni = traduzioni;
     }
 
     @Override

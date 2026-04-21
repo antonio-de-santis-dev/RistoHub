@@ -23,13 +23,27 @@ public interface ProdottoRepository extends ProdottoRepositoryWithBagRelationshi
     /**
      * Restituisce tutti i prodotti appartenenti alle portate di un dato menu,
      * con gli allergeni già inizializzati (evita N+1 sul join allergenis).
-     * Usato da GET /api/menus/{id}/prodotti-completi.
      */
     @Query("SELECT DISTINCT p FROM Prodotto p " + "LEFT JOIN FETCH p.allergenis " + "WHERE p.portata.menu.id = :menuId")
     List<Prodotto> findByPortataMenuIdWithAllergeni(@Param("menuId") UUID menuId);
 
     @Query("SELECT p.portata.menu.ristoratore.login FROM Prodotto p WHERE p.id = :id")
     Optional<String> findRistoratoreLoginByProdottoId(@Param("id") UUID id);
+
+    /**
+     * Restituisce l'id del menu a cui appartiene un prodotto. Usato per invalidare
+     * la cache "menuCompleto" dopo save/update/delete del prodotto.
+     */
+    @Query("SELECT p.portata.menu.id FROM Prodotto p WHERE p.id = :id")
+    Optional<UUID> findMenuIdByProdottoId(@Param("id") UUID id);
+
+    /**
+     * Restituisce tutti i prodotti di un menu che non hanno ancora traduzioni
+     * (campo traduzioni null o vuoto). Usato dal fallback endpoint per tradurre
+     * prodotti legacy creati prima dell'attivazione di DeepL.
+     */
+    @Query("SELECT p FROM Prodotto p WHERE p.portata.menu.id = :menuId " + "AND (p.traduzioni IS NULL OR p.traduzioni = '')")
+    List<Prodotto> findProdottiSenzaTraduzioniByMenuId(@Param("menuId") UUID menuId);
 
     default Optional<Prodotto> findOneWithEagerRelationships(UUID id) {
         return this.fetchBagRelationships(this.findById(id));

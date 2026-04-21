@@ -198,6 +198,12 @@ jhipster:
   security:
     content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
 
+application:
+  deepl:
+    api-key: '01b3042c-c833-4eb0-829e-fd731c80e3e4:fx'
+    enabled: true
+    timeout-seconds: 10
+
 # jhipster-needle-add-application-yaml-document
 ---
 # application:

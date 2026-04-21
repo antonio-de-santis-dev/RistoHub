@@ -117,62 +117,42 @@ export class MenuViewComponent implements OnInit, OnDestroy {
 
     if (codice === 'it') return;
 
-    // Raccoglie TUTTE le stringhe traducibili da portate, prodotti e piatti del giorno
-    const stringhe = this.raccogliStringheTraducibili();
-    if (stringhe.size === 0) return;
-
-    // Se tutte le stringhe sono già in cache, ri-renderizza e basta
-    if (this.traduzioneService.hasAllCached(Array.from(stringhe), codice)) {
+    // Le traduzioni sono già in cache (popolate da caricaMenu via popolaDaDati).
+    // Se la cache per questa lingua è vuota E ci sono entità senza traduzioni,
+    // chiediamo al backend di tradurre i record legacy e ricarichiamo il menu.
+    const cacheLingua = this.traduzioneService.getCached(codice);
+    if (cacheLingua && cacheLingua.size > 0) {
       this.cdr.markForCheck();
       return;
     }
 
+    // Nessuna traduzione in cache: probabile menu legacy. Chiama fallback backend.
     this.isTraducendo = true;
     this.erroreTraduzioneVisible = false;
     this.cdr.markForCheck();
 
-    const result = await this.traduzioneService.traduci(Array.from(stringhe), codice);
+    const menuId = this.menu?.id;
+    if (menuId) {
+      const tradotti = await this.traduzioneService.translateMissing(menuId);
+      if (tradotti > 0) {
+        // Ricarica il menu per prendere le traduzioni appena generate
+        await this.caricaMenu(menuId);
+      } else {
+        this.erroreTraduzioneVisible = true;
+        setTimeout(() => {
+          this.erroreTraduzioneVisible = false;
+          this.cdr.markForCheck();
+        }, 4000);
+      }
+    }
     this.isTraducendo = false;
     this.cdr.markForCheck();
-
-    if (result.rateLimited) {
-      this.erroreTraduzioneVisible = true;
-      setTimeout(() => {
-        this.erroreTraduzioneVisible = false;
-        this.cdr.markForCheck();
-      }, 4000);
-    } else if (result.errori > 0 && result.cache.size === 0) {
-      this.erroreTraduzioneVisible = true;
-      setTimeout(() => {
-        this.erroreTraduzioneVisible = false;
-        this.cdr.markForCheck();
-      }, 4000);
-    }
   }
 
   /**
    * Raccoglie tutte le stringhe traducibili del menu: nomi portate personalizzate,
    * nomi e descrizioni di tutti i prodotti di tutte le portate, e dei piatti del giorno.
    */
-  private raccogliStringheTraducibili(): Set<string> {
-    const stringhe = new Set<string>();
-    this.portate.forEach(p => {
-      if (p.tipo === 'PERSONALIZZATA' && p.nomePersonalizzato) {
-        stringhe.add(p.nomePersonalizzato);
-      }
-      (p.prodotti ?? []).forEach((prod: ProdottoDTO) => {
-        if (prod.nome) stringhe.add(prod.nome);
-        if (prod.descrizione) stringhe.add(prod.descrizione);
-      });
-    });
-    this.piattiDelGiorno.forEach(p => {
-      const nome = p.prodotto?.nome ?? p.nome;
-      const desc = p.prodotto?.descrizione ?? p.descrizione;
-      if (nome) stringhe.add(nome);
-      if (desc) stringhe.add(desc);
-    });
-    return stringhe;
-  }
 
   // ══════════════════════════════════════════════════
 
@@ -311,6 +291,9 @@ export class MenuViewComponent implements OnInit, OnDestroy {
     } finally {
       this.isLoading = false;
     }
+    // ── 8. Popola cache traduzioni dal payload (zero chiamate API esterne) ───
+    this.traduzioneService.clearCache();
+    this.traduzioneService.popolaDaDati(this.portate, this.piattiDelGiorno);
   }
 
   // ── Helpers contatti ──────────────────────────────────────────

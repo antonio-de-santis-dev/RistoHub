@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <!--
+      Aggiunge la colonna 'traduzioni' (TEXT) a prodotto, portata e piatto_del_giorno.
+      Contiene un JSON con le traduzioni automatiche generate da DeepL in EN/FR/DE/ES.
+      Nullable: i record esistenti prima dell'introduzione di DeepL avranno valore NULL,
+      e il frontend mostrerà il testo italiano come fallback.
+  -->
+  <changeSet id="20260421000000-1" author="dev">
+    <addColumn tableName="prodotto">
+      <column name="traduzioni" type="${clobType}">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="20260421000000-2" author="dev">
+    <addColumn tableName="portata">
+      <column name="traduzioni" type="${clobType}">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="20260421000000-3" author="dev">
+    <addColumn tableName="piatto_del_giorno">
+      <column name="traduzioni" type="${clobType}">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+</databaseChangeLog>

@@ -26,8 +26,6 @@ public class ProdottoDTO implements Serializable {
 
     /**
      * Riferimento alla portata di appartenenza.
-     * Necessario per il salvataggio (Prodotto.portata è @NotNull nel DB).
-     * Il mapper usa solo l'id per stabilire la relazione ManyToOne.
      */
     private PortataDTO portata;
 
@@ -35,6 +33,13 @@ public class ProdottoDTO implements Serializable {
      * Allergeni del prodotto — popolati nella risposta per visualizzare le icone.
      */
     private List<AllergeneDTO> allergenis = new ArrayList<>();
+
+    /**
+     * JSON con le traduzioni in EN/FR/DE/ES generate da DeepL.
+     * Formato: {"en":{"nome":"...","descrizione":"..."},"fr":{...},"de":{...},"es":{...}}
+     * Null se il prodotto è antecedente all'introduzione delle traduzioni o se DeepL è disabilitato.
+     */
+    private String traduzioni;
 
     public UUID getId() {
         return id;
@@ -82,6 +87,14 @@ public class ProdottoDTO implements Serializable {
 
     public void setAllergenis(List<AllergeneDTO> allergenis) {
         this.allergenis = allergenis;
+    }
+
+    public String getTraduzioni() {
+        return traduzioni;
+    }
+
+    public void setTraduzioni(String traduzioni) {
+        this.traduzioni = traduzioni;
     }
 
     @Override

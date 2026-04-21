@@ -45,6 +45,16 @@ public class PiattoDelGiorno implements Serializable {
     @Column(name = "prezzo", precision = 21, scale = 2)
     private BigDecimal prezzo;
 
+    /**
+     * Traduzioni automatiche di nome/descrizione per piatti personalizzati.
+     * Per i piatti collegati a un Prodotto esistente, le traduzioni vengono
+     * lette direttamente da Prodotto.traduzioni.
+     *
+     * Formato: { "en": {"nome":"...","descrizione":"..."}, "fr": {...}, ... }
+     */
+    @Column(name = "traduzioni", columnDefinition = "TEXT")
+    private String traduzioni;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "allergenis", "portata" }, allowSetters = true)
     private Prodotto prodotto;
@@ -145,6 +155,19 @@ public class PiattoDelGiorno implements Serializable {
 
     public void setPrezzo(BigDecimal prezzo) {
         this.prezzo = prezzo;
+    }
+
+    public String getTraduzioni() {
+        return this.traduzioni;
+    }
+
+    public void setTraduzioni(String traduzioni) {
+        this.traduzioni = traduzioni;
+    }
+
+    public PiattoDelGiorno traduzioni(String traduzioni) {
+        this.setTraduzioni(traduzioni);
+        return this;
     }
 
     public Prodotto getProdotto() {
