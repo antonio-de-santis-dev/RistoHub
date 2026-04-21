@@ -65,17 +65,20 @@ public class PdfImportService {
     private final ProdottoService prodottoService;
     private final MenuService menuService;
     private final CacheManager cacheManager;
+    private final TraduzioneAsyncService traduzioneAsyncService;
 
     public PdfImportService(
         PortataRepository portataRepository,
         ProdottoService prodottoService,
         MenuService menuService,
-        CacheManager cacheManager
+        CacheManager cacheManager,
+        TraduzioneAsyncService traduzioneAsyncService
     ) {
         this.portataRepository = portataRepository;
         this.prodottoService = prodottoService;
         this.menuService = menuService;
         this.cacheManager = cacheManager;
+        this.traduzioneAsyncService = traduzioneAsyncService;
     }
 
     // ── STEP 1: parsing (solo analisi, nessuna scrittura su DB) ─────────────
@@ -162,13 +165,20 @@ public class PdfImportService {
                     portataRef.setId(portataId);
                     dto.setPortata(portataRef);
 
-                    prodottoService.save(dto);
+                    // Salva SENZA scatenare una traduzione async per prodotto
+                    // (sarebbe un thread separato per ogni prodotto → esplosione di chiamate DeepL).
+                    // Alla fine del batch chiameremo UNA sola traduciMenuCompletoAsync.
+                    prodottoService.saveSenzaTraduzioneAsync(dto);
                     inseriti++;
                 } catch (Exception e) {
                     LOG.warn("Errore durante il salvataggio del prodotto '{}': {}", pi.getNome(), e.getMessage());
                     avvisi.add("Prodotto ignorato per errore: \"" + pi.getNome() + "\" — " + e.getMessage());
                 }
             }
+        }
+
+        if (inseriti > 0) {
+            traduzioneAsyncService.traduciMenuCompletoAsync(menuId);
         }
 
         return new PdfImportResultDTO(parsed.getPortate(), inseriti, avvisi);

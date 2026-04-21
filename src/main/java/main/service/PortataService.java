@@ -10,16 +10,14 @@ import main.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service Implementation for managing {@link main.domain.Portata}.
+ * Service per {@link main.domain.Portata}.
  *
- * Su save/update di portate PERSONALIZZATA, genera automaticamente le traduzioni
- * del nomePersonalizzato tramite TraduzioneDeepLService.
- * Le portate DEFAULT non richiedono traduzione automatica (nomi enum già tradotti
- * lato frontend in NOMI_PORTATE).
+ * Le traduzioni per le portate PERSONALIZZATA vengono generate in BACKGROUND (async).
  */
 @Service
 @Transactional
@@ -29,18 +27,18 @@ public class PortataService {
 
     private final PortataRepository portataRepository;
     private final PortataMapper portataMapper;
-    private final TraduzioneDeepLService traduzioneDeepLService;
+    private final TraduzioneAsyncService traduzioneAsyncService;
     private final CacheManager cacheManager;
 
     public PortataService(
         PortataRepository portataRepository,
         PortataMapper portataMapper,
-        TraduzioneDeepLService traduzioneDeepLService,
+        @Lazy TraduzioneAsyncService traduzioneAsyncService,
         CacheManager cacheManager
     ) {
         this.portataRepository = portataRepository;
         this.portataMapper = portataMapper;
-        this.traduzioneDeepLService = traduzioneDeepLService;
+        this.traduzioneAsyncService = traduzioneAsyncService;
         this.cacheManager = cacheManager;
     }
 
@@ -56,48 +54,37 @@ public class PortataService {
     }
 
     private PortataDTO persistPortata(PortataDTO dto) {
+        boolean richiedeTraduzione = decidiSeRichiedeTraduzione(dto);
+
         Portata portata = portataMapper.toEntity(dto);
 
-        // Genera traduzione solo per portate PERSONALIZZATA con nome non vuoto
-        String traduzioniJson = generaTraduzioniSeNecessario(dto);
-        if (traduzioniJson != null) {
-            portata.setTraduzioni(traduzioniJson);
+        // Preserva le traduzioni esistenti se non è cambiato nulla
+        if (!richiedeTraduzione && dto.getId() != null) {
+            Optional<Portata> esistente = portataRepository.findById(dto.getId());
+            esistente.ifPresent(old -> portata.setTraduzioni(old.getTraduzioni()));
         }
 
         Portata saved = portataRepository.save(portata);
         invalidaCacheMenu(saved);
+
+        if (richiedeTraduzione) {
+            UUID menuId = saved.getMenu() != null ? saved.getMenu().getId() : null;
+            traduzioneAsyncService.traduciPortataAsync(saved.getId(), menuId);
+        }
+
         return portataMapper.toDto(saved);
     }
 
-    /**
-     * Genera traduzioni solo se:
-     * - la portata è PERSONALIZZATA (le DEFAULT sono tradotte lato frontend con NOMI_PORTATE)
-     * - c'è un nomePersonalizzato valorizzato
-     * - il nome è cambiato rispetto all'entità esistente (oppure è una nuova portata)
-     */
-    private String generaTraduzioniSeNecessario(PortataDTO dto) {
-        if (dto.getTipo() == null || !"PERSONALIZZATA".equals(dto.getTipo().name())) {
-            return null;
-        }
-        if (dto.getNomePersonalizzato() == null || dto.getNomePersonalizzato().isBlank()) {
-            return null;
-        }
-
-        if (dto.getId() != null) {
-            Optional<Portata> esistente = portataRepository.findById(dto.getId());
-            if (esistente.isPresent()) {
-                Portata old = esistente.get();
-                boolean nomeCambiato =
-                    old.getNomePersonalizzato() == null || !old.getNomePersonalizzato().equals(dto.getNomePersonalizzato());
-                if (!nomeCambiato && old.getTraduzioni() != null) {
-                    return old.getTraduzioni();
-                }
-            }
-        }
-
-        Map<String, String> campi = new LinkedHashMap<>();
-        campi.put("nomePersonalizzato", dto.getNomePersonalizzato());
-        return traduzioneDeepLService.buildTraduzioniJson(campi);
+    private boolean decidiSeRichiedeTraduzione(PortataDTO dto) {
+        if (dto.getTipo() == null || !"PERSONALIZZATA".equals(dto.getTipo().name())) return false;
+        if (dto.getNomePersonalizzato() == null || dto.getNomePersonalizzato().isBlank()) return false;
+        if (dto.getId() == null) return true;
+        Optional<Portata> esistente = portataRepository.findById(dto.getId());
+        if (esistente.isEmpty()) return true;
+        Portata old = esistente.get();
+        boolean nomeCambiato = old.getNomePersonalizzato() == null || !old.getNomePersonalizzato().equals(dto.getNomePersonalizzato());
+        if (nomeCambiato) return true;
+        return old.getTraduzioni() == null || old.getTraduzioni().isBlank();
     }
 
     private void invalidaCacheMenu(Portata portata) {
@@ -117,29 +104,24 @@ public class PortataService {
 
     public Optional<PortataDTO> partialUpdate(PortataDTO portataDTO) {
         LOG.debug("Request to partially update Portata : {}", portataDTO);
-
         return portataRepository
             .findById(portataDTO.getId())
             .map(existingPortata -> {
                 portataMapper.partialUpdate(existingPortata, portataDTO);
-
-                // Rigenera traduzione se necessario
-                if (
-                    existingPortata.getTipo() != null &&
-                    "PERSONALIZZATA".equals(existingPortata.getTipo().name()) &&
-                    existingPortata.getNomePersonalizzato() != null &&
-                    !existingPortata.getNomePersonalizzato().isBlank()
-                ) {
-                    Map<String, String> campi = new LinkedHashMap<>();
-                    campi.put("nomePersonalizzato", existingPortata.getNomePersonalizzato());
-                    String json = traduzioneDeepLService.buildTraduzioniJson(campi);
-                    if (json != null) existingPortata.setTraduzioni(json);
-                }
                 return existingPortata;
             })
             .map(portataRepository::save)
             .map(saved -> {
                 invalidaCacheMenu(saved);
+                if (
+                    saved.getTipo() != null &&
+                    "PERSONALIZZATA".equals(saved.getTipo().name()) &&
+                    saved.getNomePersonalizzato() != null &&
+                    !saved.getNomePersonalizzato().isBlank()
+                ) {
+                    UUID menuId = saved.getMenu() != null ? saved.getMenu().getId() : null;
+                    traduzioneAsyncService.traduciPortataAsync(saved.getId(), menuId);
+                }
                 return saved;
             })
             .map(portataMapper::toDto);
@@ -160,7 +142,6 @@ public class PortataService {
     public void delete(UUID id) {
         LOG.debug("Request to delete Portata : {}", id);
         checkPortataOwnership(id);
-        // Recupera l'id del menu prima del delete per invalidare la cache
         UUID menuId = portataRepository.findById(id).map(p -> p.getMenu() != null ? p.getMenu().getId() : null).orElse(null);
         portataRepository.deleteById(id);
         if (menuId != null && cacheManager.getCache("menuCompleto") != null) {
@@ -187,10 +168,6 @@ public class PortataService {
         return portataRepository.findByMenuIdOrdered(menuId).stream().map(portataMapper::toDto).toList();
     }
 
-    /**
-     * Ritorna tutte le portate del menu direttamente come entità (con il campo traduzioni).
-     * Usato da MenuCompletoService per includere le traduzioni nel DTO aggregato.
-     */
     @Transactional(readOnly = true)
     public List<Portata> findPortateEntitiesByMenuId(UUID menuId) {
         return portataRepository.findByMenuIdOrdered(menuId);

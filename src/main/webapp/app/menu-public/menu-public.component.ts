@@ -160,36 +160,55 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
 
     if (codice === 'it') return;
 
-    // Le traduzioni sono già in cache (popolate da caricaMenu via popolaDaDati).
-    // Se la cache per questa lingua è vuota E ci sono entità senza traduzioni,
-    // chiediamo al backend di tradurre i record legacy e ricarichiamo il menu.
+    // Controlla se abbiamo già le traduzioni in cache (popolate al load del menu)
     const cacheLingua = this.traduzioneService.getCached(codice);
     if (cacheLingua && cacheLingua.size > 0) {
       this.cdr.markForCheck();
       return;
     }
 
-    // Nessuna traduzione in cache: probabile menu legacy. Chiama fallback backend.
+    // Nessuna traduzione in cache → menu legacy o traduzioni non ancora pronte
+    // Scatena il batch async sul backend e fai polling per 30 secondi
     this.isTraducendo = true;
     this.erroreTraduzioneVisible = false;
     this.cdr.markForCheck();
 
     const menuId = this.menu?.id;
-    if (menuId) {
-      const tradotti = await this.traduzioneService.translateMissing(menuId);
-      if (tradotti > 0) {
-        // Ricarica il menu per prendere le traduzioni appena generate
-        await this.caricaMenu(menuId);
-      } else {
-        this.erroreTraduzioneVisible = true;
-        setTimeout(() => {
-          this.erroreTraduzioneVisible = false;
-          this.cdr.markForCheck();
-        }, 4000);
+    if (!menuId) {
+      this.isTraducendo = false;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    // Avvia la traduzione async sul backend (risposta immediata)
+    await this.traduzioneService.translateMissing(menuId);
+
+    // Polling ogni 3 secondi per max 10 tentativi (30 secondi totali)
+    const MAX_TENTATIVI = 10;
+    const INTERVALLO_MS = 3000;
+
+    for (let tentativo = 0; tentativo < MAX_TENTATIVI; tentativo++) {
+      await new Promise(r => setTimeout(r, INTERVALLO_MS));
+
+      // Ricarica il menu per vedere se le traduzioni sono arrivate
+      await this.caricaMenu(menuId);
+
+      const cacheDopoReload = this.traduzioneService.getCached(codice);
+      if (cacheDopoReload && cacheDopoReload.size > 0) {
+        this.isTraducendo = false;
+        this.cdr.markForCheck();
+        return;
       }
     }
+
+    // Timeout: le traduzioni non sono arrivate entro 30 secondi
     this.isTraducendo = false;
+    this.erroreTraduzioneVisible = true;
     this.cdr.markForCheck();
+    setTimeout(() => {
+      this.erroreTraduzioneVisible = false;
+      this.cdr.markForCheck();
+    }, 4000);
   }
 
   /**
