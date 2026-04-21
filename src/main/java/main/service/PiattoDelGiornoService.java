@@ -11,14 +11,15 @@ import main.service.mapper.PiattoDelGiornoMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service per {@link main.domain.PiattoDelGiorno}.
+ * Service Implementation for managing {@link main.domain.PiattoDelGiorno}.
  *
- * Per i piatti personalizzati le traduzioni vengono generate in BACKGROUND (async).
+ * Per i piatti personalizzati (senza prodotto collegato) genera automaticamente
+ * le traduzioni di nome/descrizione via DeepL. Per i piatti con prodotto, le
+ * traduzioni vengono lette da Prodotto.traduzioni direttamente dal frontend.
  */
 @Service
 @Transactional
@@ -28,18 +29,18 @@ public class PiattoDelGiornoService {
 
     private final PiattoDelGiornoRepository piattoDelGiornoRepository;
     private final PiattoDelGiornoMapper piattoDelGiornoMapper;
-    private final TraduzioneAsyncService traduzioneAsyncService;
+    private final TraduzioneDeepLService traduzioneDeepLService;
     private final CacheManager cacheManager;
 
     public PiattoDelGiornoService(
         PiattoDelGiornoRepository piattoDelGiornoRepository,
         PiattoDelGiornoMapper piattoDelGiornoMapper,
-        @Lazy TraduzioneAsyncService traduzioneAsyncService,
+        TraduzioneDeepLService traduzioneDeepLService,
         CacheManager cacheManager
     ) {
         this.piattoDelGiornoRepository = piattoDelGiornoRepository;
         this.piattoDelGiornoMapper = piattoDelGiornoMapper;
-        this.traduzioneAsyncService = traduzioneAsyncService;
+        this.traduzioneDeepLService = traduzioneDeepLService;
         this.cacheManager = cacheManager;
     }
 
@@ -57,41 +58,42 @@ public class PiattoDelGiornoService {
     }
 
     private PiattoDelGiornoDTO persistPiatto(PiattoDelGiornoDTO dto) {
-        boolean richiedeTraduzione = decidiSeRichiedeTraduzione(dto);
-
         PiattoDelGiorno piatto = piattoDelGiornoMapper.toEntity(dto);
 
-        // Preserva traduzioni esistenti se non è cambiato nulla
-        if (!richiedeTraduzione && dto.getId() != null) {
-            Optional<PiattoDelGiorno> esistente = piattoDelGiornoRepository.findById(dto.getId());
-            esistente.ifPresent(old -> piatto.setTraduzioni(old.getTraduzioni()));
+        // Genera traduzioni solo per piatti personalizzati (senza prodotto collegato)
+        String traduzioniJson = generaTraduzioniSeNecessario(dto);
+        if (traduzioniJson != null) {
+            piatto.setTraduzioni(traduzioniJson);
         }
 
         PiattoDelGiorno saved = piattoDelGiornoRepository.save(piatto);
         invalidaCacheMenu(saved);
-
-        if (richiedeTraduzione) {
-            UUID menuId = saved.getMenu() != null ? saved.getMenu().getId() : null;
-            traduzioneAsyncService.traduciPiattoGiornoAsync(saved.getId(), menuId);
-        }
-
         return piattoDelGiornoMapper.toDto(saved);
     }
 
-    private boolean decidiSeRichiedeTraduzione(PiattoDelGiornoDTO dto) {
-        // Se ha prodotto collegato, le traduzioni sono sul prodotto
-        if (dto.getProdotto() != null && dto.getProdotto().getId() != null) return false;
-        if (
-            (dto.getNome() == null || dto.getNome().isBlank()) && (dto.getDescrizione() == null || dto.getDescrizione().isBlank())
-        ) return false;
-        if (dto.getId() == null) return true;
-        Optional<PiattoDelGiorno> esistente = piattoDelGiornoRepository.findById(dto.getId());
-        if (esistente.isEmpty()) return true;
-        PiattoDelGiorno old = esistente.get();
-        boolean nomeCambiato = !equalsSafe(old.getNome(), dto.getNome());
-        boolean descCambiata = !equalsSafe(old.getDescrizione(), dto.getDescrizione());
-        if (nomeCambiato || descCambiata) return true;
-        return old.getTraduzioni() == null || old.getTraduzioni().isBlank();
+    private String generaTraduzioniSeNecessario(PiattoDelGiornoDTO dto) {
+        // Se c'è un prodotto collegato, la traduzione è già sul Prodotto — non la ripetiamo qui
+        if (dto.getProdotto() != null && dto.getProdotto().getId() != null) {
+            return null;
+        }
+        // Se nome e descrizione sono entrambi vuoti, non abbiamo nulla da tradurre
+        if ((dto.getNome() == null || dto.getNome().isBlank()) && (dto.getDescrizione() == null || dto.getDescrizione().isBlank())) {
+            return null;
+        }
+
+        if (dto.getId() != null) {
+            Optional<PiattoDelGiorno> esistente = piattoDelGiornoRepository.findById(dto.getId());
+            if (esistente.isPresent()) {
+                PiattoDelGiorno old = esistente.get();
+                boolean nomeCambiato = !equalsSafe(old.getNome(), dto.getNome());
+                boolean descCambiata = !equalsSafe(old.getDescrizione(), dto.getDescrizione());
+                if (!nomeCambiato && !descCambiata && old.getTraduzioni() != null) {
+                    return old.getTraduzioni();
+                }
+            }
+        }
+
+        return traduzioneDeepLService.buildTraduzioniJson(dto.getNome(), dto.getDescrizione());
     }
 
     private boolean equalsSafe(String a, String b) {
@@ -121,19 +123,24 @@ public class PiattoDelGiornoService {
             .findById(piattoDelGiornoDTO.getId())
             .map(existingPiattoDelGiorno -> {
                 piattoDelGiornoMapper.partialUpdate(existingPiattoDelGiorno, piattoDelGiornoDTO);
+
+                // Rigenera traduzioni se piatto personalizzato e nome/descrizione presenti
+                if (
+                    existingPiattoDelGiorno.getProdotto() == null &&
+                    ((existingPiattoDelGiorno.getNome() != null && !existingPiattoDelGiorno.getNome().isBlank()) ||
+                        (existingPiattoDelGiorno.getDescrizione() != null && !existingPiattoDelGiorno.getDescrizione().isBlank()))
+                ) {
+                    String json = traduzioneDeepLService.buildTraduzioniJson(
+                        existingPiattoDelGiorno.getNome(),
+                        existingPiattoDelGiorno.getDescrizione()
+                    );
+                    if (json != null) existingPiattoDelGiorno.setTraduzioni(json);
+                }
                 return existingPiattoDelGiorno;
             })
             .map(piattoDelGiornoRepository::save)
             .map(saved -> {
                 invalidaCacheMenu(saved);
-                if (
-                    saved.getProdotto() == null &&
-                    ((saved.getNome() != null && !saved.getNome().isBlank()) ||
-                        (saved.getDescrizione() != null && !saved.getDescrizione().isBlank()))
-                ) {
-                    UUID menuId = saved.getMenu() != null ? saved.getMenu().getId() : null;
-                    traduzioneAsyncService.traduciPiattoGiornoAsync(saved.getId(), menuId);
-                }
                 return saved;
             })
             .map(piattoDelGiornoMapper::toDto);

@@ -47,13 +47,12 @@ import org.springframework.web.multipart.MultipartFile;
  *   • Righe vuote e righe di istruzione (iniziano con "#") vengono ignorate
  *   • Il prezzo viene normalizzato: virgola → punto, simbolo "€" rimosso
  *
+ * TRADUZIONE: i prodotti vengono salvati SENZA traduzioni (via saveSenzaTraduzioni)
+ * per non bloccare la risposta HTTP. Dopo il salvataggio, viene scatenato un thread
+ * asincrono (TraduzioneAsyncService) che traduce tutti i prodotti del menu in background.
+ * Le traduzioni compaiono nel menu quando l'utente ricarica la pagina (15-60 secondi dopo).
+ *
  * Libreria: Apache PDFBox 3.x
- *   Dipendenza da aggiungere al pom.xml:
- *   <dependency>
- *     <groupId>org.apache.pdfbox</groupId>
- *     <artifactId>pdfbox</artifactId>
- *     <version>3.0.3</version>
- *   </dependency>
  */
 @Service
 @Transactional
@@ -101,6 +100,9 @@ public class PdfImportService {
      *   Il nome estratto dal PDF viene confrontato (case-insensitive, trim) con
      *   getNomeDefault() oppure getNomePersonalizzato() di ogni portata del menu.
      *   Se non trovata, la portata viene ignorata e aggiunta agli avvisi.
+     *
+     * TRADUZIONE: usa saveSenzaTraduzioni() per salvare velocemente in italiano,
+     * poi scatena traduciMenuCompletoAsync() per tradurre tutto in background.
      *
      * @param file   file PDF caricato
      * @param menuId UUID del menu in cui inserire i prodotti
@@ -165,10 +167,9 @@ public class PdfImportService {
                     portataRef.setId(portataId);
                     dto.setPortata(portataRef);
 
-                    // Salva SENZA scatenare una traduzione async per prodotto
-                    // (sarebbe un thread separato per ogni prodotto → esplosione di chiamate DeepL).
-                    // Alla fine del batch chiameremo UNA sola traduciMenuCompletoAsync.
-                    prodottoService.saveSenzaTraduzioneAsync(dto);
+                    // Salva in italiano SENZA chiamare DeepL (sarebbe ~2s per prodotto).
+                    // Tradurremo tutto in batch dopo il ciclo.
+                    prodottoService.saveSenzaTraduzioni(dto);
                     inseriti++;
                 } catch (Exception e) {
                     LOG.warn("Errore durante il salvataggio del prodotto '{}': {}", pi.getNome(), e.getMessage());
@@ -177,7 +178,12 @@ public class PdfImportService {
             }
         }
 
+        // ✨ BATCH ASYNC: ora che i prodotti sono salvati velocemente in italiano,
+        // scateniamo un thread separato che traduce tutto in EN/FR/DE/ES via DeepL.
+        // Il client riceve la risposta subito. Le traduzioni arrivano in 30-60 secondi.
+        // L'utente ricarica il menu e le vede apparire progressivamente.
         if (inseriti > 0) {
+            LOG.info("Import PDF completato: {} prodotti salvati. Avvio traduzione async in background...", inseriti);
             traduzioneAsyncService.traduciMenuCompletoAsync(menuId);
         }
 

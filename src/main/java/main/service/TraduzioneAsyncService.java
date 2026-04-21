@@ -18,15 +18,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Traduce entità in BACKGROUND (thread separato) dopo un import bulk.
+ * Traduce entità in BACKGROUND (thread separato) dopo un import bulk (PDF).
  *
- * Uso principale: import PDF. Il controller salva i prodotti senza traduzioni e
- * risponde subito al client. Questo service, scatenato in parallelo, traduce
- * tutti i record del menu con traduzioni mancanti. Le traduzioni compariranno
- * nel menu quando l'utente ricarica la pagina (15-60 secondi dopo l'import,
- * a seconda della dimensione del PDF).
+ * Uso principale: import PDF. Il PdfImportService salva i prodotti senza traduzioni
+ * e risponde subito al client (~2-3 secondi). Questo service, scatenato in parallelo,
+ * traduce tutti i record del menu con traduzioni mancanti via DeepL.
  *
- * @Async("taskExecutor") usa il pool configurato in AsyncConfiguration.
+ * Le traduzioni compariranno nel menu quando l'utente ricarica la pagina
+ * (15-60 secondi dopo l'import, a seconda del numero di prodotti).
+ *
+ * @Async("taskExecutor") usa il thread pool configurato in AsyncConfiguration.
  */
 @Service
 public class TraduzioneAsyncService {
@@ -59,9 +60,9 @@ public class TraduzioneAsyncService {
      * Scatenato dopo l'import PDF e dall'endpoint di fallback translate-missing.
      * Gira in un thread separato: il chiamante riceve il ritorno immediatamente.
      *
-     * Strategia anti-timeout: invalida la cache del menuCompleto ogni 5 prodotti
-     * tradotti, così l'utente che ricarica la pagina durante il processo vede
-     * progressivamente le traduzioni comparire (invece di tutte alla fine).
+     * Strategia: invalida la cache del menuCompleto ogni 5 prodotti tradotti,
+     * così l'utente che ricarica la pagina durante il processo vede
+     * progressivamente le traduzioni comparire.
      */
     @Async("taskExecutor")
     @Transactional
@@ -71,14 +72,14 @@ public class TraduzioneAsyncService {
             return;
         }
 
-        LOG.info("✨ Avvio traduzione batch async per menu {}", menuId);
+        LOG.info("Avvio traduzione batch async per menu {}", menuId);
         long inizio = System.currentTimeMillis();
         int tradotti = 0;
 
         try {
             // ── 1. Prodotti senza traduzioni ────────────────────────────────
             List<Prodotto> prodotti = prodottoRepository.findProdottiSenzaTraduzioniByMenuId(menuId);
-            LOG.info("  → {} prodotti da tradurre", prodotti.size());
+            LOG.info("  -> {} prodotti da tradurre per menu {}", prodotti.size(), menuId);
 
             for (Prodotto p : prodotti) {
                 try {
@@ -138,7 +139,7 @@ public class TraduzioneAsyncService {
             // Invalidazione finale
             invalidaCache(menuId);
             long durata = (System.currentTimeMillis() - inizio) / 1000;
-            LOG.info("✓ Traduzione batch async completata: {} entità tradotte in {}s per menu {}", tradotti, durata, menuId);
+            LOG.info("Traduzione batch async completata: {} entita tradotte in {}s per menu {}", tradotti, durata, menuId);
         } catch (Exception e) {
             LOG.error("Errore globale nel batch async di traduzione per menu {}: {}", menuId, e.getMessage(), e);
         }
