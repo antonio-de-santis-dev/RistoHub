@@ -48,9 +48,13 @@ import org.springframework.web.multipart.MultipartFile;
  *   • Il prezzo viene normalizzato: virgola → punto, simbolo "€" rimosso
  *
  * TRADUZIONE: i prodotti vengono salvati SENZA traduzioni (via saveSenzaTraduzioni)
- * per non bloccare la risposta HTTP. Dopo il salvataggio, viene scatenato un thread
- * asincrono (TraduzioneAsyncService) che traduce tutti i prodotti del menu in background.
- * Le traduzioni compaiono nel menu quando l'utente ricarica la pagina (15-60 secondi dopo).
+ * per non bloccare la risposta HTTP. DOPO IL COMMIT della transazione, viene scatenato
+ * un thread asincrono (TraduzioneAsyncService) che traduce tutti i prodotti del menu
+ * in background. Le traduzioni compaiono nel menu quando l'utente ricarica la pagina.
+ *
+ * NOTA TECNICA: la traduzione async viene registrata come afterCommit() perché il thread
+ * async deve poter VEDERE i prodotti nel DB. Se partisse prima del commit, la query
+ * findProdottiSenzaTraduzioniByMenuId non troverebbe i prodotti appena inseriti.
  *
  * Libreria: Apache PDFBox 3.x
  */
@@ -102,7 +106,7 @@ public class PdfImportService {
      *   Se non trovata, la portata viene ignorata e aggiunta agli avvisi.
      *
      * TRADUZIONE: usa saveSenzaTraduzioni() per salvare velocemente in italiano,
-     * poi scatena traduciMenuCompletoAsync() per tradurre tutto in background.
+     * poi scatena traduciMenuCompletoAsync() DOPO IL COMMIT per tradurre in background.
      *
      * @param file   file PDF caricato
      * @param menuId UUID del menu in cui inserire i prodotti
@@ -112,23 +116,6 @@ public class PdfImportService {
     public PdfImportResultDTO importaPdf(MultipartFile file, UUID menuId) throws IOException {
         // Verifica che il menu appartenga all'utente corrente
         menuService.checkOwnership(menuId);
-
-        // Registra l'invalidazione della cache DOPO il commit della transazione.
-        // Se invalidassimo prima, una richiesta concorrente (o la successiva GET /full)
-        // potrebbe rileggere i dati pre-commit e ripopolare la cache con stato obsoleto.
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-                    @Override
-                    public void afterCommit() {
-                        evictMenuCaches(menuId);
-                    }
-                }
-            );
-        } else {
-            // Fallback se la transazione non è attiva (non dovrebbe succedere con @Transactional)
-            evictMenuCaches(menuId);
-        }
 
         String testo = estraiTesto(file.getInputStream());
         PdfImportResultDTO parsed = parseTesto(testo);
@@ -156,8 +143,6 @@ public class PdfImportService {
             for (ProdottoImportDTO pi : portataImport.getProdotti()) {
                 try {
                     ProdottoDTO dto = new ProdottoDTO();
-                    // Doppia pulizia: anche se parseTesto già normalizza, la applichiamo
-                    // di nuovo per proteggerci da eventuali modifiche future al flusso.
                     dto.setNome(pulisciTesto(pi.getNome()));
                     String descPulita = pulisciTesto(pi.getDescrizione());
                     dto.setDescrizione(descPulita != null && !descPulita.isBlank() ? descPulita : null);
@@ -168,7 +153,7 @@ public class PdfImportService {
                     dto.setPortata(portataRef);
 
                     // Salva in italiano SENZA chiamare DeepL (sarebbe ~2s per prodotto).
-                    // Tradurremo tutto in batch dopo il ciclo.
+                    // Tradurremo tutto in batch DOPO IL COMMIT (vedi sotto).
                     prodottoService.saveSenzaTraduzioni(dto);
                     inseriti++;
                 } catch (Exception e) {
@@ -178,13 +163,35 @@ public class PdfImportService {
             }
         }
 
-        // ✨ BATCH ASYNC: ora che i prodotti sono salvati velocemente in italiano,
-        // scateniamo un thread separato che traduce tutto in EN/FR/DE/ES via DeepL.
-        // Il client riceve la risposta subito. Le traduzioni arrivano in 30-60 secondi.
-        // L'utente ricarica il menu e le vede apparire progressivamente.
-        if (inseriti > 0) {
-            LOG.info("Import PDF completato: {} prodotti salvati. Avvio traduzione async in background...", inseriti);
-            traduzioneAsyncService.traduciMenuCompletoAsync(menuId);
+        // ✨ TRADUZIONE ASYNC — DOPO IL COMMIT DELLA TRANSAZIONE
+        //
+        // PERCHÉ afterCommit() e non subito?
+        // Il thread async chiama findProdottiSenzaTraduzioniByMenuId() che fa una
+        // SELECT sul DB. Se il thread partisse ORA, i prodotti appena inseriti
+        // NON sarebbero ancora visibili nel DB (la transazione @Transactional non
+        // è ancora committata) e la query restituirebbe lista vuota → 0 traduzioni.
+        //
+        // Registrando afterCommit(), il thread parte SOLO DOPO che Spring ha fatto
+        // il COMMIT. A quel punto i prodotti sono nel DB e la query li trova tutti.
+        final int prodottiInseriti = inseriti;
+        if (prodottiInseriti > 0) {
+            if (TransactionSynchronizationManager.isSynchronizationActive()) {
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            LOG.info("Import PDF committato: {} prodotti. Avvio traduzione async in background...", prodottiInseriti);
+                            evictMenuCaches(menuId);
+                            traduzioneAsyncService.traduciMenuCompletoAsync(menuId);
+                        }
+                    }
+                );
+            } else {
+                // Fallback: se la sincronizzazione non è attiva, proviamo comunque
+                LOG.warn("TransactionSynchronization non attiva — avvio traduzione async come fallback");
+                evictMenuCaches(menuId);
+                traduzioneAsyncService.traduciMenuCompletoAsync(menuId);
+            }
         }
 
         return new PdfImportResultDTO(parsed.getPortate(), inseriti, avvisi);
@@ -193,30 +200,17 @@ public class PdfImportService {
     // ── Helpers di parsing ────────────────────────────────────────────────────
 
     /**
-     * Normalizza una stringa estratta da PDF rimuovendo caratteri invisibili Unicode
-     * che PDFBox può preservare e che rompono:
-     *   • il confronto di uguaglianza tra stringhe
-     *   • le API di traduzione esterne (mymemory) che non li gestiscono
-     *   • la visualizzazione coerente nel frontend
-     *
-     * Gestisce:
-     *   • NBSP (\u00A0), narrow NBSP (\u202F), figure space (\u2007)
-     *   • zero-width space (\u200B), LRM/RLM (\u200E/F), line/paragraph separator
-     *   • BOM (\uFEFF)
-     *   • spazi multipli consecutivi
-     *
-     * NB: usa String.strip() (non trim()) perché trim() rimuove SOLO caratteri ≤ U+0020,
-     *     mentre strip() rimuove tutti gli spazi Unicode.
+     * Normalizza una stringa estratta da PDF rimuovendo caratteri invisibili Unicode.
      */
     private static String pulisciTesto(String s) {
         if (s == null) return null;
         String pulito = s
-            .replace('\u00A0', ' ') // NBSP
-            .replace('\u202F', ' ') // narrow NBSP
-            .replace('\u2007', ' ') // figure space
-            .replace('\u2060', ' ') // word joiner
-            .replaceAll("[\\u200B-\\u200F\\u2028\\u2029\\uFEFF\\u00AD]", "") // zero-width + soft hyphen
-            .replaceAll("\\s+", " "); // collassa whitespace multipli
+            .replace('\u00A0', ' ')
+            .replace('\u202F', ' ')
+            .replace('\u2007', ' ')
+            .replace('\u2060', ' ')
+            .replaceAll("[\\u200B-\\u200F\\u2028\\u2029\\uFEFF\\u00AD]", "")
+            .replaceAll("\\s+", " ");
         return pulito.strip();
     }
 
@@ -239,12 +233,9 @@ public class PdfImportService {
         for (String riga : testo.split("\\r?\\n")) {
             String rigaTrim = riga.trim();
 
-            // Ignora righe vuote e commenti/istruzioni
             if (rigaTrim.isBlank() || rigaTrim.startsWith("#")) continue;
 
-            // Riconosce intestazione portata
             if (rigaTrim.toUpperCase().startsWith("PORTATA:")) {
-                // Salva la portata precedente (se presente)
                 if (portataCorrente != null && !prodottiCorrenti.isEmpty()) {
                     portate.add(new PortataImportDTO(portataCorrente, new ArrayList<>(prodottiCorrenti)));
                     totaleProdotti += prodottiCorrenti.size();
@@ -254,13 +245,10 @@ public class PdfImportService {
                 continue;
             }
 
-            // Riga prodotto: inizia con "- "
             if (portataCorrente != null && rigaTrim.startsWith("- ")) {
                 String contenuto = rigaTrim.substring(2).trim();
                 String[] parti = contenuto.split("\\|", -1);
                 if (parti.length >= 1) {
-                    // pulisciTesto rimuove caratteri Unicode invisibili (NBSP ecc.)
-                    // che romperebbero la traduzione lato frontend.
                     String nome = pulisciTesto(parti[0]);
                     String descrizione = parti.length >= 2 ? pulisciTesto(parti[1]) : "";
                     String prezzo = parti.length >= 3 ? pulisciTesto(parti[2]) : "0";
@@ -273,7 +261,6 @@ public class PdfImportService {
             }
         }
 
-        // Ultima portata
         if (portataCorrente != null && !prodottiCorrenti.isEmpty()) {
             portate.add(new PortataImportDTO(portataCorrente, new ArrayList<>(prodottiCorrenti)));
             totaleProdotti += prodottiCorrenti.size();
@@ -282,23 +269,14 @@ public class PdfImportService {
         return new PdfImportResultDTO(portate, totaleProdotti, avvisi);
     }
 
-    /**
-     * Verifica se il nome estratto dal PDF corrisponde a una portata del menu.
-     * Confronto case-insensitive su nomeDefault (enum) o nomePersonalizzato.
-     */
     private boolean nomeCorreisponde(String nomePdf, main.domain.Portata portata) {
         String n = nomePdf.trim();
-        // Normalizza: "Vino Rosso" → "VINO_ROSSO"
         String nNorm = n.toUpperCase().replace(" ", "_");
         if (portata.getNomeDefault() != null && portata.getNomeDefault().name().equalsIgnoreCase(nNorm)) return true;
         if (portata.getNomePersonalizzato() != null && portata.getNomePersonalizzato().equalsIgnoreCase(n)) return true;
         return false;
     }
 
-    /**
-     * Normalizza il prezzo: rimuove "€", sostituisce virgola con punto, fa il parse.
-     * In caso di errore ritorna BigDecimal.ZERO.
-     */
     private BigDecimal parsePrezzo(String prezzoStr) {
         if (prezzoStr == null || prezzoStr.isBlank()) return BigDecimal.ZERO;
         try {
@@ -310,10 +288,6 @@ public class PdfImportService {
         }
     }
 
-    /**
-     * Svuota le cache relative al menu. Chiamato DOPO il commit della transazione
-     * per evitare che richieste concorrenti ripopolino la cache con dati pre-commit.
-     */
     private void evictMenuCaches(UUID menuId) {
         Cache menuCompleto = cacheManager.getCache("menuCompleto");
         if (menuCompleto != null) menuCompleto.evict(menuId);
