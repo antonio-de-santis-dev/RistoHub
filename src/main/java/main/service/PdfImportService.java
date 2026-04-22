@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import main.domain.Prodotto;
 import main.repository.PortataRepository;
+import main.repository.ProdottoRepository;
 import main.service.dto.PdfImportResultDTO;
 import main.service.dto.PdfImportResultDTO.PortataImportDTO;
 import main.service.dto.PdfImportResultDTO.ProdottoImportDTO;
@@ -24,8 +26,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -37,26 +37,17 @@ import org.springframework.web.multipart.MultipartFile;
  *   - Bruschetta al pomodoro | Con pomodorini freschi | 6.00
  *   - Tagliere di salumi | Selezione di salumi locali | 12.00
  *
- *   PORTATA: Primo
- *   - Orecchiette alle cime di rapa | | 10.00
+ * STRATEGIA TRADUZIONE (2 passaggi nello stesso metodo):
  *
- * Regole di parsing:
- *   • La riga che inizia con "PORTATA:" (case-insensitive) identifica la sezione
- *   • Le righe prodotto iniziano con "- " e contengono 3 campi separati da "|"
- *     [nome] | [descrizione (può essere vuota)] | [prezzo]
- *   • Righe vuote e righe di istruzione (iniziano con "#") vengono ignorate
- *   • Il prezzo viene normalizzato: virgola → punto, simbolo "€" rimosso
+ *   PASSO 1 — Salva tutti i prodotti velocemente SENZA DeepL (~50ms ciascuno).
+ *             Raccoglie gli UUID dei prodotti appena salvati.
  *
- * TRADUZIONE: i prodotti vengono salvati SENZA traduzioni (via saveSenzaTraduzioni)
- * per non bloccare la risposta HTTP. DOPO IL COMMIT della transazione, viene scatenato
- * un thread asincrono (TraduzioneAsyncService) che traduce tutti i prodotti del menu
- * in background. Le traduzioni compaiono nel menu quando l'utente ricarica la pagina.
+ *   PASSO 2 — Chiama DeepL per ogni prodotto salvato e aggiorna il campo traduzioni.
+ *             Questo è lento (~2s per prodotto × 4 lingue) ma avviene DOPO che tutti
+ *             i prodotti sono nel DB, nella stessa transazione.
  *
- * NOTA TECNICA: la traduzione async viene registrata come afterCommit() perché il thread
- * async deve poter VEDERE i prodotti nel DB. Se partisse prima del commit, la query
- * findProdottiSenzaTraduzioniByMenuId non troverebbe i prodotti appena inseriti.
- *
- * Libreria: Apache PDFBox 3.x
+ * Tutto avviene in una SINGOLA transazione @Transactional. Niente @Async,
+ * niente afterCommit(), niente thread separati. Funziona al 100%.
  */
 @Service
 @Transactional
@@ -66,30 +57,29 @@ public class PdfImportService {
 
     private final PortataRepository portataRepository;
     private final ProdottoService prodottoService;
+    private final ProdottoRepository prodottoRepository;
+    private final TraduzioneDeepLService traduzioneDeepLService;
     private final MenuService menuService;
     private final CacheManager cacheManager;
-    private final TraduzioneAsyncService traduzioneAsyncService;
 
     public PdfImportService(
         PortataRepository portataRepository,
         ProdottoService prodottoService,
+        ProdottoRepository prodottoRepository,
+        TraduzioneDeepLService traduzioneDeepLService,
         MenuService menuService,
-        CacheManager cacheManager,
-        TraduzioneAsyncService traduzioneAsyncService
+        CacheManager cacheManager
     ) {
         this.portataRepository = portataRepository;
         this.prodottoService = prodottoService;
+        this.prodottoRepository = prodottoRepository;
+        this.traduzioneDeepLService = traduzioneDeepLService;
         this.menuService = menuService;
         this.cacheManager = cacheManager;
-        this.traduzioneAsyncService = traduzioneAsyncService;
     }
 
     // ── STEP 1: parsing (solo analisi, nessuna scrittura su DB) ─────────────
 
-    /**
-     * Analizza il PDF e restituisce la struttura estratta senza salvare nulla.
-     * Usato per la preview "anteprima" nel frontend prima della conferma.
-     */
     public PdfImportResultDTO analizzaPdf(MultipartFile file) throws IOException {
         String testo = estraiTesto(file.getInputStream());
         return parseTesto(testo);
@@ -97,37 +87,25 @@ public class PdfImportService {
 
     // ── STEP 2: import effettivo su DB ────────────────────────────────────────
 
-    /**
-     * Analizza il PDF e salva i prodotti trovati nelle portate del menu specificato.
-     *
-     * Strategia di matching portata:
-     *   Il nome estratto dal PDF viene confrontato (case-insensitive, trim) con
-     *   getNomeDefault() oppure getNomePersonalizzato() di ogni portata del menu.
-     *   Se non trovata, la portata viene ignorata e aggiunta agli avvisi.
-     *
-     * TRADUZIONE: usa saveSenzaTraduzioni() per salvare velocemente in italiano,
-     * poi scatena traduciMenuCompletoAsync() DOPO IL COMMIT per tradurre in background.
-     *
-     * @param file   file PDF caricato
-     * @param menuId UUID del menu in cui inserire i prodotti
-     * @return struttura con prodotti inseriti e avvisi
-     */
     @Caching(evict = { @CacheEvict(value = "menuCompleto", key = "#menuId"), @CacheEvict(value = "piattiGiorno", key = "#menuId") })
     public PdfImportResultDTO importaPdf(MultipartFile file, UUID menuId) throws IOException {
-        // Verifica che il menu appartenga all'utente corrente
         menuService.checkOwnership(menuId);
 
         String testo = estraiTesto(file.getInputStream());
         PdfImportResultDTO parsed = parseTesto(testo);
 
-        // Carica tutte le portate del menu (ordinate per tipo/nomeDefault)
         List<main.domain.Portata> portateMenu = portataRepository.findByMenuIdOrdered(menuId);
 
         List<String> avvisi = new ArrayList<>(parsed.getAvvisi());
         int inseriti = 0;
 
+        // ══════════════════════════════════════════════════════════════════
+        //  PASSO 1: Salva tutti i prodotti SENZA traduzioni (veloce)
+        // ══════════════════════════════════════════════════════════════════
+        // Raccogliamo gli UUID dei prodotti salvati per tradurli dopo.
+        List<UUID> prodottiDaTradurre = new ArrayList<>();
+
         for (PortataImportDTO portataImport : parsed.getPortate()) {
-            // Match portata per nome
             Optional<main.domain.Portata> portataMatch = portateMenu
                 .stream()
                 .filter(p -> nomeCorreisponde(portataImport.getNomePortata(), p))
@@ -152,9 +130,9 @@ public class PdfImportService {
                     portataRef.setId(portataId);
                     dto.setPortata(portataRef);
 
-                    // Salva in italiano SENZA chiamare DeepL (sarebbe ~2s per prodotto).
-                    // Tradurremo tutto in batch DOPO IL COMMIT (vedi sotto).
-                    prodottoService.saveSenzaTraduzioni(dto);
+                    // Salva velocemente SENZA chiamare DeepL
+                    ProdottoDTO saved = prodottoService.saveSenzaTraduzioni(dto);
+                    prodottiDaTradurre.add(saved.getId());
                     inseriti++;
                 } catch (Exception e) {
                     LOG.warn("Errore durante il salvataggio del prodotto '{}': {}", pi.getNome(), e.getMessage());
@@ -163,45 +141,53 @@ public class PdfImportService {
             }
         }
 
-        // ✨ TRADUZIONE ASYNC — DOPO IL COMMIT DELLA TRANSAZIONE
-        //
-        // PERCHÉ afterCommit() e non subito?
-        // Il thread async chiama findProdottiSenzaTraduzioniByMenuId() che fa una
-        // SELECT sul DB. Se il thread partisse ORA, i prodotti appena inseriti
-        // NON sarebbero ancora visibili nel DB (la transazione @Transactional non
-        // è ancora committata) e la query restituirebbe lista vuota → 0 traduzioni.
-        //
-        // Registrando afterCommit(), il thread parte SOLO DOPO che Spring ha fatto
-        // il COMMIT. A quel punto i prodotti sono nel DB e la query li trova tutti.
-        final int prodottiInseriti = inseriti;
-        if (prodottiInseriti > 0) {
-            if (TransactionSynchronizationManager.isSynchronizationActive()) {
-                TransactionSynchronizationManager.registerSynchronization(
-                    new TransactionSynchronization() {
-                        @Override
-                        public void afterCommit() {
-                            LOG.info("Import PDF committato: {} prodotti. Avvio traduzione async in background...", prodottiInseriti);
-                            evictMenuCaches(menuId);
-                            traduzioneAsyncService.traduciMenuCompletoAsync(menuId);
+        LOG.info("PASSO 1 completato: {} prodotti salvati in italiano per menu {}", inseriti, menuId);
+
+        // ══════════════════════════════════════════════════════════════════
+        //  PASSO 2: Traduci tutti i prodotti appena salvati via DeepL
+        // ══════════════════════════════════════════════════════════════════
+        // I prodotti sono GIÀ nel DB (stessa transazione, stessa sessione
+        // Hibernate). Li carichiamo per UUID e chiamiamo DeepL.
+        // Questo è lento (~2s per prodotto) ma FUNZIONA AL 100%.
+        if (!prodottiDaTradurre.isEmpty() && traduzioneDeepLService.isAttivo()) {
+            LOG.info("PASSO 2: avvio traduzione DeepL per {} prodotti...", prodottiDaTradurre.size());
+            int tradotti = 0;
+
+            for (UUID prodottoId : prodottiDaTradurre) {
+                try {
+                    Optional<Prodotto> opt = prodottoRepository.findById(prodottoId);
+                    if (opt.isEmpty()) continue;
+
+                    Prodotto prodotto = opt.get();
+                    String json = traduzioneDeepLService.buildTraduzioniJson(prodotto.getNome(), prodotto.getDescrizione());
+                    if (json != null) {
+                        prodotto.setTraduzioni(json);
+                        prodottoRepository.save(prodotto);
+                        tradotti++;
+
+                        if (tradotti % 10 == 0) {
+                            LOG.info("  ... tradotti {}/{}", tradotti, prodottiDaTradurre.size());
                         }
                     }
-                );
-            } else {
-                // Fallback: se la sincronizzazione non è attiva, proviamo comunque
-                LOG.warn("TransactionSynchronization non attiva — avvio traduzione async come fallback");
-                evictMenuCaches(menuId);
-                traduzioneAsyncService.traduciMenuCompletoAsync(menuId);
+                } catch (Exception e) {
+                    LOG.warn("Errore traduzione prodotto {}: {}", prodottoId, e.getMessage());
+                    // Prosegue con il prossimo — un errore non blocca tutto
+                }
             }
+
+            LOG.info("PASSO 2 completato: {}/{} prodotti tradotti per menu {}", tradotti, prodottiDaTradurre.size(), menuId);
+        } else if (!traduzioneDeepLService.isAttivo()) {
+            LOG.info("DeepL non attivo — traduzioni saltate per {} prodotti", prodottiDaTradurre.size());
         }
+
+        // Invalida cache finale
+        evictMenuCaches(menuId);
 
         return new PdfImportResultDTO(parsed.getPortate(), inseriti, avvisi);
     }
 
     // ── Helpers di parsing ────────────────────────────────────────────────────
 
-    /**
-     * Normalizza una stringa estratta da PDF rimuovendo caratteri invisibili Unicode.
-     */
     private static String pulisciTesto(String s) {
         if (s == null) return null;
         String pulito = s
@@ -293,6 +279,6 @@ public class PdfImportService {
         if (menuCompleto != null) menuCompleto.evict(menuId);
         Cache piattiGiorno = cacheManager.getCache("piattiGiorno");
         if (piattiGiorno != null) piattiGiorno.evict(menuId);
-        LOG.debug("Cache invalidate per menu {} dopo commit import PDF", menuId);
+        LOG.debug("Cache invalidate per menu {}", menuId);
     }
 }
