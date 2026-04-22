@@ -2982,4 +2982,56 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     font-size: 9.5px;
     padding: 8px 3px;
   }
+  /* ── Visibilità prodotto ─────────────────────────────────────── */
+
+  .prodotto-nascosto {
+    opacity: 0.4;
+    transition: opacity 0.2s;
+  }
+
+  /* Classico */
+  .cl-btn-visibilita {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    &.cl-btn-nascosto {
+      opacity: 0.55;
+    }
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  /* Moderno + Rustico */
+  .btn-visibility {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 3px;
+    display: inline-flex;
+    align-items: center;
+    color: var(--visibility-color, currentColor);
+    transition: opacity 0.2s;
+
+    &.btn-visibility--hidden {
+      opacity: 0.4;
+    }
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
+  .btn-visibility-compact {
+    width: 26px;
+    height: 26px;
+    justify-content: center;
+  }
 }

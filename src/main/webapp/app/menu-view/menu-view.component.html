@@ -225,6 +225,48 @@
               <span class="cl-item-price" [style.color]="i % 2 === 0 ? colorePrimario : coloreSecondario">
                 {{ formatPrezzo(prodotto.prezzo) }}
               </span>
+              <!-- Pulsante visibilità CLASSICO -->
+              <button
+                class="cl-btn-visibilita"
+                [class.cl-btn-nascosto]="prodotto.visibile === false"
+                [style.backgroundColor]="i % 2 === 0 ? colorePrimario : coloreSecondario"
+                [style.color]="i % 2 === 0 ? coloreSecondario : colorePrimario"
+                (click)="toggleVisibilitaProdotto(prodotto)"
+                [title]="prodotto.visibile === false ? 'Mostra nel menu' : 'Nascondi dal menu'"
+              >
+                <svg
+                  *ngIf="prodotto.visibile !== false"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <svg
+                  *ngIf="prodotto.visibile === false"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+                <span class="cl-btn-label">{{ prodotto.visibile === false ? 'Mostra' : 'Nascondi' }}</span>
+              </button>
               <button
                 class="cl-btn-modifica"
                 [style.backgroundColor]="i % 2 === 0 ? colorePrimario : coloreSecondario"
@@ -632,6 +674,46 @@
             <span class="moderno-dots-leader"></span>
             <span class="moderno-prodotto-prezzo" [style.color]="colorePrimario">{{ formatPrezzo(prodotto.prezzo) }}</span>
             <div class="prodotto-azioni prodotto-azioni-row">
+              <!-- Pulsante visibilità MODERNO/RUSTICO -->
+              <button
+                class="btn-visibility btn-visibility-compact"
+                [class.btn-visibility--hidden]="prodotto.visibile === false"
+                [style.--visibility-color]="colorePrimario"
+                (click)="toggleVisibilitaProdotto(prodotto)"
+                [title]="prodotto.visibile === false ? 'Mostra nel menu' : 'Nascondi dal menu'"
+              >
+                <svg
+                  *ngIf="prodotto.visibile !== false"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <svg
+                  *ngIf="prodotto.visibile === false"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+              </button>
               <button
                 class="btn-edit btn-edit-compact"
                 [style.--edit-color]="colorePrimario"
@@ -1102,6 +1184,46 @@
                     formatPrezzo(prodotto.prezzo)
                   }}</span>
                   <div class="prodotto-azioni prodotto-azioni-row">
+                    <!-- Pulsante visibilità MODERNO/RUSTICO -->
+                    <button
+                      class="btn-visibility btn-visibility-compact"
+                      [class.btn-visibility--hidden]="prodotto.visibile === false"
+                      [style.--visibility-color]="colorePrimario"
+                      (click)="toggleVisibilitaProdotto(prodotto)"
+                      [title]="prodotto.visibile === false ? 'Mostra nel menu' : 'Nascondi dal menu'"
+                    >
+                      <svg
+                        *ngIf="prodotto.visibile !== false"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      <svg
+                        *ngIf="prodotto.visibile === false"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                        <line x1="1" y1="1" x2="23" y2="23" />
+                      </svg>
+                    </button>
                     <button
                       class="btn-edit btn-edit-compact"
                       [style.--edit-color]="i % 2 === 0 ? coloreSecondario : colorePrimario"

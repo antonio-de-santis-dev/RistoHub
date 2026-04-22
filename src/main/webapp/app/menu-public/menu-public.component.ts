@@ -263,8 +263,9 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
 
       // ── portate con prodotti già annidati (nessuna chiamata extra) ────────
       const portateCaricate = (dati.portate ?? []).map((p: PortataConProdottiDTO) => {
-        (p.prodotti ?? []).forEach((prod: ProdottoDTO) => this.prodottiMap.set(String(prod.id), prod));
-        return { ...p, aperta: false };
+        const prodottiFiltrati = (p.prodotti ?? []).filter((prod: ProdottoDTO) => prod.visibile !== false);
+        prodottiFiltrati.forEach((prod: ProdottoDTO) => this.prodottiMap.set(String(prod.id), prod));
+        return { ...p, prodotti: prodottiFiltrati, aperta: false };
       });
       this.portate = ordinaPortate(portateCaricate, ORDINE_PORTATE);
 

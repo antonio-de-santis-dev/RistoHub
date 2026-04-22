@@ -38,6 +38,9 @@ public class Prodotto implements Serializable {
     @Column(name = "prezzo", precision = 21, scale = 2, nullable = false)
     private BigDecimal prezzo;
 
+    @Column(name = "visibile", nullable = false)
+    private boolean visibile = true;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "rel_prodotto__allergeni",
@@ -105,6 +108,14 @@ public class Prodotto implements Serializable {
 
     public void setPrezzo(BigDecimal prezzo) {
         this.prezzo = prezzo;
+    }
+
+    public boolean isVisibile() {
+        return visibile;
+    }
+
+    public void setVisibile(boolean visibile) {
+        this.visibile = visibile;
     }
 
     public Set<Allergene> getAllergenis() {

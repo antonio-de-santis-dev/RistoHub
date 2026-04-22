@@ -24,6 +24,8 @@ public class ProdottoDTO implements Serializable {
     @NotNull
     private BigDecimal prezzo;
 
+    private boolean visibile = true;
+
     /**
      * Riferimento alla portata di appartenenza.
      * Necessario per il salvataggio (Prodotto.portata è @NotNull nel DB).
@@ -74,6 +76,14 @@ public class ProdottoDTO implements Serializable {
 
     public void setPortata(PortataDTO portata) {
         this.portata = portata;
+    }
+
+    public boolean isVisibile() {
+        return visibile;
+    }
+
+    public void setVisibile(boolean visibile) {
+        this.visibile = visibile;
     }
 
     public List<AllergeneDTO> getAllergenis() {

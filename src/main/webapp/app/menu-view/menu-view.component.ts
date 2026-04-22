@@ -366,6 +366,43 @@ export class MenuViewComponent implements OnInit, OnDestroy {
     this.editErrore = null;
   }
 
+  async toggleVisibilitaProdotto(prodotto: ProdottoDTO): Promise<void> {
+    const nuovoStato = prodotto.visibile !== false; // true → diventa false, false → diventa true
+    // No: se è true vogliamo nasconderlo (false), se è false vogliamo mostrarlo (true)
+    const statoFinale = prodotto.visibile === false ? true : false;
+
+    // Ottimistica: aggiorna subito la UI
+    const aggiornaPortate = (stato: boolean) => {
+      this.portate = this.portate.map(portata => ({
+        ...portata,
+        prodotti: (portata.prodotti ?? []).map((p: ProdottoDTO) => (p.id === prodotto.id ? { ...p, visibile: stato } : p)),
+      }));
+      // Risincronizza le reference alle portate attive
+      if (this.rusticoPortataAttiva) {
+        this.rusticoPortataAttiva = this.portate.find(p => p.id === this.rusticoPortataAttiva!.id) ?? null;
+      }
+      if (this.modernoPortataAttiva) {
+        this.modernoPortataAttiva = this.portate.find(p => p.id === this.modernoPortataAttiva!.id) ?? null;
+      }
+      this.cdr.markForCheck();
+    };
+
+    aggiornaPortate(statoFinale);
+
+    try {
+      await firstValueFrom(
+        this.http.patch(`/api/prodottos/${prodotto.id}`, {
+          id: prodotto.id,
+          visibile: statoFinale,
+        }),
+      );
+    } catch (err) {
+      console.error('Errore toggle visibilità:', err);
+      aggiornaPortate(!statoFinale); // rollback
+      this.cdr.markForCheck();
+    }
+  }
+
   chiudiModifica(): void {
     this.prodottoInModifica = null;
     this.editErrore = null;

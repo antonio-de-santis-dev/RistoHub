@@ -43,6 +43,7 @@ export interface ProdottoDTO {
   prezzo: number;
   allergenis?: AllergeneDTO[];
   portata?: { id: string };
+  visibile?: boolean;
 }
 
 /** Riferimento minimo usato nei body delle richieste HTTP */
