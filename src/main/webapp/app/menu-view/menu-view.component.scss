@@ -2982,56 +2982,110 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     font-size: 9.5px;
     padding: 8px 3px;
   }
-  /* ── Visibilità prodotto ─────────────────────────────────────── */
+}
+// ══════════════════════════════════════════════════
+//  VISIBILITÀ PRODOTTO — TUTTI I TEMPLATE
+// ══════════════════════════════════════════════════
 
-  .prodotto-nascosto {
-    opacity: 0.4;
-    transition: opacity 0.2s;
+// Prodotto nascosto: sbiadito in tutti i template
+.prodotto-nascosto {
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+
+// ── Pulsante visibilità CLASSICO ──────────────────
+// Stesso stile di .cl-btn-modifica: pill, colori dinamici via [style], hover con brightness
+.cl-btn-visibilita {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 26px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1;
+  transition:
+    filter 0.18s ease,
+    transform 0.15s ease,
+    box-shadow 0.18s ease;
+
+  svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
   }
 
-  /* Classico */
-  .cl-btn-visibilita {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s;
-
-    &.cl-btn-nascosto {
-      opacity: 0.55;
-    }
-    &:hover {
-      opacity: 0.8;
+  &:hover {
+    filter: brightness(1.12);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    svg {
+      transform: scale(1.15);
     }
   }
-
-  /* Moderno + Rustico */
-  .btn-visibility {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 3px;
-    display: inline-flex;
-    align-items: center;
-    color: var(--visibility-color, currentColor);
-    transition: opacity 0.2s;
-
-    &.btn-visibility--hidden {
-      opacity: 0.4;
-    }
-    &:hover {
-      opacity: 0.7;
-    }
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
   }
 
-  .btn-visibility-compact {
-    width: 26px;
-    height: 26px;
-    justify-content: center;
+  // Quando è in stato "nascosto": leggero trasparente per segnalare lo stato off
+  &.cl-btn-nascosto {
+    opacity: 0.65;
   }
+}
+
+// ── Pulsante visibilità MODERNO + RUSTICO ─────────
+// Stesso pattern di .btn-edit / .btn-delete: cerchio compatto, bordo colorato, hover fill
+.btn-visibility {
+  --visibility-color: currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border: 1.5px solid var(--visibility-color);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--visibility-color);
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.15s ease;
+  line-height: 1;
+
+  svg {
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    background: var(--visibility-color);
+    color: white;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+    transform: translateY(-1px);
+    svg {
+      transform: scale(1.1);
+    }
+  }
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  // Stato "nascosto": bordino semi-trasparente per indicare che è off
+  &.btn-visibility--hidden {
+    opacity: 0.5;
+  }
+}
+
+.btn-visibility-compact {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
 }

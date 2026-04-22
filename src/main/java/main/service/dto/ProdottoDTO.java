@@ -24,7 +24,15 @@ public class ProdottoDTO implements Serializable {
     @NotNull
     private BigDecimal prezzo;
 
-    private boolean visibile = true;
+    /**
+     * FIX Bug 3: cambiato da boolean primitivo a Boolean wrapper.
+     * Con il tipo primitivo, il default Java è false quando Jackson non trova il campo
+     * nel JSON (ad es. PATCH con solo {"id": "...", "visibile": false}).
+     * Con Boolean wrapper, Jackson lascia null i campi assenti → MapStruct con
+     * NullValuePropertyMappingStrategy.IGNORE li salta correttamente nel partialUpdate,
+     * preservando il valore già presente nel DB per tutti i campi non inviati.
+     */
+    private Boolean visibile = true;
 
     /**
      * Riferimento alla portata di appartenenza.
@@ -78,11 +86,11 @@ public class ProdottoDTO implements Serializable {
         this.portata = portata;
     }
 
-    public boolean isVisibile() {
+    public Boolean isVisibile() {
         return visibile;
     }
 
-    public void setVisibile(boolean visibile) {
+    public void setVisibile(Boolean visibile) {
         this.visibile = visibile;
     }
 

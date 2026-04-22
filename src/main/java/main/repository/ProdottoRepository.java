@@ -21,11 +21,14 @@ public interface ProdottoRepository extends ProdottoRepositoryWithBagRelationshi
     List<Prodotto> findByPortataId(UUID portataId);
 
     /**
-     * Restituisce tutti i prodotti appartenenti alle portate di un dato menu,
+     * Restituisce tutti i prodotti VISIBILI appartenenti alle portate di un dato menu,
      * con gli allergeni già inizializzati (evita N+1 sul join allergenis).
      * Usato da GET /api/menus/{id}/prodotti-completi.
+     *
+     * FIX: aggiunto filtro AND p.visibile = true per escludere i prodotti nascosti
+     * dal menu pubblico.
      */
-    @Query("SELECT DISTINCT p FROM Prodotto p " + "LEFT JOIN FETCH p.allergenis " + "WHERE p.portata.menu.id = :menuId")
+    @Query("SELECT DISTINCT p FROM Prodotto p LEFT JOIN FETCH p.allergenis WHERE p.portata.menu.id = :menuId AND p.visibile = true")
     List<Prodotto> findByPortataMenuIdWithAllergeni(@Param("menuId") UUID menuId);
 
     @Query("SELECT p.portata.menu.ristoratore.login FROM Prodotto p WHERE p.id = :id")

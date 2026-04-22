@@ -38,8 +38,15 @@ public class Prodotto implements Serializable {
     @Column(name = "prezzo", precision = 21, scale = 2, nullable = false)
     private BigDecimal prezzo;
 
+    /**
+     * FIX Bug 3: cambiato da boolean primitivo a Boolean wrapper.
+     * Con boolean primitivo il valore non può mai essere null, quindi
+     * NullValuePropertyMappingStrategy.IGNORE nel partialUpdate del mapper
+     * non funziona correttamente e sovrascrive sempre il valore esistente.
+     * Con Boolean wrapper, MapStruct può distinguere null (= non toccato) da false.
+     */
     @Column(name = "visibile", nullable = false)
-    private boolean visibile = true;
+    private Boolean visibile = true;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -110,11 +117,11 @@ public class Prodotto implements Serializable {
         this.prezzo = prezzo;
     }
 
-    public boolean isVisibile() {
+    public Boolean isVisibile() {
         return visibile;
     }
 
-    public void setVisibile(boolean visibile) {
+    public void setVisibile(Boolean visibile) {
         this.visibile = visibile;
     }
 
