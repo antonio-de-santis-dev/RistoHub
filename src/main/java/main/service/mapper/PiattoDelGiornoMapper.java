@@ -61,6 +61,7 @@ public interface PiattoDelGiornoMapper extends EntityMapper<PiattoDelGiornoDTO, 
     @Named("menuId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "nome", source = "nome")
     MenuDTO toDtoMenuId(Menu menu);
 
     /**

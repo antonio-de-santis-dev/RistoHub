@@ -162,6 +162,14 @@ export class PiattiGiornoGestioneComponent implements OnInit {
   }
 
   private arricchisciPiatto(piatto: PiattoDelGiornoDTO): PiattoDelGiornoDTO {
+    if (piatto.menu?.id && !piatto.menu.nome) {
+      const menuCompleto = this.menus.find(m => String(m.id) === String(piatto.menu!.id));
+      if (menuCompleto) {
+        piatto = { ...piatto, menu: { ...piatto.menu, nome: menuCompleto.nome } };
+      }
+    }
+
+    // codice esistente invariato ↓
     if (piatto.prodotto?.id) {
       const prodCompleto = this.prodottiMap.get(String(piatto.prodotto.id));
       if (prodCompleto) {
