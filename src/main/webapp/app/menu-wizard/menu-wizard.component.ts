@@ -184,22 +184,27 @@ export class MenuWizardComponent implements OnInit {
       await Promise.all([...p1, ...p2]);
 
       if (this.logoFile) {
-        const reader = new FileReader();
-        reader.readAsDataURL(this.logoFile);
-        reader.onload = async () => {
-          const base64 = (reader.result as string).split(',')[1];
-          await this.http.post('/api/immagine-menus', {
-            nome: 'logo',
-            immagine: base64,
-            immagineContentType: this.logoFile!.type,
-            tipo: 'LOGO',
-            menu: { id: menu.id },
+        try {
+          const base64 = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve((reader.result as string).split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(this.logoFile!);
           });
-          this.router.navigate(['/menu-view', menu.id]);
-        };
-      } else {
-        this.router.navigate(['/menu-view', menu.id]);
+          await firstValueFrom(
+            this.http.post('/api/immagine-menus', {
+              nome: 'logo',
+              immagine: base64,
+              immagineContentType: this.logoFile.type,
+              tipo: 'LOGO',
+              menu: { id: menu.id },
+            }),
+          );
+        } catch (logoErr) {
+          console.error('Errore caricamento logo:', logoErr);
+        }
       }
+      this.router.navigate(['/menu-view', menu.id]);
     } catch (err) {
       console.error('Errore:', err);
       this.isLoading = false;
