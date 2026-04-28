@@ -15,22 +15,19 @@ import org.springframework.web.bind.annotation.*;
  *
  * <pre>
  *   POST /api/public/traduci
- *     Body: { "testi": ["Testo 1", "Testo 2"], "lingua": "en" }
+ *     Body:     { "testi": ["Testo 1", "Testo 2"], "lingua": "en" }
  *     Response: { "traduzioni": { "Testo 1": "Text 1", "Testo 2": "Text 2" }, "ok": true }
  *
  *   GET /api/public/traduci/health
- *     Response: { "disponibile": true/false }
+ *     Response: { "disponibile": true/false, "provider": "LibreTranslate" }
  * </pre>
  *
- * <p>Perché qui e non chiamando MyMemory dal browser?
- * MyMemory applica la quota per IP del chiamante. Con il browser, il limite
- * si esauriva rapidamente con molti utenti. Facendo passare la chiamata
- * dal server Java, si usa l'IP del server (stabile e con quota più alta),
- * e si aggiunge un layer di caching futuro se necessario.
- *
  * <p>La sicurezza è gestita da SecurityConfiguration:
- * .requestMatchers(mvc.pattern("/api/public/**")).permitAll()
+ *   .requestMatchers(mvc.pattern("/api/public/**")).permitAll()
  * → nessun JWT richiesto, accessibile ai menu pubblici (QR code).
+ *
+ * <p>NOTA: questo controller condivide il mapping /api/public con MenuPublicResource.
+ * Spring li gestisce correttamente come controller separati sullo stesso prefisso.
  */
 @RestController
 @RequestMapping("/api/public")
@@ -68,13 +65,14 @@ public class TraduzioneProxyResource {
     /**
      * Traduce una lista di testi in una lingua target usando LibreTranslate.
      *
-     * <p>Il frontend invia una wave di stringhe (es. tutti i nomi dei prodotti
-     * del menu), il backend le passa in batch a LibreTranslate e restituisce
-     * la mappa { originale → tradotto }.
+     * <p>Il frontend invia la lista di stringhe del menu (nomi e descrizioni prodotti),
+     * il backend le passa in batch a LibreTranslate e restituisce la mappa
+     * { originale → tradotto }. Funziona per prodotti caricati manualmente
+     * e per quelli importati da PDF.
      *
      * <p>Le stringhe vuote o null vengono ignorate.
      * Le traduzioni fallite vengono omesse (il frontend mostra il testo originale
-     * come fallback, comportamento identico a prima con MyMemory).
+     * come fallback).
      */
     @PostMapping("/traduci")
     public ResponseEntity<TraduzioneResponse> traduci(@RequestBody TraduzioneRequest request) {
@@ -85,7 +83,7 @@ public class TraduzioneProxyResource {
             return ResponseEntity.badRequest().body(TraduzioneResponse.errore("Lingua non specificata"));
         }
 
-        // Filtra stringhe vuote o null
+        // Filtra stringhe vuote o null, rimuove duplicati
         List<String> testiValidi = request.testi().stream().filter(t -> t != null && !t.isBlank()).distinct().toList();
 
         if (testiValidi.isEmpty()) {
@@ -94,11 +92,14 @@ public class TraduzioneProxyResource {
 
         log.debug("Traduzione batch: {} stringhe → lingua={}", testiValidi.size(), request.lingua());
 
-        Map<String, String> traduzioni = traduzioneService.traduciBatch(testiValidi, request.lingua());
-
-        log.debug("Traduzione completata: {}/{} stringhe tradotte", traduzioni.size(), testiValidi.size());
-
-        return ResponseEntity.ok(TraduzioneResponse.ok(traduzioni));
+        try {
+            Map<String, String> traduzioni = traduzioneService.traduciBatch(testiValidi, request.lingua());
+            log.debug("Traduzione completata: {}/{} stringhe tradotte", traduzioni.size(), testiValidi.size());
+            return ResponseEntity.ok(TraduzioneResponse.ok(traduzioni));
+        } catch (Exception e) {
+            log.error("Errore durante traduzione batch (lingua={}): {}", request.lingua(), e.getMessage());
+            return ResponseEntity.ok(TraduzioneResponse.errore("Errore durante la traduzione: " + e.getMessage()));
+        }
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -108,6 +109,9 @@ public class TraduzioneProxyResource {
     /**
      * Verifica se LibreTranslate è raggiungibile.
      * Utile per debug e monitoring.
+     *
+     * Risposta attesa quando tutto funziona:
+     *   {"disponibile": true, "provider": "LibreTranslate"}
      */
     @GetMapping("/traduci/health")
     public ResponseEntity<Map<String, Object>> health() {
