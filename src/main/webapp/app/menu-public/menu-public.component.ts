@@ -273,6 +273,14 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
       });
       this.portate = ordinaPortate(portateCaricate, ORDINE_PORTATE);
 
+      // ── PRE-CARICA TRADUZIONI DAL DB ──────────────────────────────────────
+      // I prodotti nel menu già contengono il campo 'traduzioni' (Map lingua → {nome, descrizione})
+      // pre-calcolato dal backend al momento del salvataggio.
+      // Li carichiamo subito in cache → quando l'utente cambia lingua, la traduzione
+      // è ISTANTANEA (nessuna chiamata HTTP a LibreTranslate).
+      const tuttiIProdotti = this.portate.flatMap(p => p.prodotti ?? []);
+      this.traduzioneService.precaricaDaDB(tuttiIProdotti);
+
       // ── piatti del giorno e contatti ──────────────────────────────────────
       this.piattiDelGiorno = (dati.piattiDelGiorno ?? []).map((p: PiattoDelGiornoDTO) => this.arricchisciPiatto(p));
       this.listeContatti = dati.contatti ?? [];

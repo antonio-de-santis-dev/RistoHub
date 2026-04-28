@@ -297,6 +297,11 @@ export class MenuViewComponent implements OnInit, OnDestroy {
       });
       this.portate = ordinaPortate(portateConProdotti, ORDINE_PORTATE);
 
+      // ── PRE-CARICA TRADUZIONI DAL DB ──────────────────────────────────────
+      // Carica in cache le traduzioni già calcolate nel backend — traduzione istantanea.
+      const tuttiIProdotti = this.portate.flatMap(p => p.prodotti ?? []);
+      this.traduzioneService.precaricaDaDB(tuttiIProdotti);
+
       // ── 5. Piatti del giorno ─────────────────────────────────
       const piattiAttivi: PiattoDelGiornoDTO[] = dati.piattiDelGiorno ?? [];
       this.piattiDelGiorno = piattiAttivi.map(p => this.arricchisciPiatto(p));
