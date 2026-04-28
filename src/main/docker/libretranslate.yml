@@ -1,0 +1,53 @@
+# LibreTranslate — motore di traduzione open source, self-hosted.
+# Documentazione: https://github.com/LibreTranslate/LibreTranslate
+#
+# USO STANDALONE (sviluppo locale):
+#   docker compose -f libretranslate.yml up -d
+#
+# INTEGRAZIONE con services.yml (produzione):
+#   Aggiungere il servizio 'libretranslate' al file services.yml
+#   e impostare la variabile d'ambiente nell'app:
+#     LIBRETRANSLATE_URL=http://libretranslate:5000
+#
+# LINGUE PRECARICATE:
+#   --load-only it,en,fr,de,es,zh
+#   → Carica solo le lingue necessarie per ridurre memoria e tempo di avvio.
+#   → Il primo avvio scarica i modelli (~200MB per lingua): attendere qualche minuto.
+#
+# NOTA SICUREZZA:
+#   La porta 5000 è esposta solo su localhost (127.0.0.1) per evitare
+#   accessi esterni non autorizzati al motore di traduzione.
+name: ristohub-libretranslate
+services:
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: libretranslate
+    restart: unless-stopped
+    # FIX WINDOWS: il volume montato da Docker Desktop non eredita i permessi
+    # dell'utente 'libretranslate' del container → PermissionError su argos-translate.
+    # Avviare come root risolve il problema senza effetti collaterali in locale.
+    user: root
+    ports:
+      - '127.0.0.1:5000:5000'
+    environment:
+      # Lingue abilitate (aggiungere/rimuovere secondo necessità)
+      LT_LOAD_ONLY: 'it,en,fr,de,es,zh,ar,pt,ja'
+      # Disabilita il limite di richieste al secondo (self-hosted, traffico controllato)
+      LT_REQ_LIMIT: '0'
+      # Disabilita l'obbligo di API key (self-hosted senza autenticazione)
+      # Per abilitare l'API key: commentare la riga sotto e aggiungere
+      #   LT_API_KEYS: "true"  e  libretranslate.api-key in application.yml
+      LT_API_KEYS: 'false'
+    volumes:
+      # Persistenza dei modelli scaricati → non ri-scarica ad ogni restart
+      - libretranslate_models:/home/libretranslate/.local/share
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:5000/languages']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s # I modelli impiegano tempo al primo avvio
+
+volumes:
+  libretranslate_models:
+    driver: local
