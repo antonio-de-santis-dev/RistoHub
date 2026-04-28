@@ -5,11 +5,15 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * A Prodotto.
@@ -47,6 +51,29 @@ public class Prodotto implements Serializable {
      */
     @Column(name = "visibile", nullable = false)
     private Boolean visibile = true;
+
+    /**
+     * Traduzioni pre-calcolate del prodotto, salvate come JSONB nel DB.
+     *
+     * STRUTTURA:
+     *   { "en": { "nome": "...", "descrizione": "..." },
+     *     "fr": { "nome": "...", "descrizione": "..." },
+     *     "de": { "nome": "...", "descrizione": "..." },
+     *     "es": { "nome": "...", "descrizione": "..." } }
+     *
+     * QUANDO VIENE POPOLATO:
+     *   - Automaticamente, in modo asincrono (@Async), subito dopo il salvataggio
+     *     di ogni prodotto (save + saveAll in ProdottoService).
+     *   - Le traduzioni vengono generate da LibreTranslate via TraduzioneProxyService.
+     *
+     * QUANDO VIENE USATO:
+     *   - La risposta pubblica del menu (MenuCompletoDTO) include le traduzioni.
+     *   - Il frontend (traduzione.service.ts) le legge subito senza chiamare
+     *     il backend di traduzione → prima traduzione istantanea.
+     */
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "traduzioni", columnDefinition = "jsonb")
+    private Map<String, Map<String, String>> traduzioni = new HashMap<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -123,6 +150,14 @@ public class Prodotto implements Serializable {
 
     public void setVisibile(Boolean visibile) {
         this.visibile = visibile;
+    }
+
+    public Map<String, Map<String, String>> getTraduzioni() {
+        return traduzioni;
+    }
+
+    public void setTraduzioni(Map<String, Map<String, String>> traduzioni) {
+        this.traduzioni = traduzioni;
     }
 
     public Set<Allergene> getAllergenis() {

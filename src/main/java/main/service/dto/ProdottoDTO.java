@@ -4,7 +4,9 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -26,25 +28,30 @@ public class ProdottoDTO implements Serializable {
 
     /**
      * FIX Bug 3: cambiato da boolean primitivo a Boolean wrapper.
-     * Con il tipo primitivo, il default Java è false quando Jackson non trova il campo
-     * nel JSON (ad es. PATCH con solo {"id": "...", "visibile": false}).
-     * Con Boolean wrapper, Jackson lascia null i campi assenti → MapStruct con
-     * NullValuePropertyMappingStrategy.IGNORE li salta correttamente nel partialUpdate,
-     * preservando il valore già presente nel DB per tutti i campi non inviati.
      */
     private Boolean visibile = true;
 
     /**
      * Riferimento alla portata di appartenenza.
-     * Necessario per il salvataggio (Prodotto.portata è @NotNull nel DB).
-     * Il mapper usa solo l'id per stabilire la relazione ManyToOne.
      */
     private PortataDTO portata;
 
     /**
-     * Allergeni del prodotto — popolati nella risposta per visualizzare le icone.
+     * Allergeni del prodotto.
      */
     private List<AllergeneDTO> allergenis = new ArrayList<>();
+
+    /**
+     * Traduzioni pre-calcolate del prodotto.
+     *
+     * STRUTTURA:
+     *   { "en": { "nome": "...", "descrizione": "..." },
+     *     "fr": { "nome": "...", "descrizione": "..." }, ... }
+     *
+     * Usato dal frontend per evitare chiamate a LibreTranslate al primo caricamento.
+     * Null o mappa vuota = nessuna traduzione disponibile nel DB (verrà generata on-demand).
+     */
+    private Map<String, Map<String, String>> traduzioni = new HashMap<>();
 
     public UUID getId() {
         return id;
@@ -100,6 +107,14 @@ public class ProdottoDTO implements Serializable {
 
     public void setAllergenis(List<AllergeneDTO> allergenis) {
         this.allergenis = allergenis;
+    }
+
+    public Map<String, Map<String, String>> getTraduzioni() {
+        return traduzioni;
+    }
+
+    public void setTraduzioni(Map<String, Map<String, String>> traduzioni) {
+        this.traduzioni = traduzioni;
     }
 
     @Override

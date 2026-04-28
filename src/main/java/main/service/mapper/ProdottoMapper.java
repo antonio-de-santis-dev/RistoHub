@@ -21,14 +21,13 @@ import org.mapstruct.*;
 public interface ProdottoMapper extends EntityMapper<ProdottoDTO, Prodotto> {
     @Mapping(target = "allergenis", source = "allergenis", qualifiedByName = "allergeniSetToList")
     @Mapping(target = "portata", source = "portata", qualifiedByName = "portataId")
+    @Mapping(target = "traduzioni", source = "traduzioni")
     ProdottoDTO toDto(Prodotto s);
 
-    // ── allergenDtoListToSet aggiunto esplicitamente per garantire
-    //    che tutti gli allergeni con ID valido vengano salvati nella
-    //    tabella di join, senza dipendere dall'auto-mapping di MapStruct.
     @Mapping(target = "allergenis", source = "allergenis", qualifiedByName = "allergenDtoListToSet")
     @Mapping(target = "removeAllergeni", ignore = true)
     @Mapping(target = "portata", source = "portata", qualifiedByName = "portataFromDto")
+    @Mapping(target = "traduzioni", source = "traduzioni")
     Prodotto toEntity(ProdottoDTO prodottoDTO);
 
     /**
@@ -41,7 +40,6 @@ public interface ProdottoMapper extends EntityMapper<ProdottoDTO, Prodotto> {
 
     /**
      * toEntity: ricostruisce la Portata dall'id nel DTO.
-     * JPA ha bisogno solo dell'id per stabilire la relazione ManyToOne.
      */
     @Named("portataFromDto")
     default Portata portataFromDto(PortataDTO portataDTO) {
@@ -54,8 +52,7 @@ public interface ProdottoMapper extends EntityMapper<ProdottoDTO, Prodotto> {
     }
 
     /**
-     * Mappa un singolo Allergene con tutti i campi per visualizzare le icone:
-     * id, nome, icona (byte[] → base64), iconaContentType, colore.
+     * Mappa un singolo Allergene con tutti i campi per visualizzare le icone.
      */
     @Named("allergeneConDettagli")
     @BeanMapping(ignoreByDefault = true)
@@ -67,8 +64,7 @@ public interface ProdottoMapper extends EntityMapper<ProdottoDTO, Prodotto> {
     AllergeneDTO toDtoAllergeneConDettagli(Allergene allergene);
 
     /**
-     * toDto: converte Set<Allergene> → List<AllergeneDTO> con tutti i campi
-     * (id, nome, icona, iconaContentType, colore) necessari per la visualizzazione.
+     * toDto: converte Set<Allergene> → List<AllergeneDTO> con tutti i campi.
      */
     @Named("allergeniSetToList")
     default List<AllergeneDTO> allergeniSetToList(Set<Allergene> allergenis) {
@@ -84,12 +80,6 @@ public interface ProdottoMapper extends EntityMapper<ProdottoDTO, Prodotto> {
 
     /**
      * toEntity: converte List<AllergeneDTO> → Set<Allergene> per la persistenza.
-     *
-     * Vengono inclusi SOLO gli allergeni con ID non-null (già presenti nel DB).
-     * Gli allergeni "custom" senza ID devono essere creati tramite POST /api/allergenes
-     * dal frontend PRIMA di chiamare il save del prodotto.
-     *
-     * JPA gestisce la relazione ManyToMany tramite la tabella di join usando solo l'id.
      */
     @Named("allergenDtoListToSet")
     default Set<Allergene> allergenDtoListToSet(List<AllergeneDTO> allergeniDtos) {
@@ -111,6 +101,9 @@ public interface ProdottoMapper extends EntityMapper<ProdottoDTO, Prodotto> {
     @Mapping(target = "allergenis", source = "allergenis", qualifiedByName = "allergenDtoListToSet")
     @Mapping(target = "removeAllergeni", ignore = true)
     @Mapping(target = "portata", source = "portata", qualifiedByName = "portataFromDto")
+    // NON mappiamo traduzioni nel partialUpdate: non vogliamo che un PATCH
+    // (es. toggle visibile) sovrascriva le traduzioni già calcolate.
+    @Mapping(target = "traduzioni", ignore = true)
     void partialUpdate(@MappingTarget Prodotto entity, ProdottoDTO dto);
 
     default String map(UUID value) {
