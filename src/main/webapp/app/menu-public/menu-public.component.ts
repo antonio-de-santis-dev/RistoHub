@@ -247,8 +247,11 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
       // ── allergeni ─────────────────────────────────────────────────────────
       const allergeni = dati.allergeni ?? [];
       this.allergeniMap = new Map(allergeni.map((a: AllergeneDTO) => [String(a.id), a] as [string, AllergeneDTO]));
-      this.allergeniByNome = new Map(allergeni.map((a: AllergeneDTO) => [a.nome.toLowerCase().trim(), a] as [string, AllergeneDTO]));
-
+      this.allergeniByNome = new Map(
+        allergeni
+          .filter((a: AllergeneDTO) => !!a.nome)
+          .map((a: AllergeneDTO) => [(a.nome ?? '').toLowerCase().trim(), a] as [string, AllergeneDTO]),
+      );
       // ── immagini ──────────────────────────────────────────────────────────
       const immagini = (dati.immagini as unknown as ImmagineMenuMetaDTO[]) ?? [];
       const logo = immagini.find(i => i.tipo === 'LOGO');
@@ -309,29 +312,57 @@ export class MenuPublicComponent implements OnInit, OnDestroy {
     const svg = this.getSocialIconSvg(reteSociale);
     return svg ? this.sanitizer.bypassSecurityTrustHtml(svg) : '';
   }
+  getContattoLink(item: any): string {
+    const v = (item.valore ?? '').trim();
 
-  getContattoLink(item: ContattoItemDTO): string | null {
-    if (item.tipo === 'TELEFONO') return `tel:${item.valore}`;
-    if (item.tipo === 'EMAIL') return `mailto:${item.valore}`;
-    if (item.tipo === 'SOCIAL') {
-      const v = item.valore.trim();
+    if (!v) {
+      return '';
+    }
+
+    if (item.tipo === 'EMAIL') {
+      return `mailto:${v}`;
+    }
+
+    if (item.tipo === 'TELEFONO') {
+      return `tel:${v}`;
+    }
+
+    if (item.tipo === 'WHATSAPP') {
+      const numero = v.replace(/\D/g, '');
+      return `https://wa.me/${numero}`;
+    }
+
+    if (item.tipo === 'INDIRIZZO') {
+      return `https://maps.google.com/?q=${encodeURIComponent(item.valore ?? '')}`;
+    }
+
+    if (
+      item.tipo === 'FACEBOOK' ||
+      item.tipo === 'INSTAGRAM' ||
+      item.tipo === 'TIKTOK' ||
+      item.tipo === 'YOUTUBE' ||
+      item.tipo === 'SITO'
+    ) {
       return v.startsWith('http') ? v : `https://${v}`;
     }
-    if (item.tipo === 'INDIRIZZO') {
-      return `https://maps.google.com/?q=${encodeURIComponent(item.valore)}`;
-    }
-    return null;
+
+    return item.valore ?? '';
   }
 
   getContattoLabel(item: ContattoItemDTO): string {
     if (item.tipo === 'SOCIAL') {
-      if (item.etichetta?.trim()) return item.etichetta.trim();
+      if (item.etichetta?.trim()) {
+        return item.etichetta.trim();
+      }
+
       if (item.reteSociale && item.reteSociale !== 'ALTRO') {
         return item.reteSociale.charAt(0) + item.reteSociale.slice(1).toLowerCase().replace('_', ' ');
       }
-      return item.valore;
+
+      return item.valore ?? '';
     }
-    return item.valore;
+
+    return item.valore ?? '';
   }
 
   // ── Template helpers ─────────────────────────────────────────────

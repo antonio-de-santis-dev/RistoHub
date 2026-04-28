@@ -1,4 +1,22 @@
-// ── Allergene ─────────────────────────────────────────────────────────────────
+// ======================================================
+// RISTO MODEL - VERSIONE COMPLETA CORRETTA
+// ======================================================
+
+// ------------------------------------------------------
+// ACCOUNT
+// ------------------------------------------------------
+
+export interface AccountDTO {
+  id?: string;
+  login?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+}
+
+// ------------------------------------------------------
+// ALLERGENI
+// ------------------------------------------------------
 
 export interface AllergeneDTO {
   id: string;
@@ -8,112 +26,181 @@ export interface AllergeneDTO {
   colore?: string;
 }
 
-// ── Prodotto ──────────────────────────────────────────────────────────────────
+export interface AllergeneUI extends AllergeneDTO {
+  selected?: boolean;
+}
 
-/**
- * Mappa delle traduzioni pre-calcolate di un prodotto.
- *
- * Struttura:
- *   { "en": { "nome": "Grilled octopus", "descrizione": "With potatoes" },
- *     "fr": { "nome": "Poulpe grillé",   "descrizione": "Avec pommes de terre" },
- *     ... }
- *
- * Null o oggetto vuoto = nessuna traduzione disponibile nel DB.
- * In quel caso il frontend chiamerà LibreTranslate on-demand.
- */
-export type TraduzioniProdotto = Record<string, { nome?: string; descrizione?: string }>;
+// ------------------------------------------------------
+// PRODOTTI
+// ------------------------------------------------------
+
+export type TraduzioniProdotto = Record<
+  string,
+  {
+    nome?: string;
+    descrizione?: string;
+  }
+>;
 
 export interface ProdottoDTO {
   id: string;
   nome: string;
   descrizione?: string;
   prezzo: number;
+
   allergenis?: AllergeneDTO[];
-  portata?: { id: string };
+
+  portata?: {
+    id: string;
+  };
+
   visibile?: boolean;
-  /** Traduzioni pre-calcolate dal backend — usate dal TraduzioneService per evitare chiamate a LibreTranslate. */
+
   traduzioni?: TraduzioniProdotto;
 }
 
-/** Riferimento minimo usato nei body delle richieste HTTP */
 export interface ProdottoRef {
   id: string;
 }
 
-// ── Portata ───────────────────────────────────────────────────────────────────
+// ------------------------------------------------------
+// PORTATE
+// ------------------------------------------------------
 
 export type TipoPortata = 'DEFAULT' | 'PERSONALIZZATA';
 
 export interface PortataDTO {
   id: string;
   tipo: TipoPortata;
+
   nomeDefault?: string;
   nomePersonalizzato?: string;
+
+  menu?: MenuDTO;
 }
 
-export interface PortataConProdottiDTO {
-  id: string;
-  tipo: TipoPortata;
-  nomeDefault?: string;
-  nomePersonalizzato?: string;
+export interface PortataConProdottiDTO extends PortataDTO {
   prodotti: ProdottoDTO[];
+
+  aperta?: boolean;
 }
 
-// ── Menu ──────────────────────────────────────────────────────────────────────
+// ------------------------------------------------------
+// MENU
+// ------------------------------------------------------
 
 export interface MenuDTO {
   id: string;
+
   nome?: string;
   descrizione?: string;
+
   attivo?: boolean;
   qrCodeUrl?: string;
+
+  ristoratore?: AccountDTO;
+
+  templateStyle?: string;
+
+  colorePrimario?: string;
+  coloreSecondario?: string;
+
+  fontMenu?: string;
 }
 
-// ── Immagine ──────────────────────────────────────────────────────────────────
+// ------------------------------------------------------
+// IMMAGINI MENU
+// ------------------------------------------------------
 
 export interface ImmagineMenuMetaDTO {
   id: string;
   contentUrl: string;
+
   ordine?: number;
   tipo?: string;
+
+  visibile?: boolean;
 }
 
-// ── Piatto del giorno ─────────────────────────────────────────────────────────
+export interface ImmagineMenuDTO extends ImmagineMenuMetaDTO {
+  contentType?: string;
+  data?: any;
+}
+
+// ------------------------------------------------------
+// PIATTO DEL GIORNO
+// ------------------------------------------------------
 
 export interface PiattoDelGiornoDTO {
   id: string;
+
   attivo?: boolean;
+
+  nome?: string;
+  descrizione?: string;
+  prezzo?: number;
+
   nomePersonalizzato?: string;
   descrizionePersonalizzata?: string;
   prezzoPersonalizzato?: number;
+
   prodotto?: ProdottoDTO;
+
   allergenis?: AllergeneDTO[];
+
+  menu?: {
+    id?: string;
+    nome?: string;
+  };
 }
 
-// ── Lista contatti ────────────────────────────────────────────────────────────
+export interface PiattoDelGiornoBody extends Partial<PiattoDelGiornoDTO> {}
+
+// ------------------------------------------------------
+// CONTATTI
+// ------------------------------------------------------
 
 export interface ContattoDTO {
   id: string;
+
   tipo?: string;
   valore?: string;
+
   reteSociale?: string;
+
   etichetta?: string;
+
   ordine?: number;
 }
 
+export interface ContattoItemDTO extends ContattoDTO {}
+
 export interface ListaContattiDTO {
   id: string;
+
   nome?: string;
+
   contatti?: ContattoDTO[];
+
+  items?: ContattoDTO[];
+
+  menuIds?: string[];
 }
 
-// ── Menu completo (risposta pubblica aggregata) ────────────────────────────────
+// ------------------------------------------------------
+// MENU COMPLETO PUBBLICO
+// ------------------------------------------------------
 
 export interface MenuCompletoDTO {
   menu: MenuDTO;
+
   portate: PortataConProdottiDTO[];
+
   piattiDelGiorno: PiattoDelGiornoDTO[];
+
   immagini: ImmagineMenuMetaDTO[];
+
   allergeni: AllergeneDTO[];
+
   contatti: ListaContattiDTO[];
 }

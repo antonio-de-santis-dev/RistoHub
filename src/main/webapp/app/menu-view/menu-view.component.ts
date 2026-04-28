@@ -268,8 +268,11 @@ export class MenuViewComponent implements OnInit, OnDestroy {
       const tuttiAllergeni: AllergeneDTO[] = dati.allergeni ?? [];
       this.allergeniDisponibili = tuttiAllergeni;
       this.allergeniMap = new Map(tuttiAllergeni.map((a: AllergeneDTO) => [String(a.id), a]));
-      this.allergeniByNome = new Map(tuttiAllergeni.map((a: AllergeneDTO) => [a.nome.toLowerCase().trim(), a]));
-
+      this.allergeniByNome = new Map(
+        tuttiAllergeni
+          .filter((a: AllergeneDTO) => !!a.nome)
+          .map((a: AllergeneDTO) => [(a.nome ?? '').toLowerCase().trim(), a] as [string, AllergeneDTO]),
+      );
       // ── 3. Immagini (logo + carosello copertine) ─────────────
       // Il backend restituisce ImmagineMenuMetaDTO con contentUrl (senza byte[])
       const immagini: ImmagineMenuMetaDTO[] = (dati.immagini as unknown as ImmagineMenuMetaDTO[]) ?? [];
@@ -334,32 +337,57 @@ export class MenuViewComponent implements OnInit, OnDestroy {
     return svg ? this.sanitizer.bypassSecurityTrustHtml(svg) : '';
   }
 
-  getContattoLink(item: ContattoItemDTO): string | null {
-    if (item.tipo === 'TELEFONO') return `tel:${item.valore}`;
-    if (item.tipo === 'EMAIL') return `mailto:${item.valore}`;
-    if (item.tipo === 'SOCIAL') {
-      const v = item.valore.trim();
+  getContattoLink(item: any): string {
+    const v = (item.valore ?? '').trim();
+
+    if (!v) {
+      return '';
+    }
+
+    if (item.tipo === 'EMAIL') {
+      return `mailto:${v}`;
+    }
+
+    if (item.tipo === 'TELEFONO') {
+      return `tel:${v}`;
+    }
+
+    if (item.tipo === 'WHATSAPP') {
+      const numero = v.replace(/\D/g, '');
+      return `https://wa.me/${numero}`;
+    }
+
+    if (item.tipo === 'INDIRIZZO') {
+      return `https://maps.google.com/?q=${encodeURIComponent(item.valore ?? '')}`;
+    }
+
+    if (
+      item.tipo === 'FACEBOOK' ||
+      item.tipo === 'INSTAGRAM' ||
+      item.tipo === 'TIKTOK' ||
+      item.tipo === 'YOUTUBE' ||
+      item.tipo === 'SITO'
+    ) {
       return v.startsWith('http') ? v : `https://${v}`;
     }
-    if (item.tipo === 'INDIRIZZO') {
-      return `https://maps.google.com/?q=${encodeURIComponent(item.valore)}`;
-    }
-    return null;
+
+    return item.valore ?? '';
   }
 
   getContattoLabel(item: ContattoItemDTO): string {
     if (item.tipo === 'SOCIAL') {
-      // Se l'utente ha inserito un nome personalizzato, ha la priorità
-      if (item.etichetta?.trim()) return item.etichetta.trim();
-      // Altrimenti mostra il nome della rete sociale formattato
-      if (item.reteSociale && item.reteSociale !== 'ALTRO') {
-        const nome = item.reteSociale;
-        return nome.charAt(0) + nome.slice(1).toLowerCase().replace('_', ' ');
+      if (item.etichetta?.trim()) {
+        return item.etichetta.trim();
       }
-      // ALTRO senza etichetta: fallback al valore (URL)
-      return item.valore;
+
+      if (item.reteSociale && item.reteSociale !== 'ALTRO') {
+        return item.reteSociale.charAt(0) + item.reteSociale.slice(1).toLowerCase().replace('_', ' ');
+      }
+
+      return item.valore ?? '';
     }
-    return item.valore;
+
+    return item.valore ?? '';
   }
 
   // ══════════════════════════════════════════════════

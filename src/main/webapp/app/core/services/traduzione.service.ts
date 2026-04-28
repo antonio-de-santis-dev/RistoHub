@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { ProdottoDTO, TraduzioniProdotto } from '../../../shared/model/risto.model';
-
+import { ProdottoDTO, TraduzioniProdotto } from '../../shared/model/risto.model';
 /**
  * Servizio di traduzione — v4 (DB-first, LibreTranslate come fallback).
  *
