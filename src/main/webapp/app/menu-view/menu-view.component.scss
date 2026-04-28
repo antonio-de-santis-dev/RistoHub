@@ -52,33 +52,38 @@ $shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 //  TRADUZIONE OVERLAY & TOAST
 // ══════════════════════════════════════════════════
 
+/* OTTIMIZZAZIONE: overlay traduzione piu visibile (spinner grande + bordo) */
 .traduzione-overlay {
   position: fixed;
-  bottom: 24px;
+  bottom: 28px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(20, 20, 20, 0.88);
+  background: rgba(10, 10, 10, 0.93);
   color: white;
-  padding: 10px 20px;
+  padding: 14px 28px;
   border-radius: 40px;
-  font-size: 0.82rem;
-  font-weight: 500;
+  font-size: 0.92rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   z-index: 10000;
-  backdrop-filter: blur(8px);
-  animation: slideUpFade 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(14px);
+  animation: slideUpFade 0.25s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  min-width: 230px;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  letter-spacing: 0.01em;
 }
 
 .traduzione-spinner {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #60d9fa;
   border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+  animation: spin 0.65s linear infinite;
   flex-shrink: 0;
 }
 

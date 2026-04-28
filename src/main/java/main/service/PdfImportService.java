@@ -94,6 +94,16 @@ public class PdfImportService {
     /**
      * Analizza il PDF e salva i prodotti trovati nelle portate del menu specificato.
      *
+     * OTTIMIZZAZIONE PERFORMANCE (FIX batch insert):
+     *   Prima: prodottoService.save(dto) chiamato 1 volta per ogni prodotto in un loop.
+     *   Con 177 prodotti → 177 INSERT separati + 177 @CacheEvict(allEntries=true).
+     *   Risultato: ~5 minuti 40 secondi.
+     *
+     *   Dopo: tutti i DTO vengono raccolti in una lista e salvati con
+     *   prodottoService.saveAll(lista) in UN SOLO batch insert + UN SOLO @CacheEvict.
+     *   Hibernate raggruppa gli INSERT in blocchi da 50 (hibernate.jdbc.batch_size).
+     *   Risultato atteso: ~15-30 secondi.
+     *
      * Strategia di matching portata:
      *   Il nome estratto dal PDF viene confrontato (case-insensitive, trim) con
      *   getNomeDefault() oppure getNomePersonalizzato() di ogni portata del menu.
@@ -134,6 +144,12 @@ public class PdfImportService {
         List<String> avvisi = new ArrayList<>(parsed.getAvvisi());
         int inseriti = 0;
 
+        // ── BATCH COLLECT: raccoglie TUTTI i DTO prima di salvare ─────────────
+        // Invece di chiamare prodottoService.save(dto) una volta per prodotto
+        // (177 INSERT + 177 CacheEvict), raccogliamo tutto in lista e facciamo
+        // un unico prodottoService.saveAll(lista) alla fine.
+        List<ProdottoDTO> tuttiDaPersistere = new ArrayList<>();
+
         for (PortataImportDTO portataImport : parsed.getPortate()) {
             // Match portata per nome
             Optional<main.domain.Portata> portataMatch = portateMenu
@@ -162,12 +178,24 @@ public class PdfImportService {
                     portataRef.setId(portataId);
                     dto.setPortata(portataRef);
 
-                    prodottoService.save(dto);
-                    inseriti++;
+                    // Accumula invece di salvare subito
+                    tuttiDaPersistere.add(dto);
                 } catch (Exception e) {
-                    LOG.warn("Errore durante il salvataggio del prodotto '{}': {}", pi.getNome(), e.getMessage());
+                    LOG.warn("Errore durante la preparazione del prodotto '{}': {}", pi.getNome(), e.getMessage());
                     avvisi.add("Prodotto ignorato per errore: \"" + pi.getNome() + "\" — " + e.getMessage());
                 }
+            }
+        }
+
+        // ── BATCH SAVE: un solo INSERT batch + un solo CacheEvict ─────────────
+        if (!tuttiDaPersistere.isEmpty()) {
+            try {
+                prodottoService.saveAll(tuttiDaPersistere);
+                inseriti = tuttiDaPersistere.size();
+                LOG.info("Import PDF completato: {} prodotti salvati in batch per menu {}", inseriti, menuId);
+            } catch (Exception e) {
+                LOG.error("Errore durante il batch insert dei prodotti per menu {}: {}", menuId, e.getMessage());
+                avvisi.add("Errore durante il salvataggio batch: " + e.getMessage());
             }
         }
 

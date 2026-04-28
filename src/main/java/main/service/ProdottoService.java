@@ -52,6 +52,28 @@ public class ProdottoService {
     }
 
     /**
+     * Salva una lista di prodotti in un unico batch — usato esclusivamente dall'import PDF.
+     *
+     * OTTIMIZZAZIONE PERFORMANCE:
+     *   - Un solo @CacheEvict al posto di N evict consecutivi (uno per prodotto):
+     *     con 177 prodotti questo da solo elimina 176 invalidazioni di cache inutili.
+     *   - prodottoRepository.saveAll() sfrutta il batch insert di Hibernate
+     *     (configurato con hibernate.jdbc.batch_size=50 in application.yml):
+     *     N INSERT vengono raggruppati in un unico round-trip verso il DB.
+     *
+     * Risultato atteso: import da ~5 min 40 sec → ~15-30 secondi.
+     *
+     * @param prodottoDTOs lista di prodotti da salvare
+     * @return lista dei prodotti salvati con ID assegnato
+     */
+    @Caching(evict = { @CacheEvict(value = "menuCompleto", allEntries = true), @CacheEvict(value = "piattiGiorno", allEntries = true) })
+    public List<ProdottoDTO> saveAll(List<ProdottoDTO> prodottoDTOs) {
+        LOG.debug("Request to batch-save {} Prodotti", prodottoDTOs.size());
+        List<Prodotto> entities = prodottoDTOs.stream().map(prodottoMapper::toEntity).toList();
+        return prodottoRepository.saveAll(entities).stream().map(prodottoMapper::toDto).toList();
+    }
+
+    /**
      * Update a prodotto.
      *
      * FIX Bug 2: @Caching evict invalida la cache menuCompleto e piattiGiorno

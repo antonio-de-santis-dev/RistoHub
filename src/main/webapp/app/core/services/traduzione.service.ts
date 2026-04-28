@@ -21,10 +21,20 @@ export class TraduzioneService {
   //     Se la lasci invariata il servizio funziona comunque ma con rate limit basso.
   private readonly MYMEMORY_EMAIL = 'boardroom.progetto@gmail.com';
 
-  // Parametri di throttling — conservativi per stare sotto il rate limit
-  // anche a batch multipli consecutivi:
-  private readonly BATCH = 3; // richieste parallele per wave
-  private readonly DELAY_MS = 400; // pausa tra le wave
+  // ── Parametri di throttling ────────────────────────────────────────────────
+  //
+  // OTTIMIZZAZIONE PERFORMANCE (rispetto alla versione precedente):
+  //   BATCH:    3 → 8   (+167% richieste parallele per wave)
+  //   DELAY_MS: 400 → 200ms (-50% attesa tra le wave)
+  //
+  // Effetto su 177 prodotti × 2 stringhe = ~354 stringhe:
+  //   Prima:  354/3 = 118 wave × 400ms = ~47 secondi di delay puro
+  //   Dopo:   354/8 = 45 wave  × 200ms = ~9 secondi di delay puro
+  //
+  // Il parametro onProgress nel metodo traduci() permette al componente
+  // di aggiornare la UI dopo ogni wave (rendering progressivo prodotto per prodotto).
+  private readonly BATCH = 8; // richieste parallele per wave (era 3)
+  private readonly DELAY_MS = 200; // pausa tra le wave in ms (era 400)
   private readonly MAX_RETRIES = 3; // tentativi su 429 per singola richiesta
   private readonly RETRY_BASE_MS = 1000; // backoff esponenziale: 1s, 3s, 9s
 
@@ -140,12 +150,28 @@ export class TraduzioneService {
    * componenti possano fare lookup diretto con prod.nome/prod.descrizione
    * senza doversi preoccupare della normalizzazione.
    *
+   * PARAMETRO onProgress (NUOVO):
+   *   Callback opzionale chiamato dopo ogni wave completata.
+   *   Permette al componente di chiamare cdr.markForCheck() e aggiornare
+   *   la UI in modo PROGRESSIVO mentre la traduzione è ancora in corso,
+   *   invece di aspettare che tutte le stringhe siano tradotte.
+   *   Effetto visivo: i prodotti appaiono tradotti uno a uno man mano
+   *   che i batch vengono completati (come un aggiornamento progressivo).
+   *
    * Se durante l'esecuzione riceviamo 429 anche dopo i retry, interrompiamo
    * il loop: inutile sparare altre richieste destinate a fallire. Le
    * traduzioni già ottenute restano in cache e verranno riutilizzate al
    * prossimo cambio lingua.
+   *
+   * @param testi    array di stringhe da tradurre
+   * @param lingua   codice lingua target (es. 'en', 'fr', 'de', 'es')
+   * @param onProgress  callback opzionale chiamato dopo ogni wave → usare per cdr.markForCheck()
    */
-  async traduci(testi: string[], lingua: string): Promise<{ cache: Map<string, string>; errori: number; rateLimited: boolean }> {
+  async traduci(
+    testi: string[],
+    lingua: string,
+    onProgress?: () => void,
+  ): Promise<{ cache: Map<string, string>; errori: number; rateLimited: boolean }> {
     // Prendi la cache esistente o creane una nuova
     let cacheLingua = this.cache.get(lingua);
     if (!cacheLingua) {
@@ -193,6 +219,17 @@ export class TraduzioneService {
           // esito.nop → traduzione identica, non salviamo niente né contiamo errore
         }),
       );
+
+      // ── RENDERING PROGRESSIVO ─────────────────────────────────────────────
+      // Dopo ogni wave completata, notifichiamo il componente così può
+      // aggiornare la UI con le traduzioni già disponibili in cache,
+      // senza aspettare che tutte le stringhe siano tradotte.
+      // Il componente chiama cdr.markForCheck() → Angular ri-renderizza
+      // solo i prodotti già tradotti, lasciando gli altri con il testo originale.
+      if (onProgress) {
+        onProgress();
+      }
+
       if (i + this.BATCH < mancanti.length && !rateLimited) {
         await this.attesa(this.DELAY_MS);
       }

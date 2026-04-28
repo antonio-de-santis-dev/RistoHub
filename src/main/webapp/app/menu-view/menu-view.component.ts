@@ -131,7 +131,11 @@ export class MenuViewComponent implements OnInit, OnDestroy {
     this.erroreTraduzioneVisible = false;
     this.cdr.markForCheck();
 
-    const result = await this.traduzioneService.traduci(Array.from(stringhe), codice);
+    const result = await this.traduzioneService.traduci(
+      Array.from(stringhe),
+      codice,
+      () => this.cdr.markForCheck(), // OTTIMIZZAZIONE: re-renderizza dopo ogni wave → prodotti tradotti in modo progressivo
+    );
     this.isTraducendo = false;
     this.cdr.markForCheck();
 
